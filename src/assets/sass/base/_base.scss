@@ -10,6 +10,7 @@
   overflow-x: hidden;
   background: $background;
   min-height:100vh;
+  color:$text;
 }
 
 img.avatar {
@@ -22,6 +23,7 @@ img.avatar {
   background-position:center center;
   border-radius:50%;
   background-size:cover;
+  transition:0.2s all;
 }
 
 .errorMessage {

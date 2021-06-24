@@ -1,5 +1,8 @@
 .croppa-container {
 	position:relative;
+	::placeholder {
+	  color:green;
+	}
 }
 .croppa-container canvas {
 	border-radius:50%;

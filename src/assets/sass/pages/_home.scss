@@ -1,0 +1,14 @@
+.home {
+	&__container {
+		@include container;
+		min-height:calc(100vh - 4rem);
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		flex-direction:column;
+		svg {
+			width:30vw;
+			min-width:28rem;
+		}
+	}
+}

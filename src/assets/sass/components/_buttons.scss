@@ -1,0 +1,26 @@
+.btn {
+	@include button;
+	&__flat {
+		&:hover {
+			box-shadow:none;
+		}
+	}
+	&__primary {
+		background:$primary;
+		border-color:$primary;
+		color:white;
+		&:hover {
+			background:$primaryDark;
+			border-color:$primaryDark;
+		}
+	}
+	&__small {
+		padding: .6rem 1.2rem 0.6rem 1.2rem;
+  	font-size:1rem;
+	}
+	&__outlined {
+		border:1px solid $textLight;
+		background:transparent;
+		color:$text !important;
+	}
+}

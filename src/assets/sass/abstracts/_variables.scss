@@ -1,7 +1,15 @@
 /*VARIABLES*/
 
 $primary: #0075C9;
-
-
+$primaryDark: darken($primary, 25%);
 
 $background: #efefef;
+
+$dark: #212121;
+
+$text: #6d6d6d;
+$textLight: lighten($text, 35%);
+
+$lightText:#d0d0d0;
+
+$radius: 0.5rem;

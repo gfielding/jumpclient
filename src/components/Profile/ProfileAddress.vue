@@ -3,10 +3,10 @@
     <h2 class="mb-3">Address</h2>
     <form ref="form" @submit.prevent v-model="valid">
       <div v-if="userProfile.address && Object.keys(userProfile.address).length >= 1">
-      <div class="bold">Current Address:</div>
-        <div>{{userProfile.address.street_number}} {{userProfile.address.street}} <span v-if="userProfile.address.unit">#{{userProfile.address.unit}}</span><br />{{userProfile.address.city}}, {{userProfile.address.state}} {{userProfile.address.zip}}</div>
+      <div class="caption bold">Current Address:</div>
+        <div class="caption">{{userProfile.address.street_number}} {{userProfile.address.street}} <span v-if="userProfile.address.unit">#{{userProfile.address.unit}}</span><br />{{userProfile.address.city}}, {{userProfile.address.state}} {{userProfile.address.zip}}</div>
         <hr>
-        <div class="bold mb-2 mt-3">Change your address below:</div>
+        <div class="mb-2 mt-3">Change your address below:</div>
 
       </div>
       <div v-if="!userProfile.address || Object.keys(userProfile.address).length === 0">

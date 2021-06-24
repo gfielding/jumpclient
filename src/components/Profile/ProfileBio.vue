@@ -3,18 +3,15 @@
 		<h2 class="mb-3">Tell Us About Yourself</h2>
 		<div class="mb-3">
       <label for="bio">Bio:</label>
-      <textarea name="bio" id="bio" cols="30" rows="10" v-model.trim="userProfile.bio" @change="updateProfile()"></textarea>
+      <textarea name="bio" id="bio" cols="30" rows="10" v-model.trim="userProfile.bio" @change="updateProfile()" placeholder="Education, experience, job history, interests, etc..."></textarea>
     </div>
     <div class="mb-3">
-      <p>Upload your resumé.</p>
-      <input type="file" accept="image/*" @change="previewImage">
-      <p>Progress: {{uploadValue.toFixed()+"%"}}
-        <progress :value="uploadValue" max="100"></progress>
-      </p>
+      <h3>Upload your resumé</h3>
+      <a :href="userProfile.picture" v-if="userProfile.picture" target="_blank">View Your Resumé <i class="fas fa-external-link ml-1"></i></a>
+      <input type="file" accept="image/*,.pdf" @change="previewImage" class="upload">
+      <progress :value="uploadValue" max="100" v-if="showBar"></progress>
       <div>
-        <img :src="picture" alt="" class="preview">
-        <br>
-        <button @click="onUpload">Upload</button>
+        <button v-if="imageData != null" class="btn btn__primary" @click="onUpload">Upload</button>
       </div>
     </div>
 	</div>
@@ -27,8 +24,9 @@ export default {
   props: ['userProfile'],
   data: () => ({ 
     imageData: null,
+    uploadValue: 0,
+    showBar:false,
     picture: null,
-    uploadValue: 0
   }),
   methods: {
     updateProfile(){
@@ -41,7 +39,9 @@ export default {
       this.imageData=event.target.files[0]
     },
     onUpload() {
-      this.picture=null;
+      this.showBar = true
+      let userProfile = this.userProfile
+      userProfile.picture=null
       let rand = (Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16)).toUpperCase()
       let storageRef = fb.storageRef.child('docs/' + rand).put(this.imageData);
       storageRef.on(`state_changed`, snapshot => {
@@ -49,9 +49,12 @@ export default {
       }, error => {console.log(error.message)},
       () => {this.uploadValue=100;
         storageRef.snapshot.ref.getDownloadURL().then((url) => {
-          this.picture=url
+          userProfile.picture=url
+          this.$store.dispatch('updateUser', userProfile)
         })
+        this.showBar = false
       })
+      this.imageData = null
     }
   }
 }
