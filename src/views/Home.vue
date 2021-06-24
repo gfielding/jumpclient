@@ -1,9 +1,9 @@
 <template>
 	<div class="home">
 		<div class="home__container">
-			<SVG_TriangleTextLogo />
+			<img src="https://firebasestorage.googleapis.com/v0/b/mvpes-25aef.appspot.com/o/MVPTriangleText.svg?alt=media&token=518da9ea-28e1-4f7c-9d89-fc13c303c62b" alt="">
 			<router-link :to="{name: 'login'}">
-				<button class="btn mt-4 btn__outlined">Login</button>
+				<button class="btn mt-4 btn__outlined">Sign Up / Login</button>
 			</router-link>
 		</div>
 	</div>

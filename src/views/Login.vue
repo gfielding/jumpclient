@@ -1,12 +1,8 @@
 <template>
-  <div id="login">
+  <div class="home">
+    <div class="home__containerLogin text-center">
     <PasswordReset v-if="showPasswordReset" @close="togglePasswordReset()"></PasswordReset>
-    <section>
-      <div class="col1">
-        <h1>Vuegram</h1>
-        <p>Welcome to the <a href="https://savvyapps.com/" target="_blank">Savvy Apps</a> sample social media web app powered by Vue.js and Firebase.
-          Build this project by checking out The Definitive Guide to Getting Started with Vue.js</p>
-      </div>
+        <img src="https://firebasestorage.googleapis.com/v0/b/mvpes-25aef.appspot.com/o/MVPTriangleText.svg?alt=media&token=518da9ea-28e1-4f7c-9d89-fc13c303c62b" alt="" class="login-logo">
       <div :class="{ 'signup-form': !showLoginForm }" class="col2">
         <form v-if="showLoginForm" @submit.prevent>
           <h1>Welcome Back</h1>
@@ -25,10 +21,14 @@
           </div>
         </form>
         <form v-else @submit.prevent>
-          <h1>Get Started</h1>
+          <h1>Get Started</h1>\
           <div>
-            <label for="name">Name</label>
-            <input v-model.trim="signupForm.name" type="text" placeholder="Savvy Apps" id="name" />
+            <label for="firstname">First Name</label>
+            <input v-model.trim="signupForm.firstname" type="text" placeholder="Savvy Apps" id="firstname" />
+          </div>
+          <div>
+            <label for="lastname">Last Name</label>
+            <input v-model.trim="signupForm.lastname" type="text" placeholder="Savvy Apps" id="lastname" />
           </div>
           <div>
             <label for="title">Title</label>
@@ -48,7 +48,7 @@
           </div>
         </form>
       </div>
-    </section>
+    </div>
   </div>
 </template>
 
@@ -67,7 +67,8 @@ export default {
         password: ''
       },
       signupForm: {
-        name: '',
+        firstname: '',
+        lastname: '',
         title: '',
         email: '',
         password: ''
@@ -93,7 +94,8 @@ export default {
       this.$store.dispatch('signup', {
         email: this.signupForm.email,
         password: this.signupForm.password,
-        name: this.signupForm.name,
+        firstName: this.signupForm.firstname,
+        lastName: this.signupForm.lastname,
         title: this.signupForm.title
       })
     }
