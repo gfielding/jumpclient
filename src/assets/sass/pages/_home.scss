@@ -1,0 +1,28 @@
+.home {
+	background:white;
+	&__container {
+		@include container;
+		min-height:calc(100vh - 4rem);
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		flex-direction:column;
+		svg, img {
+			width:30vw;
+			min-width:28rem;
+		}
+	}
+	&__containerLogin {
+		@include container;
+		min-height:calc(100vh - 8rem);
+		display:flex;
+		align-items:center;
+		justify-content:flex-start;
+		flex-direction:column;
+		padding-top:6rem;
+		svg, img {
+			width:20vw;
+			min-width:20rem;
+		}
+	}
+}

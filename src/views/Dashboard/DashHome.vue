@@ -2,10 +2,12 @@
   <div class="dashboard">
     <div class="dashboard__container">
       <div class="dashboard__container--header">
-        Dashboard
+        <h1>Dashboard</h1>
       </div>
-      <div class="dashboard__container--body" v-if="userProfile">
-        <div class="dashboard__container--body--col">
+      <Loader v-if="!userProfile" />
+      <div class="dashboard__container--body pt-3" v-if="userProfile">
+        <p>Please complete your profile. Events will be posted shortly!</p>
+        <!-- <div class="dashboard__container--body--col">
           <ProfileImage :userProfile="userProfile" />
         </div>
         <div class="dashboard__container--body--col">
@@ -22,12 +24,9 @@
         </div>
         <div class="dashboard__container--body--col">
           <ProfileEmergency :userProfile="userProfile" />
-        </div>
+        </div> -->
       </div>
     </div>
-
-    <Loader v-if="!userProfile" />
-
   </div>
 </template>
 
@@ -42,7 +41,7 @@ import ProfileBio from '@/components/Profile/ProfileBio.vue'
 import ProfileSocial from '@/components/Profile/ProfileSocial.vue'
 
 export default {
-  name: 'dashboard',
+  name: 'dashHome',
   computed: {
     ...mapState(['emailVerified', 'userProfile']),
   },

@@ -2,11 +2,25 @@
 	<div>
 		<h2 class="mb-3">Social Info</h2>
     <div class="mb-3">
-      <label for="instagram">Instagram Username:</label>
+      <div class="flex align-center justify-space-between">
+        <label for="instagram">Instagram Username:</label>
+        <div v-if="userProfile.instagram">
+          <a :href="`https://instagram.com/` + userProfile.instagram" target="_blank">
+            <button class="btn btn__small btn__accent btn__flat">Test Link</button>
+          </a>
+        </div>
+      </div>
       <input type="text" placeholder="mvpeventstaffing" v-model.trim="userProfile.instagram" id="instagram" @change="updateProfile()"/>
     </div>
     <div class="mb-3">
-      <label for="facebook">Facebook Username:</label>
+      <div class="flex align-center justify-space-between">
+        <label for="facebook">Facebook Username:</label>
+        <div v-if="userProfile.facebook">
+          <a :href="`https://facebook.com/` + userProfile.facebook" target="_blank">
+            <button class="btn btn__small btn__accent btn__flat">Test Link</button>
+          </a>
+        </div>
+      </div>
       <input type="text" placeholder="mvpeventstaffing" v-model.trim="userProfile.facebook" id="facebook" @change="updateProfile()"/>
     </div>
 	</div>

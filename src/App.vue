@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <SiteNav v-if="showNav"></SiteNav>
+    <Nav v-if="showNav" :userProfile="userProfile" />
     <router-view/>
     <transition name="fade">
       <div v-if="errorMessage" class="errorMessage">
@@ -12,12 +12,17 @@
 
 <script>
 import { mapState } from 'vuex'
-import SiteNav from '@/components/SiteNav'
+import Nav from '@/components/Nav'
 
 export default {
   components: {
-    SiteNav
+    Nav
   },
+  watch:{
+    $route (to, from){
+      this.$store.dispatch('clearErrors')
+    }
+  }, 
   computed: {
     ...mapState(['userProfile', 'errorMessage']),
     showNav() {

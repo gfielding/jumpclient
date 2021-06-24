@@ -27,8 +27,43 @@
 	padding:2rem;
 }
 
+@mixin shadow-small {
+	box-shadow: 0.3rem 0.3rem 1.2rem 0 rgba(0,0,0, 0.2);
+}
 @mixin shadow {
-	box-shadow: 1rem 1rem 2rem 0 rgba(4,34,58, 0.2);
+	box-shadow: 1rem 1rem 2rem 0 rgba(0,0,0, 0.2);
+}
+@mixin shadow-large {
+	box-shadow: 2rem 2rem 3.4rem 0 rgba(0,0,0, 0.2);
+}
+
+
+@mixin button {
+	background-color: inherit;
+  border-radius: $radius;
+  letter-spacing: 0.04rem;
+  border: none;
+  padding: .8rem 1.6rem 0.8rem 1.6rem;
+  font-size:1.2rem;
+  font-weight: 500;
+  transition: all .2s linear !important;
+	display: inline-flex;
+  align-items: center;
+	line-height: 1;
+	color:inherit;
+	text-transform: uppercase;
+	.move {
+		padding-left:0.5rem;
+		transition: all .2s linear !important;
+	}
+	&:hover {
+		cursor:pointer;
+		@include shadow-small;
+		.move {
+			padding-left:1rem;
+			transition: all .2s linear !important;
+		}
+	}
 }
 
 @mixin respond ($breakpoint) {

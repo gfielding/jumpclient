@@ -15,23 +15,46 @@ const router = new VueRouter({
     }
   },
   routes: [
-    // {
-    //   path: '*',
-    //   redirect: '/'
-    // },
     {
-      path: '/dashboard',
-      name: 'dashboard',
-      component: () => import('../views/Dashboard.vue'),
-      meta: {
-        requiresAuth: true
-      }
+      path: '*',
+      redirect: '/'
+    },
+    {
+      path: '/',
+      name: 'home',
+      component: () => import('../views/Home.vue')
     },
     {
       path: '/login',
       name: 'login',
       component: () => import('../views/Login.vue')
     },
+    {
+      path: '/dashboard', redirect: '/dashboard/home',
+      name: 'dashboard',
+      component: () => import('../views/Dashboard/Dashboard.vue'),
+      meta: {
+        requiresAuth: true
+      },
+      children: [
+        {
+          path: '/dashboard/home',
+          name: 'dashHome',
+          component: () => import('../views/Dashboard/DashHome.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/dashboard/profile',
+          name: 'profile',
+          component: () => import('../views/Dashboard/Profile.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+      ]
+    }
   ]
 })
 

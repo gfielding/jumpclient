@@ -6,8 +6,29 @@ input, textarea {
   border-width: 1px;
   border-color: inherit;
   width: 100%;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   background: white;
   border-color: transparent;
   border-radius: 0.4rem;
+  margin-top: 0.2rem;
+  color:$text;
+}
+
+input.upload {
+  background: transparent;
+  padding: 0.5rem 0;
+}
+
+label {
+  font-size:1.3rem;
+  font-weight:500;
+}
+
+::placeholder {
+  color:#e89898;
+}
+
+progress {
+  height: 0.5rem;
+  width: 20rem;
 }
