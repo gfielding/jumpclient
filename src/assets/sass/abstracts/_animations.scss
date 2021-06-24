@@ -1,0 +1,11 @@
+/*Transitions*/
+.fade-enter {
+	opacity:0;
+}
+.fade-leave-active,
+.fade-enter-active {
+	transition: opacity 0.25s ease-out;
+}
+.fade-leave-to {
+  opacity: 0;
+}

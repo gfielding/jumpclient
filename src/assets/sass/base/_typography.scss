@@ -1,0 +1,25 @@
+html {
+  font-size:62.5% !important;
+  //font-size:50% !important;
+
+  @include respond(phone) {
+    font-size:55% !important;
+  }
+}
+
+@font-face {
+  font-family: system;
+  font-style: normal;
+  font-weight: 400;
+
+  src: local(-apple-system), local(BlinkMacSystemFont),
+    local("Segoe UI"), local("Roboto"), local("Oxygen"),
+    local("Ubuntu"), local("Cantarell"), local("Fira Sans"),
+    local("Droid Sans"), local("Helvetica Neue"), sans-serif;
+}
+
+a {
+  cursor: pointer;
+  text-decoration:none;
+  color: $primary;
+}

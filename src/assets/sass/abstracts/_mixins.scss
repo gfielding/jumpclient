@@ -1,0 +1,50 @@
+/*MIXINS*/
+
+@mixin container {
+	margin:auto;
+	padding:2rem;
+	display: block;
+	@include respond(tv) {
+		width:90%;
+		max-width:140rem;
+	}
+	@include respond(desktop) {
+		max-width:120rem;
+		width:90%;
+	}
+	@include respond(tablet-land) {
+		width:90%;
+	}
+	@include respond(phone) {
+		padding:1rem;
+		width:calc(100% - 2rem);
+	}
+}
+
+@mixin card {
+	@include shadow;
+	background:white;
+	padding:2rem;
+}
+
+@mixin shadow {
+	box-shadow: 1rem 1rem 2rem 0 rgba(4,34,58, 0.2);
+}
+
+@mixin respond ($breakpoint) {
+	@if $breakpoint == phone {
+		@media (max-width: 37.5em) { @content }; //600px
+	}
+	@if $breakpoint == tablet-port {
+		@media (max-width: 56.25em) { @content }; //900px
+	}
+	@if $breakpoint == tablet-land {
+		@media (max-width: 75em) { @content }; //1200px
+	}
+	@if $breakpoint == desktop {
+		@media (max-width: 112.5em) { @content }; //1800px
+	}
+	@if $breakpoint == tv {
+		@media (min-width: 112.51em) { @content }; //2400px
+	}
+}

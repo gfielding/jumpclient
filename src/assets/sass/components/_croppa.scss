@@ -1,0 +1,17 @@
+.croppa-container {
+	position:relative;
+}
+.croppa-container canvas {
+	border-radius:50%;
+	cursor:pointer;
+	border-color: #ccc !important;
+}
+svg.icon-remove {
+	top: -0.5rem;
+	right: -0.5rem;
+  left: -0.5rem;
+  position: absolute;
+  &:hover {
+  	cursor: pointer;
+  }
+}

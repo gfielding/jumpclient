@@ -1,0 +1,25 @@
+.dashboard {
+	&__container {
+		@include container;
+		&--header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+		&--body {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content:space-between;
+			@include respond(phone) {
+				flex-wrap: wrap;
+				display: block;
+			}
+			&--col {
+				width:49%;
+				@include respond(phone) {
+					width:100%;
+				}
+			}
+		}
+	}
+}

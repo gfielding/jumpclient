@@ -1,0 +1,33 @@
+/*BASE*/
+
+#app {
+  font-family: system;
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: grayscale;
+  font-smoothing: auto;
+  font-size:1.6rem;
+  max-width: 100vw;
+  overflow-x: hidden;
+  background: $background;
+  min-height:100vh;
+}
+
+
+img.avatar {
+  border-radius:50%;
+  width: 50%;
+  margin-bottom: 2rem;
+}
+
+.avatar-wrapper {
+  background-position:center center;
+  border-radius:50%;
+  background-size:cover;
+}
+
+.errorMessage {
+  text-align:center;
+  padding:1rem;
+  background:red;
+  color:white;
+}
