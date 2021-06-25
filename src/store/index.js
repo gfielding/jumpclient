@@ -71,7 +71,7 @@ const store = new Vuex.Store({
       commit('setUserProfile', {})
 
       // redirect to login view
-      router.push('/login')
+      router.push('/')
     },
     updateUserProfile({ commit }, payload) {
       fb.usersCollection.doc(payload.id).update(payload)

@@ -6,7 +6,7 @@
         <label for="instagram">Instagram Username:</label>
         <div v-if="userProfile.instagram">
           <a :href="`https://instagram.com/` + userProfile.instagram" target="_blank">
-            <button class="btn btn__small btn__accent btn__flat">Test Link</button>
+            <button class="btn btn__small btn__accent btn__flat mb-2">Test Link</button>
           </a>
         </div>
       </div>
@@ -17,7 +17,7 @@
         <label for="facebook">Facebook Username:</label>
         <div v-if="userProfile.facebook">
           <a :href="`https://facebook.com/` + userProfile.facebook" target="_blank">
-            <button class="btn btn__small btn__accent btn__flat">Test Link</button>
+            <button class="btn btn__small btn__accent btn__flat mb-2">Test Link</button>
           </a>
         </div>
       </div>

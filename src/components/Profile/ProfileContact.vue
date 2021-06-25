@@ -12,10 +12,10 @@
     <div class="mb-3">
     	<div class="flex align-center justify-space-between">
     		<label for="email">Email:</label>
-    		<span v-if="emailVerified" class="caption">verified <i style="color: green" class="fas fa-check"></i></span>
+    		<span v-if="emailVerified" class="caption mb-2">verified <i style="color: green" class="fas fa-check"></i></span>
     		<div v-if="!emailVerified">
     			<span class="caption">not verified</span>
-    			<button class="btn btn__small btn__accent btn__flat" @click="resendVerification()">resend</button>
+    			<button class="btn btn__small btn__accent btn__flat mb-2" @click="resendVerification()">resend</button>
     		</div>
     	</div>
       <input type="email" placeholder="" v-model.trim="userProfile.email" id="email" @change="updateEmail()"/>
