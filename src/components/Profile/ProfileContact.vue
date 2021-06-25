@@ -3,11 +3,11 @@
 		<h2 class="mb-3">Contact Info</h2>
 		<div class="mb-3">
       <label for="firstName">First Name:</label>
-      <input type="text" placeholder="" v-model.trim="userProfile.firstName" id="firstName" @change="updateProfile()"/>
+      <input type="text" autocomplete="given-name" placeholder="" v-model.trim="userProfile.firstName" id="firstName" @change="updateProfile()"/>
     </div>
     <div class="mb-3">
       <label for="lastName">Last Name:</label>
-      <input type="text" placeholder="" v-model.trim="userProfile.lastName" id="lastName" @change="updateProfile()"/>
+      <input type="text" autocomplete="family-name" placeholder="" v-model.trim="userProfile.lastName" id="lastName" @change="updateProfile()"/>
     </div>
     <div class="mb-3">
     	<div class="flex align-center justify-space-between">
@@ -18,14 +18,14 @@
     			<button class="btn btn__small btn__accent btn__flat mb-2" @click="resendVerification()">resend</button>
     		</div>
     	</div>
-      <input type="email" placeholder="" v-model.trim="userProfile.email" id="email" @change="updateEmail()"/>
+      <input type="email" autocomplete="email" placeholder="" v-model.trim="userProfile.email" id="email" @change="updateEmail()"/>
     </div>
     <div class="mb-3">
     	<div class="flex align-center justify-space-between">
 	      <label for="phone">Cell Phone:</label>
 	      <span v-if="userProfile.phoneVerified == 'approved'" class="caption mb-2">verified <i style="color: green" class="fas fa-check"></i></span>
 	    </div>
-      <input type="phone" placeholder="" v-model.trim="userProfile.phone" v-mask="'(###) ###-####'" placeholder="(999) 999-9999" id="phone" @keyup="showTest = true"/>
+      <input type="phone" autocomplete="tel" placeholder="" v-model.trim="userProfile.phone" v-mask="'(###) ###-####'" placeholder="(999) 999-9999" id="phone" @keyup="showTest = true"/>
 
       <!-- Button when number added or changed -->
       <transition name="fade">
@@ -38,7 +38,7 @@
       <transition name="fade">
         <div v-if="showVerification">
         	<label for="code">Verification Code:</label>
-        	<input type="text" id="code" v-model.trim="code" v-mask="'######'" placeholder="######" required @keyup="showVerifyButton = true" />
+        	<input type="text" autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]*" id="code" v-model.trim="code" v-mask="'######'" placeholder="######" required @keyup="showVerifyButton = true" />
         </div>
       </transition>
 
