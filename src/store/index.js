@@ -60,7 +60,7 @@ const store = new Vuex.Store({
       
       // change route to dashboard
       if (router.currentRoute.path === '/login') {
-        router.push('/dashboard')
+        router.push('/dashboard/profile')
       }
     },
     async logout({ commit }) {
