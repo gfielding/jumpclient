@@ -1,5 +1,5 @@
 .home {
-	background:white;
+	background:$background;
 	&__container {
 		@include container;
 		min-height:calc(100vh - 4rem);

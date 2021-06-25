@@ -9,3 +9,13 @@
 .fade-leave-to {
   opacity: 0;
 }
+
+.fadeStop-enter {
+	opacity:0;
+}
+.fadeStop-leave-active {
+	transition: opacity 0s ease-out;
+}
+.fadeStop-enter-active {
+	transition: opacity 0.25s ease-out;
+}

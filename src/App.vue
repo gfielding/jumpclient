@@ -3,8 +3,9 @@
     <Nav v-if="showNav" :userProfile="userProfile" />
     <router-view/>
     <transition name="fade">
-      <div v-if="errorMessage" class="errorMessage">
+      <div v-if="errorMessage" class="errorMessage" >
       {{errorMessage}}
+      <button @click="close" class="btn btn__flat"><i class="far fa-times-circle fa-2x"></i></button>
       </div>
     </transition>
   </div>
@@ -22,7 +23,12 @@ export default {
     $route (to, from){
       this.$store.dispatch('clearErrors')
     }
-  }, 
+  },
+  methods: {
+    close() {
+      this.$store.dispatch('clearErrors')
+    }
+  },
   computed: {
     ...mapState(['userProfile', 'errorMessage']),
     showNav() {
