@@ -2,8 +2,7 @@
 	<div>
 		<h2 class="mb-3">Tell Us About Yourself</h2>
 		<div class="mb-3">
-      <label for="bio">Bio:</label>
-      <textarea name="bio" id="bio" cols="30" rows="10" v-model.trim="userProfile.bio" @change="updateProfile()" placeholder="Education, experience, job history, interests, etc..."></textarea>
+      <vue-editor id="bio" v-model.trim="userProfile.bio" placeholder="Education, experience, job history, interests, etc..." @change="updateProfile()" :editor-toolbar="customToolbar"></vue-editor>
     </div>
     <div class="mb-3">
       <h3>Upload your resumé</h3>
@@ -27,6 +26,7 @@
 
 <script>
 const fb = require('../../firebaseConfig.js')
+import { VueEditor } from "vue2-editor";
 
 export default {
   props: ['userProfile'],
@@ -35,7 +35,14 @@ export default {
     uploadValue: 0,
     showBar:false,
     picture: null,
+    customToolbar: [
+      ["bold", "italic", "underline"],
+      [{ list: "ordered" }, { list: "bullet" }],
+    ]
   }),
+  components: {
+    VueEditor,
+  },
   methods: {
     updateProfile(){
     	let userProfile = this.userProfile
