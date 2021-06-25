@@ -33,6 +33,9 @@ a {
   cursor: pointer;
   text-decoration:none;
   color: $primary;
+  &.color--text {
+    color:$text;
+  }
 }
 
 h1 {
@@ -70,10 +73,10 @@ h2 {
 h3 {
   font-family: "BankGothicBT-Medium";
   @include respond(tv) { 
-    font-size: 1.6vw !important;
+    font-size: 1.4vw !important;
   }
   @include respond(desktop) { 
-    font-size:2.4rem !important;
+    font-size:2.2rem !important;
   }
   @include respond(tablet-port) { 
     font-size: 2rem !important;

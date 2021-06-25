@@ -8,16 +8,19 @@
       <button @click="close" class="btn btn__flat"><i class="far fa-times-circle fa-2x"></i></button>
       </div>
     </transition>
+    <Footer />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 import Nav from '@/components/Nav'
+import Footer from '@/components/Footer'
 
 export default {
   components: {
-    Nav
+    Nav,
+    Footer
   },
   watch:{
     $route (to, from){

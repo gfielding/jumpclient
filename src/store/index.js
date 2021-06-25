@@ -41,6 +41,7 @@ const store = new Vuex.Store({
         lastName: form.lastName,
         id: user.uid,
         email: form.email,
+        skills: [],
         status: 'applied'
       })
 

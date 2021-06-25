@@ -7,11 +7,19 @@
     </div>
     <div class="mb-3">
       <h3>Upload your resumé</h3>
-      <a :href="userProfile.picture" v-if="userProfile.picture" target="_blank">View Your Resumé <i class="fas fa-external-link ml-1"></i></a>
-      <input type="file" accept="image/*,.pdf" @change="previewImage" class="upload">
+      <a :href="userProfile.picture" v-if="userProfile.picture" target="_blank" class="caption">View Your Resumé <i class="fas fa-external-link ml-1 mt-2"></i></a>
+
+
+      <input type="file" ref="file" accept="image/*,.pdf" @change="previewImage" class="mt-3">
+
+      <!-- <div class="mt-3">
+        <button class="btn btn__primary" @click="$refs.file.click()">Choose File <i class="far fa-folder-open ml-3"></i></button>
+      </div> -->
+
+
       <progress :value="uploadValue" max="100" v-if="showBar"></progress>
       <div>
-        <button v-if="imageData != null" class="btn btn__primary" @click="onUpload">Upload</button>
+        <button v-if="imageData != null" class="btn btn__primary mt-3" @click="onUpload">Upload</button>
       </div>
     </div>
 	</div>
@@ -55,6 +63,7 @@ export default {
         this.showBar = false
       })
       this.imageData = null
+      this.$refs.file.value=null
     }
   }
 }
