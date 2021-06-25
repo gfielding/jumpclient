@@ -23,6 +23,9 @@
 		svg, img {
 			width:20vw;
 			min-width:20rem;
+			@include respond(tablet-port) {
+				margin-top:10vh;
+			}
 		}
 	}
 }
