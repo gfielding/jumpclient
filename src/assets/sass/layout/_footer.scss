@@ -1,5 +1,6 @@
 .footer {
 	background:$dark;
+	color:$lightText;
 	&__container {
 		@include container;
 		display:flex;

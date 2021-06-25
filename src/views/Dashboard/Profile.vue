@@ -26,6 +26,9 @@
         <div class="dashboard__container--body--col">
           <ProfileCerts :userProfile="userProfile" />
         </div>
+        <div class="dashboard__container--body--col">
+          <ProfileSkills :userProfile="userProfile" />
+        </div>
       </div>
     </div>
 
@@ -44,6 +47,7 @@ import ProfileEmergency from '@/components/Profile/ProfileEmergency.vue'
 import ProfileBio from '@/components/Profile/ProfileBio.vue'
 import ProfileSocial from '@/components/Profile/ProfileSocial.vue'
 import ProfileCerts from '@/components/Profile/ProfileCerts.vue'
+import ProfileSkills from '@/components/Profile/ProfileSkills.vue'
 
 export default {
   name: 'profile',
@@ -58,7 +62,8 @@ export default {
     ProfileEmergency,
     ProfileBio,
     ProfileSocial,
-    ProfileCerts
+    ProfileCerts,
+    ProfileSkills
   },
 
 }

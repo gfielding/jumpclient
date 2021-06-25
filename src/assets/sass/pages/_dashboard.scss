@@ -1,4 +1,5 @@
 .dashboard {
+	min-height:calc(100vh - 14rem);
 	&__container {
 		@include container;
 		&--header {
