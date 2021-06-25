@@ -19,3 +19,15 @@
 .fadeStop-enter-active {
 	transition: opacity 0.25s ease-out;
 }
+
+.slide-fade-enter-active {
+  transition: all .2s ease;
+}
+.slide-fade-leave-active {
+  transition: all .2s linear;
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+  transform: translateX(30rem);
+  opacity: 0.6;
+}

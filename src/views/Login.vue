@@ -30,7 +30,7 @@
             </div>
           </form>
           <form v-else @submit.prevent>
-            <h2>Get Started</h2>
+            <h2>Sign Up To Work</h2>
             <div class="mb-3">
               <label for="firstname">First Name</label>
               <input v-model.trim="signupForm.firstname" type="text" placeholder="" id="firstname" required />
@@ -50,7 +50,7 @@
             <button @click="signup()" class="btn btn__primary mt-3" :disabled="!valid2">Sign Up</button>
             <div class="extras mt-5">
               <button class="btn btn__small btn__flat" @click="toggleForm()">
-                Back to Log In
+                I already have an account
               </button>
             </div>
           </form>
@@ -80,7 +80,7 @@ export default {
         email: '',
         password: ''
       },
-      showLoginForm: true,
+      showLoginForm: false,
       showPasswordReset: false
     }
   },
