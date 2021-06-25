@@ -1,18 +1,18 @@
 <template>
-  <div class="modal">
-    <div class="modal-content">
-      <div @click="$emit('close')" class="close">close</div>
-      <h3>Reset Password</h3>
-      <div v-if="!showSuccess">
-        <p>Enter your email to reset your password</p>
-        <form @submit.prevent>
+  <div>
+    <button @click="$emit('close')" class="btn btn__small btn__flat">Go Back</button>
+    <h2>Reset Password</h2>
+    <div v-if="!showSuccess">
+      <p>Enter your email to reset your password</p>
+      <form @submit.prevent>
+        <div class="mb-3 mt-2">
           <input v-model.trim="email" type="email" placeholder="you@email.com" />
-        </form>
-        <p v-if="errorMsg !== ''" class="error">{{ errorMsg }}</p>
-        <button @click="resetPassword()" class="button">Reset</button>
-      </div>
-      <p v-else>Success! Check your email for a reset link.</p>
+        </div>
+      </form>
+      <p v-if="errorMsg !== ''" class="error">{{ errorMsg }}</p>
+      <button @click="resetPassword()" class="btn btn__primary mt-3">Reset</button>
     </div>
+    <p v-else>Success! Check your email for a reset link.</p>
   </div>
 </template>
 

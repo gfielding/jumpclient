@@ -14,6 +14,15 @@
 			border-color:$primaryDark;
 		}
 	}
+	&__accent {
+		background:$accent;
+		border-color:$accent;
+		color:white;
+		&:hover {
+			background:$accentDark;
+			border-color:$accentDark;
+		}
+	}
 	&__small {
 		padding: .6rem 1.2rem 0.6rem 1.2rem;
   	font-size:1rem;
