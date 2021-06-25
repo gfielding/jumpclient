@@ -6,7 +6,7 @@
       </div>
       <Loader v-if="!userProfile" />
       <div class="dashboard__container--body pt-3" v-if="userProfile">
-        <p>Please complete your profile. Events will be posted shortly!</p>
+        <p>Please complete your <router-link :to="{name: 'profile'}">profile</router-link>. Events will be posted shortly!</p>
         <!-- <div class="dashboard__container--body--col">
           <ProfileImage :userProfile="userProfile" />
         </div>
