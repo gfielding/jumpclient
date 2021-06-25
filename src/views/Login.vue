@@ -13,11 +13,11 @@
             <h2>Welcome Back</h2>
             <div class="mb-3 mt-2">
               <label for="email1">Email</label>
-              <input v-model.trim="loginForm.email" type="text" placeholder="you@email.com" id="email1" />
+              <input v-model.trim="loginForm.email" autocomplete="email" type="text" placeholder="you@email.com" id="email1" />
             </div>
             <div class="mb-3">
               <label for="password1">Password</label>
-              <input v-model.trim="loginForm.password" type="password" placeholder="******" id="password1" />
+              <input v-model.trim="loginForm.password" autocomplete="current-password" type="password" placeholder="******" id="password1" />
             </div>
             <button @click="login()" class="btn btn__primary mt-3" :disabled="!valid">Log In</button>
             <div class="extras mt-5">
@@ -33,19 +33,19 @@
             <h2>Sign Up To Work</h2>
             <div class="mb-3">
               <label for="firstname">First Name</label>
-              <input v-model.trim="signupForm.firstname" type="text" placeholder="" id="firstname" required />
+              <input v-model.trim="signupForm.firstname" autocomplete="given-name" type="text" placeholder="" id="firstname" required />
             </div>
             <div class="mb-3">
               <label for="lastname">Last Name</label>
-              <input v-model.trim="signupForm.lastname" type="text" placeholder="" id="lastname" required />
+              <input v-model.trim="signupForm.lastname" autocomplete="family-name" type="text" placeholder="" id="lastname" required />
             </div>
             <div class="mb-3">
               <label for="email2">Email</label>
-              <input v-model.trim="signupForm.email" type="text" placeholder="you@email.com" id="email2" required />
+              <input v-model.trim="signupForm.email" autocomplete="email" type="text" placeholder="you@email.com" id="email2" required />
             </div>
             <div class="mb-3">
               <label for="password2">Password</label>
-              <input v-model.trim="signupForm.password" type="password" placeholder="min 6 characters" id="password2" required />
+              <input v-model.trim="signupForm.password" autocomplete="new-password" type="password" placeholder="min 6 characters" id="password2" required />
             </div>
             <button @click="signup()" class="btn btn__primary mt-3" :disabled="!valid2">Sign Up</button>
             <div class="extras mt-5">
