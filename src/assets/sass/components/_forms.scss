@@ -26,6 +26,7 @@ label {
 
 ::placeholder {
   color:$accentLight;
+  opacity:0.8;
 }
 
 progress {
@@ -36,4 +37,20 @@ progress {
 .signup-form {
   width: 80%;
   max-width: 40rem;
+}
+
+
+.quillWrapper {
+  background: white;
+  border-radius:$radius;
+}
+.quillWrapper .ql-snow.ql-toolbar {
+  display:none;
+}
+.ql-snow {
+  border:none !important;
+}
+.ql-editor.ql-blank::before {
+  color:$accentLight !important;
+  opacity:0.8;
 }
