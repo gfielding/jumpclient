@@ -10,6 +10,7 @@
           :width="280"
           :height="280"
           accept=".jpeg,.png,.jpg,.svg"
+          :file-size-limit="2048000"
           :quality="4"
           :placeholder="'Update Image'"
           placeholder-color="white"
@@ -17,9 +18,12 @@
           :remove-button-size="32"
           @image-remove="showSetButton = false"
           @loading-end="showSetButton = true"
+          @file-size-exceed="onFileSizeExceed"
+          @file-type-mismatch="onFileTypeMismatch"
         >
         </croppa>
   			</div>
+        <p class="caption mt-3">jpg or png file. 2MB max</p>
       </div>
       <div class="flex justify-center mt-5" v-if="showSetButton">
         <button class="btn btn__primary btn__large mb-5" @click="saveProfileImage()">
@@ -51,6 +55,12 @@ export default {
   	}
   },
   methods: {
+    onFileTypeMismatch(file) {
+      alert('Invalid file type. Please choose a jpeg or png file.')
+    },
+    onFileSizeExceed(file) {
+      alert('Please choose a file smaller than 2MB')
+    },
   	saveProfileImage() {
   		this.performingRequest = true
       let croppa = this.croppa
