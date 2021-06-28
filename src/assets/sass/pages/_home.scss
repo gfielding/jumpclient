@@ -2,7 +2,7 @@
 	background:$background;
 	&__container {
 		@include container;
-		min-height:calc(100vh - 4rem);
+		min-height:calc(100vh - 10rem);
 		display:flex;
 		align-items:center;
 		justify-content:center;
