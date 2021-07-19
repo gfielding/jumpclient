@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Nav v-if="showNav" :userProfile="userProfile" />
+    <Nav v-if="showNav" :userProfile="currentUser" />
     <router-view/>
     <transition name="fade">
       <div v-if="errorMessage" class="errorMessage" >
@@ -33,9 +33,13 @@ export default {
     }
   },
   computed: {
-    ...mapState(['userProfile', 'errorMessage']),
+    ...mapState(['currentUser', 'errorMessage']),
     showNav() {
-      return Object.keys(this.userProfile).length > 1
+      if (this.currentUser) {
+        return Object.keys(this.currentUser).length > 1 || false
+      } else {
+        return false
+      }
     }
   },
 }

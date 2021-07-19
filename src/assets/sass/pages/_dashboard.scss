@@ -1,12 +1,13 @@
 .dashboard {
-	min-height:calc(100vh - 10rem);
+	min-height: calc(100vh - 20rem);
+  padding-bottom: 6rem;
 	&__container {
 		@include container;
 		&--header {
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
-			border-bottom: 1px solid $textLight;
+			// border-bottom: 1px solid $textLight;
 		}
 		&--body {
 			display: flex;
@@ -17,15 +18,14 @@
 				display: block;
 			}
 			&--col {
-				width:49%;
-				padding: 2rem 0;
-				border-bottom: 1px solid $textLight;
+				width: calc(49% - 3.2rem);
+		    padding: 1.6rem;
+		    background: white;
+		    margin-bottom: 2rem;
+		    border-radius:$radius;
 				@include respond(phone) {
-					width:calc(100% - 4rem);
-					padding: 2rem;
-					&:last-child {
-	    			border-bottom: none;
-	    		}
+					width:calc(100% - 3.2rem);
+					padding: 1.6rem;
 				}
 			}
 		}

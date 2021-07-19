@@ -1,0 +1,196 @@
+<template>
+	<div class="dashboard">
+    <div class="dashboard__container">
+      <div class="dashboard__container--header">
+        <h1>Event Shifts</h1>
+        <button class="btn btn__outlined" @click="goBack">Go Back</button>
+      </div>
+      
+      <Loader v-if="!event" />
+    	<div class="dashboard__container--body" v-if="event">
+    		<div class="dashboard__container--body--col">
+	    		<form ref="form" @submit.prevent style="width:100%;">
+	    			<div class="mb-3">
+	            <label for="eventShiftsDetails">Shifts Details:</label>
+	            <vue-editor id="eventShiftsDetails" v-model="event.shiftsDetails"></vue-editor>
+	          </div>
+	          <button class="btn btn__primary mt-3 ml-1" @click="updateEvent">Save</button>
+	        </form>
+	      </div>
+	      <div class="dashboard__container--body--col">
+	    		<h2>Choose Jobs</h2>
+    			<div v-for="(job, index) in jobs" :key="job.id">
+    				<input type="checkbox" :id="index" :value="job" v-model="event.jobs" @change="updateEvent()">
+						<label :for="job.title" class="ml-3">{{job.title}}</label>
+    			</div>
+	    	</div>
+    	</div>
+    	<hr>
+     	<transition name="fade">
+		    <div class="dashboard__container--body pt-3" style="justify-content: space-evenly;" v-if="event && event.jobs && event.jobs.length > 0">
+		    	<div class="dashboard__container--body--col" style="width:calc(100% - 3.2rem);">
+			    	<div class="list">
+			  			<ul>
+			  				<li class="align-center">
+
+						    	<div class="mb-3 pr-3 pl-3">
+				            <label for="job">Select Job:</label>
+				            <select v-model="newShift.job" id="job" required>
+				              <option v-for="(job, index) in event.jobs" :key="index" v-bind:value="job">
+				                {{job.title}}
+				              </option>
+				            </select>
+				          </div>
+				          <div class="mb-3 pr-3 pl-3">
+				            <label for="day">Select day:</label>
+				            <select v-model="newShift.day" id="day" required>
+				              <option v-for="(day, index) in event.days" :key="index" v-bind:value="day">
+				                {{day}}
+				              </option>
+				            </select>
+				          </div>
+				          <div class="mb-3 pr-3 pl-3">
+				            <label for="staff">Staff Requested:</label>
+				            <input type="number" v-model.trim="newShift.staffReqested" id="staff" />
+				          </div>
+				          <div class="mb-3 pr-3 pl-3">
+				            <label for="start">Start Time:</label>
+				            <input type="time" v-model.trim="newShift.start" id="start" />
+				          </div>
+				          <div class="mb-3 pr-3 pl-3">
+				            <label for="end">End Time:</label>
+				            <input type="time" v-model.trim="newShift.end" id="end" />
+				          </div>
+				          <button class="btn btn__primary ml-2" @click="addNewShift">Add</button>
+						    
+							  </li>
+							</ul>
+						</div>
+					</div>
+				</div>
+		  </transition>
+		  <hr>
+		  <div class="dashboard__container--body">
+		  	<div class="dashboard__container--body--col" style="width:calc(100% - 3.2rem);">
+			  	<div class="list">
+			  		<ul>
+			  			<li v-for="(eventShift, index) in eventShifts" :key="eventShift.id" class="align-center">
+			  				<div class="mb-3 pr-3 pl-3">
+			            <label for="job">Select Job:</label>
+			            <input type="text" v-model="eventShift.position.title" readonly />
+			            <!-- <select v-model="eventShift.position" id="job" required>
+			              <option v-for="(job, index) in event.jobs" :key="index" v-bind:value="job" read-only>
+			                {{job.title}}
+			              </option>
+			            </select> -->
+			          </div>
+			          <div class="mb-3 pr-3 pl-3">
+			            <label for="day">Select day:</label>
+			            <select v-model="eventShift.day" id="day" readonly>
+			              <option v-for="(day, index) in event.days" :key="index" v-bind:value="day">
+			                {{day}}
+			              </option>
+			            </select>
+			          </div>
+			          <div class="mb-3 pr-3 pl-3">
+			            <label for="staff">Staff Requested:</label>
+			            <input type="number" v-model.trim="eventShift.staff" id="staff" readonly/>
+			          </div>
+			          <div class="mb-3 pr-3 pl-3">
+			            <label for="start">Start Time:</label>
+			            <input type="time" v-model.trim="eventShift.startTime" id="start" readonly />
+			          </div>
+			          <div class="mb-3 pr-3 pl-3">
+			            <label for="end">End Time:</label>
+			            <input type="time" v-model.trim="eventShift.endTime" id="end" readonly />
+			          </div>
+			          <button class="btn btn__dark ml-2" @click="deleteShift(eventShift)">Delete</button>
+			  			</li>
+			  		</ul>
+			  	</div>
+		  	</div>
+		  </div>
+		</div>
+	</div>
+</template>
+
+<script>
+import { mapState } from 'vuex'
+import Loader from '@/components/Loader.vue'
+import { VueEditor } from "vue2-editor";
+import router from '@/router'
+const fb = require('../../firebaseConfig.js')
+
+export default {
+  name: 'eventshifts',
+  components: {
+    VueEditor,
+    Loader
+  },
+  data() {
+    return {
+      performingRequest: false,
+      newShift: {},
+    }
+  },
+  created () {
+    this.$store.dispatch("getEventFromId", this.$route.params.id);
+  },
+  async mounted () {
+    if (!this.jobs || this.jobs.length < 1) {
+      this.$store.dispatch("getJobsState")
+    }
+  },
+  computed: {
+    ...mapState(['eventInfo', 'jobs', 'eventShifts']),
+    event() {
+      return this.eventInfo
+    },
+    eventId() {
+    	return this.eventInfo.id
+    }
+  },
+  methods: {
+  	goBack() {
+      router.go(-1)
+    },
+    updateEvent(){
+      let event = this.event
+      console.log(event)
+      this.$store.dispatch('updateEvent', event)
+    },
+    addNewShift () {
+      let shift = {
+        position: this.newShift.job,
+        startTime: this.newShift.start,
+        endTime: this.newShift.end,
+        staff: this.newShift.staffReqested,
+        eventId: this.event.id,
+        event: this.event.title,
+        day: this.newShift.day
+      }
+      console.log(shift)
+      fb.shiftsCollection.add(shift)
+      .then(
+        doc => {
+          fb.shiftsCollection.doc(doc.id).update({
+            id: doc.id, 
+          })
+        }
+      )
+      this.newShift = {}
+      this.$store.dispatch("getEventShifts", this.eventId)
+    },
+    deleteShift(eventShift) {
+      console.log(eventShift)
+      this.$store.dispatch("deleteShift", eventShift.id)
+    },
+  },
+  beforeDestroy () {
+  	this.$store.dispatch("clearJobsState")
+    this.$store.dispatch("clearEventState")
+    this.$store.dispatch("clearEventShifts")
+  	this.$store.dispatch('clearErrors')
+  }
+}
+</script>

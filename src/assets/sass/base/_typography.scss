@@ -17,6 +17,68 @@ html {
   font-family: "BankGothicBT-Medium";
   src: url('./fonts/BankGothicBTMedium/font.woff2') format('woff2'), url('./fonts/BankGothicBTMedium/font.woff') format('woff');
 }
+@font-face {
+font-family: 'D-DIN Regular';
+font-style: normal;
+font-weight: normal;
+src: url('./fonts/D-DIN.woff') format('woff');
+}
+
+
+@font-face {
+font-family: 'D-DIN DIN-Italic';
+font-style: normal;
+font-weight: normal;
+src: url('./fonts/D-DIN-Italic.woff') format('woff');
+}
+
+
+@font-face {
+font-family: 'D-DIN DIN-Bold';
+font-style: normal;
+font-weight: normal;
+src: url('./fonts/D-DIN-Bold.woff') format('woff');
+}
+
+
+@font-face {
+font-family: 'D-DIN Condensed Regular';
+font-style: normal;
+font-weight: normal;
+src: url('./fonts/D-DINCondensed.woff') format('woff');
+}
+
+
+@font-face {
+font-family: 'D-DIN Exp Regular';
+font-style: normal;
+font-weight: normal;
+src: url('./fonts/D-DINExp.woff') format('woff');
+}
+
+
+@font-face {
+font-family: 'D-DIN Exp DINExp-Italic';
+font-style: normal;
+font-weight: normal;
+src: url('./fonts/D-DINExp-Italic.woff') format('woff');
+}
+
+
+@font-face {
+font-family: 'D-DIN Condensed DINCondensed-Bold';
+font-style: normal;
+font-weight: normal;
+src: url('./fonts/D-DINCondensed-Bold.woff') format('woff');
+}
+
+
+@font-face {
+font-family: 'D-DIN Exp DINExp-Bold';
+font-style: normal;
+font-weight: normal;
+src: url('./fonts/D-DINExp-Bold.woff') format('woff');
+}
 
 @font-face {
   font-family: system;
@@ -39,31 +101,33 @@ a {
 }
 
 h1 {
-  font-family: "BankGothicBT-Medium";
+  // font-family: "BankGothicBT-Medium";
+  font-family: 'D-DIN DIN-Bold';
   @include respond(tv) { 
-    font-size: 3vw !important;
+    font-size: 3.6vw !important;
   }
   @include respond(desktop) { 
-    font-size: 4rem !important;
+    font-size: 4.8rem !important;
   }
   @include respond(tablet-port) { 
-    font-size: 3.2rem !important;
+    font-size: 3.6rem !important;
   }
   @include respond(phone) { 
-    font-size: 2.6rem !important;
+    font-size: 2.8rem !important;
   }
 }
 
 h2 {
-  font-family: "BankGothicBT-Light";
+  // font-family: "BankGothicBT-Light";
+  font-family: 'D-DIN Exp Regular';
   @include respond(tv) { 
     font-size: 2vw !important;
   }
   @include respond(desktop) { 
-    font-size: 2.8rem !important;
+    font-size: 2.6rem !important;
   }
   @include respond(tablet-port) { 
-    font-size: 2.4rem !important;
+    font-size: 2.3rem !important;
   }
   @include respond(phone) { 
     font-size: 2rem !important;
@@ -71,7 +135,8 @@ h2 {
 }
 
 h3 {
-  font-family: "BankGothicBT-Medium";
+  // font-family: "BankGothicBT-Medium";
+  font-family: 'D-DIN Condensed DINCondensed-Bold';
   @include respond(tv) { 
     font-size: 1.4vw !important;
   }
@@ -86,8 +151,15 @@ h3 {
   }
 }
 
-.caption {
-  font-size:1.2rem;
+h5 {
+  font-family: 'D-DIN DIN-Bold';
+}
+
+address, .caption {
+  font-size:1.4rem;
+  @include respond(phone) { 
+    font-size: 1.2rem !important;
+  }
 }
 .bold {
   font-weight:600;

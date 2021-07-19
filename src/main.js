@@ -4,6 +4,9 @@ import router from './router'
 import store from './store'
 import { auth } from './firebaseConfig'
 import Croppa from 'vue-croppa'
+import vSelect from 'vue-select'
+import 'vue-select/dist/vue-select.css';
+import VTooltip from 'v-tooltip'
 import VueGoodTablePlugin from 'vue-good-table'
 import * as VueGoogleMaps from "vue2-google-maps"
 import {GmapMarker} from 'vue2-google-maps/src/components/marker'
@@ -13,9 +16,11 @@ import 'vue-good-table/dist/vue-good-table.css'
 import './assets/sass/main.scss'
 const fb = require('./firebaseConfig.js')
 
+Vue.component('v-select', vSelect)
 Vue.use(VueGoodTablePlugin);
 Vue.use(Croppa);
 Vue.use(VueMask);
+Vue.use(VTooltip)
 Vue.use(require('vue-moment'))
 Vue.use(VueGoogleMaps, {
   load: {

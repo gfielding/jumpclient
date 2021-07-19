@@ -7,13 +7,20 @@ input, textarea {
   border-color: inherit;
   width: 100%;
   font-size: 1.4rem;
-  background: white;
+  background: $background;
   border-color: transparent;
   border-radius: 0.4rem;
   margin-top: 0.2rem;
   color:$text;
 }
-
+select {
+  padding: 0.8rem;
+  height:auto;
+  background:$background;
+}
+input[type=time],  input[type=date]{
+  padding: 0.5rem;
+}
 input.upload {
   background: transparent;
   padding: 0.5rem 0;
@@ -39,7 +46,9 @@ progress {
   max-width: 40rem;
 }
 
-
+.ql-editor {
+  background: $background;
+}
 .quillWrapper {
   background: white;
   border-radius:$radius;

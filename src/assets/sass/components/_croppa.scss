@@ -1,11 +1,14 @@
 .croppa-container {
 	position:relative;
-	::placeholder {
-	  color:green;
-	}
 }
-.croppa-container canvas {
+.avatar-wrapper .croppa-container canvas {
 	border-radius:50%;
+	cursor:pointer;
+	border-color: #ccc !important;
+}
+
+.event-wrapper .croppa-container canvas {
+	border-radius:0;
 	cursor:pointer;
 	border-color: #ccc !important;
 }
@@ -17,4 +20,9 @@ svg.icon-remove {
   &:hover {
   	cursor: pointer;
   }
+}
+
+.ql-editor {
+  min-height: 200px;
+  font-size: 14px !important;
 }

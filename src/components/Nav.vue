@@ -5,21 +5,54 @@
         <div class="nav__logo">
           <router-link to="/dashboard">
             <SVG_TriangleLogo />
-            MVP Event Staffing
+            MVP ADMIN
           </router-link>
         </div>
         <div class="nav__menu">
-          <div class="nav__menu--item desktop">
+          <!-- <div class="nav__menu--item desktop">
             <router-link :to="{name: 'dashboard'}">Dashboard</router-link>
-          </div>
-          <div class="nav__menu--item desktop">
+          </div> -->
+          <!-- <div class="nav__menu--item desktop">
             <router-link :to="{name: 'profile'}">Profile</router-link>
-          </div>
-          <div class="nav__menu--item desktop">
+          </div> -->
+          <!-- <div class="nav__menu--item desktop">
             <a @click="logout()">logout</a>
+          </div> -->
+          <!-- <div class="nav__menu--item desktop">
+            <img :src="pic" alt="" class="avatar">
+          </div> -->
+          <div class="nav__menu--item desktop">
+            <router-link :to="{name: 'clients'}">
+              clients
+            </router-link>
           </div>
           <div class="nav__menu--item desktop">
-            <img :src="pic" alt="" class="avatar">
+            <router-link :to="{name: 'events'}">
+              events
+            </router-link>
+          </div>
+          <div class="nav__menu--item desktop">
+            <router-link :to="{name: 'jobs'}">
+              jobs
+            </router-link>
+          </div>
+          <div class="nav__menu--item desktop">
+            <router-link :to="{name: 'users'}">
+              users
+            </router-link>
+          </div>
+          <div class="nav__menu--item desktop">
+            <router-link :to="{name: 'venues'}">
+              Venues
+            </router-link>
+          </div>
+          <div class="nav__menu--item desktop">
+            <router-link :to="{name: 'placements'}">
+              placements
+            </router-link>
+          </div>
+          <div class="nav__menu--item">
+            <a @click="logout()">logout</a>
           </div>
           <div class="nav__menu--item mobile">
             <a @click="showSideNav()">
@@ -39,12 +72,6 @@
               <i class="fal fa-times fa-2x" v-show="showSide"></i>
             </a>
           </div>
-          <div class="nav__menu--item">
-          <router-link :to="{name: 'profile'}">
-            <img :src="pic" alt="" class="avatar mr-3">
-            Profile
-          </router-link>
-        </div>
           <div class="nav__menu--item">
             <router-link :to="{name: 'dashboard'}">Dashboard</router-link>
           </div>

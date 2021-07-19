@@ -26,6 +26,13 @@ img.avatar {
   transition:0.2s all;
 }
 
+.event-wrapper {
+  background-position:center center;
+  border-radius:0;
+  background-size:cover;
+  transition:0.2s all;
+}
+
 .errorMessage {
   text-align:center;
   padding:1rem;
@@ -37,4 +44,18 @@ img.avatar {
   display:flex;
   align-items:center;
   justify-content:center;
+}
+
+hr {
+  border-bottom:1px solid $textLight;
+  margin:2rem 0;
+}
+
+.notification {
+  width: 100%;
+  background: $accentDark;
+  border-radius: $radius;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  color:white;
 }

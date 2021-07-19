@@ -14,6 +14,15 @@
 			border-color:$primaryDark;
 		}
 	}
+	&__dark {
+		background:$dark;
+		border-color:$dark;
+		color:white;
+		&:hover {
+			background:$darkDark;
+			border-color:$darkDark;
+		}
+	}
 	&__accent {
 		background:$accent;
 		border-color:$accent;
@@ -27,9 +36,28 @@
 		padding: .6rem 1.2rem 0.6rem 1.2rem;
   	font-size:1rem;
 	}
+	&__large {
+		padding: 1rem 2rem 1rem 2rem;
+  	font-size:1.4rem;
+	}
 	&__outlined {
 		border:1px solid $textLight;
 		background:transparent;
 		color:$text !important;
 	}
+}
+
+button.chip {
+	padding: .5rem 1rem 0.5rem 1rem;
+  font-size:1.1rem;
+  border-radius:12rem;
+  border:1px solid $textLight;
+}
+button.chipDark {
+	padding: .5rem 1rem 0.5rem 1rem;
+  font-size:1.1rem;
+  background:$dark;
+  color:white;
+  border-radius:12rem;
+  border:1px solid $dark;
 }

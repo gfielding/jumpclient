@@ -8,11 +8,13 @@ $accentDark: darken($accent, 20%);
 $accentLight: lighten($accent, 20%);
 
 $background: #efefef;
+$backDark: darken($background, 5%);
 
 $dark: #212121;
+$darkDark: darken($dark, 20%);
 
 $text: #3d3d3d;
-$textLight: lighten($text, 35%);
+$textLight: lighten($text, 20%);
 
 $lightText:#d0d0d0;
 

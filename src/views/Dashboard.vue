@@ -5,7 +5,7 @@
         <h1>Dashboard</h1>
       </div>
       <div class="dashboard__container--body" v-if="userProfile">
-        <div class="dashboard__container--body--col">
+        <!-- <div class="dashboard__container--body--col">
           <ProfileImage :userProfile="userProfile" />
         </div>
         <div class="dashboard__container--body--col">
@@ -22,7 +22,7 @@
         </div>
         <div class="dashboard__container--body--col">
           <ProfileEmergency :userProfile="userProfile" />
-        </div>
+        </div> -->
       </div>
     </div>
 
@@ -34,31 +34,15 @@
 <script>
 import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
-import ProfileImage from '@/components/Profile/ProfileImage.vue'
-import ProfileContact from '@/components/Profile/ProfileContact.vue'
-import ProfileAddress from '@/components/Profile/ProfileAddress.vue'
-import ProfileEmergency from '@/components/Profile/ProfileEmergency.vue'
-import ProfileBio from '@/components/Profile/ProfileBio.vue'
-import ProfileSocial from '@/components/Profile/ProfileSocial.vue'
 
 export default {
   name: 'dashboard',
   computed: {
-    ...mapState(['emailVerified', 'userProfile']),
+    ...mapState(['userProfile']),
   },
   components: {
     Loader,
-    ProfileImage,
-    ProfileContact,
-    ProfileAddress,
-    ProfileEmergency,
-    ProfileBio,
-    ProfileSocial
   },
 
 }
 </script>
-
-<style lang="scss" scoped>
-
-</style>

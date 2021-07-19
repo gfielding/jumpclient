@@ -4,36 +4,36 @@
     <div class="mb-3">
       <div class="flex align-center justify-space-between">
         <label for="instagram">Instagram Username:</label>
-        <div v-if="userProfile.instagram">
-          <a :href="`https://instagram.com/` + userProfile.instagram" target="_blank">
+        <div v-if="user.instagram">
+          <a :href="`https://instagram.com/` + user.instagram" target="_blank">
             <button class="btn btn__small btn__primary btn__flat mb-2">Test Link <i class="fas fa-external-link ml-2"></i></button>
           </a>
         </div>
       </div>
-      <input type="text" placeholder="mvpeventstaffing" v-model.trim="userProfile.instagram" id="instagram" @change="updateProfile()"/>
+      <input type="text" placeholder="mvpeventstaffing" v-model.trim="user.instagram" id="instagram" readonly />
     </div>
     <div class="mb-3">
       <div class="flex align-center justify-space-between">
         <label for="facebook">Facebook Username:</label>
-        <div v-if="userProfile.facebook">
-          <a :href="`https://facebook.com/` + userProfile.facebook" target="_blank">
+        <div v-if="user.facebook">
+          <a :href="`https://facebook.com/` + user.facebook" target="_blank">
             <button class="btn btn__small btn__primary btn__flat mb-2">Test Link <i class="fas fa-external-link ml-2"></i></button>
           </a>
         </div>
       </div>
-      <input type="text" placeholder="mvpeventstaffing" v-model.trim="userProfile.facebook" id="facebook" @change="updateProfile()"/>
+      <input type="text" placeholder="mvpeventstaffing" v-model.trim="user.facebook" id="facebook" readonly />
     </div>
 	</div>
 </template>
 
 <script>
 export default {
-  props: ['userProfile'],
+  props: ['user'],
   methods: {
-    updateProfile(){
-    	let userProfile = this.userProfile
-    	this.$store.dispatch('updateUser', userProfile)
-    },
+  },
+  beforeDestroy () {
+    this.$store.dispatch('clearUserState')
+    this.$store.dispatch('clearErrors')
   }
 }
 </script>
