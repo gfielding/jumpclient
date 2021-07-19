@@ -14,6 +14,30 @@
 			border-color:$primaryDark;
 		}
 	}
+	&__success {
+		background:$success;
+		border-color:$success;
+		color:white;
+		&:hover {
+			box-shadow:none;
+		}
+	}
+	&__warning {
+		background:$warning;
+		border-color:$warning;
+		color:white;
+		&:hover {
+			box-shadow:none;
+		}
+	}
+	&__danger {
+		background:$danger;
+		border-color:$danger;
+		color:white;
+		&:hover {
+			box-shadow:none;
+		}
+	}
 	&__dark {
 		background:$dark;
 		border-color:$dark;
@@ -37,7 +61,7 @@
   	font-size:1rem;
 	}
 	&__large {
-		padding: 1rem 2rem 1rem 2rem;
+		padding: 1rem 2rem 0.9rem 2rem;
   	font-size:1.4rem;
 	}
 	&__outlined {

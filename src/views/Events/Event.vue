@@ -2,7 +2,15 @@
 	<div class="dashboard">
     <div class="dashboard__container">
       <div class="dashboard__container--header">
-        <h1>Edit Event</h1>
+        <div class="flex align-center">
+          <h1>Edit Event</h1>
+          <button class="btn btn__large btn__success ml-5" v-if="event && event.published">
+            Published
+          </button>
+          <button class="btn btn__large btn__warning ml-5" v-if="event && !event.published">
+            Draft
+          </button>
+        </div>
         <div class="flex align-center">
           <button class="btn btn__outlined mr-3" @click="shifts()">Event Shifts</button>
           <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
@@ -28,6 +36,18 @@
     					<label for="eventPublished">Published:</label>
     					<input type="checkbox" v-model.trim="event.published" id="eventPublished" class="ml-3" />
     				</div>
+
+            <div class="mb-3" v-if="venues.length > 1">
+              <label for="venue">Venue: (updates on change)</label>
+              <v-select
+                class="mt-2"
+                label="title" 
+                :options="venues"
+                v-model="event.venue"
+                @input="updateVenue()"
+                >
+              </v-select>
+            </div>
           </div>
           <div class="dashboard__container--body--col">
             <div class="mb-3">
@@ -91,43 +111,77 @@
             <transition name="fadeStop">
               <div class="mb-3">
                 <label for="pickDate">Choose Jobs:</label>
-                <select v-model="job" id="venue" @change="addJob()">
-                  <option v-for="job in jobs" v-bind:value="job">
-                    {{job.title}}
-                  </option>
-                </select>
+                <v-select
+                  class="mt-2"
+                  label="title" 
+                  :options="jobs"
+                  v-model="job"
+                  @input="addJob()"
+                  >
+                </v-select>
+
               </div>
             </transition>
           </div>
 
-
           <div class="dashboard__container--body--col">
-
-            <div class="mb-3" v-if="venues.length > 1">
-              <label for="venue">Venue: <span v-if="event.venue && event.venue.title">{{event.venue.title}}</span> - (updates on change)</label>
-              <select v-model="event.venue" id="venue" required @change="updateVenue()"> 
-                <option v-for="venue in venues" v-bind:value="venue">
-                  {{venue.title}}
-                </option>
-              </select>
-            </div>
-
-          </div>
-          <div class="dashboard__container--body--col">
-
             <div class="mb-3" v-if="clients.length >= 1">
-              <label for="client">Client:</label>
-              <select v-model="event.client" id="client" required>
-                <option v-for="client in clients" v-bind:value="client">
-                  {{client.title}}
-                </option>
-              </select>
+              <h3>Client</h3>
+              <v-select
+                class="mt-2"
+                label="title" 
+                :options="clients"
+                v-model="event.client"
+                >
+              </v-select>
             </div>
-
           </div>
           
+          <div class="dashboard__container--body--col">
+            <h3>Attach Files</h3>
+
+            <div class="mb-3">
+              <label for="fileTitle">Details:</label>
+              <input class="mb-2" placeholder="File Title" type="text" v-model.trim="fileTitle" id="fileTitle" />
+              <textarea placeholder="File Description" name="fileDescription" id="fileDescription" cols="30" rows="2" v-model="fileDescription"></textarea>
+
+              <input class="mt-3" type="file" ref="fileInputTip" accept="image/*,application/pdf,.doc" @change="previewImage">
+              <progress :value="uploadValue" max="100" v-if="showBar"></progress>
+              <div class="mb-3">
+                <button v-if="imageData != null" class="btn btn__primary mt-3" @click="onUploadFile">
+                  Upload
+                  <transition name="fade">
+                    <span class="ml-2" v-if="performingRequest3">
+                    <i class="fa fa-spinner fa-spin"></i>
+                    </span>
+                  </transition>
+                </button>
+              </div>
+              <div v-if="event.files && event.files.length >= 1">
+                <vue-good-table
+                  :columns="columns"
+                  :rows="event.files"
+                  >
+                  <template slot="table-row" slot-scope="props">
+                    <span v-if="props.column.field == 'url'">
+                      <a :href="props.row.url" target="_blank"><i class="fas fa-external-link"></i></a>
+                    </span>
+                    <span v-else-if="props.column.field == 'extras'">
+                      <button @click="deleteUploadedFile(props.row, props.index)">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </span>
+                    <span v-else>
+                      {{props.formattedRow[props.column.field]}}
+                    </span>
+                  </template>
+                </vue-good-table>
+              </div>
+            </div>
+          </div>
 
       		<div class="dashboard__container--body--col">
+            <h3 class="mb-3">Background Image</h3>
             <div class="flex flex-column align-center">
               <div class="event-wrapper" :style="{ backgroundImage: 'url(' + backgroundUrl + ')' }">
                 <croppa 
@@ -151,61 +205,60 @@
             </div>
           </div>
           <div class="dashboard__container--body--col">
-
+            <h3>Attire</h3>
             <div class="mb-3">
-              <label for="attire">Attire:</label>
-              <textarea name="attire" id="attire" cols="30" rows="2" v-model="event.attire"></textarea>
+              <vue-editor id="attire" v-model="event.attire" required></vue-editor>
             </div>
           </div>
           <div class="dashboard__container--body--col">
 
             <div class="mb-3">
-              <label for="pay">Pay:</label>
-              <textarea name="pay" id="pay" cols="30" rows="2" v-model="event.pay"></textarea>
+              <h3>Pay</h3>
+              <vue-editor id="pay" v-model="event.pay" required></vue-editor>
             </div>
           </div>
           <div class="dashboard__container--body--col">
 
             <div class="mb-3">
-              <label for="checkin">Check-In Details:</label>
-              <textarea name="checkin" id="checkin" cols="30" rows="2" v-model="event.checkin"></textarea>
+              <h3>Check-In Instructions</h3>
+              <vue-editor id="checkin" v-model="event.checkin" required></vue-editor>
             </div>
 
           </div>
 
           <div class="dashboard__container--body--col">
             <div class="mb-3">
-              <label for="parking">Parking Details:</label>
-              <textarea name="parking" id="parking" cols="30" rows="2" v-model="event.parking"></textarea>
+              <h3>Parking Instructions</h3>
+              <vue-editor id="parking" v-model="event.parking" required></vue-editor>
             </div>
           </div>
 
           <div class="dashboard__container--body--col">
             <div class="mb-3">
-              <label for="camping">Camping Details:</label>
-              <textarea name="camping" id="camping" cols="30" rows="2" v-model="event.camping"></textarea>
+              <h3>Camping Instructions</h3>
+              <vue-editor id="camping" v-model="event.camping" required></vue-editor>
             </div>
           </div>
 
           <div class="dashboard__container--body--col">
             <div class="mb-3">
-              <label for="creds">Credentials Details:</label>
-              <textarea name="creds" id="creds" cols="30" rows="2" v-model="event.creds"></textarea>
+              <h3>Credentials Instructions</h3>
+              <vue-editor id="creds" v-model="event.creds" required></vue-editor>
             </div>
           </div>
 
           <div class="dashboard__container--body--col">
             <div class="mb-3">
-              <label for="covid">COVID Requirements:</label>
-              <textarea name="covid" id="covid" cols="30" rows="2" v-model="event.covid"></textarea>
+              <h3>COVID Requirements:</h3>
+              <vue-editor id="covid" v-model="event.covid" required></vue-editor>
             </div>
           </div>
 
 
           <div class="dashboard__container--body--col">
             <div class="mb-3">
-              <label for="notes">Additional Notes:</label>
-              <textarea name="notes" id="notes" cols="30" rows="2" v-model="event.notes"></textarea>
+              <h3>Additional Notes:</h3>
+              <vue-editor id="notes" v-model="event.notes" required></vue-editor>
             </div>
           </div>
           <div class="dashboard__container--body--col">
@@ -234,7 +287,7 @@
                   </span>
                 </transition>
               </button>
-              <button class="btn btn__dark" @click="deleteEvent()">delete</button>
+              <!-- <button class="btn btn__dark" @click="deleteEvent()">delete event</button> -->
             </div>
       		</div>
       	</div>
@@ -259,6 +312,32 @@ export default {
     multiDay: false,
     performingRequest: false,
     performingRequest2: false,
+    performingRequest3: false,
+    imageData: null,
+    fileTitle: '',
+    fileDescription: '',
+    uploadValue: 0,
+    showBar:false,
+    columns: [
+      {
+        label: 'Title',
+        field: 'title',
+      },
+      {
+        label: 'Description',
+        field: 'description',
+      },
+      {
+        label: 'Url',
+        field: 'url',
+        tdClass: 'text-right',
+      },
+      {
+        label: '',
+        field: 'extras',
+        tdClass: 'text-right',
+      },
+    ]
   }),
   components: {
     VueEditor,
@@ -286,6 +365,44 @@ export default {
     },
   },
   methods: {
+    previewImage(event) {
+      this.uploadValue=0;
+      this.imageData=event.target.files[0]
+    },
+    onUploadFile() {
+      this.showBar = true
+      let event = this.event
+      let fileTitle = this.fileTitle
+      let fileDescription = this.fileDescription
+      let rand = (Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16)).toUpperCase()
+      let storageRef = fb.storageRef.child('docs/' + rand).put(this.imageData);
+      storageRef.on(`state_changed`, snapshot => {
+        this.uploadValue=(snapshot.bytesTransferred/snapshot.totalBytes)*100;
+      }, error => {console.log(error.message)},
+      () => {this.uploadValue=100;
+        storageRef.snapshot.ref.getDownloadURL().then((downloadURL) => {
+          console.log('File available at', downloadURL)
+            var docRef = fb.eventsCollection.doc(event.id)
+            docRef.update({
+              files: fb.firestore.FieldValue.arrayUnion({
+                title: fileTitle,
+                description: fileDescription,
+                url: downloadURL
+              })
+            });
+            event.files.push({
+              title: fileTitle,
+              description: fileDescription,
+              url: downloadURL
+            })
+        })
+        this.showBar = false
+      })
+      this.imageData = null
+      this.fileTitle = ''
+      this.fileDescription = ''
+      this.$refs.fileInputTip.value=null
+    },
     onFileTypeMismatch(file) {
       alert('Invalid file type. Please choose a jpeg or png file.')
     },
@@ -315,6 +432,12 @@ export default {
     deleteJob(index) {
       let event = this.event
       event.jobs.splice(index, 1)
+      this.$store.dispatch('updateEvent', event)
+    },
+    deleteUploadedFile(u, index) {
+      console.log(u)
+      let event = this.event
+      event.files.splice(index, 1)
       this.$store.dispatch('updateEvent', event)
     },
     shifts() {
@@ -377,14 +500,20 @@ export default {
   beforeDestroy () {
     this.croppa = null
     this.multiDay = null
+    this.fileTitle = null
+    this.fileDescription = null
     this.performingRequest = null
     this.performingRequest2 = null
+    this.performingRequest4 = null
     this.day = null
     delete this.day
     delete this.croppa
     delete this.multiDay
+    delete this.fileTitle
+    delete this.fileDescription
     delete this.performingRequest
     delete this.performingRequest2
+    delete this.performingRequest3
   	this.$store.dispatch('clearErrors')
   }
 }
