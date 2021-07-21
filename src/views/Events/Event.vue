@@ -262,6 +262,10 @@
             </div>
           </div>
           <div class="dashboard__container--body--col">
+            <div class="mb-3">
+              <h3>Send Message to Update Staff:</h3>
+              <textarea name="updateMessage" id="updateMessage" cols="30" rows="4" v-model="event.updateMessage"></textarea>
+            </div>
             <button class="btn btn__outlined btn__large" @click="updateStaff()">
               Update Staff
               <transition name="fade">
@@ -515,6 +519,7 @@ export default {
     delete this.performingRequest2
     delete this.performingRequest3
   	this.$store.dispatch('clearErrors')
+    this.$store.dispatch('clearEventState')
   }
 }
 </script>

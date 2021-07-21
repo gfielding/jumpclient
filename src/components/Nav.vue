@@ -51,6 +51,11 @@
               placements
             </router-link>
           </div>
+          <div class="nav__menu--item desktop">
+            <router-link :to="{name: 'shifts'}">
+              timesheets
+            </router-link>
+          </div>
           <div class="nav__menu--item">
             <a @click="logout()">logout</a>
           </div>

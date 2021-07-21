@@ -21,8 +21,9 @@
         </span>
 
         <span v-if="props.column.field == 'submittedBy'">
-          <router-link :to="`/users/` + props.row.submittedBy" target="_blank">	<i class="fas fa-external-link"></i>
-          </router-link>
+          {{props.row.submittedBy}}
+          <!-- <router-link :to="`/users/` + props.row.submittedBy" target="_blank">	<i class="fas fa-external-link"></i>
+          </router-link> -->
         </span>
       </template>
 
@@ -61,7 +62,7 @@ export default {
         console.log(q)
         const postedDate = new Date(q.seconds) * 1000;
         console.log(postedDate)
-        return moment(postedDate).format('MMMM Do YYYY, h:mm:ss a')
+        return moment(postedDate).format('MMMM Do YYYY')
       } else {
         return null
       }

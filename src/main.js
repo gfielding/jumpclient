@@ -7,6 +7,7 @@ import Croppa from 'vue-croppa'
 import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css';
 import VTooltip from 'v-tooltip'
+import vClickOutside from 'v-click-outside'
 import VueGoodTablePlugin from 'vue-good-table'
 import * as VueGoogleMaps from "vue2-google-maps"
 import {GmapMarker} from 'vue2-google-maps/src/components/marker'
@@ -21,6 +22,7 @@ Vue.use(VueGoodTablePlugin);
 Vue.use(Croppa);
 Vue.use(VueMask);
 Vue.use(VTooltip)
+Vue.use(vClickOutside)
 Vue.use(require('vue-moment'))
 Vue.use(VueGoogleMaps, {
   load: {

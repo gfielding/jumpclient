@@ -69,6 +69,31 @@
 		background:transparent;
 		color:$text !important;
 	}
+	&__gradient {
+		color:white;
+		z-index: 1;
+		background-image: linear-gradient(to right bottom, $accent, $accentDark, $primaryDark);
+		position: relative;
+		&::before {
+		  position: absolute;
+		  content: "";
+		  top: 0;
+		  right: 0;
+		  bottom: 0;
+		  left: 0;
+		  background-image: linear-gradient(to right bottom, $accentDark, $primaryDark, $primary);
+		  z-index: -1;
+		  transition: opacity 0.2s linear;
+		  opacity: 0;
+		  border-radius:$radius;
+		}
+		&:hover {
+			&::before {
+			  opacity: 1;
+			  border-radius:$radius;
+			}
+		}
+	}
 }
 
 button.chip {

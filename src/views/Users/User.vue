@@ -53,7 +53,7 @@
           <NotesTable :notes="userNotes" />
         </div>
         <div class="dashboard__container--body--col">
-          <UserNote :user="user" />
+          <UserNote :user="user" :me="userProfile" />
         </div>
       </div>
 
@@ -88,7 +88,7 @@ import router from '@/router'
 export default {
   name: 'user',
   computed: {
-    ...mapState(['userInfo', 'userNotes']),
+    ...mapState(['userInfo', 'userNotes', 'userProfile']),
     user() {
       return this.userInfo
     }

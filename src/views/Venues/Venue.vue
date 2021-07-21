@@ -95,6 +95,17 @@
             }"
             @on-row-click="onRowClick"
           >
+          <template slot="table-row" slot-scope="props">
+            <span v-if="props.column.field == 'startDate'">
+              {{props.row.startDate | moment("ddd, MMM Do YYYY") }}
+              <span v-if="props.row.endDate">
+                  - {{props.row.endDate | moment("ddd, MMM Do YYYY") }}
+              </span>
+            </span>
+             <span v-else>
+              {{props.formattedRow[props.column.field]}}
+            </span>
+          </template>
         </vue-good-table>
       </div>
     </div>
@@ -120,16 +131,12 @@ export default {
     croppa: {},
     columns: [
       {
-        label: 'Title',
+        label: 'Event',
         field: 'title',
       },
       {
-        label: 'Start',
+        label: 'Date',
         field: 'startDate',
-      },
-      {
-        label: 'End',
-        field: 'endDate',
       },
     ]
   }),

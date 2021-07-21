@@ -173,6 +173,22 @@ const router = new VueRouter({
         requiresAuth: true
       }
     },
+    {
+      path: '/timesheets',
+      name: 'shifts',
+      component: () => import('../views/Shifts/Shifts.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/timesheets/:id',
+      name: 'shift',
+      component: () => import('../views/Shifts/Shift.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
   ]
 })
 

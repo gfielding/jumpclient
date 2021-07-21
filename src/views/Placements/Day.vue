@@ -22,7 +22,7 @@
             >
             <template slot="table-row" slot-scope="props">
             	<span v-if="props.column.field == 'extras'">
-            		<span v-if="props.row.note" style="display:inline; margin-right: 1rem;">
+            		<span v-if="props.row.note" style="display:inline; margin-right: 1.5rem;">
             			<button class="icon" v-tooltip="props.row.note">
 	            			<i class="far fa-sticky-note"></i>
 	            		</button>
@@ -31,14 +31,14 @@
 	                (props.row.dayStatus != 'hired') &&
 	                (props.row.dayStatus != 'assigned') &&
 	                (props.row.dayStatus != 'not requested')
-	              " style="display:inline; margin-right: 1rem;">
+	              " style="display:inline; margin-right: 1.5rem;">
 	                <button class="icon" @click="reserveUser(props.row)" v-tooltip="'reserve user'">
 	                	<i class="far fa-calendar"></i>
 	                </button>
 	              </span>
 	              <span v-if="
 	                (props.row.dayStatus == 'hired' || props.row.dayStatus == 'assigned')
-	              " style="display:inline; margin-right: 1rem;">
+	              " style="display:inline; margin-right: 1.5rem;">
 	                <button class="icon" v-tooltip="'cancel reservation'" @click="unreserveUser(props.row)">
 	                	<i class="fas fa-calendar-check" style="color:green;"></i>
 	                </button>
@@ -48,7 +48,7 @@
 	                (props.row.dayStatus != 'hired') &&
                   (props.row.dayStatus != 'assigned') &&
                   (props.row.dayStatus != 'not requested')"
-	              	style="display:inline; margin-right: 1rem;">
+	              	style="display:inline; margin-right: 1.5rem;">
 	                <button class="icon" v-tooltip="'not use this staff today'" @click="notRequestUser(props.row)">
 	                	<i class="fas fa-calendar-times"></i>
 	                </button>
@@ -56,7 +56,7 @@
 
 	              <span v-if="
 	                (props.row.dayStatus == 'not requested')
-	              " style="display:inline; margin-right: 1rem;">
+	              " style="display:inline; margin-right: 1.5rem;">
 	                <button class="icon" v-tooltip="'cancel cancellation'" @click="cancelNotRequestUser(props.row)">
 	                	<i class="fas fa-calendar-times" style="color:red;"></i>
 	                </button>
@@ -64,36 +64,43 @@
 
 	              <span v-if="
 	                (props.row)
-	              " style="display:inline; margin-right: 1rem;">
+	              " style="display:inline; margin-right: 1.5rem;">
 	              	<span v-for="u in filteredInfo(props.row)">
 
-	              		<span v-if="u.contractorStatus" style="display:inline; margin-right: 1rem;">
+	              		<span v-if="u.contractorStatus" style="display:inline; margin-right: 1.5rem;">
 		              		<button class="icon" v-tooltip="'C - ' + u.contractorStatus">
 			                	<i class="fas fa-hammer"></i>
 			                </button>
 			              </span>
 
-			              <span v-if="u.employeeStatus" style="display:inline; margin-right: 1rem;">
+			              <span v-if="u.employeeStatus" style="display:inline; margin-right: 1.5rem;">
 		              		<button class="icon" v-tooltip="'E - ' + u.employeeStatus">
 			                	<i class="fas fa-user"></i>
 			                </button>
 			              </span>
 
 
-	              		<span v-for="client in u.blacklist" style="display:inline; margin-right: 1rem;">
+	              		<span v-for="client in u.blacklist" style="display:inline; margin-right: 1.5rem;">
 	              			<button class="icon" v-tooltip="client.title">
 			                	<i class="fas fa-exclamation-triangle" style="color:red;"></i>
 			                </button>
 	              		</span>
+
+	              		<span style="display:inline; margin-right: 1.5rem;">
+	              			<button class="icon" v-tooltip="'TIPS Certification'">
+	              				<i class="fas fa-file-certificate" style="color:green;" v-if="u.certTips"></i>
+			                	<i class="fas fa-file-certificate" v-if="!u.certTips" style="color:red;"></i>
+			                </button>
+	              		</span>
 	              	
-	              		<span v-if="u && u.address && u.address.city && u.address.state" style="display:inline; margin-right: 1rem;">
+	              		<span v-if="u && u.address && u.address.city && u.address.state" style="display:inline; margin-right: 1.5rem;">
 		              		<button class="icon" v-tooltip="u.address.city + ', ' + u.address.state">
 			                	<i class="fas fa-map-marker"></i>
 			                </button>
 			              </span>
 
 			              <v-popover v-if="u.skills && u.skills.length >= 1" style="display:inline;">
-			              	<button class="icon" style="display:inline; margin-right: 1rem;">
+			              	<button class="icon" style="display:inline; margin-right: 1.5rem;">
 			                	<i class="fas fa-briefcase"></i>
 			                </button>
 			                <template slot="popover">
@@ -101,7 +108,7 @@
   										</template>
 			              </v-popover>
 
-			              <router-link :to="'/users/' + u.userId" style="display:inline; margin-right: 1rem;">
+			              <router-link :to="'/users/' + u.userId" style="display:inline; margin-right: 1.5rem;">
                       <i class="fas fa-external-link" style="color:mediumblue;"></i>
                     </router-link>
 
@@ -149,7 +156,7 @@
 		            >
 		            <template slot="table-row" slot-scope="props">
 		            	<span v-if="props.column.field == 'extras2'">
-		            		<span v-if="props.row.note" style="display:inline; margin-right: 1rem;">
+		            		<span v-if="props.row.note" style="display:inline; margin-right: 1.5rem;">
 		            			<button class="icon" v-tooltip="props.row.note">
 			            			<i class="far fa-sticky-note"></i>
 			            		</button>
@@ -158,21 +165,21 @@
 			                (props.row.dayStatus != 'hired') &&
 			                (props.row.dayStatus != 'assigned') &&
 			                (props.row.dayStatus != 'not requested')
-			              " style="display:inline; margin-right: 1rem;">
+			              " style="display:inline; margin-right: 1.5rem;">
 			                <button class="icon" @click="reserveUser(props.row)" v-tooltip="'reserve user'">
 			                	<i class="far fa-calendar"></i>
 			                </button>
 			              </span>
 			              <span v-if="
 			                (props.row.dayStatus == 'hired')
-			              " style="display:inline; margin-right: 1rem;">
+			              " style="display:inline; margin-right: 1.5rem;">
 			                <button class="icon" v-tooltip="'cancel reservation'" @click="unreserveUser(props.row)">
 			                	<i class="fas fa-calendar-check" style="color:green;"></i>
 			                </button>
 			              </span>
 			              <span v-if="
 			                (props.row.dayStatus == 'not requested')
-			              " style="display:inline; margin-right: 1rem;">
+			              " style="display:inline; margin-right: 1.5rem;">
 			                <button class="icon" v-tooltip="'cancel cancellation'" @click="cancelNotRequestUser(props.row)">
 			                	<i class="fas fa-calendar-times" style="color:red;"></i>
 			                </button>
@@ -180,36 +187,43 @@
 
 			              <span v-if="
 			                (props.row)
-			              " style="display:inline; margin-right: 1rem;">
+			              " style="display:inline; margin-right: 1.5rem;">
 			              	<span v-for="u in filteredInfo(props.row)">
 
-			              		<span v-if="u.contractorStatus" style="display:inline; margin-right: 1rem;">
+			              		<span v-if="u.contractorStatus" style="display:inline; margin-right: 1.5rem;">
 				              		<button class="icon" v-tooltip="'C - ' + u.contractorStatus">
 					                	<i class="fas fa-hammer"></i>
 					                </button>
 					              </span>
 
-					              <span v-if="u.employeeStatus" style="display:inline; margin-right: 1rem;">
+					              <span v-if="u.employeeStatus" style="display:inline; margin-right: 1.5rem;">
 				              		<button class="icon" v-tooltip="'E - ' + u.employeeStatus">
 					                	<i class="fas fa-user"></i>
 					                </button>
 					              </span>
 
 
-			              		<span v-for="client in u.blacklist" style="display:inline; margin-right: 1rem;">
+			              		<span v-for="client in u.blacklist" style="display:inline; margin-right: 1.5rem;">
 			              			<button class="icon" v-tooltip="client.title">
 					                	<i class="fas fa-exclamation-triangle" style="color:red;"></i>
 					                </button>
 			              		</span>
+
+			              		<span style="display:inline; margin-right: 1.5rem;">
+			              			<button class="icon" v-tooltip="'TIPS Certification'">
+			              				<i class="fas fa-file-certificate" style="color:green;" v-if="u.certTips"></i>
+					                	<i class="fas fa-file-certificate" v-if="!u.certTips" style="color:red;"></i>
+					                </button>
+			              		</span>
 			              	
-			              		<span v-if="u && u.address && u.address.city && u.address.state" style="display:inline; margin-right: 1rem;">
+			              		<span v-if="u && u.address && u.address.city && u.address.state" style="display:inline; margin-right: 1.5rem;">
 				              		<button class="icon" v-tooltip="u.address.city + ', ' + u.address.state">
 					                	<i class="fas fa-map-marker"></i>
 					                </button>
 					              </span>
 
 					              <v-popover v-if="u.skills && u.skills.length >= 1" style="display:inline;">
-					              	<button class="icon" style="display:inline; margin-right: 1rem;">
+					              	<button class="icon" style="display:inline; margin-right: 1.5rem;">
 					                	<i class="fas fa-briefcase"></i>
 					                </button>
 					                <template slot="popover">
@@ -217,7 +231,7 @@
 		  										</template>
 					              </v-popover>
 
-					              <router-link :to="'/users/' + u.userId" style="display:inline; margin-right: 1rem;">
+					              <router-link :to="'/users/' + u.userId" style="display:inline; margin-right: 1.5rem;">
 		                      <i class="fas fa-external-link" style="color:mediumblue;"></i>
 		                    </router-link>
 			              	</span>
@@ -225,11 +239,11 @@
 										</span>
 
 
-										<button v-if="props.row.dayStatus == 'hired' && props.row.status != 'assigned'" class="icon" v-tooltip="'lock shift'" @click="lockShift(props, shift)" style="display:inline; margin-right: 1rem;">
+										<button v-if="props.row.dayStatus == 'hired' && props.row.status != 'assigned'" class="icon" v-tooltip="'lock shift'" @click="lockShift(props, shift)" style="display:inline; margin-right: 1.5rem;">
 		                	<i class="fas fa-lock-open-alt"></i>
 		                </button>
 
-		                <button class="icon" v-if="props.row.dayStatus == 'hired' && props.row.status == 'assigned'" style="display:inline; margin-right: 1rem;">
+		                <button class="icon" v-if="props.row.dayStatus == 'hired' && props.row.status == 'assigned'" style="display:inline; margin-right: 1.5rem;">
 		                	<i class="fas fa-lock-alt"></i>
 		                </button>
 
@@ -438,6 +452,7 @@ export default {
             phone: props.row.phone,
             event: shift.event,
             name:  shift.event,
+            fileId: props.row.fileId || '123',
             position: shift.position.title,
             start: shiftDay + " " + shift.startTime,
             end: shiftDay + " " + shift.endTime,

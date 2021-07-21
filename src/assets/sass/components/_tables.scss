@@ -9,9 +9,10 @@
 }
 
 table.vgt-table {
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   border: 1px solid $textLight;
   border:none;
+  width:calc(100% - 1px);
 }
 
 .vgt-global-search {

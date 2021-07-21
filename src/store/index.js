@@ -41,6 +41,9 @@ const store = new Vuex.Store({
     dayUsers: [],
     availableUsers: [],
     dayEvents: [],
+    shifts:[],
+    shift:{},
+    shiftAssignments: [],
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -322,7 +325,7 @@ const store = new Vuex.Store({
         doc => {
           fb.userNotesCollection.doc(doc.id).update({
             userId: payload.userId,
-            submittedBy: state.currentUser.uid,
+            submittedBy: payload.submittedBy,
             id: doc.id,
             created: fb.firestore.FieldValue.serverTimestamp()
           })
@@ -499,6 +502,7 @@ const store = new Vuex.Store({
             phone: doc.data().phone,
             name: doc.data().name,
             email: doc.data().email,
+            message: payload.updateMessage,
             event: payload
           }
           if (payload.published) {
@@ -599,6 +603,44 @@ const store = new Vuex.Store({
     clearEventShifts({ commit }) {
       commit('setEventShifts', [])
     },
+    getShifts({ commit }, payload) {
+      fb.shiftsCollection.orderBy('day', 'desc').onSnapshot(querySnapshot => {
+        let shiftsArray = []
+        querySnapshot.forEach(doc => {
+          let shift = doc.data()
+          shift.id = doc.id
+          shiftsArray.push(shift)
+        })
+        commit('setShifts', shiftsArray)
+      })
+    },
+    clearShiftsState({ commit }) {
+      commit('setShifts', [])
+    },
+    getShiftFromId({ commit }, payload) {
+      fb.shiftsCollection.where("id", "==", payload).onSnapshot(querySnapshot => {
+        querySnapshot.forEach(function (doc) {
+          commit("setShift", doc.data())
+        })
+      })
+      store.dispatch('getAssignmentsForShift', payload)
+    },
+    getAssignmentsForShift({ commit }, payload) {
+      console.log(payload)
+      fb.assignmentsCollection.where("shiftId", "==", payload).orderBy('firstName', 'asc').onSnapshot(querySnapshot => {
+        let assignmentsArray = []
+        querySnapshot.forEach(doc => {
+          let assignment = doc.data()
+          assignment.id = doc.id
+          assignmentsArray.push(assignment)
+        })
+        commit('setShiftAssignments', assignmentsArray)
+      })
+    },
+    clearShiftState({ commit }) {
+      commit('setShift', {})
+      commit('setShiftAssignments', [])
+    },
 
 
 
@@ -692,8 +734,18 @@ const store = new Vuex.Store({
 
 
 
-
-
+    /*TIMESHEETS*/
+    updateTimesheet({ commit }, payload) {
+      console.log(payload)
+      fb.assignmentsCollection.where("id", "==", payload.id).get()
+      .then(function (querySnapshot) {
+        if (querySnapshot.empty) {
+        }
+        querySnapshot.forEach(function (doc) {
+          fb.assignmentsCollection.doc(doc.id).update(payload)
+        })
+      })
+    },
 
 
     clearErrors({ commit }) {
@@ -720,7 +772,7 @@ const store = new Vuex.Store({
         state.venues = []
       }
     },
-     setVenueInfo(state, val) {
+    setVenueInfo(state, val) {
       state.venueInfo = val
     },
     setVenueEvents(state, val) {
@@ -801,6 +853,16 @@ const store = new Vuex.Store({
         state.dayShifts = []
       }
     },
+    setShifts(state, val) {
+      if (val) {
+        state.shifts = val
+      } else {
+        state.shifts = []
+      }
+    },
+    setShift(state, val) {
+      state.shift = val
+    },
     setDayUsers(state, val) {
       if (val) {
         state.dayUsers = val
@@ -820,6 +882,13 @@ const store = new Vuex.Store({
         state.dayEvents = val
       } else {
         state.dayEvents = []
+      }
+    },
+    setShiftAssignments(state, val) {
+      if (val) {
+        state.shiftAssignments = val
+      } else {
+        state.shiftAssignments = []
       }
     },
     setPerformingRequest(state, val) {

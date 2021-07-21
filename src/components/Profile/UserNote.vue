@@ -16,7 +16,7 @@
 
 <script>
 export default {
-  props: ['user'],
+  props: ['user', 'me'],
   data: () => ({
     performingRequest: false,
     note: '',
@@ -24,9 +24,11 @@ export default {
   methods: {
   	onAddNote() {
   		this.performingRequest = true
+      let name = this.me.firstName + ' ' + this.me.lastName
   		let theNote = {
   			note: this.note,
   			userId: this.user.id,
+        submittedBy: name
   		}
   		this.$store.dispatch('addUserNote', theNote)
   		setTimeout(() => {
