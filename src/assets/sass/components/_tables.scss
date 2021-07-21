@@ -14,6 +14,9 @@ table.vgt-table {
   border:none;
   width:calc(100% - 1px);
 }
+table.vgt-table td {
+  vertical-align:middle;
+}
 
 .vgt-global-search {
   border: none;

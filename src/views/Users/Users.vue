@@ -10,6 +10,7 @@
           <vue-good-table
             :columns="columns"
             :rows="users"
+            styleClass="vgt-table striped"
             :search-options="{
               enabled: true,
               placeholder: 'Search this table',

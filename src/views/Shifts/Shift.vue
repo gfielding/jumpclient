@@ -37,7 +37,48 @@
           
             <template slot="table-row" slot-scope="props">
               <span v-if="props.column.field == 'regHours'">
-                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onSheetEdit(props.row)" />
+                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'otHours'">
+                <input type="number" v-model.trim="props.row.otHours" id="otHours" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'ot2Hours'">
+                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'mbp'">
+                <input type="number" v-model.trim="props.row.mbp" id="mbp" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'tips'">
+                <input type="number" v-model.trim="props.row.tips" id="tips" @change="onSheetEdit(props.row)" :readonly="props.row.locked"  />
+              </span>
+              <span v-else-if="props.column.field == 'state'">
+                <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'status'">
+                <v-select
+                  label="status" 
+                  :options="statuses"
+                  v-model="props.row.status"
+                  @input="onSheetEdit(props.row)"
+                  :disabled="props.row.locked"
+                  >
+                </v-select>
+              </span>
+              <span v-else-if="props.column.field == 'locked'">
+                <button class="btn btn__icon" @click="lock(props.row)" v-if="!props.row.locked">
+                  <i class="fas fa-lock-open-alt"></i>
+                </button>
+                <button class="btn btn__icon" @click="unlock(props.row)" v-if="props.row.locked">
+                  <i class="fas fa-lock-alt" style="color:#5cb85c;"></i>
+                </button>
+              </span>
+
+
+              
+              <span v-else-if="props.column.field == 'link'">
+                <router-link :to="`/users/` + props.row.id" target="_blank">
+                  <button class="btn btn__flat btn__small btn__outlined">open <i class="fas fa-external-link ml-2"></i></button>
+                </router-link>
               </span>
                <span v-else>
                 {{props.formattedRow[props.column.field]}}
@@ -66,20 +107,22 @@ export default {
   name: 'shift',
   data: () => ({
     activeItem: null,
+    statuses: ['completed', 'arrived late', 'left early', 'no-show', 'client fired', 'terminated' ],
     columns: [
       {
-        label: 'Locked',
+        label: 'Lock',
         field: 'locked',
         type: 'boolean',
+        tdClass: 'text-center',
       },
       {
-        label: 'Link',
         field: 'link',
         sortable: false,
       },
       {
         label: 'Status',
         field: 'status',
+        width: '150px',
       },
       {
         label: 'First',
@@ -92,6 +135,7 @@ export default {
       {
         label: 'ID',
         field: 'fileId',
+        sortable: false,
       },
       {
         label: 'State',
@@ -107,7 +151,7 @@ export default {
       },
       {
         label: '2OT Hours',
-        field: '2otHours',
+        field: 'ot2Hours',
       },
       {
         label: 'Meal Break Penalty',
@@ -131,6 +175,12 @@ export default {
   methods: {
     onSheetEdit(row) {
       this.$store.dispatch('updateTimesheet', row)
+    },
+    lock(item) {
+      fb.assignmentsCollection.doc(item.id).update({ locked: true })
+    },
+    unlock(item) {
+      fb.assignmentsCollection.doc(item.id).update({ locked: false })
     },
     goBack() {
       router.go(-1)

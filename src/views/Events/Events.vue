@@ -12,6 +12,7 @@
           <vue-good-table
               :columns="columns"
               :rows="events"
+               styleClass="vgt-table striped"
               :search-options="{
                 enabled: true,
                 placeholder: 'Search this table',
@@ -57,7 +58,6 @@ export default {
       {
         label: 'Date',
         field: 'startDate',
-        type: 'date',
       },
       {
         label: 'Visible',
