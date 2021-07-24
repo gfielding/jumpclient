@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <Nav v-if="showNav" :userProfile="currentUser" />
-    <router-view/>
+    <keep-alive  max="2" :exclude="['day','user', 'event', 'venue', 'shift']">
+      <router-view/>
+    </keep-alive>
     <transition name="fade">
       <div v-if="errorMessage" class="errorMessage" >
       {{errorMessage}}

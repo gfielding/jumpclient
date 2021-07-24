@@ -13,6 +13,7 @@ import * as VueGoogleMaps from "vue2-google-maps"
 import {GmapMarker} from 'vue2-google-maps/src/components/marker'
 import GmapCluster from 'vue2-google-maps/dist/components/cluster'
 import VueMask from 'v-mask'
+import VueGapi from 'vue-gapi'
 import 'vue-good-table/dist/vue-good-table.css'
 import './assets/sass/main.scss'
 const fb = require('./firebaseConfig.js')
@@ -29,6 +30,13 @@ Vue.use(VueGoogleMaps, {
     key: 'AIzaSyBvT8-4gdOJ8CRHv2mD_MAohqD8vo0To10',
     libraries: 'places' // necessary for places input
   }
+})
+
+Vue.use(VueGapi, {
+  apiKey: 'AIzaSyAodk6UTPCONDk1ANHsgvhMDXvaLD0710M',
+  clientId: '79524683437-sgf8m6ag6okpijaghonr3hpu6rlfc9q0.apps.googleusercontent.com',
+  discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+  scope: 'https://www.googleapis.com/auth/spreadsheets',
 })
 
 Vue.config.productionTip = false

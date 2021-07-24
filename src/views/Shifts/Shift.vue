@@ -18,6 +18,12 @@
           <span>{{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}</span> - <span>{{ [ shift.endTime, "HH:mm" ] | moment("hh:mm A") }}</span>
           <div>Staff Requested: {{shift.staff}}</div>
         </div>
+        <div class="dashboard__container--body--col">
+          <button class="btn btn__outlined" @click.prevent="exportReport">Export Payroll<i class="fas fa-external-link ml-3"></i></button>
+          <div class="caption mt-3" v-if="shift.exported">
+            Last Exported: {{ shift.exported.toDate() | moment("MMMM Do YYYY, h:mm a") }}
+          </div>
+        </div>
       </div>
       <div class="dashboard__container--body" v-if="shift">
         <div class="dashboard__container--body--col max">
@@ -36,7 +42,13 @@
           >
           
             <template slot="table-row" slot-scope="props">
-              <span v-if="props.column.field == 'regHours'">
+              <span v-if="props.column.field == 'regRate'">
+                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'fileId'">
+                <input type="text" v-model.trim="props.row.fileId" id="fileId" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'regHours'">
                 <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'otHours'">
@@ -101,6 +113,7 @@
 import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import router from '@/router'
+import ExportService from "@/services/ExportService"
 const fb = require('../../firebaseConfig.js')
 
 export default {
@@ -140,6 +153,10 @@ export default {
       {
         label: 'State',
         field: 'state',
+      },
+      {
+        label: 'Reg Rate',
+        field: 'regRate',
       },
       {
         label: 'Reg Hours',
@@ -184,6 +201,51 @@ export default {
     },
     goBack() {
       router.go(-1)
+    },
+    exportReport() {
+      this.performingRequest = true
+      const exportHeaders = [
+        "Co Code",
+        "Batch ID",
+        "File #",
+        "State",
+        "Tax Frequency",
+        "Temp Dept",
+        "Temp Rate",
+        "Reg Hours",
+        "O/T Hours",
+        "2 O/T Hours",
+        "Meal Break Penalty",
+        "Tips"
+      ];
+      console.log(exportHeaders)
+      const exportItems = [];
+      for (var key in this.shiftAssignments) {
+        exportItems.push([
+          "VJL",
+          this.shiftAssignments[key].id,
+          this.shiftAssignments[key].fileId,
+          this.shiftAssignments[key].state,
+          "", 
+          "",
+          this.shiftAssignments[key].regRate,
+          this.shiftAssignments[key].regHours,
+          this.shiftAssignments[key].otHours,
+          this.shiftAssignments[key].ot2Hours,
+          this.shiftAssignments[key].mbp,
+          this.shiftAssignments[key].tips,
+        ]);
+      }
+      console.log(exportItems)
+      this.$gapi.getGapiClient().then(gapi => {
+        const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+        exportService.export();
+      });
+      fb.shiftsCollection.doc(this.shift.id).update({ exported: fb.firestore.FieldValue.serverTimestamp() })
+      setTimeout(() => {
+        this.$store.dispatch("getShiftFromId", this.$route.params.id)
+        this.performingRequest = false
+      }, 2000)
     },
   },
   beforeDestroy () {

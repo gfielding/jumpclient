@@ -26,6 +26,32 @@
             <span v-if="props.column.field == 'created'">
               <span>{{formatDate(props.row.created)}}</span>
             </span>
+             <span v-else-if="props.column.field == 'vax'">
+              <i class="fas fa-syringe" style="color:#5cb85c;" v-if="props.row.fullyVaccinated == 'yes'"></i>
+              <i class="fas fa-syringe" style="color:#d9534f;" v-if="props.row.fullyVaccinated == 'no'"></i>
+              <i class="fas fa-syringe" v-if="!props.row.fullyVaccinated || props.row.fullyVaccinated == null"></i>
+             </span>
+             <span v-else-if="props.column.field == 'status'">
+              
+              <span style="display:inline;">
+                <i class="fas fa-hammer" v-if="props.row.contractorStatus == 'applied' || !props.row.contractorStatus" style="margin-right: 2.5rem;"></i>
+              </span>
+              <span  style="display:inline;">
+                <i class="fas fa-hammer" v-if="props.row.contractorStatus == 'payroll invitation'" style="color:#f0ad4e; margin-right: 2.5rem;"></i>
+              </span>
+              <span  style="display:inline;">
+                <i class="fas fa-hammer" v-if="props.row.contractorStatus == 'hired'" style="color:#5cb85c; margin-right: 2.5rem;"></i>
+              </span>
+
+              <!-- <span style="display:inline;">
+                <i class="fas fa-user" v-if="props.row.employeeStatus == 'applied' || !props.row.employeeStatus" style="margin-right: 2.5rem;"></i>
+              </span> -->
+
+    
+             </span>
+             <span v-else>
+                {{props.formattedRow[props.column.field]}}
+              </span>
           </template>
           </vue-good-table>
         </div>
@@ -52,6 +78,10 @@ export default {
       {
         label: 'Last Name',
         field: 'lastName',
+      },
+      {
+        label: 'Vax',
+        field: 'vax',
       },
       {
         label: 'Status',
@@ -89,6 +119,11 @@ export default {
         return null
       }
     },
+    filteredInfo(user) {
+      return this.availableUsers.filter(member => {
+        return member.id == user.userId
+      })
+    },
     filteredUsers() {
       if (!this.searchText) {return this.users}
       else {
@@ -116,7 +151,7 @@ export default {
       if(q) {
         console.log(q)
         const postedDate = new Date(q.seconds) * 1000;
-        return moment(postedDate).format('MMMM Do YYYY, h:mm:ss a')
+        return moment(postedDate).format('MMMM Do YYYY')
       } else {
         return null
       }

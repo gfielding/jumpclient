@@ -54,6 +54,7 @@ const textsCollection = db.collection('texts')
 const emailsCollection = db.collection('emails')
 const userNotesCollection = db.collection('userNotes')
 const placementsCollection = db.collection('placements')
+const faqsCollection = db.collection('faqs')
 
 export {
   db,
@@ -87,4 +88,5 @@ export {
   emailsCollection,
   userNotesCollection,
   placementsCollection,
+  faqsCollection
 }

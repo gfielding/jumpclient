@@ -61,7 +61,6 @@
 	                	<i class="fas fa-calendar-times" style="color:red;"></i>
 	                </button>
 	              </span>
-
 	              <span v-if="
 	                (props.row)
 	              " style="display:inline; margin-right: 1.5rem;">
@@ -108,7 +107,7 @@
   										</template>
 			              </v-popover>
 
-			              <router-link :to="'/users/' + u.userId" style="display:inline; margin-right: 1.5rem;">
+			              <router-link :to="'/users/' + u.id" style="display:inline; margin-right: 1.5rem;">
                       <i class="fas fa-external-link" style="color:mediumblue;"></i>
                     </router-link>
 
@@ -231,7 +230,7 @@
 		  										</template>
 					              </v-popover>
 
-					              <router-link :to="'/users/' + u.userId" style="display:inline; margin-right: 1.5rem;">
+					              <router-link :to="'/users/' + u.id" style="display:inline; margin-right: 1.5rem;">
 		                      <i class="fas fa-external-link" style="color:mediumblue;"></i>
 		                    </router-link>
 			              	</span>
@@ -452,7 +451,7 @@ export default {
             phone: props.row.phone,
             event: shift.event,
             name:  shift.event,
-            fileId: props.row.fileId || '123',
+            fileId: props.row.employeeNumber || props.row.contractorNumber || '123',
             position: shift.position.title,
             start: shiftDay + " " + shift.startTime,
             end: shiftDay + " " + shift.endTime,

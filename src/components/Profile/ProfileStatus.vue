@@ -24,6 +24,21 @@
         </button>
       </div>
     </transition>
+
+    <transition name="fade">
+      <div class="mb-3" v-if="user.contractorStatus == `hired contractor` || user.contractorStatus == `terminated`">
+        <label for="contNum">Contractor Number: (copy and paste {{contNum}})</label>
+        <input type="text" placeholder="" v-model.trim="user.contractorNumber" id="contNum" @change="updateUser()" />
+      </div>
+    </transition>
+
+
+
+
+
+
+
+
     <div class="mb-3">
 			<label for="emp">Employee Status:</label>
       <select v-model="user.employeeStatus" id="emp" @change="showButton2 = true">
@@ -47,7 +62,7 @@
         </button>
       </div>
     </transition>
-    <hr v-if="user.employeeStatus == `hired`">
+
     <transition name="fade">
 	    <div class="mb-3" v-if="user.employeeStatus == `hired`">
 	      <label for="hireDate">Hire Date:</label>
@@ -77,19 +92,17 @@
         </button>
       </div>
     </transition>
+
+
+
     <hr v-if="user.employeeStatus == `hired` || user.employeeStatus == `terminated`">
     <transition name="fade">
 	    <div class="mb-3" v-if="user.employeeStatus == `hired` || user.employeeStatus == `terminated`">
-	      <label for="empNum">Employee Number:</label>
+	      <label for="empNum">Employee Number: (get from OnPay)</label>
 	      <input type="text" placeholder="" v-model.trim="user.employeeNumber" id="empNum" @change="updateUser()" />
 	    </div>
 	  </transition>
-	  <transition name="fade">
-	    <div class="mb-3" v-if="user.contractorStatus == `approved contractor` || user.contractorStatus == `terminated`">
-	      <label for="contNum">Contractor Number:</label>
-	      <input type="text" placeholder="" v-model.trim="user.contractorNumber" id="contNum" @change="updateUser()" />
-	    </div>
-	  </transition>
+	  
 	  <hr v-if="user.employeeStatus == `terminated`">
     <transition name="fade">
 	    <div class="mb-3" v-if="user.employeeStatus == `terminated`">
@@ -106,14 +119,19 @@ import { mapState } from 'vuex'
 export default {
   props: ['user'],
   data: () => ({
-    empStatuses: ['applied', 'interviewed', 'payroll invitation', 'hired', 'not-hired', 'on-hold', 'terminated'],
-    contStatuses: ['applied', 'payroll invitation', 'approved contractor', 'not-hired', 'on-hold', 'terminated'],
-    positions: ['regular staff', 'shift-lead', 'assistant manager', 'manager'],
+    empStatuses: ['applied', 'payroll invitation', 'hired', 'not-hired', 'on-hold', 'terminated'],
+    contStatuses: ['applied', 'payroll invitation', 'hired contractor', 'not-hired', 'on-hold', 'terminated', 'hired as employee'],
+    positions: ['regular staff', 'shift-lead', 'assistant manager', 'manager', 'admin'],
     showButton: false,
     showButton2: false,
     showButton3: false,
     performingRequest: false,
   }),
+  computed: {
+    contNum() {
+      return this.user.id.slice(0,8)
+    }
+  },
   methods: {
     updateUser () {
     	this.performingRequest = true

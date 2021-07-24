@@ -35,6 +35,8 @@ const store = new Vuex.Store({
     eventDays: [],
     jobs:[],
     jobInfo: {},
+    faqs:[],
+    faqInfo: {},
     clients:[],
     clientInfo: {},
     dayShifts: [],
@@ -44,6 +46,7 @@ const store = new Vuex.Store({
     shifts:[],
     shift:{},
     shiftAssignments: [],
+    usersPerDay: [],
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -105,6 +108,16 @@ const store = new Vuex.Store({
 
       // redirect to login view
       router.push('/')
+    },
+    getUserProfile({ commit, state }) {
+      fb.usersCollection.doc(state.currentUser.uid)
+      .onSnapshot(function (doc) {
+        if (doc.exists) {
+          commit('setUserProfile', doc.data())
+        } else {
+
+        }
+      })
     },
     updateUserProfile({ commit }, payload) {
       fb.usersCollection.doc(payload.id).update(payload)
@@ -394,6 +407,50 @@ const store = new Vuex.Store({
     },
     clearJobsState({ commit }) {
       commit('setJobs', [])
+    },
+
+
+
+    /*FAQS*/
+    addFaq({ commit }, payload) {
+      fb.faqsCollection.add(payload)
+      .then(
+        doc => {
+          fb.faqsCollection.doc(doc.id).update({
+            id: doc.id,
+            created: fb.firestore.FieldValue.serverTimestamp(),
+          })
+        }
+      )
+    },
+    getFaqsState({ commit }) {
+      fb.faqsCollection.onSnapshot(querySnapshot => {
+        let faqsArray = []
+        querySnapshot.forEach(doc => {
+          let faq = doc.data()
+          faqsArray.push(faq)
+        })
+        commit('setFaqs', faqsArray)
+      })
+    },
+    getFaqFromId({ commit }, payload) {
+      fb.faqsCollection.where("id", "==", payload).onSnapshot(querySnapshot => {
+        querySnapshot.forEach(function (doc) {
+          commit("setFaqInfo", doc.data())
+        })
+      })
+    },
+    deleteFaq({ commit }, payload) {
+      fb.faqsCollection.doc(payload).delete()
+    },
+    updateFaq({ commit }, payload) {
+      fb.faqsCollection.doc(payload.id).update(payload)
+    },
+    clearFaqState({ commit }) {
+      commit('setFaqInfo', {})
+    },
+    clearFaqsState({ commit }) {
+      commit('setFaqs', [])
     },
 
 
@@ -725,6 +782,16 @@ const store = new Vuex.Store({
         venue: payload.eventInfo.venueId
       })
     },
+    getUsersPerDay({ commit }) {
+      fb.userDaysCollection.onSnapshot(querySnapshot => {
+        let userDaysArray = []
+        querySnapshot.forEach(doc => {
+          let day = doc.data()
+          userDaysArray.push(day)
+        })
+        commit('setUsersPerDay', userDaysArray)
+      })
+    },
     clearDayState({ commit }) {
       commit('setDayEvents', null)
       commit('setDayShifts', null)
@@ -836,6 +903,16 @@ const store = new Vuex.Store({
     setJobInfo(state, val) {
       state.jobInfo = val
     },
+    setFaqs(state, val) {
+      if (val) {
+        state.faqs = val
+      } else {
+        state.faqs = []
+      }
+    },
+    setFaqInfo(state, val) {
+      state.faqInfo = val
+    },
     setClients(state, val) {
       if (val) {
         state.clients = val
@@ -889,6 +966,13 @@ const store = new Vuex.Store({
         state.shiftAssignments = val
       } else {
         state.shiftAssignments = []
+      }
+    },
+    setUsersPerDay(state, val) {
+      if (val) {
+        state.usersPerDay = val
+      } else {
+        state.usersPerDay = []
       }
     },
     setPerformingRequest(state, val) {

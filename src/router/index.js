@@ -110,6 +110,30 @@ const router = new VueRouter({
       },
     },
     {
+      path: '/addfaq',
+      name: 'addfaq',
+      component: () => import('../views/FAQ/AddFAQ.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/faqs',
+      name: 'faqs',
+      component: () => import('../views/FAQ/FAQS.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/faqs/:id',
+      name: 'faq',
+      component: () => import('../views/FAQ/FAQ.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
       path: '/addclient',
       name: 'addclient',
       component: () => import('../views/Clients/AddClient.vue'),
