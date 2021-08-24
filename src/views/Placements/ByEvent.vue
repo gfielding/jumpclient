@@ -2,10 +2,7 @@
   <div class="dashboard">
     <div class="dashboard__container">
       <div class="dashboard__container--header">
-        <h1>Events</h1>
-        <router-link :to="{name: 'addevent'}" class="color--text">
-          <button class="btn btn__flat"><i class="fas fa-plus fa-2x"></i></button>
-        </router-link>
+        <h1>Place Staff By Event</h1>
       </div>
       <div class="dashboard__container--body">
           <Loader v-if="!events || events.length == 0" />
@@ -61,7 +58,7 @@ import Loader from '@/components/Loader.vue'
 import router from '@/router'
 
 export default {
-  name: 'events',
+  name: 'eventplacements',
   data: () => ({
     columns: [
       {
@@ -118,7 +115,7 @@ export default {
   },
   methods: {
     onRowClick(params) {
-      let url = `/events/` + params.row.id
+      let url = `/eventplacements/` + params.row.id
       console.log(url)
       router.push(url)
     }

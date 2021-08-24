@@ -32,10 +32,13 @@
 			    	<div class="list">
 			  			<ul>
 			  				<li class="align-center">
-
+			  					<div class="mb-3 pr-3 pl-3">
+				            <label for="name">Shift Name:</label>
+				            <input type="text" v-model.trim="newShift.name" id="name" />
+				          </div>
 						    	<div class="mb-3 pr-3 pl-3">
 				            <label for="job">Select Job:</label>
-				            <select v-model="newShift.job" id="job" required>
+				            <select v-model="newShift.job" id="job">
 				              <option v-for="(job, index) in event.jobs" :key="index" v-bind:value="job">
 				                {{job.title}}
 				              </option>
@@ -76,33 +79,32 @@
 			  		<ul>
 			  			<li v-for="(eventShift, index) in eventShifts" :key="eventShift.id" class="align-center">
 			  				<div class="mb-3 pr-3 pl-3">
+			            <label for="name">Shift Name:</label>
+			            <input type="text" v-model.trim="eventShift.name" id="name" @change="updateShift(eventShift)" />
+			          </div>
+			  				<div class="mb-3 pr-3 pl-3">
 			            <label for="job">Select Job:</label>
 			            <input type="text" v-model="eventShift.position.title" readonly />
-			            <!-- <select v-model="eventShift.position" id="job" required>
-			              <option v-for="(job, index) in event.jobs" :key="index" v-bind:value="job" read-only>
-			                {{job.title}}
-			              </option>
-			            </select> -->
 			          </div>
 			          <div class="mb-3 pr-3 pl-3">
 			            <label for="day">Select day:</label>
-			            <select v-model="eventShift.day" id="day" readonly>
+			            <select v-model="eventShift.day" id="day" @change="updateShift(eventShift)">
 			              <option v-for="(day, index) in event.days" :key="index" v-bind:value="day">
-			                {{day}}
+			                {{eventShift.day}}
 			              </option>
 			            </select>
 			          </div>
 			          <div class="mb-3 pr-3 pl-3">
 			            <label for="staff">Staff Requested:</label>
-			            <input type="number" v-model.trim="eventShift.staff" id="staff" readonly/>
+			            <input type="number" v-model.trim="eventShift.staff" id="staff" @change="updateShift(eventShift)" />
 			          </div>
 			          <div class="mb-3 pr-3 pl-3">
 			            <label for="start">Start Time:</label>
-			            <input type="time" v-model.trim="eventShift.startTime" id="start" readonly />
+			            <input type="time" v-model.trim="eventShift.startTime" id="start" @change="updateShift(eventShift)"  />
 			          </div>
 			          <div class="mb-3 pr-3 pl-3">
 			            <label for="end">End Time:</label>
-			            <input type="time" v-model.trim="eventShift.endTime" id="end" readonly />
+			            <input type="time" v-model.trim="eventShift.endTime" id="end" @change="updateShift(eventShift)" />
 			          </div>
 			          <button class="btn btn__dark ml-2" @click="deleteShift(eventShift)">Delete</button>
 			  			</li>
@@ -161,9 +163,10 @@ export default {
     },
     addNewShift () {
       let shift = {
-        position: this.newShift.job,
-        startTime: this.newShift.start,
-        endTime: this.newShift.end,
+        position: this.newShift.job || { title: null},
+        startTime: this.newShift.start || null,
+        endTime: this.newShift.end || null,
+        name: this.newShift.name,
         staff: this.newShift.staffReqested,
         eventId: this.event.id,
         event: this.event.title,
@@ -180,6 +183,9 @@ export default {
       )
       this.newShift = {}
       this.$store.dispatch("getEventShifts", this.eventId)
+    },
+    updateShift(eventShift) {
+    	this.$store.dispatch("updateEventShift", eventShift)
     },
     deleteShift(eventShift) {
       console.log(eventShift)

@@ -101,7 +101,7 @@ export default {
     center: { lat: 45.508, lng: -73.587 },
     marker: {},
     address: {},
-    place: '',
+    place: {},
     currentPlace: null,
     croppa: {},
     performingRequest:false,
@@ -210,6 +210,7 @@ export default {
   },
   beforeDestroy () {
   	this.$store.dispatch('clearErrors')
+    console.log(this)
   }
 }
 </script>

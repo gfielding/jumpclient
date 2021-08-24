@@ -21,6 +21,16 @@
           }"
           @on-row-click="onRowClick"
         >
+          <template slot="table-row" slot-scope="props">
+            <span v-if="props.column.field == 'payrollComplete'">
+              <span v-if="props.row.payrollComplete">
+                <i class="fas fa-check"></i>
+              </span>
+            </span>
+             <span v-else>
+              {{props.formattedRow[props.column.field]}}
+            </span>
+          </template>
         </vue-good-table>
       </div>
     </div>
@@ -60,6 +70,11 @@ export default {
         label: 'Position',
         field: 'position.title',
       },
+      {
+        label: 'Complete',
+        field: 'payrollComplete',
+        tdClass: 'text-center',
+      },
     ]
   }),
   computed: {
@@ -82,6 +97,7 @@ export default {
   },
   beforeDestroy () {
     this.$store.dispatch('clearShiftsState')
+    console.log(this)
   }
 }
 </script>

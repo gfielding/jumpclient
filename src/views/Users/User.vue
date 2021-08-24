@@ -122,6 +122,7 @@ export default {
   beforeDestroy() {
     this.$store.dispatch('clearUserState')
     this.$store.dispatch('clearErrors')
+    console.log(this)
   }
 }
 

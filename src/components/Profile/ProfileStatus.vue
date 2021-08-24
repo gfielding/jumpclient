@@ -28,7 +28,7 @@
     <transition name="fade">
       <div class="mb-3" v-if="user.contractorStatus == `hired contractor` || user.contractorStatus == `terminated`">
         <label for="contNum">Contractor Number: (copy and paste {{contNum}})</label>
-        <input type="text" placeholder="" v-model.trim="user.contractorNumber" id="contNum" @change="updateUser()" />
+        <input type="text" placeholder="" v-model.trim="user.contractorNumber" id="contNum" @change="updateUserFile1()" />
       </div>
     </transition>
 
@@ -99,7 +99,7 @@
     <transition name="fade">
 	    <div class="mb-3" v-if="user.employeeStatus == `hired` || user.employeeStatus == `terminated`">
 	      <label for="empNum">Employee Number: (get from OnPay)</label>
-	      <input type="text" placeholder="" v-model.trim="user.employeeNumber" id="empNum" @change="updateUser()" />
+	      <input type="text" placeholder="" v-model.trim="user.employeeNumber" id="empNum" @change="updateUserFile2()" />
 	    </div>
 	  </transition>
 	  
@@ -136,6 +136,30 @@ export default {
     updateUser () {
     	this.performingRequest = true
     	let user = this.user
+      this.$store.dispatch('updateUser', user)
+      setTimeout(() => {
+          this.showButton = false
+          this.showButton2 = false
+          this.showButton3 = false
+          this.performingRequest = false
+      }, 500)
+    },
+    updateUserFile1 () {
+      this.performingRequest = true
+      let user = this.user
+      user.fileId = user.contractorNumber
+      this.$store.dispatch('updateUser', user)
+      setTimeout(() => {
+          this.showButton = false
+          this.showButton2 = false
+          this.showButton3 = false
+          this.performingRequest = false
+      }, 500)
+    },
+    updateUserFile2 () {
+      this.performingRequest = true
+      let user = this.user
+      user.fileId = user.employeeNumber
       this.$store.dispatch('updateUser', user)
       setTimeout(() => {
           this.showButton = false

@@ -53,6 +53,38 @@ const router = new VueRouter({
         requiresAuth: true
       },
     },
+    // {
+    //   path: '/addseries',
+    //   name: 'addseries',
+    //   component: () => import('../views/Series/AddSeries.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    // },
+    // {
+    //   path: '/series',
+    //   name: 'series',
+    //   component: () => import('../views/Series/Series.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    // },
+    // {
+    //   path: '/series/:id',
+    //   name: 'seriesInfo',
+    //   component: () => import('../views/Series/SeriesInfo.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    // },
+    // {
+    //   path: '/series/:id/days',
+    //   name: 'seriesDaus',
+    //   component: () => import('../views/Series/SeriesDays.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    // },
     {
       path: '/addevent',
       name: 'addevent',
@@ -196,6 +228,22 @@ const router = new VueRouter({
       meta: {
         requiresAuth: true
       }
+    },
+    {
+      path: '/eventplacements',
+      name: 'eventplacements',
+      component: () => import('../views/Placements/ByEvent.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/eventplacements/:id',
+      name: 'eventplacement',
+      component: () => import('../views/Placements/Event.vue'),
+      meta: {
+        requiresAuth: true
+      },
     },
     {
       path: '/timesheets',

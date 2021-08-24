@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Nav v-if="showNav" :userProfile="currentUser" />
-    <keep-alive  max="2" :exclude="['day','user', 'event', 'venue', 'shift']">
+    <keep-alive  max="2" :exclude="['day','user', 'event', 'venue', 'shift', 'eventplacement', 'eventplacements']">
       <router-view/>
     </keep-alive>
     <transition name="fade">

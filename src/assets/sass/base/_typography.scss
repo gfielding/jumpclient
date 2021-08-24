@@ -104,7 +104,7 @@ h1 {
   // font-family: "BankGothicBT-Medium";
   font-family: 'D-DIN DIN-Bold';
   @include respond(tv) { 
-    font-size: 3.6vw !important;
+    font-size: 2.4vw !important;
   }
   @include respond(desktop) { 
     font-size: 4rem !important;
@@ -166,4 +166,7 @@ address, .caption {
 }
 .color--text {
   color:$text;
+}
+p.danger {
+  color:$danger;
 }

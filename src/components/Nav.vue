@@ -31,6 +31,11 @@
               events
             </router-link>
           </div>
+          <!-- <div class="nav__menu--item desktop">
+            <router-link :to="{name: 'series'}">
+              series
+            </router-link>
+          </div> -->
           <div class="nav__menu--item desktop">
             <router-link :to="{name: 'jobs'}">
               jobs
@@ -51,6 +56,11 @@
               placements
             </router-link>
           </div>
+          <!-- <div class="nav__menu--item">
+            <router-link :to="{name: 'eventplacements'}">
+              placements by event
+            </router-link>
+          </div> -->
           <div class="nav__menu--item desktop">
             <router-link :to="{name: 'shifts'}">
               timesheets
@@ -61,7 +71,7 @@
               faqs
             </router-link>
           </div>
-          <div class="nav__menu--item">
+          <div class="nav__menu--item desktop">
             <a @click="logout()">logout</a>
           </div>
           <div class="nav__menu--item mobile">
@@ -84,6 +94,51 @@
           </div>
           <div class="nav__menu--item">
             <router-link :to="{name: 'dashboard'}">Dashboard</router-link>
+          </div>
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'clients'}">
+              clients
+            </router-link>
+          </div>
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'events'}">
+              events
+            </router-link>
+          </div>
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'jobs'}">
+              jobs
+            </router-link>
+          </div>
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'users'}">
+              users
+            </router-link>
+          </div>
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'venues'}">
+              Venues
+            </router-link>
+          </div>
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'placements'}">
+              placements
+            </router-link>
+          </div>
+          <!-- <div class="nav__menu--item">
+            <router-link :to="{name: 'eventplacements'}">
+              placements by event
+            </router-link>
+          </div> -->
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'shifts'}">
+              timesheets
+            </router-link>
+          </div>
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'faqs'}">
+              faqs
+            </router-link>
           </div>
           <div class="nav__menu--item">
             <a @click="logout()">logout</a>

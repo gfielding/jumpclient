@@ -46,6 +46,8 @@ export default {
       {
         label: 'City',
         field: 'address.city',
+        thClass: 'hidden-small',
+        tdClass: 'hidden-small',
       },
       {
         label: 'State',
@@ -66,7 +68,6 @@ export default {
   methods: {
     onRowClick(params) {
       let url = `/venues/` + params.row.id
-      console.log(url)
       router.push(url)
     }
   },
@@ -74,6 +75,9 @@ export default {
     if (!this.venues || this.venues.length < 1) {
       this.$store.dispatch("getVenues")
     }
+  },
+  beforeDestroy () {
+    console.log(this)
   }
 }
 </script>

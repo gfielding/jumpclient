@@ -267,6 +267,7 @@ export default {
   beforeDestroy () {
     this.$store.dispatch('clearVenueState')
   	this.$store.dispatch('clearErrors')
+    console.log(this)
   }
 }
 </script>

@@ -32,6 +32,8 @@ export default {
     Loader
   },
   beforeDestroy () {
+    this.$store.dispatch("clearPlacementsState")
+    console.log(this)
   }
 };
 </script>

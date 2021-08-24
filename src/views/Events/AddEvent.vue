@@ -80,11 +80,14 @@
             <transition name="fadeStop">
               <div class="mb-3">
                 <label for="pickDate">Choose Jobs:</label>
-                <select v-model="job" id="venue" @change="addJob()">
-                  <option v-for="job in jobs" v-bind:value="job">
-                    {{job.title}}
-                  </option>
-                </select>
+                <v-select
+                  class="mt-2"
+                  label="title" 
+                  :options="jobs"
+                  v-model="job"
+                  @input="addJob()"
+                  >
+                </v-select>
               </div>
             </transition>
           </div>
@@ -94,11 +97,14 @@
 
             <div class="mb-3" v-if="venues.length > 1">
               <label for="venue">Venue:</label>
-              <select v-model="event.venue" id="venue" required>
-                <option v-for="venue in venues" v-bind:value="venue">
-                  {{venue.title}}
-                </option>
-              </select>
+              <v-select
+                class="mt-2"
+                label="title" 
+                :options="venues"
+                v-model="event.venue"
+                @input="updateVenue()"
+                >
+              </v-select>
             </div>
 
           </div>
@@ -106,11 +112,13 @@
 
             <div class="mb-3" v-if="clients.length >= 1">
               <label for="client">Client:</label>
-              <select v-model="event.client" id="client" required>
-                <option v-for="client in clients" v-bind:value="client">
-                  {{client.title}}
-                </option>
-              </select>
+              <v-select
+                class="mt-2"
+                label="title" 
+                :options="clients"
+                v-model="event.client"
+                >
+              </v-select>
             </div>
 
           </div>
@@ -118,7 +126,7 @@
 
             <div class="mb-3">
               <label for="checkin">Check-In Details:</label>
-              <textarea name="checkin" id="checkin" cols="30" rows="10" v-model="event.checkin"></textarea>
+              <vue-editor id="checkin" v-model="event.checkin"></vue-editor>
             </div>
 
       		</div>
@@ -126,28 +134,28 @@
           <div class="dashboard__container--body--col">
             <div class="mb-3">
               <label for="parking">Parking Details:</label>
-              <textarea name="parking" id="parking" cols="30" rows="10" v-model="event.parking"></textarea>
+              <vue-editor id="parking" v-model="event.parking"></vue-editor>
             </div>
           </div>
 
           <div class="dashboard__container--body--col">
             <div class="mb-3">
               <label for="camping">Camping Details:</label>
-              <textarea name="camping" id="camping" cols="30" rows="10" v-model="event.camping"></textarea>
+              <vue-editor id="camping" v-model="event.camping"></vue-editor>
             </div>
           </div>
 
           <div class="dashboard__container--body--col">
             <div class="mb-3">
               <label for="creds">Credentials Details:</label>
-              <textarea name="creds" id="creds" cols="30" rows="10" v-model="event.creds"></textarea>
+              <vue-editor id="creds" v-model="event.creds"></vue-editor>
             </div>
           </div>
 
           <div class="dashboard__container--body--col">
             <div class="mb-3">
               <label for="covid">COVID Requirements:</label>
-              <textarea name="covid" id="covid" cols="30" rows="10" v-model="event.covid"></textarea>
+              <vue-editor id="covid" v-model="event.covid"></vue-editor>
             </div>
           </div>
 
@@ -184,7 +192,7 @@
 
             <div class="mb-3">
               <label for="attire">Attire:</label>
-              <textarea name="attire" id="attire" cols="30" rows="10" v-model="event.attire"></textarea>
+              <vue-editor id="attire" v-model="event.attire"></vue-editor>
             </div>
 
             </div>
@@ -192,7 +200,7 @@
 
             <div class="mb-3">
               <label for="pay">Pay:</label>
-              <textarea name="pay" id="pay" cols="30" rows="10" v-model="event.pay"></textarea>
+              <vue-editor id="pay" v-model="event.pay"></vue-editor>
             </div>
 
             </div>
@@ -200,7 +208,7 @@
 
             <div class="mb-3">
               <label for="notes">Additional Notes:</label>
-              <textarea name="notes" id="notes" cols="30" rows="10" v-model="event.notes"></textarea>
+              <vue-editor id="notes" v-model="event.notes"></vue-editor>
             </div>
             </div>
           <div class="dashboard__container--body--col">
@@ -233,6 +241,7 @@ export default {
     event: {
       days:[],
       jobs:[],
+      published: true,
     },
     croppa: {},
     day:'',

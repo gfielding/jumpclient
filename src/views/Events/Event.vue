@@ -280,9 +280,25 @@
             </span>
             </div>
           </div>
+          <div class="dashboard__container--body--col">
+            <div class="mb-3">
+              <div class="mb-3">
+                <label for="payDate">Pay Date:</label>
+                <input type="date" v-model.trim="event.payDate"  id="payDate"  />
+              </div>
+              <div class="mb-3">
+                <label for="payProcessed">Paid and Complete:</label>
+                <input type="checkbox" v-model.trim="event.paid" id="payProcessed" class="ml-3" />
+              </div>
+            </div>
+          </div>
 
           <div class="dashboard__container--body--col" style="background: transparent;">
             <div class="flex justify-space-between">
+              <!-- <button class="btn btn__outlined btn__large" @click="exportStaff()">
+              export Staff
+
+              </button> -->
               <button class="btn btn__primary btn__large" @click="updateEvent()">
               Update Event
                 <transition name="fade">

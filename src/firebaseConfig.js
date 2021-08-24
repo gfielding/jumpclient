@@ -36,6 +36,8 @@ const jobsCollection = db.collection('jobs')
 const questionsCollection = db.collection('questions')
 const mailCollection = db.collection('mail')
 const eventsCollection = db.collection('events')
+const seriesCollection = db.collection('series')
+const seriesDaysCollection = db.collection('seriesDays')
 const venuesCollection = db.collection('venues')
 const applicationsCollection = db.collection('applications')
 const venueFollowersCollection = db.collection('venueFollowers')
@@ -88,5 +90,7 @@ export {
   emailsCollection,
   userNotesCollection,
   placementsCollection,
-  faqsCollection
+  faqsCollection,
+  seriesCollection,
+  seriesDaysCollection
 }

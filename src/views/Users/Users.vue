@@ -29,23 +29,39 @@
              <span v-else-if="props.column.field == 'vax'">
               <i class="fas fa-syringe" style="color:#5cb85c;" v-if="props.row.fullyVaccinated == 'yes'"></i>
               <i class="fas fa-syringe" style="color:#d9534f;" v-if="props.row.fullyVaccinated == 'no'"></i>
-              <i class="fas fa-syringe" v-if="!props.row.fullyVaccinated || props.row.fullyVaccinated == null"></i>
+              <i class="fas fa-syringe" v-if="!props.row.fullyVaccinated || props.row.fullyVaccinated == null" style="opacity:0.25;"></i>
              </span>
              <span v-else-if="props.column.field == 'status'">
-              
-              <span style="display:inline;">
-                <i class="fas fa-hammer" v-if="props.row.contractorStatus == 'applied' || !props.row.contractorStatus" style="margin-right: 2.5rem;"></i>
-              </span>
-              <span  style="display:inline;">
-                <i class="fas fa-hammer" v-if="props.row.contractorStatus == 'payroll invitation'" style="color:#f0ad4e; margin-right: 2.5rem;"></i>
-              </span>
-              <span  style="display:inline;">
-                <i class="fas fa-hammer" v-if="props.row.contractorStatus == 'hired'" style="color:#5cb85c; margin-right: 2.5rem;"></i>
+              <span v-if="props.row.contractorStatus != 'hired as employee'">
+                <span style="display:inline;">
+                  <i class="fas fa-hammer" v-if="props.row.contractorStatus == 'applied' || !props.row.contractorStatus" style="margin-right: 2.5rem; opacity:0.25;"></i>
+                </span>
+                <span  style="display:inline;">
+                  <i class="fas fa-hammer" v-if="props.row.contractorStatus == 'payroll invitation' || props.row.contractorStatus == 'on-hold'" style="color:#f0ad4e; margin-right: 2.5rem;"></i>
+                </span>
+                <span  style="display:inline;">
+                  <i class="fas fa-hammer" v-if="props.row.contractorStatus == 'hired contractor'" style="color:#5cb85c; margin-right: 2.5rem;"></i>
+                </span>
+                <span  style="display:inline;">
+                  <i class="fas fa-hammer" v-if="props.row.contractorStatus == 'terminated' || props.row.contractorStatus == 'not-hired'" style="color:#d9534f; margin-right: 2.5rem;"></i>
+                </span>
               </span>
 
-              <!-- <span style="display:inline;">
-                <i class="fas fa-user" v-if="props.row.employeeStatus == 'applied' || !props.row.employeeStatus" style="margin-right: 2.5rem;"></i>
-              </span> -->
+              <span style="display:inline;">
+                <i class="fas fa-user" v-if="props.row.employeeStatus == 'applied' || !props.row.employeeStatus" style="margin-right: 2.5rem;opacity:0.25;"></i>
+              </span>
+              <span style="display:inline;">
+                <i class="fas fa-user" v-if="props.row.employeeStatus == 'payroll invitation' || props.row.employeeStatus == 'on-hold'" style="color:#f0ad4e; margin-right: 2.5rem;"></i>
+              </span>
+              <span style="display:inline;">
+                <i class="fas fa-user" v-if="props.row.employeeStatus == 'hired'" style="color:#5cb85c; margin-right: 2.5rem;"></i>
+              </span>
+              <span  style="display:inline;">
+                <i class="fas fa-user" v-if="props.row.employeeStatus == 'terminated' || props.row.employeeStatus == 'not-hired'" style="color:#d9534f; margin-right: 2.5rem;"></i>
+              </span>
+
+
+
 
     
              </span>
@@ -149,7 +165,6 @@ export default {
     },
     formatDate(q) {
       if(q) {
-        console.log(q)
         const postedDate = new Date(q.seconds) * 1000;
         return moment(postedDate).format('MMMM Do YYYY')
       } else {
@@ -158,7 +173,12 @@ export default {
     },
   },
   beforeDestroy () {
+    this.columns = []
+    delete this.columns
+    this.search = ''
+    delete this.search
     this.$store.dispatch("clearUsersState")
+    console.log(this)
   }
 }
 </script>

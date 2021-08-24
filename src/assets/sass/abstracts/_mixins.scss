@@ -9,7 +9,6 @@
 		max-width:140rem;
 	}
 	@include respond(desktop) {
-		max-width:120rem;
 		width:90%;
 	}
 	@include respond(tablet-land) {
