@@ -302,7 +302,7 @@ export default {
       ];
       const exportItems = [];
       for (var key in this.shiftAssignments) {
-        if (this.shiftAssignments[key].employeeNumber = null || !this.shiftAssignments[key].employeeNumber) {
+        if (this.shiftAssignments[key].fileId.length < 9) {
           exportItems.push([
             "1",
             "307",
@@ -377,14 +377,14 @@ export default {
       ];
       const exportItems = [];
       for (var key in this.shiftAssignments) {
-        if (this.shiftAssignments[key].employeeNumber) {
+        if (this.shiftAssignments[key].fileId.length > 9) {
           exportItems.push([
             "1",
             "307",
             this.shiftAssignments[key].fileId,
             "1",
             this.shiftAssignments[key].dayRate,
-            "0"
+            "1"
           ]);
           exportItems.push([
             "1",

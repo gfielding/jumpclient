@@ -1,36 +1,39 @@
 <template>
 	<div>
     <h2>Employment Status</h2>
-		<div class="mb-3">
-			<label for="cont">Contractor Status:</label>
-      <select v-model="user.contractorStatus" id="cont" @change="showButton = true">
-        <option v-for="item in contStatuses" v-bind:value="item">
-          {{item}}
-        </option>
-      </select>
-		</div>
-		<transition name="fade">
-      <div class="flex align-center justify-space-between mb-3" v-if="showButton">
-        <button class="btn btn__primary" @click="updateUser()">
-          update
-          <transition name="fade">
-            <span class="ml-2" v-if="performingRequest">
-            <i class="fa fa-spinner fa-spin"></i>
-            </span>
-          </transition>
-        </button>
-        <button class="btn btn__outlined" @click="cancelContUpdate()">
-          cancel changes
-        </button>
-      </div>
-    </transition>
+    <div v-show="!user.employeeStatus || user.employeeStatus != `hired`">
+  		<div class="mb-3">
+  			<label for="cont">Contractor Status:</label>
+        <select v-model="user.contractorStatus" id="cont" @change="showButton = true">
+          <option v-for="item in contStatuses" v-bind:value="item">
+            {{item}}
+          </option>
+        </select>
+  		</div>
+  		<transition name="fade">
+        <div class="flex align-center justify-space-between mb-3" v-if="showButton">
+          <button class="btn btn__primary" @click="updateUser()">
+            update
+            <transition name="fade">
+              <span class="ml-2" v-if="performingRequest">
+              <i class="fa fa-spinner fa-spin"></i>
+              </span>
+            </transition>
+          </button>
+          <button class="btn btn__outlined" @click="cancelContUpdate()">
+            cancel changes
+          </button>
+        </div>
+      </transition>
 
-    <transition name="fade">
-      <div class="mb-3" v-if="user.contractorStatus == `hired contractor` || user.contractorStatus == `terminated`">
-        <label for="contNum">Contractor Number: (copy and paste {{contNum}})</label>
-        <input type="text" placeholder="" v-model.trim="user.contractorNumber" id="contNum" @change="updateUserFile1()" />
-      </div>
-    </transition>
+      <transition name="fade">
+        <div class="mb-3" v-if="user.contractorStatus == `hired contractor` || user.contractorStatus == `terminated`">
+          <label for="contNum">Contractor Number: (copy and paste {{contNum}})</label>
+          <input type="text" placeholder="" v-model.trim="user.contractorNumber" id="contNum" @change="updateUserFile1()" />
+          <button class="btn btn__outlined btn__small mt-3" v-clipboard:copy="user.contractorNumber" v-clipboard:success="onCopy">Copy <i class="fas fa-copy ml-2"></i></button>
+        </div>
+      </transition>
+    </div>
 
 
 
@@ -98,8 +101,9 @@
     <hr v-if="user.employeeStatus == `hired` || user.employeeStatus == `terminated`">
     <transition name="fade">
 	    <div class="mb-3" v-if="user.employeeStatus == `hired` || user.employeeStatus == `terminated`">
-	      <label for="empNum">Employee Number: (get from OnPay)</label>
-	      <input type="text" placeholder="" v-model.trim="user.employeeNumber" id="empNum" @change="updateUserFile2()" />
+	      <label for="empNum">Employee Number: (copy and paste  {{empNum}} )</label>
+	      <input type="text" v-model.trim="user.employeeNumber" id="empNum" @change="updateUserFile2()" />
+        <button class="btn btn__outlined btn__small mt-3" v-clipboard:copy="user.employeeNumber" v-clipboard:success="onCopy">Copy <i class="fas fa-copy ml-2"></i></button>
 	    </div>
 	  </transition>
 	  
@@ -107,7 +111,7 @@
     <transition name="fade">
 	    <div class="mb-3" v-if="user.employeeStatus == `terminated`">
 	      <label for="terminationDate">Termination Date:</label>
-	      <input type="date" placeholder="" v-model.trim="user.terminationDate" id="terminationDate" @change="updateUser()" />
+	      <input type="date" placeholder="" v-model.trim="user.terminationDate" id="terminationDate" @change="updateUserHired()" />
 	    </div>
 	  </transition>
 	</div>
@@ -130,12 +134,25 @@ export default {
   computed: {
     contNum() {
       return this.user.id.slice(0,8)
+    },
+    empNum() {
+      return this.user.id.slice(0,10)
     }
   },
   methods: {
+    onCopy: function (e) {
+      alert('Copied to Clipboard')
+    },
     updateUser () {
     	this.performingRequest = true
     	let user = this.user
+      if (user.contractorStatus == `hired contractor`) {
+        user.contractorNumber = this.contNum
+      }
+      if (user.employeeStatus == `hired`) {
+        console.log(this.empNum)
+        user.employeeNumber = this.empNum
+      }
       this.$store.dispatch('updateUser', user)
       setTimeout(() => {
           this.showButton = false

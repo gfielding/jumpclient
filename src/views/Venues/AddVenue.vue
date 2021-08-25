@@ -307,6 +307,11 @@ export default {
   },
   beforeDestroy () {
   	this.$store.dispatch('clearErrors')
+    this.performingRequest = false
+    let place = null
+    let center = null
+    let address = null
+    let store = null
     console.log(this)
   }
 }
