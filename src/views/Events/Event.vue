@@ -15,7 +15,6 @@
           <button class="btn btn__outlined mr-3" @click="shifts()">Event Shifts</button>
           <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
         </div>
-        
       </div>
       <form ref="form" @submit.prevent>
         <Loader v-if="!event" />
@@ -100,14 +99,9 @@
             </transition>
           </div>
 
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
 
             <h3>Jobs to Staff</h3>
-            <transition name="fadeStop">
-              <div class="mb-2 mt-2 flex" v-if="event.jobs && event.jobs.length >= 1">
-                <button class="chip mr-2" v-for="(job, index) in event.jobs" :key="job.id" @click="deleteJob(index)">{{job.title}} <i class="far fa-times-circle ml-2"></i></button>
-              </div>
-            </transition> 
             <transition name="fadeStop">
               <div class="mb-3">
                 <label for="pickDate">Choose Jobs:</label>
@@ -115,23 +109,23 @@
                   class="mt-2"
                   label="title" 
                   :options="jobs"
-                  v-model="job"
-                  @input="addJob()"
+                  v-model="event.venue.job"
+                  multiple
                   >
                 </v-select>
-
               </div>
             </transition>
           </div>
 
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3" v-if="clients.length >= 1">
               <h3>Client</h3>
               <v-select
                 class="mt-2"
-                label="title" 
+                label="title"
+                multiple
                 :options="clients"
-                v-model="event.client"
+                v-model="event.venue.client"
                 >
               </v-select>
             </div>
@@ -204,61 +198,61 @@
               <p class="caption mt-3">jpg or png file. 2MB max</p>
             </div>
           </div>
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
             <h3>Attire</h3>
             <div class="mb-3">
-              <vue-editor id="attire" v-model="event.attire" required></vue-editor>
+              <vue-editor id="attire" v-model="event.venue.attire"></vue-editor>
             </div>
           </div>
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
 
             <div class="mb-3">
               <h3>Pay</h3>
-              <vue-editor id="pay" v-model="event.pay" required></vue-editor>
+              <vue-editor id="pay" v-model="event.venue.pay"></vue-editor>
             </div>
           </div>
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
 
             <div class="mb-3">
               <h3>Check-In Instructions</h3>
-              <vue-editor id="checkin" v-model="event.checkin" required></vue-editor>
+              <vue-editor id="checkin" v-model="event.venue.checkin"></vue-editor>
             </div>
 
           </div>
 
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3">
               <h3>Parking Instructions</h3>
-              <vue-editor id="parking" v-model="event.parking" required></vue-editor>
+              <vue-editor id="parking" v-model="event.venue.parking"></vue-editor>
             </div>
           </div>
 
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3">
               <h3>Camping Instructions</h3>
-              <vue-editor id="camping" v-model="event.camping" required></vue-editor>
+              <vue-editor id="camping" v-model="event.venue.camping"></vue-editor>
             </div>
           </div>
 
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3">
               <h3>Credentials Instructions</h3>
-              <vue-editor id="creds" v-model="event.creds" required></vue-editor>
+              <vue-editor id="creds" v-model="event.venue.creds"></vue-editor>
             </div>
           </div>
 
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3">
               <h3>COVID Requirements:</h3>
-              <vue-editor id="covid" v-model="event.covid" required></vue-editor>
+              <vue-editor id="covid" v-model="event.venue.covid"></vue-editor>
             </div>
           </div>
 
 
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3">
               <h3>Additional Notes:</h3>
-              <vue-editor id="notes" v-model="event.notes" required></vue-editor>
+              <vue-editor id="notes" v-model="event.venue.notes"></vue-editor>
             </div>
           </div>
           <div class="dashboard__container--body--col">
