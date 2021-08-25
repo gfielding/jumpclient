@@ -141,7 +141,7 @@
 
             <div class="mb-3">
               <label for="pay">Additional Notes:</label>
-              <vue-editor id="pay" v-model="notes.pay"></vue-editor>
+              <vue-editor id="pay" v-model="place.notes"></vue-editor>
             </div>
           </div>
       		
@@ -254,12 +254,22 @@ export default {
     	let center = this.center
     	let address = this.address
     	let store = this.$store
+
     	let newVenue = {
     		address: address,
     		title: place.name,
     		center: center,
-    		visible: place.visible || false,
-    		details: place.details || null
+    		visible: place.visible,
+    		checkin: place.checkin || null,
+        parking: place.parking || null,
+        camping: place.camping || null,
+        creds: place.creds || null,
+        covid: place.covid || null,
+        attire: place.attire || null,
+        pay: place.pay || null,
+        notes: place.notes || null,
+        job: place.job || null,
+        client: place.client || null,
     	}
     	console.log(newVenue)
     	let croppa = this.croppa
