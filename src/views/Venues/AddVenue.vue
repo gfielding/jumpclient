@@ -46,6 +46,26 @@
 		    					<label for="venueVisibility">Visible:</label>
 	      					<input type="checkbox" v-model.trim="place.visible" id="venueVisibility" class="ml-3" />
 		    				</div>
+                <div class="mb-3" v-if="clients.length >= 1">
+                  <label for="client">Default Client:</label>
+                  <v-select
+                    class="mt-2"
+                    label="title" 
+                    :options="clients"
+                    multiple
+                    v-model="place.client"
+                    >
+                  </v-select>
+                  <label for="pickDate">Default Jobs:</label>
+                    <v-select
+                      class="mt-2"
+                      label="title" 
+                      :options="jobs"
+                      multiple
+                      v-model="place.job"
+                      >
+                    </v-select>
+                </div>
 	    				</div>
 	    			</transition>
       		</div>
@@ -64,14 +84,68 @@
             ></gmap-marker>
             </gmap-map>
       		</div>
+          
       		<div class="dashboard__container--body--col">
-      			<div class="mb-3">
-              <label for="details">Venue Details:</label>
-              <vue-editor id="details" v-model.trim="place.details" placeholder="General uses, parking, staff entrance, etc."></vue-editor>
+
+            <div class="mb-3">
+              <label for="checkin">Check-In Details:</label>
+              <vue-editor id="checkin" v-model="place.checkin"></vue-editor>
             </div>
-      		</div>
+
+          </div>
+
+          <div class="dashboard__container--body--col">
+            <div class="mb-3">
+              <label for="parking">Parking Details:</label>
+              <vue-editor id="parking" v-model="place.parking"></vue-editor>
+            </div>
+          </div>
+
+          <div class="dashboard__container--body--col">
+            <div class="mb-3">
+              <label for="camping">Camping Details:</label>
+              <vue-editor id="camping" v-model="place.camping"></vue-editor>
+            </div>
+          </div>
+
+          <div class="dashboard__container--body--col">
+            <div class="mb-3">
+              <label for="creds">Credentials Details:</label>
+              <vue-editor id="creds" v-model="place.creds"></vue-editor>
+            </div>
+          </div>
+
+          <div class="dashboard__container--body--col">
+            <div class="mb-3">
+              <label for="covid">COVID Requirements:</label>
+              <vue-editor id="covid" v-model="place.covid"></vue-editor>
+            </div>
+          </div>
+          <div class="dashboard__container--body--col">
+
+            <div class="mb-3">
+              <label for="attire">Attire:</label>
+              <vue-editor id="attire" v-model="place.attire"></vue-editor>
+            </div>
+
+            </div>
+          <div class="dashboard__container--body--col">
+
+            <div class="mb-3">
+              <label for="pay">Pay:</label>
+              <vue-editor id="pay" v-model="place.pay"></vue-editor>
+            </div>
+          </div>
+
+          <div class="dashboard__container--body--col">
+
+            <div class="mb-3">
+              <label for="pay">Additional Notes:</label>
+              <vue-editor id="pay" v-model="notes.pay"></vue-editor>
+            </div>
+          </div>
       		
-      		<div class="dashboard__container--body--col">
+      		<div class="dashboard__container--body--col" style="background: transparent;">
       			<transition name="fade">
 		    			<button v-if="place" class="btn btn__primary" @click="addVenue()">Add Venue
                 <transition name="fade">
@@ -101,7 +175,11 @@ export default {
     center: { lat: 45.508, lng: -73.587 },
     marker: {},
     address: {},
-    place: {},
+    place: {
+      visible: true,
+      job:[],
+      client:[],
+    },
     currentPlace: null,
     croppa: {},
     performingRequest:false,
@@ -110,7 +188,16 @@ export default {
     Loader,
     VueEditor
   },
+  created () {
+    if (!this.clients || this.clients.length < 1) {
+      this.$store.dispatch("getClients")
+    }
+    if (!this.jobs || this.jobs.length < 1) {
+      this.$store.dispatch("getJobsState")
+    }
+  },
   computed: {
+    ...mapState(['jobs', 'clients']),
     backgroundUrl() {
       return 'https://firebasestorage.googleapis.com/v0/b/mvpes-25aef.appspot.com/o/stadium.png?alt=media&token=89f2362c-d1bc-4338-a837-fad1d664c51d'
     }

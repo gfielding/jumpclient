@@ -46,6 +46,26 @@
     					<label for="venueVisibility">Visibile:</label>
     					<input type="checkbox" v-model.trim="venue.visible" id="venueVisibility" class="ml-3" />
     				</div>
+            <div class="mb-3" v-if="clients.length >= 1">
+              <label for="client">Default Client:</label>
+              <v-select
+                class="mt-2"
+                label="title" 
+                multiple
+                :options="clients"
+                v-model="venue.client"
+                >
+              </v-select>
+              <label for="pickDate">Default Jobs:</label>
+                <v-select
+                  class="mt-2"
+                  label="title" 
+                  :options="jobs"
+                  multiple
+                  v-model="venue.job"
+                  >
+                </v-select>
+            </div>
       		</div>
           
       		<div class="dashboard__container--body--col">
@@ -58,9 +78,62 @@
             </gmap-map>
       		</div>
           <div class="dashboard__container--body--col">
+
             <div class="mb-3">
-              <label for="details">Venue Details:</label>
-              <vue-editor id="details" v-model.trim="venue.details" placeholder="General uses, parking, staff entrance, etc."></vue-editor>
+              <label for="checkin">Check-In Details:</label>
+              <vue-editor id="checkin" v-model="venue.checkin"></vue-editor>
+            </div>
+
+          </div>
+
+          <div class="dashboard__container--body--col">
+            <div class="mb-3">
+              <label for="parking">Parking Details:</label>
+              <vue-editor id="parking" v-model="venue.parking"></vue-editor>
+            </div>
+          </div>
+
+          <div class="dashboard__container--body--col">
+            <div class="mb-3">
+              <label for="camping">Camping Details:</label>
+              <vue-editor id="camping" v-model="venue.camping"></vue-editor>
+            </div>
+          </div>
+
+          <div class="dashboard__container--body--col">
+            <div class="mb-3">
+              <label for="creds">Credentials Details:</label>
+              <vue-editor id="creds" v-model="venue.creds"></vue-editor>
+            </div>
+          </div>
+
+          <div class="dashboard__container--body--col">
+            <div class="mb-3">
+              <label for="covid">COVID Requirements:</label>
+              <vue-editor id="covid" v-model="venue.covid"></vue-editor>
+            </div>
+          </div>
+          <div class="dashboard__container--body--col">
+
+            <div class="mb-3">
+              <label for="attire">Attire:</label>
+              <vue-editor id="attire" v-model="venue.attire"></vue-editor>
+            </div>
+
+            </div>
+          <div class="dashboard__container--body--col">
+
+            <div class="mb-3">
+              <label for="pay">Pay:</label>
+              <vue-editor id="pay" v-model="venue.pay"></vue-editor>
+            </div>
+          </div>
+
+          <div class="dashboard__container--body--col">
+
+            <div class="mb-3">
+              <label for="pay">Additional Notes:</label>
+              <vue-editor id="pay" v-model="venue.notes"></vue-editor>
             </div>
           </div>
           <div class="dashboard__container--body--col" style="background: transparent;">
@@ -141,7 +214,7 @@ export default {
     ]
   }),
    computed: {
-    ...mapState(['venueInfo', 'venueEvents']),
+    ...mapState(['venueInfo', 'venueEvents', 'clients', 'jobs']),
     venue() {
       return this.venueInfo
     },
@@ -151,6 +224,12 @@ export default {
   },
   created () {
     this.$store.dispatch("getVenueFromId", this.$route.params.id);
+    if (!this.clients || this.clients.length < 1) {
+      this.$store.dispatch("getClients")
+    }
+    if (!this.jobs || this.jobs.length < 1) {
+      this.$store.dispatch("getJobsState")
+    }
   },
    components: {
     Loader,

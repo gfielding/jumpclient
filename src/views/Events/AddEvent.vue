@@ -17,13 +17,48 @@
     					<label for="eventPublished">Published:</label>
     					<input type="checkbox" v-model.trim="event.published" id="eventPublished" class="ml-3" />
     				</div>
+            <div class="mb-3" v-if="venues.length > 1">
+              <label for="venue">Venue:</label>
+              <v-select
+                class="mt-2"
+                label="title" 
+                :options="venues"
+                v-model="event.venue"
+                >
+              </v-select>
+            </div>
+            <div class="mb-3" v-if="clients.length >= 1 && event.venue">
+              <label for="client">Client:</label>
+              <v-select
+                class="mt-2"
+                label="title" 
+                :options="clients"
+                multiple
+                v-model="event.venue.client"
+                >
+              </v-select>
+            </div>
+            <div class="mb-3" v-if="jobss.length >= 1 && event.venue">
+            <label for="pickDate">Choose Jobs:</label>
+                <v-select
+                  class="mt-2"
+                  label="title" 
+                  :options="jobss"
+                  multiple
+                  v-model="event.venue.job"
+                  >
+                </v-select>
+              </div>
+            
+
+          </div>
+          <div class="dashboard__container--body--col">
             <div class="mb-3">
               <label for="eventDescription">Description:</label>
               <vue-editor id="eventDescription" v-model="event.description" required></vue-editor>
             </div>
-
           </div>
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
 
             <div class="mb-3">
               <label for="multiDay">Multiple Days:</label>
@@ -52,7 +87,7 @@
             </transition>
 
           </div>
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
 
             <h3>Days to Staff</h3>
             <transition name="fadeStop">
@@ -69,7 +104,7 @@
 
           </div>
 
-          <div class="dashboard__container--body--col">
+          <!-- <div class="dashboard__container--body--col">
 
             <h3>Jobs to Staff</h3>
             <transition name="fadeStop">
@@ -79,87 +114,49 @@
             </transition> 
             <transition name="fadeStop">
               <div class="mb-3">
-                <label for="pickDate">Choose Jobs:</label>
-                <v-select
-                  class="mt-2"
-                  label="title" 
-                  :options="jobs"
-                  v-model="job"
-                  @input="addJob()"
-                  >
-                </v-select>
+                
               </div>
             </transition>
           </div>
-
-
-          <div class="dashboard__container--body--col">
-
-            <div class="mb-3" v-if="venues.length > 1">
-              <label for="venue">Venue:</label>
-              <v-select
-                class="mt-2"
-                label="title" 
-                :options="venues"
-                v-model="event.venue"
-                @input="updateVenue()"
-                >
-              </v-select>
-            </div>
-
-          </div>
-          <div class="dashboard__container--body--col">
-
-            <div class="mb-3" v-if="clients.length >= 1">
-              <label for="client">Client:</label>
-              <v-select
-                class="mt-2"
-                label="title" 
-                :options="clients"
-                v-model="event.client"
-                >
-              </v-select>
-            </div>
-
-          </div>
-          <div class="dashboard__container--body--col">
+ -->
+          <div class="dashboard__container--body--col" v-if="event.venue">
 
             <div class="mb-3">
               <label for="checkin">Check-In Details:</label>
-              <vue-editor id="checkin" v-model="event.checkin"></vue-editor>
+              <vue-editor id="checkin" v-model="event.venue.checkin"></vue-editor>
             </div>
 
       		</div>
 
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3">
               <label for="parking">Parking Details:</label>
-              <vue-editor id="parking" v-model="event.parking"></vue-editor>
+              <vue-editor id="parking" v-model="event.venue.parking"></vue-editor>
             </div>
           </div>
 
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3">
               <label for="camping">Camping Details:</label>
-              <vue-editor id="camping" v-model="event.camping"></vue-editor>
+              <vue-editor id="camping" v-model="event.venue.camping"></vue-editor>
             </div>
           </div>
 
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3">
               <label for="creds">Credentials Details:</label>
-              <vue-editor id="creds" v-model="event.creds"></vue-editor>
+              <vue-editor id="creds" v-model="event.venue.creds"></vue-editor>
             </div>
           </div>
 
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3">
               <label for="covid">COVID Requirements:</label>
-              <vue-editor id="covid" v-model="event.covid"></vue-editor>
+              <vue-editor id="covid" v-model="event.venue.covid"></vue-editor>
             </div>
           </div>
 
-      		<div class="dashboard__container--body--col">
+      		<div class="dashboard__container--body--col" v-if="event.venue">
             <div class="flex flex-column align-center">
               <div class="event-wrapper" :style="{ backgroundImage: 'url(' + backgroundUrl + ')' }">
                 <croppa 
@@ -188,30 +185,30 @@
             </div> -->
 
           </div>
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
 
             <div class="mb-3">
               <label for="attire">Attire:</label>
-              <vue-editor id="attire" v-model="event.attire"></vue-editor>
+              <vue-editor id="attire" v-model="event.venue.attire"></vue-editor>
             </div>
 
             </div>
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
 
             <div class="mb-3">
               <label for="pay">Pay:</label>
-              <vue-editor id="pay" v-model="event.pay"></vue-editor>
+              <vue-editor id="pay" v-model="event.venue.pay"></vue-editor>
             </div>
 
             </div>
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
 
             <div class="mb-3">
               <label for="notes">Additional Notes:</label>
-              <vue-editor id="notes" v-model="event.notes"></vue-editor>
+              <vue-editor id="notes" v-model="event.venue.notes"></vue-editor>
             </div>
             </div>
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col"  style="background: transparent;" v-if="event.venue">
             <button class="btn btn__primary btn__large" @click="addEvent()">
               Add Event
               <transition name="fade">
@@ -268,6 +265,9 @@ export default {
     ...mapState(['venues', 'clients', 'jobs']),
     backgroundUrl() {
       return this.event.photoUrl || 'https://firebasestorage.googleapis.com/v0/b/mvpes-25aef.appspot.com/o/stadium.png?alt=media&token=89f2362c-d1bc-4338-a837-fad1d664c51d'
+    },
+    jobss() {
+      return this.jobs
     },
     year() {
       return moment(this.event.startDate).format('YYYY')
