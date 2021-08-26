@@ -33,7 +33,10 @@ const store = new Vuex.Store({
     eventInfo: {},
     eventShifts: [],
     eventDays: [],
+    eventsByDay: [],
     eventUsers: [],
+    currentEvents: [],
+    pastEvents: [],
     jobs:[],
     jobInfo: {},
     faqs:[],
@@ -48,6 +51,7 @@ const store = new Vuex.Store({
     shift:{},
     shiftAssignments: [],
     usersPerDay: [],
+    eventShifts: [],
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -581,12 +585,31 @@ const store = new Vuex.Store({
       fb.eventsCollection.orderBy('startDate', 'asc').onSnapshot(querySnapshot => {
         let eventsArray = []
         let eventDays = []
+        let currentEventsArray = []
+        let pastEventsArray = []
 
         querySnapshot.forEach(doc => {
+          let yesterday = new Date()
+          yesterday.setDate(yesterday.getDate() - 1);
+          let startComp = new Date(doc.data().startDate)
           let event = doc.data()
           event.id = doc.id
+          let start = doc.data().startDate
+          let dateObject = new Date(start)
+
           eventsArray.push(event)
           eventDays.push(event.days)
+
+          if (doc.data().published && startComp >= yesterday) {
+            currentEventsArray.push(event)
+            commit('setCurrentEvents', currentEventsArray)
+          }
+
+          if (doc.data().published && startComp < yesterday) {
+            pastEventsArray.push(event)
+            commit('setPastEvents', pastEventsArray)
+          }
+
         })
         commit('setEvents', eventsArray)
 
@@ -611,6 +634,8 @@ const store = new Vuex.Store({
     },
     clearEventsState({ commit }) {
       commit('setEvents', [])
+      commit('setCurrentEvents', [])
+      commit('setPastEvents', [])
     },
 
 
@@ -704,12 +729,26 @@ const store = new Vuex.Store({
 
 
     /*PLACEMENTS*/
+    preferEvent({ commit }, payload) {
+      console.log(payload)
+      fb.userDaysCollection.where("userId", "==", payload.userId).where("day", "==", payload.day).get()
+        .then(function (querySnapshot) {
+          querySnapshot.forEach(function (doc) {
+            console.log(doc.id, " => ", doc.data())
+            fb.userDaysCollection.doc(doc.id).update({
+            preferredEvent: payload.event
+          })
+        })
+      })
+
+    },
     getEventPlacementFromId({ commit }, payload) {
       console.log(payload)
       fb.eventsCollection.where("id", "==", payload).onSnapshot(querySnapshot => {
         querySnapshot.forEach(function (doc) {
           commit("setEventInfo", doc.data())
           store.dispatch('getEventUsers', doc.data().id)
+          store.dispatch("getEventShiftsState", doc.data().id)
         })
       })
     },
@@ -734,6 +773,29 @@ const store = new Vuex.Store({
         })
         commit('setDayShifts', dayShiftsArray)
         store.dispatch('getUserAvailabilityState', payload)
+      })
+    },
+    getEventsByDay({ commit }, payload) {
+      fb.eventsCollection.where("days", "array-contains", payload).orderBy('title', 'asc').onSnapshot(querySnapshot => {
+        let dayEventsArray = []
+        querySnapshot.forEach(doc => {
+          let dayEvents = doc.data()
+          dayEvents.id = doc.id
+          dayEventsArray.push(dayEvents)
+        })
+        commit('setEventsByDay', dayEventsArray)
+      })
+    },
+    getEventShiftsState({ commit }, payload) {
+      fb.shiftsCollection.where("eventId", "==", payload).orderBy('startTime', 'asc').onSnapshot(querySnapshot => {
+        let eventShiftsArray = []
+        querySnapshot.forEach(doc => {
+          let eventShift = doc.data()
+          eventShift.id = doc.id
+          eventShiftsArray.push(eventShift)
+        })
+        commit('setEventShifts', eventShiftsArray)
+        // store.dispatch('getUserAvailabilityState', payload)
       })
     },
     getUserAvailabilityState({ commit }, payload) {
@@ -816,6 +878,7 @@ const store = new Vuex.Store({
     },
     clearDayState({ commit }) {
       commit('setDayEvents', null)
+      commit('setEventsByDay', null)
       commit('setDayShifts', null)
       commit('setDayUsers', null)
       commit('setAvailableUsers', null)
@@ -826,6 +889,10 @@ const store = new Vuex.Store({
     },
     clearEventUsers({ commit }) {
       commit('setEventUsers', null)
+      commit('setEventInfo', null)
+    },
+    clearEventShiftsState({ commit }) {
+      commit('setEventShifts', null)
       commit('setEventInfo', null)
     },
 
@@ -909,6 +976,13 @@ const store = new Vuex.Store({
         state.events = []
       }
     },
+    setEventsByDay(state, val) {
+      if (val) {
+        state.eventsByDay = val
+      } else {
+        state.eventsByDay = []
+      }
+    },
     setEventDays(state, val) {
       if (val) {
         state.eventDays = val
@@ -924,6 +998,27 @@ const store = new Vuex.Store({
         state.eventShifts = val
       } else {
         state.eventShifts = []
+      }
+    },
+    setDayEvents(state, val) {
+      if (val) {
+        state.dayEvents = val
+      } else {
+        state.dayEvents = []
+      }
+    },
+    setCurrentEvents(state, val) {
+      if (val) {
+        state.currentEvents = val
+      } else {
+        state.currentEvents = []
+      }
+    },
+    setPastEvents(state, val) {
+      if (val) {
+        state.pastEvents = val
+      } else {
+        state.pastEvents = []
       }
     },
     setUsers(state, val) {
@@ -983,6 +1078,13 @@ const store = new Vuex.Store({
         state.dayShifts = []
       }
     },
+    setEventShifts(state, val) {
+      if (val) {
+        state.eventShifts = val
+      } else {
+        state.eventShifts = []
+      }
+    },
     setEventUsers(state, val) {
       if (val) {
         state.eventUsers = val
@@ -1012,13 +1114,6 @@ const store = new Vuex.Store({
         state.availableUsers = val
       } else {
         state.availableUsers = []
-      }
-    },
-    setDayEvents(state, val) {
-      if (val) {
-        state.dayEvents = val
-      } else {
-        state.dayEvents = []
       }
     },
     setShiftAssignments(state, val) {

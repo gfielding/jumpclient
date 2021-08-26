@@ -1,23 +1,15 @@
 <template>
 	<div class="dashboard">
-    <div class="dashboard__container">
-      <div class="dashboard__container--header mb-3" v-if="day">
-        <h1>Staff Placements for {{day | moment("dddd, MMMM Do YYYY") }}</h1>
+      <div class="flex justify-space-between align-center mb-3" v-if="day">
+        <h2>Staff Placements for {{day | moment("dddd, MMMM Do YYYY") }}</h2>
         <div class="flex align-center"> 
 	        <button class="btn btn__flat mr-3" @click="exportAll()">export all</button>
-	        <button class="btn btn__icon" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
         </div>
       </div>
-      <div class="dashboard__container--body" v-if="day">
+      <div class="flex flex-wrap justify-space-between">
       	<div class="dashboard__container--body--col">
     			<form ref="form" @submit.prevent>
     				<div class="mb-3">
-    					<!-- <label for="addedUser">Add User:</label>
-    					<select v-model="user" id="venue" @change="addUser()">
-                <option v-for="user in users" v-bind:value="user">
-                  {{user.firstName}} {{user.lastName}}
-                </option>
-              </select> -->
               <h4>Add User:</h4>
               <v-select
                 class="mt-2"
@@ -33,7 +25,7 @@
     			</form>
       		<vue-good-table
               :columns="columns"
-              :rows="orderedUsers"
+              :rows="orderedAvailableUsers"
               :search-options="{
                 enabled: true,
                 placeholder: 'Search this table',
@@ -236,187 +228,146 @@
           </vue-good-table>
       	</div>
 
-      	<div class="dashboard__container--body--col" style="background:transparent; padding:0;">
-      		<div v-for="shift in dayShifts" :key="shift.id" style=" padding:1.6rem; background: white; margin-bottom:1.6rem;">
+      	<div class="dashboard__container--body--col alt-col">
+      		<div v-for="event in eventsByDay" :key="event.id" style=" padding:1.6rem; background: white; margin-bottom:1.6rem;">
       			<div class="flex align-center justify-space-between">
-      				<h2>{{shift.event}}</h2>
-      				<!-- <router-link :to="'/shifts/' + shift.id">
-      					<button class="btn btn__small btn__outlined">Open <i class="fas fa-external-link ml-2"></i></button>
-      				</router-link> -->
-      				<div>
-	      				<button class="btn btn__flat mr-3" @click="exportStaff(shift)">export</button>
-	      				<button class="btn btn__icon" @click="expand(shift)" v-if="shift.collapse"><i class="fas fa-chevron-up"></i></button>
-	      				<button class="btn btn__icon" @click="collapse(shift)" v-if="!shift.collapse"><i class="fas fa-chevron-down"></i></button>
-      				</div>
-      			</div>
-      			<transition name="fade">
-	      			<div v-if="shift.collapse == true">
-		      			<div class="pt-2">
-		      				<h3 v-if="shift.name">{{shift.name}}</h3>
-		      				<h4 v-if="shift.position.title">{{shift.position.title}}, 
-		                <span v-if="shift.startTime" class="ml-2"> {{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}</span> - 
-		                <span v-if="shift.endTime">{{ [ shift.endTime, "HH:mm" ] | moment("hh:mm A") }}</span>
-		              </h4>
+              <h3>{{event.title}}<span v-if="event.venue"> | {{event.venue.title }}</span></h3>
+              <div>
+                <button class="btn btn__flat mr-3" @click="exportStaff(event)">export</button>
+                <button class="btn btn__icon" @click="expand(event)" v-if="event.collapse"><i class="fas fa-chevron-up"></i></button>
+                <button class="btn btn__icon" @click="collapse(event)" v-if="!event.collapse"><i class="fas fa-chevron-down"></i></button>
+              </div>
+            </div>
+            <transition name="fade">
+              <div v-if="event.collapse == true">
+                <div class="pt-3" v-if="orderedAvailableUsers.length >= 1">
+                  <v-select
+                    label="fullName" 
+                    :options="orderedAvailableUsers"
+                    v-model="event.selectedStaff"
+                    @input="assignEvent(event)"
+                    >
+                    <!-- <template #option="{ fullName, day }">
+                      <span>{{ fullName }} | {{day | moment("ddd, MMM Do")}}</span>
+                    </template> -->
+                  </v-select>
+                </div>
+                <div class="pt-3">
+                	<vue-good-table
+                    :columns="columns2"
+                    :rows="preferredUsers(event)"
+                    >
+                    <template slot="table-row" slot-scope="props">
+                      <span v-if="props.column.field == 'extras'">
+                        <span v-if="(props.row)">
+                            <span v-for="u in filteredInfo(props.row)">
+                              <v-popover>
+                                <button class="tooltip-target" style="display:inline;"><i class="fas fa-th"></i></button>
+                                <template slot="popover">
+                                  <p>
+                                    Vaccinated: {{u.fullyVaccinated || ''}}
+                                  </p>
+                                  <p>
+                                    Contractor: {{u.contractorStatus || ''}}
+                                  </p>
+                                  <p>
+                                    Employee: {{u.employeeStatus || ''}}
+                                  </p>
+                                  <p>
+                                    Alcohol Cert: <span v-if="u.certTips">yes</span><span v-else>false</span>
+                                  </p>
+                                  <p v-for="job in u.skills">{{job.title}}</p>
+                                  <p v-for="client in u.blacklist" class="danger">{{client.title}}</p>
+                                </template>
+                              </v-popover>
+                            </span>
+                          </span>
+                        </span>
+                      </span>
+                      <span v-else-if="props.column.field == 'created'">
+                <span v-if="props.row.created">{{formatDate(props.row.created)}}</span>
+              </span>
+                      <span v-else-if="props.column.field == 'reservations'">
+                  <span v-if="
+                    (props.row.dayStatus != 'hired') &&
+                    (props.row.dayStatus != 'assigned') &&
+                    (props.row.dayStatus != 'not requested')
+                  " style="display:inline; margin-right: 1.5rem;">
+                    <button class="icon" @click="reserveUser(props.row)" v-tooltip="'reserve user'">
+                      <i class="far fa-calendar"></i>
+                    </button>
+                  </span>
+                  <span v-if="
+                    (props.row.dayStatus == 'hired' || props.row.dayStatus == 'assigned')
+                  " style="display:inline;">
+                    <button class="icon" v-tooltip="'cancel reservation'" @click="unreserveUser(props.row)">
+                      <i class="fas fa-calendar-check" style="color:green;"></i>
+                    </button>
+                  </span>
 
-		              <button class="btn btn__flat chip mt-1">{{orderedPlacedUsers(shift.id).length}} / {{shift.staff}}</button>
-		      			</div>
-		      			<div class="pt-3" v-if="orderedUsers.length >= 1">
-		      				<v-select
-		      					label="fullName" 
-		      					:options="orderedUsers"
-		      					v-model="shift.selectedStaff"
-		      					@input="assignShift(shift)"
-		      					>
-		      				</v-select>
-		      			</div>
-		      			<div class="pt-3">
-		      				<vue-good-table
-			              :columns="columns2"
-			              :rows="orderedPlacedUsers(shift.id)"
-				            >
-				            <template slot="table-row" slot-scope="props">
-				            	<span v-if="props.column.field == 'extras2'">
-				            		<span v-if="props.row.note" style="display:inline; margin-right: 1.5rem;">
-				            			<button class="icon" v-tooltip="props.row.note">
-					            			<i class="far fa-sticky-note"></i>
-					            		</button>
-				            		</span>
-					              <span v-if="
-					                (props.row.dayStatus != 'hired') &&
-					                (props.row.dayStatus != 'assigned') &&
-					                (props.row.dayStatus != 'not requested')
-					              " style="display:inline; margin-right: 1.5rem;">
-					                <button class="icon" @click="reserveUser(props.row)" v-tooltip="'reserve user'">
-					                	<i class="far fa-calendar"></i>
-					                </button>
-					              </span>
-					              <span v-if="
-					                (props.row.dayStatus == 'hired')
-					              " style="display:inline; margin-right: 1.5rem;">
-					                <button class="icon" v-tooltip="'cancel reservation'" @click="unreserveUser(props.row)">
-					                	<i class="fas fa-calendar-check" style="color:green;"></i>
-					                </button>
-					              </span>
-					              <span v-if="
-					                (props.row.dayStatus == 'not requested')
-					              " style="display:inline; margin-right: 1.5rem;">
-					                <button class="icon" v-tooltip="'cancel cancellation'" @click="cancelNotRequestUser(props.row)">
-					                	<i class="fas fa-calendar-times" style="color:red;"></i>
-					                </button>
-					              </span>
+                  <span v-if="
+                    (props.row.dayStatus != 'hired') &&
+                    (props.row.dayStatus != 'assigned') &&
+                    (props.row.dayStatus != 'not requested')"
+                    style="display:inline;">
+                    <button class="icon" v-tooltip="'not use this staff today'" @click="notRequestUser(props.row)">
+                      <i class="fas fa-calendar-times"></i>
+                    </button>
+                  </span>
 
-					              <span v-if="
-					                (props.row)
-					              " style="display:inline; margin-right: 1.5rem;">
-					              	<span v-for="u in filteredInfo(props.row)">
+                  <span v-if="
+                    (props.row.dayStatus == 'not requested')
+                  " style="display:inline;">
+                    <button class="icon" v-tooltip="'cancel cancellation'" @click="cancelNotRequestUser(props.row)">
+                      <i class="fas fa-calendar-times" style="color:red;"></i>
+                    </button>
+                  </span>
+              </span>
 
-					              		<span v-if="u.fullyVaccinated == 'yes'" style="display:inline; margin-right: 1.5rem;">
-					              			<i class="fas fa-syringe" style="color:#5cb85c;"></i>
-					              		</span>
-					              		<span v-if="u.fullyVaccinated == 'no'" style="display:inline; margin-right: 1.5rem;">
-					              			<i class="fas fa-syringe" style="color:#d9534f;"></i>
-					              		</span>
-					              		<span v-if="!u.fullyVaccinated || u.fullyVaccinated == null" style="display:inline; margin-right: 1.5rem;">
-					              			<i class="fas fa-syringe" style="opacity:0.25;"></i>
-					              		</span>
+              <span v-else-if="props.column.field == 'fullName'">
+                <router-link :to="'/users/' + props.row.userId">
+                  {{props.row.fullName}}
+                </router-link>
+              </span>
+              <span v-else-if="props.column.field == 'notes'">
+                <button class="icon" v-if="props.row.note" v-tooltip="props.row.note">
+                  <i class="far fa-sticky-note"></i>
+                </button>
+              </span>
+              <span v-else-if="props.column.field == 'state'">
+                <span v-if="(props.row)">
+                  <span v-for="u in filteredInfo(props.row)">
+                    <span v-if="u && u.address && u.address.city && u.address.state" style="display:inline;">
+                      <span v-tooltip="u.address.city">{{u.address.state}}</span>
+                    </span>
+                  </span>
+                </span>
+              </span>
+              <span v-else-if="props.column.field == 'delete'">
 
-					              		<span v-if="u.contractorStatus == 'applied' || !u.contractorStatus" style="display:inline; margin-right: 1.5rem;">
-						              		<button class="icon" v-tooltip="'C - ' + u.contractorStatus">
-							                	<i class="fas fa-hammer"  style="opacity:0.25;"></i>
-							                </button>
-							              </span>
+	            	<button class="icon" v-if="!props.row.showTrash" v-tooltip="'delete instance'" @click="showTrash(props)">
+                	<i class="fas fa-times"></i>
+                </button>
 
-							              <span v-if="u.contractorStatus == 'payroll invitation'" style="display:inline; margin-right: 1.5rem;">
-						              		<button class="icon" v-tooltip="'C - ' + u.contractorStatus">
-							                	<i class="fas fa-hammer" style="color:#f0ad4e;"></i>
-							                </button>
-							              </span>
+                <button class="icon" v-if="props.row.showTrash" v-tooltip="'cancel'" @click="hideTrash(props)">
+                	<i class="fas fa-times"></i>
+                </button>
 
-							              <span v-if="u.contractorStatus == 'hired contractor'" style="display:inline; margin-right: 1.5rem;">
-						              		<button class="icon" v-tooltip="'C - ' + u.contractorStatus">
-							                	<i class="fas fa-hammer" style="color:#5cb85c;"></i>
-							                </button>
-							              </span>
-
-							              <span v-if="u.employeeStatus == 'hired employee'" style="display:inline; margin-right: 1.5rem;">
-						              		<button class="icon" v-tooltip="'E - ' + u.employeeStatus">
-							                	<i class="fas fa-user" style="color:#5cb85c;"></i>
-							                </button>
-							              </span>
-
-							              <span v-if="u.employeeStatus == 'payroll invitation'" style="display:inline; margin-right: 1.5rem;">
-						              		<button class="icon" v-tooltip="'E - ' + u.employeeStatus">
-							                	<i class="fas fa-user" style="color:#f0ad4e;"></i>
-							                </button>
-							              </span>
-
-							              <span v-if="u.employeeStatus == 'applied' || !u.employeeStatus" style="display:inline; margin-right: 1.5rem;">
-						              		<button class="icon" v-tooltip="'E - ' + u.employeeStatus">
-							                	<i class="fas fa-user"></i>
-							                </button>
-							              </span>
-
-
-					              		<span v-for="client in u.blacklist" style="display:inline; margin-right: 1.5rem;">
-					              			<button class="icon" v-tooltip="client.title">
-							                	<i class="fas fa-exclamation-triangle" style="color:red;"></i>
-							                </button>
-					              		</span>
-
-					              		<span style="display:inline; margin-right: 1.5rem;">
-					              			<button class="icon" v-tooltip="'TIPS Certification'">
-					              				<i class="fas fa-file-certificate" style="color:green;" v-if="u.certTips"></i>
-							                	<i class="fas fa-file-certificate" v-if="!u.certTips" style="color:red;"></i>
-							                </button>
-					              		</span>
-					              	
-					              		<span v-if="u && u.address && u.address.city && u.address.state" style="display:inline; margin-right: 1.5rem;">
-						              		<button class="icon" v-tooltip="u.address.city + ', ' + u.address.state">
-							                	<i class="fas fa-map-marker"></i>
-							                </button>
-							              </span>
-
-							              <v-popover v-if="u.skills && u.skills.length >= 1" style="display:inline;">
-							              	<button class="icon" style="display:inline; margin-right: 1.5rem;">
-							                	<i class="fas fa-briefcase"></i>
-							                </button>
-							                <template slot="popover">
-							                	<span v-for="job in u.skills">{{job.title}} / </span>
-				  										</template>
-							              </v-popover>
-
-							              
-					              	</span>
-
-												</span>
-
-
-												<button v-if="props.row.dayStatus == 'hired' && props.row.status != 'assigned'" class="icon" v-tooltip="'lock shift'" @click="lockShift(props, shift)" style="display:inline; margin-right: 1.5rem;">
-				                	<i class="fas fa-lock-open-alt"></i>
-				                </button>
-
-				                <button class="icon" v-if="props.row.dayStatus == 'hired' && props.row.status == 'assigned'" style="display:inline; margin-right: 1.5rem;">
-				                	<i class="fas fa-lock-alt"></i>
-				                </button>
-
-												<button v-if="props.row.status == 'placed'" class="icon ml-4" v-tooltip="'remove'" @click="removePlacement(props.row)">
-				                	<i class="fas fa-trash"></i>
-				                </button>
-
-				                <button v-if="props.row.status == 'assigned'" class="icon ml-4" v-tooltip="'remove'" @click="removeAssignment(props, shift)">
-				                	<i class="fas fa-trash"></i>
-				                </button>
-
-					            </span>
-				              <span v-else>
-				                {{props.formattedRow[props.column.field]}}
-				              </span>
-				            </template>
-				          </vue-good-table>
-		      			</div>
-	      			</div>
-	      		</transition>
+            	 	<button class="icon" v-if="props.row.showTrash" v-tooltip="'delete instance'" @click="deleteUser(props.row)" style="margin-left: 1.5rem;">
+                	<i class="fas fa-trash"></i>
+                </button>
+	            </span>
+                      
+                      <span v-else>
+                        {{props.formattedRow[props.column.field]}}
+                      </span>
+                    </template>
+                  </vue-good-table>
+                </div>
+              </div>
+            </transition>
       		</div>
+      		
       	</div>
       </div>
     </div>
@@ -453,7 +404,9 @@ export default {
 	        field: 'fullName',
 	      },
 	      {
+	      	label: 'Signed Up',
 	        field: 'created',
+	        sortable: false,
 	      },
 	      {
 	        field: 'state',
@@ -485,23 +438,56 @@ export default {
 	      },
 	    ],
 	    columns2: [
-	      {
-	        label: 'Name',
-	        field: 'fullName',
-	      },
-	      {
-	        label: '',
-	        field: 'extras2',
-	        tdClass: 'text-right',
-	      },
+        {
+          label: 'Name',
+          field: 'fullName',
+        },
+        {
+          label: 'Signed Up',
+          field: 'created',
+          sortable: false,
+        },
+        {
+          field: 'state',
+          tdClass: 'text-center',
+          sortable: false,
+        },
+        {
+          label: '',
+          field: 'notes',
+          sortable: false,
+          tdClass: 'text-center',
+        },
+        {
+          label: '',
+          field: 'reservations',
+          sortable: false,
+        },
+        {
+          label: '',
+          field: 'extras',
+          tdClass: 'text-center',
+          sortable: false,
+        },
+        {
+          label: '',
+          field: 'delete',
+          tdClass: 'text-left',
+          sortable: false,
+        },
 	    ]
     }
   },
   computed: {
-    ...mapState(['currentUser', 'dayShifts', 'availableUsers', 'dayUsers', 'users']),
+    ...mapState(['currentUser', 'eventsByDay', 'availableUsers', 'dayUsers', 'users']),
+    filteredAvailableUsers () {
+      return this.dayUsers.filter(user => {
+        return user.status == 'available' && (!user.preferredEvent || user.preferredEvent == null)
+      })
+    },
     filteredUsers () {
       return this.dayUsers.filter(user => {
-        return user.status == 'available'
+        return user.status == 'available' && user.preferredEvent
       })
     },
     orderedUsers () {
@@ -512,7 +498,17 @@ export default {
           return 1;
         return 0;
       }
-      return this.filteredUsers.sort(compare);
+      return this.filteredUsers.sort(compare)
+    },
+    orderedAvailableUsers () {
+      function compare(a, b) {
+        if (a.firstName < b.firstName)
+          return -1;
+        if (a.firstName > b.firstName)
+          return 1;
+        return 0;
+      }
+      return this.filteredAvailableUsers.sort(compare)
     },
     filteredPlacedUsers () {
       return this.dayUsers.filter(user => {
@@ -522,7 +518,8 @@ export default {
   },
   created () {
     if (this.day) {
-      this.$store.dispatch("getDayShiftsState", this.day)
+      this.$store.dispatch("getEventsByDay", this.day)
+      this.$store.dispatch("getUserAvailabilityState", this.day)
       this.$store.dispatch("getDayEventsState", this.day)
     }
     if (!this.users || this.users.length < 1) {
@@ -533,13 +530,13 @@ export default {
     Loader
   },
   methods: {
-  	expand(shift) {
-  		shift.collapse = false
-  		this.$store.dispatch("updateEventShift", shift)
+  	expand(event) {
+  		event.collapse = false
+  		this.$store.dispatch("updateEvent", event)
   	},
-  	collapse(shift) {
-  		shift.collapse = true
-  		this.$store.dispatch("updateEventShift", shift)
+  	collapse(event) {
+  		event.collapse = true
+  		this.$store.dispatch("updateEvent", event)
   	},
   	exportAll() {
   		const exportHeaders = [
@@ -641,6 +638,11 @@ export default {
       return this.availableUsers.filter(member => {
         return member.id == user.userId
       })
+    },
+    preferredUsers(event) {
+    	return this.orderedUsers.filter(user => {
+    		return user.preferredEvent == event.id
+    	})
     },
     orderedPlacedUsers (shift) {
       function compare(a, b) {
@@ -779,6 +781,17 @@ export default {
       })
       shift.selectedStaff = null
     },
+    assignEvent(event) {
+    	let userId = event.selectedStaff.userId
+    	console.log(userId)
+    	this.$store.dispatch('preferEvent', {
+    		userId: userId,
+    		event: event.id,
+    		day: this.day
+    	})
+    	event.selectedStaff = null
+    	this.$store.dispatch("getUserAvailabilityState", this.day)
+    },
     removeAssignment(props, shift) {
       console.log(props.row)
       console.log(shift)
@@ -801,7 +814,7 @@ export default {
     formatDate(q) {
       if(q) {
         const postedDate = new Date(q.seconds) * 1000;
-        return moment(postedDate).format('MMMM Do YYYY')
+        return moment(postedDate).format('MMMM Do YYYY, hh:mm a')
       } else {
         return null
       }
@@ -836,7 +849,9 @@ export default {
     	fb.userDaysCollection.doc(p.row.id).update({showTrash: false})
     },
     deleteUser(userDay) {
-    	fb.userDaysCollection.doc(userDay.id).delete()
+    	fb.userDaysCollection.doc(userDay.id).update({
+    		preferredEvent: null
+    	})
     },
   },
   beforeDestroy () {

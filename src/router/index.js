@@ -213,37 +213,48 @@ const router = new VueRouter({
         requiresAuth: true
       },
     },
+    
     {
-      path: '/placements',
-      name: 'placements',
-      component: () => import('../views/Placements/Placements.vue'),
+      path: '/placements', redirect: '/placements/day',
+      name: 'placementshome',
+      component: () => import('../views/Placements/PlacementsHome.vue'),
       meta: {
         requiresAuth: true
       },
-    },
-    {
-      path: '/placements/:id',
-      name: 'day',
-      component: () => import(/* webpackChunkName: "day" */ '../views/Placements/Day.vue'),
-      meta: {
-        requiresAuth: true
-      }
-    },
-    {
-      path: '/eventplacements',
-      name: 'eventplacements',
-      component: () => import('../views/Placements/ByEvent.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
-    {
-      path: '/eventplacements/:id',
-      name: 'eventplacement',
-      component: () => import('../views/Placements/Event.vue'),
-      meta: {
-        requiresAuth: true
-      },
+      children: [
+        {
+          path: '/placements/day',
+          name: 'placements',
+          component: () => import('../views/Placements/Placements.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/placements/day/:id',
+          name: 'day',
+          component: () => import(/* webpackChunkName: "day" */ '../views/Placements/Day.vue'),
+          meta: {
+            requiresAuth: true
+          }
+        },
+        // {
+        //   path: '/eventplacements',
+        //   name: 'eventplacements',
+        //   component: () => import('../views/Placements/ByEvent.vue'),
+        //   meta: {
+        //     requiresAuth: true
+        //   },
+        // },
+        {
+          path: '/placements/event/:id',
+          name: 'eventplacement',
+          component: () => import('../views/Placements/Event.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+      ]
     },
     {
       path: '/timesheets',

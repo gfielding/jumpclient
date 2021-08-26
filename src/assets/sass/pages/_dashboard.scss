@@ -31,3 +31,12 @@
 		}
 	}
 }
+
+.alt-col {
+	background:transparent;
+	padding:0;
+	width:49%;
+	@include respond(phone) {
+		width:100%;
+	}
+}

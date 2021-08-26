@@ -52,7 +52,7 @@
             </router-link>
           </div>
           <div class="nav__menu--item desktop">
-            <router-link :to="{name: 'placements'}">
+            <router-link :to="{name: 'placementshome'}">
               placements
             </router-link>
           </div>
