@@ -405,7 +405,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['eventUsers', 'availableUsers', 'getEventsByDay', 'users', 'eventInfo']),
+    ...mapState(['eventUsers', 'availableUsers', 'eventShifts', 'users', 'eventInfo']),
     event() {
       return this.eventInfo 
     },
