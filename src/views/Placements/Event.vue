@@ -8,7 +8,7 @@
         <div class="dashboard__container--body--col">
           <vue-good-table
               :columns="columns"
-              :rows="eventUsers"
+              :rows="filteredUsers"
               :search-options="{
                 enabled: true,
                 placeholder: 'Search this table',
@@ -442,6 +442,11 @@ export default {
     hideTrash(p) {
       fb.userDaysCollection.doc(p.row.id).update({showTrash: false})
     },
+    deleteUser(userDay) {
+      fb.userDaysCollection.doc(userDay.id).update({
+        preferredEvent: null
+      })
+    },
     orderedUsers(shift) {
       function compare(a, b) {
         if (a.firstName < b.firstName)
@@ -552,7 +557,7 @@ export default {
       fb.usersCollection.doc(user.userId).get()
       .then(
         doc => {
-          let dateObj = new Date(this.day);
+          let dateObj = new Date(user.day);
           let month = dateObj.getUTCMonth() + 1;
           let day = dateObj.getUTCDate();
           let year = dateObj.getUTCFullYear();
