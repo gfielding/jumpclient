@@ -553,7 +553,7 @@ export default {
 					this.availableUsers[key].lastName,
 					this.availableUsers[key].email,
 					this.availableUsers[key].phone,
-					this.availableUsers[key].address.state,
+					// this.availableUsers[key].address.state,
   			])
   		}
   		this.$gapi.getGapiClient().then(gapi => {

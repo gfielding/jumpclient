@@ -131,9 +131,16 @@
           </vue-good-table>
         </div>
         <div class="dashboard__container--body--col alt-col">
+          <button class="btn btn__flat mr-3" @click="exportAll()">export all</button>
           <div v-for="shift in eventShifts" :key="shift.id" style=" padding:1.6rem; background: white; margin-bottom:1.6rem;">
             <div class="flex align-center justify-space-between">
-              <h3>{{shift.day | moment("dddd, MMM Do") }}</h3>
+              <span>
+                <h3>{{shift.day | moment("dddd, MMM Do") }}</h3>
+                <span v-if="shift.position.title">{{shift.position.title}}, 
+                  <span v-if="shift.startTime" class="ml-2"> {{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}</span> - 
+                  <span v-if="shift.endTime">{{ [ shift.endTime, "HH:mm" ] | moment("hh:mm A") }}</span>
+                </span>
+              </span>
               <div>
                 <button class="btn btn__flat mr-3" @click="exportStaff(shift)">export</button>
                 <button class="btn btn__icon" @click="expand(shift)" v-if="shift.collapse"><i class="fas fa-chevron-up"></i></button>
@@ -144,10 +151,10 @@
               <div v-if="shift.collapse == true">
                 <div class="pt-2">
                   <h4 v-if="shift.name">{{shift.name}}</h4>
-                  <p v-if="shift.position.title">{{shift.position.title}}, 
+                  <!-- <p v-if="shift.position.title">{{shift.position.title}}, 
                     <span v-if="shift.startTime" class="ml-2"> {{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}</span> - 
                     <span v-if="shift.endTime">{{ [ shift.endTime, "HH:mm" ] | moment("hh:mm A") }}</span>
-                  </p>
+                  </p> -->
 
                   <button class="btn btn__flat chip mt-1">{{orderedPlacedUsers(shift).length}} / {{shift.staff}}</button>
                 </div>
@@ -298,6 +305,7 @@ import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import * as moment from 'moment'
 import router from '@/router'
+import ExportService from "@/services/ExportService"
 const fb = require('../../firebaseConfig.js')
 
 export default {
@@ -422,6 +430,63 @@ export default {
     },
   },
   methods: {
+    exportAll() {
+      const exportHeaders = [
+        "First Name",
+        "Last Name",
+        "Email",
+        "Phone",
+      ]
+      const exportItems = [];
+      for (var key in this.eventUsers) {
+        exportItems.push([
+          this.eventUsers[key].firstName,
+          this.eventUsers[key].lastName,
+          this.eventUsers[key].email,
+          this.eventUsers[key].phone,
+          // this.eventUsers[key].address.state,
+        ])
+      }
+      this.$gapi.getGapiClient().then(gapi => {
+        const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+        exportService.export();
+      });
+    },
+    exportStaff(shift) {
+      console.log(shift)
+      const exportHeaders = [
+        "Day",
+        "Event",
+        "Position",
+        "Start",
+        "End",
+        "First Name",
+        "Last Name",
+        "Phone",
+        "Email",
+        "Code"
+      ];
+      const exportItems = [];
+      for (var key in this.orderedPlacedUsers2(shift.id)) {
+        exportItems.push([
+          shift.day,
+          shift.event,
+          shift.position.title,
+          shift.startTime,
+          shift.endTime,
+          this.orderedPlacedUsers2(shift.id)[key].firstName,
+          this.orderedPlacedUsers2(shift.id)[key].lastName,
+          this.orderedPlacedUsers2(shift.id)[key].phone,
+          this.orderedPlacedUsers2(shift.id)[key].email,
+          `=REGEXEXTRACT(H2,"....$")`
+        ])
+      }
+      console.log(exportItems)
+      this.$gapi.getGapiClient().then(gapi => {
+        const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+        exportService.export();
+      });
+    },
     removeAssignment(props, shift) {
       fb.userDaysCollection.doc(props.row.id).update({status: "available", shift: null})
       fb.assignmentsCollection.where("shiftId", "==", shift.id).where("userId", "==", props.row.userId).get().then(function(querySnapshot) {
@@ -475,6 +540,18 @@ export default {
     //     return user.status == 'available' && user.shift == shift.id && user.day == shift.day
     //   })
     // },
+    orderedPlacedUsers2 (shift) {
+      function compare(a, b) {
+        if (a.firstName < b.firstName)
+          return -1;
+        if (a.firstName > b.firstName)
+          return 1;
+        return 0;
+      }
+      return this.filteredPlacedUsers.sort(compare).filter(user => {
+        return user.shift == shift
+      });
+    },
     orderedPlacedUsers (shift) {
       function compare(a, b) {
         if (a.firstName < b.firstName)
