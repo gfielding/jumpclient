@@ -28,7 +28,7 @@
                   <i class="far fa-sticky-note"></i>
                 </button>
               </span>
-              <span v-else-if="props.column.field == 'state'">
+              <!-- <span v-else-if="props.column.field == 'state'">
                 <span v-if="(props.row)">
                   <span v-for="u in filteredInfo(props.row)">
                     <span v-if="u && u.address && u.address.city && u.address.state" style="display:inline;">
@@ -36,13 +36,13 @@
                     </span>
                   </span>
                 </span>
-              </span>
+              </span> -->
               <span v-else-if="props.column.field == 'days'">
                 <span v-if="(props.row)">
                   {{props.row.start}}
                 </span>
               </span>
-              <span v-else-if="props.column.field == 'extras'">
+              <!-- <span v-else-if="props.column.field == 'extras'">
                 <span v-if="(props.row)">
                     <span v-for="u in filteredInfo(props.row)">
                       <v-popover>
@@ -67,7 +67,7 @@
                     </span>
                   </span>
                 </span>
-              </span>
+              </span> -->
               <span v-else-if="props.column.field == 'reservations'">
                   <span v-if="
                     (props.row.dayStatus != 'hired') &&
@@ -176,7 +176,7 @@
                     :rows="orderedPlacedUsers(shift)"
                     >
                     <template slot="table-row" slot-scope="props">
-                      <span v-if="props.column.field == 'extras'">
+                      <!-- <span v-if="props.column.field == 'extras'">
                         <span v-if="(props.row)">
                             <span v-for="u in filteredInfo(props.row)">
                               <v-popover>
@@ -201,8 +201,8 @@
                             </span>
                           </span>
                         </span>
-                      </span>
-                      <span v-else-if="props.column.field == 'created'">
+                      </span> -->
+                      <span v-if="props.column.field == 'created'">
                 <span v-if="props.row.created">{{formatDate(props.row.created)}}</span>
               </span>
                       <span v-else-if="props.column.field == 'reservations'">
@@ -252,7 +252,7 @@
                   <i class="far fa-sticky-note"></i>
                 </button>
               </span>
-              <span v-else-if="props.column.field == 'state'">
+              <!-- <span v-else-if="props.column.field == 'state'">
                 <span v-if="(props.row)">
                   <span v-for="u in filteredInfo(props.row)">
                     <span v-if="u && u.address && u.address.city && u.address.state" style="display:inline;">
@@ -260,7 +260,7 @@
                     </span>
                   </span>
                 </span>
-              </span>
+              </span> -->
               <span v-else-if="props.column.field == 'delete'">
 
                 <button v-if="props.row.dayStatus == 'hired' && props.row.status != 'assigned'" class="icon" v-tooltip="'lock shift'" @click="lockShift(props, shift)" style="display:inline; margin-right: 1.5rem;">
@@ -327,9 +327,9 @@ export default {
           field: 'days',
         },
         {
-          field: 'state',
+          label: 'Job',
+          field: 'requestedJob.title',
           tdClass: 'text-center',
-          sortable: false,
         },
         {
           label: '',
@@ -342,12 +342,12 @@ export default {
           field: 'reservations',
           sortable: false,
         },
-        {
-          label: '',
-          field: 'extras',
-          tdClass: 'text-center',
-          sortable: false,
-        },
+        // {
+        //   label: '',
+        //   field: 'extras',
+        //   tdClass: 'text-center',
+        //   sortable: false,
+        // },
         {
           label: '',
           field: 'delete',
@@ -366,9 +366,9 @@ export default {
           sortable: false,
         },
         {
-          field: 'state',
+          label: 'Job',
+          field: 'requestedJob.title',
           tdClass: 'text-center',
-          sortable: false,
         },
         {
           label: '',
@@ -381,12 +381,12 @@ export default {
           field: 'reservations',
           sortable: false,
         },
-        {
-          label: '',
-          field: 'extras',
-          tdClass: 'text-center',
-          sortable: false,
-        },
+        // {
+        //   label: '',
+        //   field: 'extras',
+        //   tdClass: 'text-center',
+        //   sortable: false,
+        // },
         {
           label: '',
           field: 'delete',
@@ -587,6 +587,7 @@ export default {
             shiftId: shift.id,
             userId: props.row.userId,
             date: newdate,
+            day: shift.day,
             eventId: shift.eventId,
             email: props.row.email,
             firstName: props.row.firstName,
@@ -649,7 +650,7 @@ export default {
             dayStatus: 'hired',
             email: doc.data().email,
             phone: doc.data().phone,
-            dateFormat: newdate
+            dateFormat: newdate,
           })
         }
       )

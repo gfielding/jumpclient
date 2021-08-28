@@ -845,7 +845,13 @@ const store = new Vuex.Store({
     },
     removeUserPlacement({ commit }, payload) {
       console.log(payload)
-      fb.userDaysCollection.doc(payload.id).update({status: "available", shift: null})
+      fb.userDaysCollection.doc(payload.id).update({
+        status: "available", 
+        shift: null,
+        event: null,
+        eventName: null,
+        slug: null
+      })
     },
     addPlacement({ commit }, payload) {
       console.log(payload)
@@ -865,11 +871,28 @@ const store = new Vuex.Store({
       fb.eventStaffCollection.add({
         email: payload.email,
         name: payload.firstName,
+        event: payload.event,
+        slug: payload.slug,
+        eventName: payload.eventName,
         phone: payload.phone,
         user: payload.userId,
         event: payload.eventId,
         venueName: payload.eventInfo.venue.title,
-        venue: payload.eventInfo.venueId
+        venue: payload.eventInfo.venueId,
+        fileId: payload.fileId,
+      })
+      fb.userDaysCollection.where("userId", "==", payload.userId).where("day", "==", payload.day).get()
+      .then(function (querySnapshot) {
+          querySnapshot.forEach(function (doc) {
+            console.log(doc.id, " => ", doc.data())
+            fb.userDaysCollection.doc(doc.id).update({
+            event: payload.event,
+            slug: payload.slug,
+            event: payload.eventId,
+            fileId: payload.fileId,
+            eventName: payload.eventName
+          })
+        })
       })
     },
     getUsersPerDay({ commit }) {
