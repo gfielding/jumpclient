@@ -567,6 +567,7 @@ export default {
     lockShift(props, shift) {
       console.log(props.row)
       console.log(shift)
+      let event = this.event
       this.performingRequest = true
       let shiftDay = shift.day
       let dateObj = new Date(shift.day);
@@ -602,7 +603,10 @@ export default {
             slug: eventData.slug,
             eventInfo: eventData.eventInfo,
             shiftStart: shiftStart,
-            shiftEnd: shiftEnd
+            shiftEnd: shiftEnd,
+            event: event.id,
+            eventName: event.title,
+            slug: event.slug,
           }
           console.log(assignment)
           this.$store.dispatch("lockShift", assignment)

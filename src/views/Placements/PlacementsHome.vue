@@ -17,12 +17,12 @@
 		      <v-select
 		        class="mt-2"
 		        label="title" 
-		        :options="currentEvents"
+		        :options="events"
 		        v-model="selectedEvent"
 		        @input="setSelectedEvent" 
 		      >
 			      <template #option="{ title, startDate, venue }">
-				      <span>{{ title }} | {{venue.title}} | {{startDate | moment("ddd, MMM Do YYYY")}}</span>
+				      <span>{{ title }} | {{venue.title}} | Starts: {{startDate | moment("ddd, MMM Do YYYY")}}</span>
 				    </template>
 		      </v-select>
 		    </div>
@@ -78,7 +78,7 @@ import * as moment from 'moment'
 	  	},
 	  },
 	  computed: {
-    ...mapState(['currentUser', 'eventDays', 'usersPerDay', 'eventDays', 'currentEvents', 'pastEvents']),
+    ...mapState(['currentUser', 'eventDays', 'usersPerDay', 'eventDays', 'events', 'pastEvents']),
   	},
 	}
 </script>

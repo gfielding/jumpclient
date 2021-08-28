@@ -592,6 +592,8 @@ const store = new Vuex.Store({
           let yesterday = new Date()
           yesterday.setDate(yesterday.getDate() - 1);
           let startComp = new Date(doc.data().startDate)
+          let endComp = new Date(doc.data().endDate)
+
           let event = doc.data()
           event.id = doc.id
           let start = doc.data().startDate
@@ -600,10 +602,15 @@ const store = new Vuex.Store({
           eventsArray.push(event)
           eventDays.push(event.days)
 
-          if (doc.data().published && startComp >= yesterday) {
+          if (doc.data().published && (endComp >= yesterday || startComp >= yesterday)) {
             currentEventsArray.push(event)
             commit('setCurrentEvents', currentEventsArray)
           }
+
+          // if (doc.data().published && startComp >= yesterday) {
+          //   currentEventsArray.push(event)
+          //   commit('setCurrentEvents', currentEventsArray)
+          // }
 
           if (doc.data().published && startComp < yesterday) {
             pastEventsArray.push(event)
@@ -753,7 +760,6 @@ const store = new Vuex.Store({
       })
     },
     getEventUsers({ commit }, payload) {
-      console.log(payload)
       fb.userDaysCollection.where("preferredEvent", "==", payload).orderBy('created', 'asc').onSnapshot(querySnapshot => {
         let eventUsersArray = []
         querySnapshot.forEach(doc => {
