@@ -45,7 +45,7 @@
             			<i class="far fa-sticky-note"></i>
             		</button>
             	</span>
-            	<span v-else-if="props.column.field == 'state'">
+            	<!-- <span v-else-if="props.column.field == 'state'">
             		<span v-if="(props.row)">
 		              <span v-for="u in filteredInfo(props.row)">
 		              	<span v-if="u && u.address && u.address.city && u.address.state" style="display:inline;">
@@ -53,8 +53,8 @@
 				            </span>
 		              </span>
 		            </span>
-            	</span>
-            	<span v-else-if="props.column.field == 'extras'">
+            	</span> -->
+            	<!-- <span v-else-if="props.column.field == 'extras'">
 	              <span v-if="(props.row)">
 		              	<span v-for="u in filteredInfo(props.row)">
 		              		<v-popover>
@@ -76,95 +76,11 @@
 											    <p v-for="client in u.blacklist" class="danger">{{client.title}}</p>
 											  </template>
 											</v-popover>
-											<!-- <span v-if="u && u.address && u.address.city && u.address.state" style="display:inline;">
-			              		<button class="icon" v-tooltip="u.address.city + ', ' + u.address.state">
-				                	<i class="fas fa-map-marker"></i>
-				                </button>
-				              </span> -->
-				             <!--  <span v-for="client in u.blacklist" style="display:inline;">
-		              			<button class="icon" v-tooltip="client.title">
-				                	<i class="fas fa-exclamation-triangle" style="color:red;"></i>
-				                </button>
-		              		</span> -->
 		              	</span>
 		              
-
-	              		<!-- <span v-if="u.fullyVaccinated == 'yes'" style="display:inline; margin-right: 1.5rem;">
-			              			<i class="fas fa-syringe" style="color:#5cb85c;"></i>
-			              		</span>
-			              		<span v-if="u.fullyVaccinated == 'no'" style="display:inline; margin-right: 1.5rem;">
-			              			<i class="fas fa-syringe" style="color:#d9534f;"></i>
-			              		</span>
-			              		<span v-if="!u.fullyVaccinated || u.fullyVaccinated == null" style="display:inline; margin-right: 1.5rem;">
-			              			<i class="fas fa-syringe"  style="opacity:0.25;"></i>
-			              		</span> -->
-
-	              		<!-- <span v-if="u.contractorStatus == 'applied' || !u.contractorStatus" style="display:inline; margin-right: 1.5rem;">
-				              		<button class="icon" v-tooltip="'C - ' + u.contractorStatus">
-					                	<i class="fas fa-hammer"  style="opacity:0.25;"></i>
-					                </button>
-					              </span>
-
-					              <span v-if="u.contractorStatus == 'payroll invitation'" style="display:inline; margin-right: 1.5rem;">
-				              		<button class="icon" v-tooltip="'C - ' + u.contractorStatus">
-					                	<i class="fas fa-hammer" style="color:#f0ad4e;"></i>
-					                </button>
-					              </span>
-
-					              <span v-if="u.contractorStatus == 'hired contractor'" style="display:inline; margin-right: 1.5rem;">
-				              		<button class="icon" v-tooltip="'C - ' + u.contractorStatus">
-					                	<i class="fas fa-hammer" style="color:#5cb85c;"></i>
-					                </button>
-					              </span>
-
-					              <span v-if="u.employeeStatus == 'hired employee'" style="display:inline; margin-right: 1.5rem;">
-				              		<button class="icon" v-tooltip="'E - ' + u.employeeStatus">
-					                	<i class="fas fa-user" style="color:#5cb85c;"></i>
-					                </button>
-					              </span>
-
-					              <span v-if="u.employeeStatus == 'payroll invitation'" style="display:inline; margin-right: 1.5rem;">
-				              		<button class="icon" v-tooltip="'E - ' + u.employeeStatus">
-					                	<i class="fas fa-user" style="color:#f0ad4e;"></i>
-					                </button>
-					              </span>
-
-					              <span v-if="u.employeeStatus == 'applied' || !u.employeeStatus" style="display:inline; margin-right: 1.5rem;">
-				              		<button class="icon" v-tooltip="'E - ' + u.employeeStatus">
-					                	<i class="fas fa-user"></i>
-					                </button>
-					              </span> -->
-
-
-	              		
-
-	              		<!-- <span style="display:inline; margin-right: 1.5rem;">
-	              			<button class="icon" v-tooltip="'TIPS Certification'">
-	              				<i class="fas fa-file-certificate" style="color:green;" v-if="u.certTips"></i>
-			                	<i class="fas fa-file-certificate" v-if="!u.certTips" style="color:red;"></i>
-			                </button>
-	              		</span> -->
-	              	
-	              		
-
-			              <!-- <v-popover v-if="u.skills && u.skills.length >= 1" style="display:inline;">
-			              	<button class="icon" style="display:inline; margin-right: 1.5rem;">
-			                	<i class="fas fa-briefcase"></i>
-			                </button>
-			                <template slot="popover">
-			                	<span v-for="job in u.skills">{{job.title}} / </span>
-  										</template>
-			              </v-popover> -->
-
-			              <!-- <router-link :to="'/users/' + u.id" style="display:inline; margin-right: 1.5rem;">
-                      <i class="fas fa-external-link" style="color:mediumblue;"></i>
-                    </router-link> -->
-
-
-
 	              	</span>
 								</span>
-	            </span>
+	            </span> -->
 	            <span v-else-if="props.column.field == 'reservations'">
 		            	<span v-if="
 		                (props.row.dayStatus != 'hired') &&
@@ -217,7 +133,7 @@
                 	<i class="fas fa-times"></i>
                 </button>
 
-            	 	<button class="icon" v-if="props.row.showTrash" v-tooltip="'delete instance'" @click="deleteUser(props.row)" style="margin-left: 1.5rem;">
+            	 	<button class="icon" v-if="props.row.showTrash" v-tooltip="'delete instance'" @click="deleteUserDay(props.row)" style="margin-left: 1.5rem;">
                 	<i class="fas fa-trash"></i>
                 </button>
 	            </span>
@@ -258,7 +174,7 @@
                     :rows="preferredUsers(event)"
                     >
                     <template slot="table-row" slot-scope="props">
-                      <span v-if="props.column.field == 'extras'">
+                      <!-- <span v-if="props.column.field == 'extras'">
                         <span v-if="(props.row)">
                             <span v-for="u in filteredInfo(props.row)">
                               <v-popover>
@@ -283,8 +199,8 @@
                             </span>
                           </span>
                         </span>
-                      </span>
-                      <span v-else-if="props.column.field == 'created'">
+                      </span> -->
+                      <span v-if="props.column.field == 'created'">
                 <span v-if="props.row.created">{{formatDate(props.row.created)}}</span>
               </span>
                       <span v-else-if="props.column.field == 'reservations'">
@@ -334,7 +250,7 @@
                   <i class="far fa-sticky-note"></i>
                 </button>
               </span>
-              <span v-else-if="props.column.field == 'state'">
+              <!-- <span v-else-if="props.column.field == 'state'">
                 <span v-if="(props.row)">
                   <span v-for="u in filteredInfo(props.row)">
                     <span v-if="u && u.address && u.address.city && u.address.state" style="display:inline;">
@@ -342,7 +258,7 @@
                     </span>
                   </span>
                 </span>
-              </span>
+              </span> -->
               <span v-else-if="props.column.field == 'delete'">
 
 	            	<button class="icon" v-if="!props.row.showTrash" v-tooltip="'delete instance'" @click="showTrash(props)">
@@ -409,10 +325,15 @@ export default {
 	        sortable: false,
 	      },
 	      {
-	        field: 'state',
-	        tdClass: 'text-center',
-	        sortable: false,
-	      },
+          label: 'Job',
+          field: 'requestedJob.title',
+          tdClass: 'text-center',
+        },
+	      // {
+	      //   field: 'state',
+	      //   tdClass: 'text-center',
+	      //   sortable: false,
+	      // },
 	      {
 	        label: '',
 	        field: 'notes',
@@ -424,12 +345,12 @@ export default {
 	        field: 'reservations',
 	        sortable: false,
 	      },
-	      {
-	        label: '',
-	        field: 'extras',
-	        tdClass: 'text-center',
-	        sortable: false,
-	      },
+	      // {
+	      //   label: '',
+	      //   field: 'extras',
+	      //   tdClass: 'text-center',
+	      //   sortable: false,
+	      // },
 	      {
 	      	label: '',
 	        field: 'delete',
@@ -447,10 +368,15 @@ export default {
           field: 'created',
           sortable: false,
         },
+        // {
+        //   field: 'state',
+        //   tdClass: 'text-center',
+        //   sortable: false,
+        // },
         {
-          field: 'state',
+          label: 'Job',
+          field: 'requestedJob.title',
           tdClass: 'text-center',
-          sortable: false,
         },
         {
           label: '',
@@ -463,12 +389,12 @@ export default {
           field: 'reservations',
           sortable: false,
         },
-        {
-          label: '',
-          field: 'extras',
-          tdClass: 'text-center',
-          sortable: false,
-        },
+        // {
+        //   label: '',
+        //   field: 'extras',
+        //   tdClass: 'text-center',
+        //   sortable: false,
+        // },
         {
           label: '',
           field: 'delete',
@@ -482,7 +408,7 @@ export default {
     ...mapState(['currentUser', 'eventsByDay', 'availableUsers', 'dayUsers', 'users']),
     filteredAvailableUsers () {
       return this.dayUsers.filter(user => {
-        return user.status == 'available' && (!user.preferredEvent || user.preferredEvent == null)
+        return (!user.preferredEvent || user.preferredEvent == null)
       })
     },
     filteredUsers () {
@@ -686,25 +612,26 @@ export default {
       return date;
     },
     reserveUser(user) {
-      fb.usersCollection.doc(user.userId).get()
-      .then(
-        doc => {
-          let dateObj = new Date(this.day);
-          let month = dateObj.getUTCMonth() + 1;
-          let day = dateObj.getUTCDate();
-          let year = dateObj.getUTCFullYear();
-          let newdate = month + "/" + day + "/" + year;
-      		console.log(newdate)
-      		console.log(user.id)
-          fb.userDaysCollection.doc(user.id).update({
-            dayStatus: 'hired',
-            email: doc.data().email,
-            phone: doc.data().phone,
-            dateFormat: newdate
-          })
-        }
-      )
+      this.$store.dispatch('reserveUser', user)
     },
+    // reserveUser(user) {
+    //   fb.usersCollection.doc(user.userId).get()
+    //   .then(
+    //     doc => {
+    //       let dateObj = new Date(this.day);
+    //       let month = dateObj.getUTCMonth() + 1;
+    //       let day = dateObj.getUTCDate();
+    //       let year = dateObj.getUTCFullYear();
+    //       let newdate = month + "/" + day + "/" + year;
+    //       fb.userDaysCollection.doc(user.id).update({
+    //         dayStatus: 'hired',
+    //         email: doc.data().email,
+    //         phone: doc.data().phone,
+    //         dateFormat: newdate
+    //       })
+    //     }
+    //   )
+    // },
     notRequestUser(user) {
       fb.userDaysCollection.doc(user.id).update({ dayStatus: 'not requested' })
     },
@@ -715,8 +642,6 @@ export default {
       fb.userDaysCollection.doc(user.id).update({dayStatus: null})
     },
     lockShift(props, shift) {
-    	console.log(props.row)
-    	console.log(shift)
       this.performingRequest = true
       let shiftDay = shift.day
       let dateObj = new Date(shift.day);
@@ -754,7 +679,6 @@ export default {
             shiftStart: shiftStart,
             shiftEnd: shiftEnd
           }
-          console.log(assignment)
           this.$store.dispatch("lockShift", assignment)
           fb.userDaysCollection.doc(props.row.id).update({status: "assigned", shift: shift.id})
         }
@@ -848,6 +772,9 @@ export default {
     hideTrash(p) {
     	fb.userDaysCollection.doc(p.row.id).update({showTrash: false})
     },
+    deleteUserDay(p) {
+    	fb.userDaysCollection.doc(p.id).delete()
+    },
     deleteUser(userDay) {
     	fb.userDaysCollection.doc(userDay.id).update({
     		preferredEvent: null
@@ -871,6 +798,10 @@ export default {
     delete this.performingRequest
     delete this.activeUser
     delete this.newUser
+    this.columns = null
+    delete this.columns
+    this.columns2 = null
+    delete this.columns2
     this.$store.dispatch("clearDayState")
     console.log(this)
   }

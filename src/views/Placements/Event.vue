@@ -165,9 +165,9 @@
                     v-model="shift.selectedStaff"
                     @input="assignShift(shift)"
                     >
-                    <!-- <template #option="{ fullName, day }">
-                      <span>{{ fullName }} | {{day | moment("ddd, MMM Do")}}</span>
-                    </template> -->
+                    <template #option="{ fullName, day, requestedJob }">
+                      <span>{{ fullName }}<span v-if="requestedJob"> | {{requestedJob.title}}</span></span>
+                    </template>
                   </v-select>
                 </div>
                 <div class="pt-3">
@@ -272,11 +272,11 @@
                         </button>
 
                         <button v-if="props.row.status == 'placed'" class="icon ml-4" v-tooltip="'remove'" @click="removePlacement(props.row)">
-                          <i class="fas fa-trash"></i>
+                          <i class="fas fa-times"></i>
                         </button>
 
                         <button v-if="props.row.status == 'assigned'" class="icon ml-4" v-tooltip="'remove'" @click="removeAssignment(props, shift)">
-                          <i class="fas fa-trash"></i>
+                          <i class="fas fa-times"></i>
                         </button>
               </span>
                       
@@ -401,25 +401,29 @@ export default {
   },
   created () {
     this.$store.dispatch("getEventPlacementFromId", this.$route.params.id)
+    // if (!this.users || this.users.length < 1) {
+    //   this.$store.dispatch("getUsers")
+    // }
   },
   watch: {
     '$route' (to, from) {
       this.$store.dispatch("getEventPlacementFromId", this.$route.params.id)
     }
   },
-  mounted() {
-    if (!this.users || this.users.length < 1) {
-      this.$store.dispatch("getUsers")
-    }
-  },
+  // mounted() {
+  //   if (!this.users || this.users.length < 1) {
+  //     this.$store.dispatch("getUsers")
+  //   }
+  // },
   computed: {
-    ...mapState(['eventUsers', 'availableUsers', 'eventShifts', 'users', 'eventInfo']),
+    ...mapState(['eventUsers', 'eventShifts', 'eventInfo']),
     event() {
       return this.eventInfo 
     },
     filteredUsers () {
       return this.eventUsers.filter(user => {
-        return user.status == 'available'
+        // return user.status == 'available'
+        return ((user.status != 'placed') && (user.status != 'assigned'))
       })
     },
     
@@ -436,6 +440,7 @@ export default {
         "Last Name",
         "Email",
         "Phone",
+        "Day",
       ]
       const exportItems = [];
       for (var key in this.eventUsers) {
@@ -444,6 +449,7 @@ export default {
           this.eventUsers[key].lastName,
           this.eventUsers[key].email,
           this.eventUsers[key].phone,
+          this.eventUsers[key].day,
           // this.eventUsers[key].address.state,
         ])
       }
@@ -577,46 +583,34 @@ export default {
       let newdate = month + "/" + day + "/" + year;
       let shiftStart = this.formatAMPM(shift.startTime)
       let shiftEnd = this.formatAMPM(shift.endTime)
-      fb.eventsCollection.doc(shift.eventId).get().then(
-        doc => {
-          let eventData = {
-            eventInfo: doc.data(),
-            slug: doc.data().slug,
-          }
-          let assignment = {
-            shiftId: shift.id,
-            userId: props.row.userId,
-            date: newdate,
-            day: shift.day,
-            eventId: shift.eventId,
-            email: props.row.email,
-            firstName: props.row.firstName,
-            lastName: props.row.lastName,
-            phone: props.row.phone,
-            event: shift.event,
-            name:  shift.event,
-            fileId: props.row.employeeNumber || props.row.contractorNumber || '123',
-            position: shift.position.title,
-            start: shiftDay + " " + shift.startTime,
-            end: shiftDay + " " + shift.endTime,
-            startTime: shift.startTime,
-            endTime: shift.endTime,
-            slug: eventData.slug,
-            eventInfo: eventData.eventInfo,
-            shiftStart: shiftStart,
-            shiftEnd: shiftEnd,
-            event: event.id,
-            eventName: event.title,
-            slug: event.slug,
-          }
-          console.log(assignment)
-          this.$store.dispatch("lockShift", assignment)
-          fb.userDaysCollection.doc(props.row.id).update({status: "assigned", shift: shift.id})
-        }
-      )
-      setTimeout(() => {
-        this.performingRequest = false
-      }, 1500)
+
+
+      let assignment = {
+        shiftId: shift.id,
+        userId: props.row.userId,
+        date: newdate,
+        day: shift.day,
+        eventId: shift.eventId,
+        email: props.row.email,
+        firstName: props.row.firstName,
+        lastName: props.row.lastName,
+        phone: props.row.phone,
+        name:  shift.event,
+        fileId: props.row.employeeNumber || props.row.contractorNumber || '123',
+        position: shift.position.title,
+        start: shiftDay + " " + shift.startTime,
+        end: shiftDay + " " + shift.endTime,
+        startTime: shift.startTime,
+        endTime: shift.endTime,
+        eventInfo: event,
+        shiftStart: shiftStart,
+        shiftEnd: shiftEnd,
+        event: event.id,
+        eventName: event.title,
+        slug: event.slug,
+      }
+      console.log(assignment)
+      this.$store.dispatch("lockShift", assignment)
     },
     assignShift(shift) {
       console.log(shift)
@@ -636,24 +630,7 @@ export default {
       shift.selectedStaff = null
     },
     reserveUser(user) {
-      fb.usersCollection.doc(user.userId).get()
-      .then(
-        doc => {
-          let dateObj = new Date(user.day);
-          let month = dateObj.getUTCMonth() + 1;
-          let day = dateObj.getUTCDate();
-          let year = dateObj.getUTCFullYear();
-          let newdate = month + "/" + day + "/" + year;
-          console.log(newdate)
-          console.log(user.id)
-          fb.userDaysCollection.doc(user.id).update({
-            dayStatus: 'hired',
-            email: doc.data().email,
-            phone: doc.data().phone,
-            dateFormat: newdate,
-          })
-        }
-      )
+      this.$store.dispatch('reserveUser', user)
     },
     notRequestUser(user) {
       fb.userDaysCollection.doc(user.id).update({ dayStatus: 'not requested' })
@@ -709,7 +686,12 @@ export default {
   },
   beforeDestroy () {
     this.$store.dispatch("clearEventUsers")
+    this.$store.dispatch("clearEventState")
     this.$store.dispatch("clearEventShiftsState")
+    this.columns = null
+    delete this.columns
+    this.columns2 = null
+    delete this.columns2
     console.log(this)
   }
 }
