@@ -78,7 +78,15 @@ import * as moment from 'moment'
 	  	},
 	  },
 	  computed: {
-    ...mapState(['currentUser', 'eventDays', 'usersPerDay', 'eventDays', 'events', 'pastEvents']),
+    ...mapState(['currentUser', 'eventDays', 'usersPerDay', 'events', 'pastEvents']),
   	},
+  	beforeDestroy () {
+  		this.selected = ''
+			this.selectedEvent = ''
+			delete this.selected
+			delete this.selectedEvent
+	    this.$store.dispatch('clearPlacementsHome')
+	    console.log(this)
+	  }
 	}
 </script>

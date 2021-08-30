@@ -9,7 +9,7 @@ Vue.use(Vuex)
 fb.auth.onAuthStateChanged(user => {
   if (user) {
     store.commit('setCurrentUser', user)
-    store.dispatch('getEvents')
+    // store.dispatch('getEvents')
     store.dispatch('getVenues')
     store.dispatch('getJobsState')
     store.dispatch('getClients')
@@ -52,6 +52,7 @@ const store = new Vuex.Store({
     shiftAssignments: [],
     usersPerDay: [],
     eventShifts: [],
+    opr: []
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -266,6 +267,18 @@ const store = new Vuex.Store({
     },
     deleteVenue({ commit }, payload) {
       fb.venuesCollection.doc(payload).delete()
+    },
+    updateOpr({ commit }, payload) {
+      fb.oprCollection.doc(payload.id).update(payload)
+    },
+    removeOpr({ commit }, payload) {
+      console.log(payload)
+      fb.oprCollection.where("id", "==", payload.id).get()
+      .then(
+        doc => {
+          fb.oprCollection.doc(doc.id).delete()
+        }
+      )
     },
     getVenues({ commit }) {
       fb.venuesCollection.orderBy('address.state', 'asc').orderBy('address.city', 'asc').onSnapshot(querySnapshot => {
@@ -793,7 +806,7 @@ const store = new Vuex.Store({
       })
     },
     getEventShiftsState({ commit }, payload) {
-      fb.shiftsCollection.where("eventId", "==", payload).orderBy('startTime', 'asc').onSnapshot(querySnapshot => {
+      fb.shiftsCollection.where("eventId", "==", payload).orderBy('day', 'asc').orderBy('startTime', 'asc').onSnapshot(querySnapshot => {
         let eventShiftsArray = []
         querySnapshot.forEach(doc => {
           let eventShift = doc.data()
@@ -817,7 +830,7 @@ const store = new Vuex.Store({
           dayUserIdsArray.push(dayUserID)
         })
         commit('setDayUsers', dayUsersArray)
-        store.dispatch('getDayUserListState', dayUserIdsArray)
+        // store.dispatch('getDayUserListState', dayUserIdsArray)
       })
     },
     getDayUserListState({ commit }, payload) {
@@ -854,7 +867,6 @@ const store = new Vuex.Store({
       })
     },
     reserveUser({ commit }, payload) {
-      console.log(payload)
       fb.usersCollection.doc(payload.userId).get()
       .then(
         doc => {
@@ -863,9 +875,6 @@ const store = new Vuex.Store({
           let day = dateObj.getUTCDate();
           let year = dateObj.getUTCFullYear();
           let newdate = month + "/" + day + "/" + year;
-          console.log(newdate)
-          console.log(payload.id)
-          console.log(doc.data())
           fb.userDaysCollection.doc(payload.id).update({
             dayStatus: 'hired',
             email: doc.data().email,
@@ -934,7 +943,10 @@ const store = new Vuex.Store({
       commit('setEventShifts', null)
       commit('setEventInfo', null)
     },
-
+    clearPlacementsHome({ commit }) {
+      commit('setUsersPerDay', null)
+      commit('setPastEvents', null)
+    },
 
     /*TIMESHEETS*/
     updateTimesheet({ commit }, payload) {
@@ -947,6 +959,20 @@ const store = new Vuex.Store({
           fb.assignmentsCollection.doc(doc.id).update(payload)
         })
       })
+    },
+    getOprs({ commit }, payload) {
+      fb.oprCollection.orderBy('created', 'desc').onSnapshot(querySnapshot => {
+        let oprArray = []
+        querySnapshot.forEach(doc => {
+          let op = doc.data()
+          op.id = doc.id
+          oprArray.push(op)
+        })
+        commit('setOpr', oprArray)
+      })
+    },
+    clearOprState({ commit }) {
+      commit('setOpr', [])
     },
 
 
@@ -1006,6 +1032,13 @@ const store = new Vuex.Store({
         state.seriesDays = val
       } else {
         state.seriesDays = []
+      }
+    },
+    setOpr(state, val) {
+      if (val) {
+        state.opr = val
+      } else {
+        state.opr = []
       }
     },
     setEvents(state, val) {

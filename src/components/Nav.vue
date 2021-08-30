@@ -22,6 +22,11 @@
             <img :src="pic" alt="" class="avatar">
           </div> -->
           <div class="nav__menu--item desktop">
+            <router-link :to="{name: 'opr'}">
+              opr
+            </router-link>
+          </div>
+          <div class="nav__menu--item desktop">
             <router-link :to="{name: 'clients'}">
               clients
             </router-link>
@@ -91,6 +96,11 @@
             <a @click="showSideNav()">
               <i class="fal fa-times fa-2x" v-show="showSide"></i>
             </a>
+          </div>
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'opr'}">
+              opr
+            </router-link>
           </div>
           <div class="nav__menu--item">
             <router-link :to="{name: 'dashboard'}">Dashboard</router-link>

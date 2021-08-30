@@ -57,6 +57,7 @@ const emailsCollection = db.collection('emails')
 const userNotesCollection = db.collection('userNotes')
 const placementsCollection = db.collection('placements')
 const faqsCollection = db.collection('faqs')
+const oprCollection = db.collection('opr')
 
 export {
   db,
@@ -92,5 +93,6 @@ export {
   placementsCollection,
   faqsCollection,
   seriesCollection,
-  seriesDaysCollection
+  seriesDaysCollection,
+  oprCollection
 }

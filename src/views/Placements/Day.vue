@@ -6,6 +6,8 @@
 	        <button class="btn btn__flat mr-3" @click="exportAll()">export all</button>
         </div>
       </div>
+      <Loader v-if="!dayUsers || dayUsers.length < 1" />
+      <div class="dashboard__container--body" v-if="dayUsers && dayUsers.length >= 1">
       <div class="flex flex-wrap justify-space-between">
       	<div class="dashboard__container--body--col">
     			<form ref="form" @submit.prevent>
@@ -405,7 +407,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['currentUser', 'eventsByDay', 'availableUsers', 'dayUsers', 'users']),
+    ...mapState(['currentUser', 'eventsByDay', 'dayUsers', 'users']),
     filteredAvailableUsers () {
       return this.dayUsers.filter(user => {
         return (!user.preferredEvent || user.preferredEvent == null)
@@ -470,15 +472,14 @@ export default {
 				"Last Name",
 				"Email",
 				"Phone",
-				"State"
   		]
   		const exportItems = [];
-  		for (var key in this.availableUsers) {
+  		for (var key in this.dayUsers) {
   			exportItems.push([
-  				this.availableUsers[key].firstName,
-					this.availableUsers[key].lastName,
-					this.availableUsers[key].email,
-					this.availableUsers[key].phone,
+  				this.dayUsers[key].firstName,
+					this.dayUsers[key].lastName,
+					this.dayUsers[key].email,
+					this.dayUsers[key].phone,
 					// this.availableUsers[key].address.state,
   			])
   		}
@@ -714,7 +715,7 @@ export default {
     		day: this.day
     	})
     	event.selectedStaff = null
-    	this.$store.dispatch("getUserAvailabilityState", this.day)
+    	// this.$store.dispatch("getUserAvailabilityState", this.day)
     },
     removeAssignment(props, shift) {
       console.log(props.row)

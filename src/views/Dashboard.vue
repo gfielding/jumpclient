@@ -5,9 +5,6 @@
         <h1>Dashboard</h1>
       </div>
       <div class="dashboard__container--body" v-if="userProfile">
-        <div class="dashboard__container--body--col" v-if="users && users.length">
-          Users: {{users.length}}
-        </div>
         <!-- <div class="dashboard__container--body--col">
           <ProfileImage :userProfile="userProfile" />
         </div>
@@ -41,7 +38,7 @@ import Loader from '@/components/Loader.vue'
 export default {
   name: 'dashboard',
   computed: {
-    ...mapState(['userProfile', 'users']),
+    ...mapState(['userProfile']),
   },
   components: {
     Loader,

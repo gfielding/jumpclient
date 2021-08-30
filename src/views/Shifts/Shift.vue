@@ -111,10 +111,20 @@
               </span>
 
 
+              <span v-if="props.column.field == 'onpay'">
+                <button class="btn btn__icon" @click="opr(props.row)" v-if="!props.row.opr">
+                  <i class="fad fa-money-bill-wave ml-3 mr-3"></i>
+                </button>
+                <button class="btn btn__icon" @click="removeopr(props.row)" v-if="props.row.opr">
+                  <i class="fad fa-money-bill-wave ml-3 mr-3" style="color:#f0ad4e;"></i>
+                </button>
+              </span>
+
+
               
               <span v-else-if="props.column.field == 'link'">
                 <router-link :to="`/users/` + props.row.userId" target="_blank">
-                  <button class="btn btn__flat btn__small btn__outlined">open <i class="fas fa-external-link ml-2"></i></button>
+                  <i class="fas fa-external-link ml-3 mr-3"></i>
                 </router-link>
               </span>
                <span v-else>
@@ -132,6 +142,9 @@
 .max {
   width:calc(100% - 3.2rem);
 }
+table.vgt-table td {
+  padding: 0 !important;
+}
 </style>
 
 <script>
@@ -148,10 +161,10 @@ export default {
     statuses: ['completed', 'arrived late', 'left early', 'no-show', 'client fired', 'terminated' ],
     columns: [
       {
-        label: 'Lock',
         field: 'locked',
         type: 'boolean',
         tdClass: 'text-center',
+        sortable: false,
       },
       {
         field: 'link',
@@ -161,6 +174,7 @@ export default {
         label: 'Status',
         field: 'status',
         width: '150px',
+        sortable: false,
       },
       {
         label: 'First',
@@ -176,8 +190,8 @@ export default {
         sortable: false,
       },
       {
-        label: 'State',
-        field: 'state',
+        field: 'onpay',
+        sortable: false,
       },
       {
         label: 'Day Rate',
@@ -232,6 +246,22 @@ export default {
     },
     onSheetEdit(row) {
       this.$store.dispatch('updateTimesheet', row)
+    },
+    opr(item) {
+      fb.assignmentsCollection.doc(item.id).update({ opr: true })
+      fb.oprCollection.add(item)
+      .then(
+        doc => {
+          fb.oprCollection.doc(doc.id).update({
+            id: doc.id, 
+            created: fb.firestore.FieldValue.serverTimestamp()
+          })
+        }
+      )
+    },
+    removeopr(item) {
+      fb.assignmentsCollection.doc(item.id).update({ opr: false })
+      this.$store.dispatch("removeOpr", item)
     },
     lock(item) {
       fb.usersCollection.where("id", "==", item.userId).get()

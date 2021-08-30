@@ -272,6 +272,14 @@ const router = new VueRouter({
         requiresAuth: true
       },
     },
+    {
+      path: '/opr',
+      name: 'opr',
+      component: () => import('../views/OPR/OPR.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
   ]
 })
 

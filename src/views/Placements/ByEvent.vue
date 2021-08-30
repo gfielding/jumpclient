@@ -124,6 +124,10 @@ export default {
     if (!this.events || this.events.length < 1) {
       this.$store.dispatch("getEvents")
     }
+  },
+  beforeDestroy () {
+    this.columns = null
+    delete this.columns
   }
 }
 </script>

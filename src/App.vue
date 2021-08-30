@@ -1,9 +1,18 @@
 <template>
   <div id="app">
     <Nav v-if="showNav" :userProfile="currentUser" />
-    <keep-alive  max="2" :exclude="['day','user', 'event', 'venue', 'shift', 'eventplacement', 'addfaq', 'shift', 'day']">
-      <router-view/>
+    <!-- <keep-alive  max="2" :exclude="['day','user', 'event', 'venue', 'shift', 'eventplacement', 'addfaq', 'shift', 'placements']">
+      <router-view :key="$route.fullPath"></router-view> 
+    </keep-alive> -->
+
+    <keep-alive  max="5" :include="['users', 'events']">
+      <router-view :key="$route.fullPath"></router-view> 
     </keep-alive>
+
+   <!--  <keep-alive include="users, events" max="1"> 
+      <router-view/>
+    </keep-alive> -->
+    
     <transition name="fade">
       <div v-if="errorMessage" class="errorMessage" >
       {{errorMessage}}

@@ -4,7 +4,8 @@
       <div class="dashboard__container--header mb-3" v-if="event">
         <h2 v-if="event.title">Staff Placements for {{event.title}}</h2>
       </div>
-      <div class="dashboard__container--body" v-if="eventUsers">
+      <Loader v-if="!eventUsers || eventUsers.length < 1" />
+      <div class="dashboard__container--body" v-if="eventUsers && eventUsers.length >= 1">
         <div class="dashboard__container--body--col">
           <vue-good-table
               :columns="columns"
@@ -401,12 +402,13 @@ export default {
   },
   created () {
     this.$store.dispatch("getEventPlacementFromId", this.$route.params.id)
+    this.$store.dispatch("getUserAvailabilityState", this.$route.params.id)
     // if (!this.users || this.users.length < 1) {
     //   this.$store.dispatch("getUsers")
     // }
   },
   watch: {
-    '$route' (to, from) {
+    '$route' (to) {
       this.$store.dispatch("getEventPlacementFromId", this.$route.params.id)
     }
   },
@@ -574,7 +576,6 @@ export default {
       console.log(props.row)
       console.log(shift)
       let event = this.event
-      this.performingRequest = true
       let shiftDay = shift.day
       let dateObj = new Date(shift.day);
       let month = dateObj.getUTCMonth() + 1;
@@ -613,9 +614,7 @@ export default {
       this.$store.dispatch("lockShift", assignment)
     },
     assignShift(shift) {
-      console.log(shift)
       let userId = shift.selectedStaff.userId
-      console.log(userId)
       let day = this.day
       let placement = {
         shiftId: shift.id,
@@ -630,6 +629,7 @@ export default {
       shift.selectedStaff = null
     },
     reserveUser(user) {
+      user.status == 'hired'
       this.$store.dispatch('reserveUser', user)
     },
     notRequestUser(user) {

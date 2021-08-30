@@ -27,16 +27,16 @@ table.vgt-table td {
   color: $text;
   vertical-align: bottom;
   border-bottom: 1px solid $textLight;
-  padding-right: 1.5em;
-  background: $backDark;
+  padding-right: 0.5rem;
+  // background: $backDark;
 }
 
 .vgt-wrap__footer {
   color: $text;
   font-size: 1.1rem;
-  padding: 1em;
+  padding: 0.5rem;
   border: 1px solid #dcdfe6;
-  background: $backDark;
+  // background: $backDark;
 }
 
 .vgt-global-search__input .input__icon .magnifying-glass {
@@ -49,3 +49,16 @@ table.vgt-table td {
   position: relative;
   border-radius: 50%;
 }
+
+input, textarea {
+  background: white !important;
+  border-radius: 0 !important;
+}
+table.vgt-table td {
+    padding: 0.5rem;
+  }
+  .vs__dropdown-toggle {
+    background: white !important;
+    border-radius: 0 !important;
+    border:none;
+  }
