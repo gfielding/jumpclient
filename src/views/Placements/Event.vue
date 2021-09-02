@@ -7,6 +7,7 @@
       <Loader v-if="!eventUsers || eventUsers.length < 1" />
       <div class="dashboard__container--body" v-if="eventUsers && eventUsers.length >= 1">
         <div class="dashboard__container--body--col">
+          <button class="btn btn__flat mr-3" @click="exportUnplaced()">export unplaced</button>
           <vue-good-table
               :columns="columns"
               :rows="filteredUsers"
@@ -460,11 +461,36 @@ export default {
         exportService.export();
       });
     },
+    exportUnplaced() {
+      const exportHeaders = [
+        "First Name",
+        "Last Name",
+        "Email",
+        "Phone",
+        "Day",
+      ]
+      const exportItems = [];
+      for (var key in this.filteredUsers) {
+        exportItems.push([
+          this.filteredUsers[key].firstName,
+          this.filteredUsers[key].lastName,
+          this.filteredUsers[key].email,
+          this.filteredUsers[key].phone,
+          this.filteredUsers[key].day,
+        ])
+      }
+      console.log(exportItems)
+      this.$gapi.getGapiClient().then(gapi => {
+        const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+        exportService.export();
+      });
+    },
     exportStaff(shift) {
       console.log(shift)
       const exportHeaders = [
         "Day",
         "Event",
+
         "Position",
         "Start",
         "End",
@@ -472,7 +498,7 @@ export default {
         "Last Name",
         "Phone",
         "Email",
-        "Code"
+        "Code",
       ];
       const exportItems = [];
       for (var key in this.orderedPlacedUsers2(shift.id)) {
@@ -585,6 +611,7 @@ export default {
       let shiftStart = this.formatAMPM(shift.startTime)
       let shiftEnd = this.formatAMPM(shift.endTime)
 
+      props.row.status = "assigned"
 
       let assignment = {
         shiftId: shift.id,
@@ -629,16 +656,19 @@ export default {
       shift.selectedStaff = null
     },
     reserveUser(user) {
-      user.status == 'hired'
+      user.dayStatus = "hired"
       this.$store.dispatch('reserveUser', user)
     },
     notRequestUser(user) {
+      user.dayStatus = "not requested"
       fb.userDaysCollection.doc(user.id).update({ dayStatus: 'not requested' })
     },
     unreserveUser(user) {
+      user.dayStatus = null
       fb.userDaysCollection.doc(user.id).update({dayStatus: null})
     },
     cancelNotRequestUser(user) {
+      user.dayStatus = null
       fb.userDaysCollection.doc(user.id).update({dayStatus: null})
     },
     filteredInfo(user) {

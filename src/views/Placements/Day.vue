@@ -7,8 +7,7 @@
         </div>
       </div>
       <Loader v-if="!dayUsers || dayUsers.length < 1" />
-      <div class="dashboard__container--body" v-if="dayUsers && dayUsers.length >= 1">
-      <div class="flex flex-wrap justify-space-between">
+      <div class="dashboard__container--body" v-if="dayUsers && dayUsers.length >= 1" style="width:100%;">
       	<div class="dashboard__container--body--col">
     			<form ref="form" @submit.prevent>
     				<div class="mb-3">
@@ -286,7 +285,6 @@
             </transition>
       		</div>
       		
-      	</div>
       </div>
     </div>
 

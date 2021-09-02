@@ -50,14 +50,14 @@ table.vgt-table td {
   border-radius: 50%;
 }
 
-input, textarea {
+table input, table textarea {
   background: white !important;
   border-radius: 0 !important;
 }
 table.vgt-table td {
     padding: 0.5rem;
   }
-  .vs__dropdown-toggle {
+ table .vs__dropdown-toggle {
     background: white !important;
     border-radius: 0 !important;
     border:none;

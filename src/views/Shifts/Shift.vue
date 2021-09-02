@@ -233,17 +233,17 @@ export default {
     }
   },
   computed: {
-    ...mapState(['userProfile', 'shift', 'shiftAssignments', 'users']),
+    ...mapState(['userProfile', 'shift', 'shiftAssignments']),
   },
   methods: {
     updateShift() {
       this.$store.dispatch("updateEventShift", this.shift)
     },
-    filteredInfo(user) {
-      return this.users.filter(member => {
-        return member.id == user.userId
-      })
-    },
+    // filteredInfo(user) {
+    //   return this.users.filter(member => {
+    //     return member.id == user.userId
+    //   })
+    // },
     onSheetEdit(row) {
       this.$store.dispatch('updateTimesheet', row)
     },

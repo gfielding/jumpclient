@@ -77,6 +77,50 @@
               </GmapMarker>
             </gmap-map>
       		</div>
+
+          <div class="dashboard__container--body--col">
+            <h3>Attach Files</h3>
+
+            <div class="mb-3">
+              <label for="fileTitle">Details:</label>
+              <input class="mb-2" placeholder="File Title" type="text" v-model.trim="fileTitle" id="fileTitle" />
+              <textarea placeholder="File Description" name="fileDescription" id="fileDescription" cols="30" rows="2" v-model="fileDescription"></textarea>
+
+              <input class="mt-3" type="file" ref="fileInputTip" accept="image/*,application/pdf,.doc" @change="previewImage">
+              <progress :value="uploadValue" max="100" v-if="showBar"></progress>
+              <div class="mb-3">
+                <button v-if="imageData != null" class="btn btn__primary mt-3" @click="onUploadFile">
+                  Upload
+                  <transition name="fade">
+                    <span class="ml-2" v-if="performingRequest3">
+                    <i class="fa fa-spinner fa-spin"></i>
+                    </span>
+                  </transition>
+                </button>
+              </div>
+              <div v-if="venue.files && venue.files.length >= 1">
+                <vue-good-table
+                  :columns="columns"
+                  :rows="venue.files"
+                  >
+                  <template slot="table-row" slot-scope="props">
+                    <span v-if="props.column.field == 'url'">
+                      <a :href="props.row.url" target="_blank"><i class="fas fa-external-link"></i></a>
+                    </span>
+                    <span v-else-if="props.column.field == 'extras'">
+                      <button @click="deleteUploadedFile(props.row, props.index)">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </span>
+                    <span v-else>
+                      {{props.formattedRow[props.column.field]}}
+                    </span>
+                  </template>
+                </vue-good-table>
+              </div>
+            </div>
+          </div>
+
           <div class="dashboard__container--body--col">
 
             <div class="mb-3">
@@ -202,6 +246,11 @@ export default {
     currentPlace: null,
     performingRequest: false,
     croppa: {},
+    imageData: null,
+    fileTitle: '',
+    fileDescription: '',
+    uploadValue: 0,
+    showBar:false,
     columns: [
       {
         label: 'Event',
@@ -236,6 +285,44 @@ export default {
     VueEditor
   },
   methods: {
+    previewImage(venue) {
+      this.uploadValue=0;
+      this.imageData=venue.target.files[0]
+    },
+    onUploadFile() {
+      this.showBar = true
+      let venue = this.venue
+      let fileTitle = this.fileTitle
+      let fileDescription = this.fileDescription
+      let rand = (Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16)).toUpperCase()
+      let storageRef = fb.storageRef.child('docs/' + rand).put(this.imageData);
+      storageRef.on(`state_changed`, snapshot => {
+        this.uploadValue=(snapshot.bytesTransferred/snapshot.totalBytes)*100;
+      }, error => {console.log(error.message)},
+      () => {this.uploadValue=100;
+        storageRef.snapshot.ref.getDownloadURL().then((downloadURL) => {
+          console.log('File available at', downloadURL)
+            var docRef = fb.venuesCollection.doc(venue.id)
+            docRef.update({
+              files: fb.firestore.FieldValue.arrayUnion({
+                title: fileTitle,
+                description: fileDescription,
+                url: downloadURL
+              })
+            });
+            venue.files.push({
+              title: fileTitle,
+              description: fileDescription,
+              url: downloadURL
+            })
+        })
+        this.showBar = false
+      })
+      this.imageData = null
+      this.fileTitle = ''
+      this.fileDescription = ''
+      this.$refs.fileInputTip.value=null
+    },
     onFileTypeMismatch(file) {
       alert('Invalid file type. Please choose a jpeg or png file.')
     },
