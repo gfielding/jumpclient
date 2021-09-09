@@ -5,7 +5,7 @@
       <router-view :key="$route.fullPath"></router-view> 
     </keep-alive> -->
 
-    <keep-alive  max="5" :include="['users', 'events']">
+    <keep-alive  max="5" :include="['users', 'events', 'shifts']">
       <router-view :key="$route.fullPath"></router-view> 
     </keep-alive>
 

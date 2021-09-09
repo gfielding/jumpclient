@@ -1,7 +1,7 @@
 <template>
 	<div>
     <h2>Employment Status</h2>
-    <div v-show="!user.employeeStatus || user.employeeStatus != `hired`">
+    <div v-if="!user.employeeStatus || user.employeeStatus == `applied`">
   		<div class="mb-3">
   			<label for="cont">Contractor Status:</label>
         <select v-model="user.contractorStatus" id="cont" @change="showButton = true">
@@ -28,7 +28,7 @@
 
       <transition name="fade">
         <div class="mb-3" v-if="user.contractorStatus == `hired contractor` || user.contractorStatus == `terminated`">
-          <label for="contNum">Contractor Number: (copy and paste {{contNum}})</label>
+          <label for="contNum">Contractor Number:</label>
           <input type="text" placeholder="" v-model.trim="user.contractorNumber" id="contNum" @change="updateUserFile1()" />
           <button class="btn btn__outlined btn__small mt-3" v-clipboard:copy="user.contractorNumber" v-clipboard:success="onCopy">Copy <i class="fas fa-copy ml-2"></i></button>
         </div>
@@ -72,7 +72,7 @@
 	      <input type="date" placeholder="" v-model.trim="user.hireDate" id="hireDate" @change="updateUser()" />
 	    </div>
 	  </transition>
-    <div class="mb-3" v-if="user.hireDate && user.employeeStatus == `hired`">
+    <div class="mb-3" v-if="user.hireDate && user.employeeStatus == `hired || user.employeeStatus == 'signed offer letter'`">
 			<label for="position">Position:</label>
       <select v-model="user.position" id="position" @change="showButton3 = true">
         <option v-for="item in positions" v-bind:value="item">
@@ -98,10 +98,10 @@
 
 
 
-    <hr v-if="user.employeeStatus == `hired` || user.employeeStatus == `terminated`">
+    <hr v-if="user.employeeStatus == `hired` || user.employeeStatus == `terminated` || user.employeeStatus == 'signed offer letter'">
     <transition name="fade">
-	    <div class="mb-3" v-if="user.employeeStatus == `hired` || user.employeeStatus == `terminated`">
-	      <label for="empNum">Employee Number: (copy and paste  {{empNum}} )</label>
+	    <div class="mb-3" v-if="user.employeeStatus == `hired` || user.employeeStatus == `terminated` || user.employeeStatus == 'signed offer letter'">
+	      <label for="empNum">Employee Number:</label>
 	      <input type="text" v-model.trim="user.employeeNumber" id="empNum" @change="updateUserFile2()" />
         <button class="btn btn__outlined btn__small mt-3" v-clipboard:copy="user.employeeNumber" v-clipboard:success="onCopy">Copy <i class="fas fa-copy ml-2"></i></button>
 	    </div>
@@ -123,7 +123,7 @@ import { mapState } from 'vuex'
 export default {
   props: ['user'],
   data: () => ({
-    empStatuses: ['applied', 'payroll invitation', 'hired', 'not-hired', 'on-hold', 'terminated'],
+    empStatuses: ['applied', 'payroll invitation', 'signed offer letter', 'hired', 'not-hired', 'on-hold', 'terminated'],
     contStatuses: ['applied', 'payroll invitation', 'hired contractor', 'not-hired', 'on-hold', 'terminated', 'hired as employee'],
     positions: ['regular staff', 'shift-lead', 'assistant manager', 'manager', 'admin'],
     showButton: false,
@@ -147,11 +147,11 @@ export default {
     	this.performingRequest = true
     	let user = this.user
       if (user.contractorStatus == `hired contractor`) {
-        user.contractorNumber = this.contNum
+        user.contractorNumber = this.user.id.slice(0,8)
       }
-      if (user.employeeStatus == `hired`) {
+      if (user.employeeStatus == `hired` || user.employeeStatus == 'signed offer letter') {
         console.log(this.empNum)
-        user.employeeNumber = this.empNum
+        user.employeeNumber = this.user.id.slice(0,10)
       }
       this.$store.dispatch('updateUser', user)
       setTimeout(() => {
@@ -164,7 +164,7 @@ export default {
     updateUserFile1 () {
       this.performingRequest = true
       let user = this.user
-      user.fileId = user.contractorNumber
+      user.fileId = user.id.slice(0,8)
       this.$store.dispatch('updateUser', user)
       setTimeout(() => {
           this.showButton = false
@@ -176,7 +176,7 @@ export default {
     updateUserFile2 () {
       this.performingRequest = true
       let user = this.user
-      user.fileId = user.employeeNumber
+      user.fileId = user.id.slice(0,10)
       this.$store.dispatch('updateUser', user)
       setTimeout(() => {
           this.showButton = false

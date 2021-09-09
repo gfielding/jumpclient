@@ -12,19 +12,46 @@
           <vue-good-table
             :columns="columns"
             :rows="opr"
-            styleClass="vgt-table striped"
             :search-options="{
               enabled: true,
               placeholder: 'Search this table',
+            }"
+            :pagination-options="{
+              enabled: true,
+              mode: 'records',
+              perPage: 20,
             }"
             >
             <template slot="table-row" slot-scope="props">
               <span v-if="props.column.field == 'created'">
                 <span v-if="props.row.created">{{formatDate(props.row.created)}}</span>
               </span>
+              <span v-else-if="props.column.field == 'link'">
+                <router-link :to="`/users/` + props.row.userId" target="_blank">
+                  <i class="fas fa-external-link ml-3 mr-3"></i>
+                </router-link>
+              </span>
               <span v-else-if="props.column.field == 'checked'">
                 <input type="checkbox" v-model.trim="props.row.check" id="check" class="ml-3" @change="markAdded(props.row)" />
               </span>
+              <span v-else-if="props.column.field == 'empstatus'">
+                <v-select
+                  label="status" 
+                  :options="empStatuses"
+                  v-model="props.row.employeeStatus"
+                  @input="onSheetEdit(props.row)"
+                  :clearable=false
+                  >
+                </v-select>
+              </span>
+              <span v-else-if="props.column.field == 'extras'">
+                <span v-if="(props.row)">
+                  <span v-for="u in filteredInfo(props.row)">
+                    {{u.firstName}}
+                  </span>
+                </span>
+              </span>
+
               <span v-else>
                   {{props.formattedRow[props.column.field]}}
                 </span>
@@ -41,15 +68,21 @@ import * as moment from 'moment'
 import { mapState } from 'vuex'
 import ExportService from "@/services/ExportService"
 import Loader from '@/components/Loader.vue'
+const fb = require('../../firebaseConfig.js')
 
 export default {
   name: 'oprs',
   data: () => ({
     search: '',
+    empStatuses: ['applied', 'payroll invitation', 'signed offer letter', 'hired', 'not-hired', 'on-hold', 'terminated'],
     columns: [
+      // {
+      //   label: 'Added',
+      //   field: 'checked',
+      //   sortable: false,
+      // },
       {
-        label: 'Added',
-        field: 'checked',
+        field: 'link',
         sortable: false,
       },
       {
@@ -74,6 +107,23 @@ export default {
         field: 'phone',
       },
       {
+        label: 'Emp Status',
+        field: 'empstatus',
+        width: '150px',
+      },
+      {
+        label: 'Pay ID',
+        field: 'employeeNumber',
+      },
+      {
+        label: 'Extras',
+        field: 'extras',
+      },
+      {
+        label: 'State',
+        field: 'address.state',
+      },
+      {
         label: 'State Wored',
         field: 'eventInfo.venue.address.state',
       },
@@ -91,6 +141,27 @@ export default {
     }
   },
   methods: {
+    filteredInfo(p) {
+      fb.usersCollection.doc(p.id).get()
+      .then(
+        doc => {
+          return doc.data()
+        }
+      )
+      // return this.users.filter(member => {
+      //   return member.id == user.userId
+      // })
+    },
+    onSheetEdit(row) {
+      if (row.employeeStatus == `hired` || row.employeeStatus == 'signed offer letter') {
+        row.employeeNumber = row.id.slice(0,10)
+      }
+      this.$store.dispatch('updateUser2', row)
+      setTimeout(() => {
+        this.$store.dispatch("removeOpr2", row)
+        // this.$store.dispatch("removeOprAssignment", row)
+      }, 1000)
+    },
     exportAll() {
       const exportHeaders = [
         "Added",

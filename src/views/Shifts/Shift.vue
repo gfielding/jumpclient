@@ -95,6 +95,18 @@
                   v-model="props.row.status"
                   @input="onSheetEdit(props.row)"
                   :disabled="props.row.locked"
+                  :clearable=false
+                  >
+                </v-select>
+              </span>
+              <span v-else-if="props.column.field == 'paystatus'">
+                <v-select
+                  label="status" 
+                  :options="paystatuses"
+                  v-model="props.row.paystatus"
+                  @input="onSheetEdit(props.row)"
+                  :disabled="props.row.locked"
+                  :clearable=false
                   >
                 </v-select>
               </span>
@@ -120,6 +132,12 @@
                 </button>
               </span>
 
+              <span v-else-if="props.column.field == 'delete'">
+                <button :disabled="props.row.locked" class="btn btn__icon" v-tooltip="'remove'" @click="removeEntry(props.row)">
+                  <i class="fas fa-times ml-3 mr-2"></i>
+                </button>
+              </span>
+
 
               
               <span v-else-if="props.column.field == 'link'">
@@ -139,6 +157,9 @@
 </template>
 
 <style scoped type="text/css">
+.dashboard__container {
+  width: calc(100% - 4rem);
+}
 .max {
   width:calc(100% - 3.2rem);
 }
@@ -159,6 +180,7 @@ export default {
   data: () => ({
     activeItem: null,
     statuses: ['completed', 'arrived late', 'left early', 'no-show', 'client fired', 'terminated' ],
+    paystatuses: ['paid', 'paid partial', 'not paid' ],
     columns: [
       {
         field: 'locked',
@@ -167,13 +189,23 @@ export default {
         sortable: false,
       },
       {
+        field: 'delete',
+        sortable: false,
+      },
+      {
         field: 'link',
         sortable: false,
       },
       {
-        label: 'Status',
+        label: 'Pay Status',
+        field: 'paystatus',
+        width: '120px',
+        sortable: false,
+      },
+      {
+        label: 'Event Status',
         field: 'status',
-        width: '150px',
+        width: '120px',
         sortable: false,
       },
       {
@@ -194,7 +226,7 @@ export default {
         sortable: false,
       },
       {
-        label: 'Day Rate',
+        label: 'Bonus',
         field: 'dayRate',
       },
       {
@@ -236,6 +268,9 @@ export default {
     ...mapState(['userProfile', 'shift', 'shiftAssignments']),
   },
   methods: {
+    removeEntry(row) {
+      fb.assignmentsCollection.doc(row.id).delete()
+    },
     updateShift() {
       this.$store.dispatch("updateEventShift", this.shift)
     },
@@ -254,7 +289,8 @@ export default {
         doc => {
           fb.oprCollection.doc(doc.id).update({
             id: doc.id, 
-            created: fb.firestore.FieldValue.serverTimestamp()
+            created: fb.firestore.FieldValue.serverTimestamp(),
+            assignment: item.id
           })
         }
       )
@@ -332,7 +368,7 @@ export default {
       ];
       const exportItems = [];
       for (var key in this.shiftAssignments) {
-        if (this.shiftAssignments[key].fileId.length < 9) {
+        if (this.shiftAssignments[key].fileId && this.shiftAssignments[key].fileId.length < 9) {
           exportItems.push([
             "1",
             "307",
@@ -407,7 +443,7 @@ export default {
       ];
       const exportItems = [];
       for (var key in this.shiftAssignments) {
-        if (this.shiftAssignments[key].fileId.length > 9) {
+        if (this.shiftAssignments[key].fileId && this.shiftAssignments[key].fileId.length > 9) {
           exportItems.push([
             "1",
             "307",

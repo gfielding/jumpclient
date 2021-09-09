@@ -132,6 +132,18 @@ const store = new Vuex.Store({
       commit('setUserProfile', userProfile)
       
     },
+    updateUser2({ commit }, payload) {
+      console.log(payload)
+      let user = payload
+      fb.usersCollection.doc(payload.userId).update(
+      {
+        employeeNumber: payload.employeeNumber,
+        employeeStatus: payload.employeeStatus
+      })
+      .then(
+        store.dispatch('fetchUserProfile', user)
+      )
+    },
     updateUser({ commit }, payload) {
       console.log(payload)
       let user = payload
@@ -279,6 +291,33 @@ const store = new Vuex.Store({
           fb.oprCollection.doc(doc.id).delete()
         }
       )
+    },
+    removeOpr2({ commit }, payload) {
+      console.log(payload)
+      fb.oprCollection.where("userId", "==", payload.userId).where("shiftId", "==", payload.shiftId).onSnapshot(querySnapshot => {
+        querySnapshot.forEach(function (doc) {
+          console.log(doc.data())
+          fb.oprCollection.doc(doc.data().id).delete()
+        })
+      })
+      store.dispatch('removeOprAssignment', payload)
+      // .then(
+      //   doc => {
+      //     console.log(doc.data())
+      //     fb.oprCollection.doc(doc.id).delete()
+      //   }
+      // )
+    },
+    removeOprAssignment({ commit }, payload) {
+      console.log(payload)
+      fb.assignmentsCollection.where("userId", "==", payload.userId).where("shiftId", "==", payload.shiftId).onSnapshot(querySnapshot => {
+        querySnapshot.forEach(function (doc) {
+          console.log(doc.data())
+          fb.assignmentsCollection.doc(doc.data().id).update({
+            opr: false
+          })
+        })
+      })
     },
     getVenues({ commit }) {
       fb.venuesCollection.orderBy('address.state', 'asc').orderBy('address.city', 'asc').onSnapshot(querySnapshot => {

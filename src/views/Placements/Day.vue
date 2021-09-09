@@ -9,6 +9,9 @@
       <Loader v-if="!dayUsers || dayUsers.length < 1" />
       <div class="dashboard__container--body" v-if="dayUsers && dayUsers.length >= 1" style="width:100%;">
       	<div class="dashboard__container--body--col">
+          <div class="flex justify-flex-end">
+            <button class="btn btn__flat mr-3" @click="exportHomeless(dayUsers)">export homeless</button>
+          </div>
     			<form ref="form" @submit.prevent>
     				<div class="mb-3">
               <h4>Add User:</h4>
@@ -464,6 +467,27 @@ export default {
   		event.collapse = true
   		this.$store.dispatch("updateEvent", event)
   	},
+    exportHomeless(orderedAvailableUsers) {
+      const exportHeaders = [
+        "First Name",
+        "Last Name",
+        "Email",
+        "Phone",
+      ]
+      const exportItems = [];
+      for (var key in this.orderedAvailableUsers) {
+        exportItems.push([
+          this.orderedAvailableUsers[key].firstName,
+          this.orderedAvailableUsers[key].lastName,
+          this.orderedAvailableUsers[key].email,
+          this.orderedAvailableUsers[key].phone,
+        ])
+      }
+      this.$gapi.getGapiClient().then(gapi => {
+        const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+        exportService.export();
+      });
+    },
   	exportAll() {
   		const exportHeaders = [
   			"First Name",
