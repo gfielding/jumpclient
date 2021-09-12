@@ -7,7 +7,37 @@
           <button class="btn btn__flat mr-3" @click="exportAll()">export all</button>
         </div>
       </div>
-      <div class="dashboard__container--body">
+       <ais-instant-search :search-client="searchClient" index-name="a_users">
+        <ais-search-box />
+        <ais-hits>
+          <template v-slot:item="{ item }">
+            <div>
+              <router-link :to="`users/` + item.objectID">
+              <button class="btn btn__icon btn__flat mr-4"><i class="fad fa-external-link"></i></button>
+              </router-link>
+              <h4 style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</h4 style="display: inline;">
+            </div>
+          </template>
+        </ais-hits>
+      </ais-instant-search>
+
+ <!--  <ais-instant-search>
+      <ais-index
+      app-id="0T1SIY6Y1V"
+      api-key="f03dc899fbdd294d6797791724cdb402"
+      index-name="a_users"
+    >
+      <ais-search-box></ais-search-box>
+      <ais-results>
+        <template slot-scope="{ result }">
+          <p>
+            <ais-highlight :result="result" attribute-name="name"></ais-highlight>
+          </p>
+        </template>
+      </ais-results>
+    </ais-index>
+  </ais-instant-search> -->
+      <!-- <div class="dashboard__container--body">
         <Loader v-if="!users || users.length == 0" />
         <div class="flex pt-3" v-if="users && users.length >= 1" style="width:100%;"> 
           <vue-good-table
@@ -53,21 +83,7 @@
                 </span>
               </span>
 
-             <!--  <span style="display:inline;">
-                <i class="fas fa-user" v-if="props.row.employeeStatus == 'applied' || !props.row.employeeStatus" style="margin-right: 2.5rem;opacity:0.25;"></i>
-              </span>
-              <span style="display:inline;">
-                <i class="fas fa-user" v-if="props.row.employeeStatus == 'payroll invitation' || props.row.employeeStatus == 'on-hold'" style="color:#f0ad4e; margin-right: 2.5rem;"></i>
-              </span>
-              <span style="display:inline;">
-                <i class="fas fa-user" v-if="props.row.employeeStatus == 'hired'" style="color:#5cb85c; margin-right: 2.5rem;"></i>
-              </span>
-              <span  style="display:inline;">
-                <i class="fas fa-user" v-if="props.row.employeeStatus == 'terminated' || props.row.employeeStatus == 'not-hired'" style="color:#d9534f; margin-right: 2.5rem;"></i>
-              </span> -->
-
-
-
+      
 
     
              </span>
@@ -91,7 +107,7 @@
           </template>
           </vue-good-table>
         </div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -102,95 +118,109 @@ import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import ExportService from "@/services/ExportService"
 import router from '@/router'
+import algoliasearch from 'algoliasearch/lite';
+import 'instantsearch.css/themes/satellite-min.css'
 
 export default {
   name: 'users',
-  data: () => ({
-    search: '',
-    empStatuses: ['applied', 'payroll invitation', 'signed offer letter', 'hired', 'not-hired', 'on-hold', 'terminated'],
-    columns: [
-      {
-        field: 'link',
-        sortable: false,
-      },
-      {
-        label: 'First Name',
-        field: 'firstName',
-      },
-      {
-        label: 'Last Name',
-        field: 'lastName',
-      },
-      {
-        label: 'Vax',
-        field: 'vax',
-      },
-      {
-        label: 'Status',
-        field: 'status',
-      },
-      {
-        label: 'Emp Status',
-        field: 'empstatus',
-        width: '150px',
-      },
-      {
-        label: 'Pay ID',
-        field: 'employeeNumber',
-      },
-      {
-        label: 'City',
-        field: 'address.city',
-      },
-      {
-        label: 'State',
-        field: 'address.state',
-      },
-      {
-        label: 'Email',
-        field: 'email',
-      },
-      {
-        label: 'Phone',
-        field: 'phone',
-      },
-      {
-        label: 'Created',
-        field: 'created',
-      }
-    ]
-  }),
+  data() {
+    return {
+      searchClient: algoliasearch(
+        '0T1SIY6Y1V',
+        'f03dc899fbdd294d6797791724cdb402'
+      ),
+    };
+  },
+  // data: () => ({
+  //   searchClient: algoliasearch(
+  //       'B1G2GM9NG0',
+  //       'aadef574be1f9252bb48d4ea09b5cfe5'
+  //     ),
+  //   search: '',
+  //   empStatuses: ['applied', 'payroll invitation', 'signed offer letter', 'hired', 'not-hired', 'on-hold', 'terminated'],
+  //   columns: [
+  //     {
+  //       field: 'link',
+  //       sortable: false,
+  //     },
+  //     {
+  //       label: 'First Name',
+  //       field: 'firstName',
+  //     },
+  //     {
+  //       label: 'Last Name',
+  //       field: 'lastName',
+  //     },
+  //     {
+  //       label: 'Vax',
+  //       field: 'vax',
+  //     },
+  //     {
+  //       label: 'Status',
+  //       field: 'status',
+  //     },
+  //     {
+  //       label: 'Emp Status',
+  //       field: 'empstatus',
+  //       width: '150px',
+  //     },
+  //     {
+  //       label: 'Pay ID',
+  //       field: 'employeeNumber',
+  //     },
+  //     {
+  //       label: 'City',
+  //       field: 'address.city',
+  //     },
+  //     {
+  //       label: 'State',
+  //       field: 'address.state',
+  //     },
+  //     {
+  //       label: 'Email',
+  //       field: 'email',
+  //     },
+  //     {
+  //       label: 'Phone',
+  //       field: 'phone',
+  //     },
+  //     {
+  //       label: 'Created',
+  //       field: 'created',
+  //     }
+  //   ]
+  // }),
   computed: {
-    ...mapState(['users']),
-    searchText() {
-      if (this.search) {
-        return this.search.toLowerCase().trim()
-      }
-      if (!this.search || this.search == null) {
-        return null
-      }
-    },
-    filteredInfo(user) {
-      return this.availableUsers.filter(member => {
-        return member.id == user.userId
-      })
-    },
-    filteredUsers() {
-      if (!this.searchText) {return this.users}
-      else {
-      return this.users.filter(user => {
-        return (user.firstName.toLowerCase().includes(this.searchText) || user.lastName.toLowerCase().includes(this.searchText) || user.address.city.toLowerCase().includes(this.searchText))
-      })
-      }
-    },
+    // ...mapState(['users']),
+    // searchText() {
+    //   if (this.search) {
+    //     return this.search.toLowerCase().trim()
+    //   }
+    //   if (!this.search || this.search == null) {
+    //     return null
+    //   }
+    // },
+    // filteredInfo(user) {
+    //   return this.availableUsers.filter(member => {
+    //     return member.id == user.userId
+    //   })
+    // },
+    // filteredUsers() {
+    //   if (!this.searchText) {return this.users}
+    //   else {
+    //   return this.users.filter(user => {
+    //     return (user.firstName.toLowerCase().includes(this.searchText) || user.lastName.toLowerCase().includes(this.searchText) || user.address.city.toLowerCase().includes(this.searchText))
+    //   })
+    //   }
+    // },
   },
   components: {
     Loader,
   },
   created () {
-    if (!this.users || this.users.length < 1) {
-      this.$store.dispatch("getUsers")
-    }
+    // if (!this.users || this.users.length < 1) {
+    //   this.$store.dispatch("getUsers")
+    // }
   },
   methods: {
     onSheetEdit(row) {

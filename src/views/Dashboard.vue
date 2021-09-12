@@ -43,11 +43,11 @@ export default {
   components: {
     Loader,
   },
-  created () {
-    if (!this.userProfile) {
-      this.$store.dispatch("getUserProfile");
-    }
-  },
+  // created () {
+  //   if (!this.userProfile) {
+  //     this.$store.dispatch("getUserProfile");
+  //   }
+  // },
 
 }
 </script>

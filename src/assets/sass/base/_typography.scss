@@ -1,10 +1,9 @@
 html {
   font-size:62.5% !important;
-  font-size:55% !important;
 
-  // @include respond(phone) {
-  //   font-size:55% !important;
-  // }
+  @include respond(phone) {
+    font-size:55% !important;
+  }
 }
 
 @import url("//hello.myfonts.net/count/3eb1be");
@@ -151,8 +150,29 @@ h3 {
   }
 }
 
+h4 {
+  // font-family: "BankGothicBT-Medium";
+  font-family: 'D-DIN Exp Regular';
+  @include respond(tv) { 
+    font-size: 1.2vw !important;
+  }
+  @include respond(desktop) { 
+    font-size:2rem !important;
+  }
+  @include respond(tablet-port) { 
+    font-size: 1.8rem !important;
+  }
+  @include respond(phone) { 
+    font-size: 1.6rem !important;
+  }
+}
+
 h5 {
   font-family: 'D-DIN DIN-Bold';
+}
+
+p {
+  font-size:1.6rem;
 }
 
 address, .caption {

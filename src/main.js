@@ -16,11 +16,14 @@ import VueMask from 'v-mask'
 import VueGapi from 'vue-gapi'
 import VueClipboard from 'vue-clipboard2'
 import 'vue-good-table/dist/vue-good-table.css'
+import InstantSearch from 'vue-instantsearch';
+import 'instantsearch.css/themes/satellite-min.css';
 import './assets/sass/main.scss'
 const fb = require('./firebaseConfig.js')
 
 Vue.component('v-select', vSelect)
 Vue.use(VueGoodTablePlugin);
+Vue.use(InstantSearch);
 Vue.use(Croppa);
 Vue.use(VueMask);
 Vue.use(VTooltip)

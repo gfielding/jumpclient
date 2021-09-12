@@ -2,12 +2,15 @@
 	<div class="dashboard">
     <div>
       <div class="dashboard__container--header mb-3" v-if="event">
-        <h2 v-if="event.title">Staff Placements for {{event.title}}</h2>
+        <div>
+          <h2 v-if="event.title">Staff Placements for {{event.title}}</h2>
+          <p>{{event.venue.title}} | {{event.venue.address.city}}, {{event.venue.address.state}} | {{event.startDate | moment("ddd, MMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("ddd, MMM Do YYYY") }}</span></p>
+        </div>
       </div>
       <Loader v-if="!eventUsers || eventUsers.length < 1" />
       <div class="dashboard__container--body" v-if="eventUsers && eventUsers.length >= 1">
         <div class="dashboard__container--body--col">
-          <button class="btn btn__flat mr-3" @click="exportUnplaced()">export unplaced</button>
+          <button class="btn btn__outlined mb-2" @click="exportUnplaced()">export unplaced</button>
           <vue-good-table
               :columns="columns"
               :rows="filteredUsers"
@@ -133,7 +136,7 @@
           </vue-good-table>
         </div>
         <div class="dashboard__container--body--col alt-col">
-          <button class="btn btn__flat mr-3" @click="exportAll()">export all</button>
+          <button class="btn btn__outlined mb-3" @click="exportAll()">export all</button>
           <div v-for="shift in eventShifts" :key="shift.id" style=" padding:1.6rem; background: white; margin-bottom:1.6rem;">
             <div class="flex align-center justify-space-between">
               <span>
@@ -144,7 +147,7 @@
                 </span>
               </span>
               <div>
-                <button class="btn btn__flat mr-3" @click="exportStaff(shift)">export</button>
+                <button class="btn btn__outlined mb-2 mr-5" @click="exportStaff(shift)">export</button>
                 <button class="btn btn__icon" @click="expand(shift)" v-if="shift.collapse"><i class="fas fa-chevron-up"></i></button>
                 <button class="btn btn__icon" @click="collapse(shift)" v-if="!shift.collapse"><i class="fas fa-chevron-down"></i></button>
               </div>

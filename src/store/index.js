@@ -623,9 +623,9 @@ const store = new Vuex.Store({
       fb.userDaysCollection.where("event", "==", payload.id).onSnapshot(querySnapshot => {
         querySnapshot.forEach(doc => {
           let message = {
-            phone: doc.data().phone,
+            phone: doc.data().phone || null,
             name: doc.data().fullName,
-            email: doc.data().email,
+            email: doc.data().email || null,
             message: payload.updateMessage,
             event: payload
           }
@@ -665,7 +665,7 @@ const store = new Vuex.Store({
 
           if (doc.data().published && (endComp >= yesterday || startComp >= yesterday)) {
             currentEventsArray.push(event)
-            commit('setCurrentEvents', currentEventsArray)
+            
           }
 
           // if (doc.data().published && startComp >= yesterday) {
@@ -675,17 +675,22 @@ const store = new Vuex.Store({
 
           if (doc.data().published && startComp < yesterday) {
             pastEventsArray.push(event)
-            commit('setPastEvents', pastEventsArray)
+            
           }
 
         })
+        commit('setCurrentEvents', currentEventsArray)
         commit('setEvents', eventsArray)
+        commit('setPastEvents', pastEventsArray)
 
 
         let merged = [].concat.apply([], eventDays)
         let uniqueSet = new Set(merged)
         let uniqueEventDays = [...uniqueSet]
         commit('setEventDays', uniqueEventDays)
+
+        // commit('setEventDays', uniqueEventDays.sort((a, b) => a.days[0] > b.days[0] ? 1 : a.days[0] === b.days[0] ? 0 : -1))
+        
       })
     },
     getEventFromId({ commit }, payload) {
@@ -872,30 +877,30 @@ const store = new Vuex.Store({
       console.log(payload)
       fb.userDaysCollection.where("day", "==", payload).onSnapshot(querySnapshot => {
         let dayUsersArray = []
-        let dayUserIdsArray = []
+        // let dayUserIdsArray = []
         querySnapshot.forEach(doc => {
           let dayUser = doc.data()
-          let dayUserID = doc.data().userId
-          dayUser.id = doc.id
+          // let dayUserID = doc.data().userId
+          // dayUser.id = doc.id
           dayUsersArray.push(dayUser)
-          dayUserIdsArray.push(dayUserID)
+          // dayUserIdsArray.push(dayUserID)
         })
         commit('setDayUsers', dayUsersArray)
         // store.dispatch('getDayUserListState', dayUserIdsArray)
       })
     },
-    getDayUserListState({ commit }, payload) {
-      fb.usersCollection.onSnapshot(querySnapshot => {
-        let usersArray = []
-        querySnapshot.forEach(doc => {
-          let user = doc.data()
-          user.id = doc.id
-          usersArray.push(user)
-        })
-        const availableUsers = usersArray.filter(item => payload.includes(item.id))
-        commit('setAvailableUsers', availableUsers)
-      })
-    },
+    // getDayUserListState({ commit }, payload) {
+    //   fb.usersCollection.onSnapshot(querySnapshot => {
+    //     let usersArray = []
+    //     querySnapshot.forEach(doc => {
+    //       let user = doc.data()
+    //       user.id = doc.id
+    //       usersArray.push(user)
+    //     })
+    //     const availableUsers = usersArray.filter(item => payload.includes(item.id))
+    //     commit('setAvailableUsers', availableUsers)
+    //   })
+    // },
     getDayEventsState({ commit }, payload) {
       fb.eventsCollection.where("days", "array-contains", payload).orderBy('startDate', 'desc').onSnapshot(querySnapshot => {
         let dayEventsArray = []

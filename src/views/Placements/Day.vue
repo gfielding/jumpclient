@@ -12,8 +12,8 @@
           <div class="flex justify-flex-end">
             <button class="btn btn__flat mr-3" @click="exportHomeless(dayUsers)">export homeless</button>
           </div>
-    			<form ref="form" @submit.prevent>
-    				<div class="mb-3">
+    			<form ref="form" @submit.prevent class="mb-1">
+    			<!-- 	<div class="mb-3">
               <h4>Add User:</h4>
               <v-select
                 class="mt-2"
@@ -25,7 +25,24 @@
                 @input="addUser()"
                 >
               </v-select>
-    				</div>
+    				</div> -->
+    <ais-instant-search :search-client="searchClient" index-name="a_users" >
+      <ais-search-box placeholder="Add User..." />
+      <ais-state-results>
+        <template slot-scope="{ state: { query } }">
+          <ais-hits v-show="query.length > 0">
+            <template v-slot:item="{ item }">
+              <div>
+                <button @click="addUser(item)" class="btn btn__icon btn__flat mr-4"><i class="fas fa-plus" style="color:blue;"></i></button>
+                <p style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</p style="display: inline;">
+              </div>
+            </template>
+          </ais-hits>
+        </template>
+      </ais-state-results>
+    </ais-instant-search>
+      
+
     			</form>
       		<vue-good-table
               :columns="columns"
@@ -296,11 +313,21 @@
 	</div>
 </template>
 
+<style scoped type="text/css">
+ .btn__icon {
+  transition: ease all 1s;
+ }
+.btn__icon:hover {
+   transform: scale(1.4);
+  }
+</style>
+
 <script>
 import { mapState } from 'vuex'
 import router from '@/router'
 import * as moment from 'moment'
 import Loader from '@/components/Loader.vue'
+import algoliasearch from 'algoliasearch/lite';
 import ExportService from "@/services/ExportService"
 const fb = require('../../firebaseConfig.js')
 
@@ -308,6 +335,10 @@ export default {
   name: 'day',
   data() {
     return {
+      searchClient: algoliasearch(
+        '0T1SIY6Y1V',
+        'f03dc899fbdd294d6797791724cdb402',
+      ),
     	day: this.$route.params.id,
       selectedStaff: {},
       performingRequest: false,
@@ -408,7 +439,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['currentUser', 'eventsByDay', 'dayUsers', 'users']),
+    ...mapState(['currentUser', 'eventsByDay', 'dayUsers']),
     filteredAvailableUsers () {
       return this.dayUsers.filter(user => {
         return (!user.preferredEvent || user.preferredEvent == null)
@@ -449,11 +480,11 @@ export default {
     if (this.day) {
       this.$store.dispatch("getEventsByDay", this.day)
       this.$store.dispatch("getUserAvailabilityState", this.day)
-      this.$store.dispatch("getDayEventsState", this.day)
+      // this.$store.dispatch("getDayEventsState", this.day)
     }
-    if (!this.users || this.users.length < 1) {
-      this.$store.dispatch("getUsers")
-	  }
+   //  if (!this.users || this.users.length < 1) {
+   //    this.$store.dispatch("getUsers")
+	  // }
   },
   components: {
     Loader
@@ -707,7 +738,6 @@ export default {
         }
       )
       setTimeout(() => {
-        // this.$store.dispatch("getDayShiftsState", this.day)
         this.performingRequest = false
       }, 1500)
     },
@@ -769,15 +799,16 @@ export default {
     goBack() {
       router.go(-1)
     },
-    addUser() {
+    addUser(item) {
+      console.log(item)
       fb.userDaysCollection.add({
-        userId: this.newUser.id,
-        firstName: this.newUser.firstName,
-        lastName: this.newUser.lastName,
+        userId: item.objectID,
+        firstName: item.firstName,
+        lastName: item.lastName,
         day: this.day,
         start: this.day,
         status: "available",
-        fullName: this.newUser.firstName + ' ' + this.newUser.lastName,
+        fullName: item.firstName + ' ' + item.lastName,
       }).then(
         doc => {
           fb.userDaysCollection.doc(doc.id).update({
@@ -786,7 +817,16 @@ export default {
         })
       })
       setTimeout(() => {
-        this.newUser = ''
+        this.$state.query = ''
+        // document
+        // .querySelectorAll('.ais-SearchBox-input')
+        // .forEach((e) => (e.value = ''))
+
+      // clear all the hits
+      // document.querySelectorAll('.ais-Hits-item').forEach((e) => e.remove())
+
+      // also clear the hits from the component, otherwise subsequent searches throw exceptions
+      // this.$refs.searchHits.state.hits = []
       }, 1000)
     },
     showTrash(p) {

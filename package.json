@@ -7,8 +7,10 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "algoliasearch": "^4.10.5",
     "core-js": "^3.6.5",
     "firebase": "^8.6.8",
+    "instantsearch.css": "^7.4.5",
     "v-click-outside": "^3.1.2",
     "v-mask": "^2.2.4",
     "v-tooltip": "^2.1.3",
@@ -17,6 +19,7 @@
     "vue-croppa": "^1.3.8",
     "vue-gapi": "^1.1.0",
     "vue-good-table": "^2.21.10",
+    "vue-instantsearch": "^4.0.0",
     "vue-meta": "^2.4.0",
     "vue-moment": "^4.1.0",
     "vue-router": "^3.2.0",

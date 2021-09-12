@@ -57,7 +57,7 @@ import * as moment from 'moment'
 	    if (!this.eventDays || this.eventDays.length < 1) {
 	      this.$store.dispatch("getEvents")
 	    }
-	    this.$store.dispatch("getUsersPerDay")
+	    // this.$store.dispatch("getUsersPerDay")
 	  },
 	  watch: {
 	    '$route' (to, from) {
@@ -78,7 +78,7 @@ import * as moment from 'moment'
 	  	},
 	  },
 	  computed: {
-    ...mapState(['currentUser', 'eventDays', 'usersPerDay', 'events', 'pastEvents']),
+    ...mapState(['currentUser', 'eventDays', 'events']),
   	},
   	beforeDestroy () {
   		this.selected = ''
