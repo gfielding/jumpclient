@@ -27,6 +27,11 @@
             </router-link>
           </div>
           <div class="nav__menu--item desktop">
+            <router-link :to="{name: 'team'}">
+              directory
+            </router-link>
+          </div>
+          <div class="nav__menu--item desktop">
             <router-link :to="{name: 'clients'}">
               clients
             </router-link>

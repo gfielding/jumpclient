@@ -3,42 +3,45 @@
     <div class="dashboard__container">
       <div class="dashboard__container--header">
         <div class="flex align-center">
-          <h1>Timesheet</h1>
+          <h1>Timesheets</h1>
         </div>
         <div class="flex align-center">
           <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
         </div>
       </div>
-      <Loader v-if="!shift" />
-      <div class="dashboard__container--body" v-if="shift">
+      <div class="dashboard__container--body mb-3" v-if="day && eventInfo && eventInfo.venue">
+      	
+      </div>
+      <div class="dashboard__container--body">
         <div class="dashboard__container--body--col">
-          <h2>{{shift.event}}</h2>
-          <h3 v-if="shift.position">{{shift.position.title}}</h3>
-          <h5>{{shift.day | moment("dddd, MMM Do YYYY") }}</h5>
-          <span>{{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}</span> - <span>{{ [ shift.endTime, "HH:mm" ] | moment("hh:mm A") }}</span>
-          <div>Staff Requested: {{shift.staff}}</div>
+        	<div v-if="day && eventInfo && eventInfo.venue">
+        	 <h2>{{eventInfo.title}}</h2>
+        	{{day | moment("dddd, MMMM Do YYYY") }} | {{eventInfo.venue.title}}
+        	</div>
         </div>
-        <div class="dashboard__container--body--col pt-5">
+        <div class="dashboard__container--body--col">
           <button class="btn btn__outlined mr-3 mb-3" @click.prevent="exportReportCont">Contractor Payroll<i class="fas fa-external-link ml-3"></i></button>
-          <div class="caption mb-2" v-if="shift.exportedCont">
-            Contractors Exported: {{ shift.exportedCont.toDate() | moment("MMMM Do YYYY, h:mm a") }}
+          <div class="caption mb-2" v-if="eventInfo.exportedCont">
+            Contractors Exported: {{ eventInfo.exportedCont.toDate() | moment("MMMM Do YYYY, h:mm a") }}
           </div>
           <button class="btn btn__outlined mr-3 mb-3" @click.prevent="exportReportEmp">Employee Payroll<i class="fas fa-external-link ml-3"></i></button>
-          <div class="caption mb-2" v-if="shift.exportedEmp">
-            Employees Exported: {{ shift.exportedEmp.toDate() | moment("MMMM Do YYYY, h:mm a") }}
+          <div class="caption mb-2" v-if="eventInfo.exportedEmp">
+            Employees Exported: {{ eventInfo.exportedEmp.toDate() | moment("MMMM Do YYYY, h:mm a") }}
           </div>
           <button class="btn btn__outlined mr-3 mb-3" @click.prevent="exportRegister">Payroll Register<i class="fas fa-external-link ml-3"></i></button>
-          <div class="caption mb-2" v-if="shift.exportedRegister">
-            Register Exported: {{ shift.exportedRegister.toDate() | moment("MMMM Do YYYY, h:mm a") }}
+          <div class="caption mb-2" v-if="eventInfo.exportedRegister">
+            Register Exported: {{ eventInfo.exportedRegister.toDate() | moment("MMMM Do YYYY, h:mm a") }}
           </div>
-          <hr>
+          <!-- <hr>
           <div>
             <label for="payrollStatus">Payroll Completed:</label>
-              <input type="checkbox" v-model.trim="shift.payrollComplete" id="payrollStatus" class="ml-3" @change="updateShift()" />
-          </div>
+              <input type="checkbox" v-model.trim="eventInfo.payrollComplete" id="payrollStatus" class="ml-3" @change="updateShift()" />
+          </div> -->
         </div>
       </div>
-      <div class="dashboard__container--body" v-if="shift">
+      
+      <div class="dashboard__container--body">
+        <Loader v-if="!dayShifts || dayShifts.length == 0" />
         <div class="dashboard__container--body--col max">
           <vue-good-table
             :columns="columns"
@@ -67,9 +70,6 @@
               <span v-else-if="props.column.field == 'lastName'">
                 <input type="text" v-model.trim="props.row.lastName" id="lastName" readonly />
               </span>
-              <!-- <span v-else-if="props.column.field == 'fileId'">
-                <input type="text" v-model.trim="props.row.fileId" id="fileId" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
-              </span> -->
               <span v-else-if="props.column.field == 'note'">
                 <button v-show="!props.row.note" class="btn btn__flat btn__icon" @click="showNote(props.row)" v-tooltip="'Leave a note'"><i class="far fa-sticky-note ml-3 mr-3" style="opacity:0.5;"></i></button>
                 <button v-show="props.row.note" class="btn btn__flat btn__icon" @click="showNote(props.row)" v-tooltip="'Leave a note'"><i class="far fa-sticky-note ml-3 mr-3" style="color:blue"></i></button>
@@ -79,7 +79,9 @@
                   </div>
                 </transition>
               </span>
-
+              <!-- <span v-else-if="props.column.field == 'fileId'">
+                <input type="text" v-model.trim="props.row.fileId" id="fileId" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+              </span> -->
               <span v-else-if="props.column.field == 'regHours'">
                 <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
               </span>
@@ -122,10 +124,10 @@
               </span>
               <span v-else-if="props.column.field == 'locked'">
                 <button class="btn btn__icon" @click="lock(props.row)" v-if="!props.row.locked">
-                  <i class="fas fa-lock-open-alt ml-3 mr-3"></i>
+                  <i class="fas fa-lock-open-alt"></i>
                 </button>
                 <button class="btn btn__icon" @click="unlock(props.row)" v-if="props.row.locked">
-                  <i class="fas fa-lock-alt ml-3 mr-3" style="color:#5cb85c;"></i>
+                  <i class="fas fa-lock-alt" style="color:#5cb85c;"></i>
                 </button>
               </span>
               <span v-if="props.column.field == 'fileId'">
@@ -162,6 +164,15 @@
           </vue-good-table>
         </div>
       </div>
+
+      <div class="dashboard__container--body">
+        <div class="dashboard__container--body--col">
+          <NotesTable :notes="eventTimesheetNotes" />
+        </div>
+        <div class="dashboard__container--body--col">
+          <EventTimesheetNote :event="eventInfo" :me="userProfile" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -181,13 +192,16 @@ table.vgt-table td {
 <script>
 import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
+import * as moment from 'moment'
 import router from '@/router'
 import ExportService from "@/services/ExportService"
 import TimesheetNote from '@/components/Timesheets/TimesheetNote.vue'
 const fb = require('../../firebaseConfig.js')
+import EventTimesheetNote from '@/components/Timesheets/EventTimesheetNote.vue'
+import NotesTable from '@/components/Timesheets/NotesTable.vue'
 
 export default {
-  name: 'shift',
+  name: 'daytimesheets',
   data: () => ({
     activeItem: null,
     statuses: ['completed', 'arrived late', 'left early', 'no-show', 'client fired', 'terminated' ],
@@ -270,38 +284,26 @@ export default {
       },
     ]
   }),
+	computed: {
+    ...mapState(['dayShifts', 'eventInfo', 'shiftAssignments', 'userProfile', 'eventTimesheetNotes']),
+    day() {
+    	return this.$route.params.day
+    }
+  },
   components: {
     Loader,
-    TimesheetNote
+    TimesheetNote,
+    EventTimesheetNote,
+    NotesTable
   },
-  created () {
-    this.$store.dispatch("getShiftFromId", this.$route.params.id);
-    // if (!this.users || this.users.length < 1) {
-    //   this.$store.dispatch("getUsers")
-    // }
-  },
-  computed: {
-    ...mapState(['userProfile', 'shift', 'shiftAssignments']),
-  },
-  methods: {
-    showNote(r) {
+	methods: {
+		showNote(r) {
       console.log(r)
       this.activeItem = r
     },
     closeNote(r) {
       this.activeItem = null
     },
-    removeEntry(row) {
-      fb.assignmentsCollection.doc(row.id).delete()
-    },
-    updateShift() {
-      this.$store.dispatch("updateEventShift", this.shift)
-    },
-    // filteredInfo(user) {
-    //   return this.users.filter(member => {
-    //     return member.id == user.userId
-    //   })
-    // },
     onSheetEdit(row) {
       row = row
       this.$store.dispatch('updateTimesheet', row)
@@ -322,37 +324,6 @@ export default {
     removeopr(item) {
       fb.assignmentsCollection.doc(item.id).update({ opr: false })
       this.$store.dispatch("removeOpr", item)
-    },
-    lock(item) {
-      fb.usersCollection.doc(item.userId).get()
-      .then(
-        doc => {
-          console.log(doc.id, " => ", doc.data())
-          console.log(doc.data().contractorNumber)
-          console.log(doc.data().employeeNumber || null)
-          fb.assignmentsCollection.doc(item.id).update({ 
-            locked: true, 
-            fileId: doc.data().employeeNumber || doc.data().contractorNumber || null
-          })
-        }
-      )
-    },
-    //   .then(function (querySnapshot) {
-    //     if (querySnapshot.empty) {
-    //     }
-    //     querySnapshot.forEach(function (doc) {
-    //       console.log(doc.id, " => ", doc.data())
-    //       console.log(doc.data().contractorNumber)
-    //       console.log(doc.data().employeeNumber || null)
-    //       fb.assignmentsCollection.doc(item.id).update({ 
-    //         locked: true, 
-    //         fileId: doc.data().employeeNumber || doc.data().contractorNumber || null
-    //       })
-    //     })
-    //   })
-    // },
-    unlock(item) {
-      fb.assignmentsCollection.doc(item.id).update({ locked: false })
     },
     goBack() {
       router.go(-1)
@@ -386,9 +357,9 @@ export default {
         const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
         exportService.export();
       });
-      fb.shiftsCollection.doc(this.shift.id).update({ exportedRegister: fb.firestore.FieldValue.serverTimestamp() })
+      fb.eventsCollection.doc(this.eventInfo.id).update({ exportedRegister: fb.firestore.FieldValue.serverTimestamp() })
       setTimeout(() => {
-        this.$store.dispatch("getShiftFromId", this.$route.params.id)
+        this.$store.dispatch("getEventFromId", this.$route.params.id)
         this.performingRequest = false
       }, 2000)
     },
@@ -461,9 +432,9 @@ export default {
         const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
         exportService.export();
       });
-      fb.shiftsCollection.doc(this.shift.id).update({ exportedCont: fb.firestore.FieldValue.serverTimestamp() })
+      fb.eventsCollection.doc(this.eventInfo.id).update({ exportedCont: fb.firestore.FieldValue.serverTimestamp() })
       setTimeout(() => {
-        this.$store.dispatch("getShiftFromId", this.$route.params.id)
+        this.$store.dispatch("getEventFromId", this.$route.params.id)
         this.performingRequest = false
       }, 2000)
     },
@@ -536,16 +507,27 @@ export default {
         const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
         exportService.export();
       });
-      fb.shiftsCollection.doc(this.shift.id).update({ exportedEmp: fb.firestore.FieldValue.serverTimestamp() })
+      fb.eventsCollection.doc(this.eventInfo.id).update({ exportedEmp: fb.firestore.FieldValue.serverTimestamp() })
       setTimeout(() => {
-        this.$store.dispatch("getShiftFromId", this.$route.params.id)
+        this.$store.dispatch("getEventFromId", this.$route.params.id)
         this.performingRequest = false
       }, 2000)
     },
   },
+	created () {
+		this.$store.dispatch("getEventFromId", this.$route.params.id);
+    this.$store.dispatch("getDayShifts", 
+    	{ 
+    		event: this.$route.params.id,
+    		day: this.$route.params.day,
+    	}
+    )
+  },
   beforeDestroy () {
-    this.$store.dispatch('clearShiftState')
-    console.log(this)
+    this.$store.dispatch("clearEventState")
+    this.$store.dispatch("clearDayShifts")
+    this.$store.dispatch('clearErrors')
   }
 }
+	
 </script>

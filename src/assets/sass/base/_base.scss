@@ -6,7 +6,7 @@
   -webkit-font-smoothing: auto;
   -moz-osx-font-smoothing: grayscale;
   font-smoothing: auto;
-  font-size:1.8rem;
+  font-size:1.6rem;
   max-width: 100vw;
   overflow-x: hidden;
   background: $background;
@@ -65,4 +65,10 @@ hr {
   @include respond(tablet-port) {
     display:none;
   }
+}
+
+.vs--disabled .vs__clear, .vs--disabled .vs__dropdown-toggle, .vs--disabled .vs__open-indicator, .vs--disabled .vs__search, .vs--disabled .vs__selected {
+    cursor: not-allowed;
+    background-color: transparent !important;
+    border:none;
 }

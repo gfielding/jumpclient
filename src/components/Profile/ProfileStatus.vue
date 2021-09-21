@@ -114,11 +114,17 @@
 	      <input type="date" placeholder="" v-model.trim="user.terminationDate" id="terminationDate" @change="updateUserHired()" />
 	    </div>
 	  </transition>
+    <div v-if="!user.employeeStatus || user.employeeStatus == 'applied'">
+      <button v-if="!user.opr || user.opr == false" class="btn btn__outlined mt-5" @click="opr()">Request OnPay Employee Setup</button>
+
+      <button v-if="user.opr" class="btn btn__flat btn__outlined mt-5" disabled>OnPay Setup Requested</button>
+    </div>
 	</div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
+const fb = require('../../firebaseConfig.js')
 
 export default {
   props: ['user'],
@@ -199,7 +205,29 @@ export default {
     	setTimeout(() => {
           this.showButton3 = false
       }, 500)
-    }
+    },
+    opr() {
+      let user = this.user
+      console.log(user)
+      fb.oprCollection.add(user)
+      .then(
+        doc => {
+          console.log(doc)
+          fb.oprCollection.doc(doc.id).update({
+            id: doc.id, 
+            created: fb.firestore.FieldValue.serverTimestamp(),
+          })
+        }
+      )
+      this.$store.dispatch('updateUser', {
+        id: user.id,
+        opr: true
+      })
+    },
+    removeopr() {
+      let user = this.user
+      this.$store.dispatch("removeUserOpr", user)
+    },
   },
   beforeDestroy () {
   	this.showButton = false

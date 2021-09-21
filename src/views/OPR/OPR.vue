@@ -3,7 +3,7 @@
     <div class="dashboard__container">
       <div class="dashboard__container--header">
         <h1>OnPay Requests</h1>
-        <button class="btn btn__flat mr-3" @click="exportAll()">export all</button>
+        <button class="btn btn__outlined mr-3" @click="exportAll()">export all</button>
       </div>
       <div class="dashboard__container--body">
         <Loader v-if="!opr || opr.length == 0" />
@@ -32,7 +32,7 @@
                 </router-link>
               </span>
               <span v-else-if="props.column.field == 'checked'">
-                <input type="checkbox" v-model.trim="props.row.check" id="check" class="ml-3" @change="markAdded(props.row)" />
+                <input type="checkbox" v-model.trim="props.row.eos" id="check" class="ml-3" @change="markAdded(props.row)" />
               </span>
               <span v-else-if="props.column.field == 'empstatus'">
                 <v-select
@@ -50,6 +50,12 @@
                     {{u.firstName}}
                   </span>
                 </span>
+              </span>
+
+              <span v-else-if="props.column.field == 'delete'">
+                <button class="btn btn__icon" v-tooltip="'delete'" @click="removeEntry(props.row)">
+                  <i class="fas fa-times ml-3 mr-2"></i>
+                </button>
               </span>
 
               <span v-else>
@@ -76,11 +82,15 @@ export default {
     search: '',
     empStatuses: ['applied', 'payroll invitation', 'signed offer letter', 'hired', 'not-hired', 'on-hold', 'terminated'],
     columns: [
-      // {
-      //   label: 'Added',
-      //   field: 'checked',
-      //   sortable: false,
-      // },
+      {
+        label: 'EOS',
+        field: 'checked',
+        sortable: false,
+      },
+      {
+        field: 'delete',
+        sortable: false,
+      },
       {
         field: 'link',
         sortable: false,
@@ -115,14 +125,14 @@ export default {
         label: 'Pay ID',
         field: 'employeeNumber',
       },
-      {
-        label: 'Extras',
-        field: 'extras',
-      },
-      {
-        label: 'State',
-        field: 'address.state',
-      },
+      // {
+      //   label: 'Extras',
+      //   field: 'extras',
+      // },
+      // {
+      //   label: 'State',
+      //   field: 'address.state',
+      // },
       {
         label: 'State Wored',
         field: 'eventInfo.venue.address.state',
@@ -174,6 +184,7 @@ export default {
       const exportItems = [];
       for (var key in this.opr) {
         exportItems.push([
+          this.opr[key].created,
           this.opr[key].checked,
           this.opr[key].firstName,
           this.opr[key].lastName,
@@ -189,12 +200,16 @@ export default {
       });
     },
     markAdded(p) {
+      p.eos = p.eos
       this.$store.dispatch("updateOpr", p)
+    },
+    removeEntry(r) {
+      fb.oprCollection.doc(r.id).delete()
     },
     formatDate(q) {
       if(q) {
         const postedDate = new Date(q.seconds) * 1000;
-        return moment(postedDate).format('MMMM Do YYYY, hh:mm a')
+        return moment(postedDate).format('MM Do YYYY, hh:mm a')
       } else {
         return null
       }

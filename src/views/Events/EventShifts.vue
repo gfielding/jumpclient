@@ -3,7 +3,7 @@
     <div class="dashboard__container">
       <div class="dashboard__container--header">
         <h1>Event Shifts</h1>
-        <button class="btn btn__outlined" @click="goBack">Go Back</button>
+        <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
       </div>
       
       <Loader v-if="!event" />

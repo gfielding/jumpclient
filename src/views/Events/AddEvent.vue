@@ -40,15 +40,26 @@
             </div>
             <div class="mb-3" v-if="jobss.length >= 1 && event.venue">
             <label for="pickDate">Choose Jobs:</label>
-                <v-select
-                  class="mt-2"
-                  label="title" 
-                  :options="jobss"
-                  multiple
-                  v-model="event.venue.job"
-                  >
-                </v-select>
-              </div>
+              <v-select
+                class="mt-2"
+                label="title" 
+                :options="jobss"
+                multiple
+                v-model="event.venue.job"
+                >
+              </v-select>
+            </div>
+            <div class="mb-3" v-if="mgrs.length >= 1 && event.venue">
+            <label for="pickDate">Managers:</label>
+              <v-select
+                class="mt-2"
+                label="name" 
+                :options="mgrs"
+                multiple
+                v-model="event.venue.mgrs"
+                >
+              </v-select>
+            </div>
             
 
           </div>
@@ -308,9 +319,12 @@ export default {
     if (!this.jobs || this.jobs.length < 1) {
       this.$store.dispatch("getJobsState")
     }
+    if (!this.mgrs || this.mgrs.length < 1) {
+      this.$store.dispatch("getMgrsState")
+    }
   },
   computed: {
-    ...mapState(['venues', 'clients', 'jobs']),
+    ...mapState(['venues', 'clients', 'jobs', 'mgrs']),
     backgroundUrl() {
       return this.event.photoUrl || 'https://firebasestorage.googleapis.com/v0/b/mvpes-25aef.appspot.com/o/stadium.png?alt=media&token=89f2362c-d1bc-4338-a837-fad1d664c51d'
     },

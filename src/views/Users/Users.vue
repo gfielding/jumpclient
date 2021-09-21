@@ -4,22 +4,28 @@
       <div class="dashboard__container--header flex justify-space-between align-center">
         <h1>Users</h1>
         <div class="flex align-center"> 
-          <button class="btn btn__flat mr-3" @click="exportAll()">export all</button>
+          <button class="btn btn__outlined mb-3" @click="exportAll()">export all</button>
         </div>
       </div>
-       <ais-instant-search :search-client="searchClient" index-name="a_users">
-        <ais-search-box />
-        <ais-hits>
-          <template v-slot:item="{ item }">
-            <div>
-              <router-link :to="`users/` + item.objectID">
-              <button class="btn btn__icon btn__flat mr-4"><i class="fad fa-external-link"></i></button>
-              </router-link>
-              <h4 style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</h4 style="display: inline;">
-            </div>
-          </template>
-        </ais-hits>
-      </ais-instant-search>
+
+      <ais-instant-search :search-client="searchClient" index-name="a_users" >
+      <ais-search-box placeholder="Search Users..." />
+      <ais-state-results>
+        <template slot-scope="{ state: { query } }">
+          <ais-hits v-show="query.length > 0">
+            <template v-slot:item="{ item }">
+              <div>
+                <router-link :to="`users/` + item.objectID">
+                  <button class="btn btn__icon btn__flat mr-4"><i class="fad fa-external-link"></i></button>
+                </router-link>
+                <h4 style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</h4 style="display: inline;">
+              </div>
+            </template>
+          </ais-hits>
+        </template>
+      </ais-state-results>
+    </ais-instant-search>
+
 
  <!--  <ais-instant-search>
       <ais-index

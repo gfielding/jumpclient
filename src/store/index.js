@@ -52,7 +52,11 @@ const store = new Vuex.Store({
     shiftAssignments: [],
     usersPerDay: [],
     eventShifts: [],
-    opr: []
+    dayShifts: [],
+    opr: [],
+    eventTimesheetNotes: [],
+    mgrs: [],
+    mgrInfo: {}
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -433,6 +437,50 @@ const store = new Vuex.Store({
     },
 
 
+    /*MGRS*/
+    getMgrsState({ commit }, payload) {
+      fb.mgrsCollection.onSnapshot(querySnapshot => {
+        let mgrsArray = []
+        querySnapshot.forEach(doc => {
+          let mgr = doc.data()
+          mgrsArray.push(mgr)
+        })
+        commit('setMgrs', mgrsArray)
+      })
+    },
+    addMgr({ commit }, payload) {
+      console.log(payload)
+      fb.mgrsCollection.add(payload)
+      .then(
+        doc => {
+          fb.mgrsCollection.doc(doc.id).update({
+            id: doc.id,
+            created: fb.firestore.FieldValue.serverTimestamp(),
+          })
+        }
+      )
+    },
+    getMgrFromId({ commit }, payload) {
+      fb.mgrsCollection.where("id", "==", payload).onSnapshot(querySnapshot => {
+        querySnapshot.forEach(function (doc) {
+          commit("setMgrInfo", doc.data())
+        })
+      })
+    },
+    deleteMgr({ commit }, payload) {
+      fb.mgrsCollection.doc(payload).delete()
+    },
+    updateMgr({ commit }, payload) {
+      fb.mgrsCollection.doc(payload.id).update(payload)
+    },
+    clearMgrState({ commit }) {
+      commit('setMgrInfo', {})
+    },
+    clearMgrsState({ commit }) {
+      commit('setMgrs', [])
+    },
+
+
 
     /*JOBS*/
     addJob({ commit }, payload) {
@@ -761,6 +809,24 @@ const store = new Vuex.Store({
     clearEventShifts({ commit }) {
       commit('setEventShifts', [])
     },
+    getDayShifts({ commit }, payload) {
+      console.log(payload)
+      fb.shiftsCollection.where("eventId", "==", payload.event).where("day", "==", payload.day).onSnapshot(querySnapshot => {
+        let shiftsArray = []
+        querySnapshot.forEach(doc => {
+          let shift = doc.data()
+          shift.id = doc.id
+          shiftsArray.push(shift)
+        })
+        commit('setDayShifts', shiftsArray)
+      })
+      store.dispatch('getAssignmentsForDay', payload)
+      store.dispatch('getEventTimesheetNotes', payload.event)
+    },
+    clearDayShifts({ commit }) {
+      commit('setDayShifts', [])
+      commit('setShiftAssignments', [])
+    },
 
     getShifts({ commit }, payload) {
       fb.shiftsCollection.orderBy('day', 'desc').onSnapshot(querySnapshot => {
@@ -797,10 +863,50 @@ const store = new Vuex.Store({
         commit('setShiftAssignments', assignmentsArray)
       })
     },
+    getAssignmentsForDay({ commit }, payload) {
+      console.log(payload)
+      fb.assignmentsCollection.where("eventId", "==", payload.event).where("day", "==", payload.day).orderBy('firstName', 'asc').onSnapshot(querySnapshot => {
+        let assignmentsArray = []
+        querySnapshot.forEach(doc => {
+          let assignment = doc.data()
+          assignment.id = doc.id
+          assignmentsArray.push(assignment)
+        })
+        commit('setShiftAssignments', assignmentsArray)
+      })
+    },
     clearShiftState({ commit }) {
       commit('setShift', {})
       commit('setShiftAssignments', [])
     },
+    addEventTimesheetNote({ commit }, payload) {
+      console.log(payload)
+      fb.eventTimesheetNotesCollection.add(payload)
+      .then(
+        doc => {
+          fb.eventTimesheetNotesCollection.doc(doc.id).update({
+            eventId: payload.eventId,
+            submittedBy: payload.submittedBy,
+            id: doc.id,
+            created: fb.firestore.FieldValue.serverTimestamp()
+          })
+        }
+      )
+    },
+    getEventTimesheetNotes({ commit }, payload) {
+      console.log(payload)
+      fb.eventTimesheetNotesCollection.where("eventId", "==", payload).orderBy('created', 'desc').onSnapshot(querySnapshot => {
+        let userNotesArray = []
+
+        querySnapshot.forEach(doc => {
+          let note = doc.data()
+          note.id = doc.id
+          userNotesArray.push(note)
+        })
+        commit('setEventTimesheetNotes', userNotesArray)
+      })
+    },
+
 
 
 
@@ -1031,6 +1137,10 @@ const store = new Vuex.Store({
         commit('setOpr', oprArray)
       })
     },
+    removeUserOpr({ commit }, payload) {
+      console.log(payload)
+      fb.oprCollection.where("user.id", "==", payload.user.id).delete()
+    },
     clearOprState({ commit }) {
       commit('setOpr', [])
     },
@@ -1167,6 +1277,13 @@ const store = new Vuex.Store({
         state.userNotes = []
       }
     },
+    setEventTimesheetNotes(state, val) {
+      if (val) {
+        state.eventTimesheetNotes = val
+      } else {
+        state.eventTimesheetNotes = []
+      }
+    },
     setUserInfo(state, val) {
       state.userInfo = val
     },
@@ -1179,6 +1296,16 @@ const store = new Vuex.Store({
       } else {
         state.jobs = []
       }
+    },
+    setMgrs(state, val) {
+      if (val) {
+        state.mgrs = val
+      } else {
+        state.mgrs = []
+      }
+    },
+    setMgrInfo(state, val) {
+      state.mgrInfo = val
     },
     setJobInfo(state, val) {
       state.jobInfo = val
@@ -1229,6 +1356,13 @@ const store = new Vuex.Store({
         state.shifts = val
       } else {
         state.shifts = []
+      }
+    },
+    setDayShifts(state, val) {
+      if (val) {
+        state.dayShifts = val
+      } else {
+        state.dayShifts = []
       }
     },
     setShift(state, val) {

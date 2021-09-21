@@ -65,6 +65,15 @@
                       v-model="place.job"
                       >
                     </v-select>
+              <label for="client">Select Managers:</label>
+              <v-select
+                class="mt-2"
+                label="name" 
+                multiple
+                :options="mgrs"
+                v-model="place.mgrs"
+                >
+              </v-select>
                 </div>
 	    				</div>
 	    			</transition>
@@ -238,9 +247,12 @@ export default {
     if (!this.jobs || this.jobs.length < 1) {
       this.$store.dispatch("getJobsState")
     }
+    if (!this.mgrs || this.mgrs.length < 1) {
+      this.$store.dispatch("getMgrsState")
+    }
   },
   computed: {
-    ...mapState(['jobs', 'clients']),
+    ...mapState(['jobs', 'clients', 'mgrs']),
     backgroundUrl() {
       return 'https://firebasestorage.googleapis.com/v0/b/mvpes-25aef.appspot.com/o/stadium.png?alt=media&token=89f2362c-d1bc-4338-a837-fad1d664c51d'
     }

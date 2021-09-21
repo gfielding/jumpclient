@@ -68,6 +68,7 @@
             </div>
       		</div>
           
+          
       		<div class="dashboard__container--body--col">
       			<gmap-map v-if="venue && venue.center" class="mb-5" :center="venue.center" :zoom="12"  style="width: 100%; height: 300px">
               <GmapMarker
@@ -77,6 +78,21 @@
               </GmapMarker>
             </gmap-map>
       		</div>
+
+          <div class="dashboard__container--body--col">
+            <h3>Managers</h3>
+            <div class="mb-3" v-if="mgrs.length >= 1">
+              <label for="client">Select Managers:</label>
+              <v-select
+                class="mt-2"
+                label="name" 
+                multiple
+                :options="mgrs"
+                v-model="venue.mgrs"
+                >
+              </v-select>
+            </div>
+          </div>
 
           <div class="dashboard__container--body--col">
             <h3>Attach Files</h3>
@@ -263,7 +279,7 @@ export default {
     ]
   }),
    computed: {
-    ...mapState(['venueInfo', 'venueEvents', 'clients', 'jobs']),
+    ...mapState(['venueInfo', 'venueEvents', 'clients', 'jobs', 'mgrs']),
     venue() {
       return this.venueInfo
     },
@@ -278,6 +294,9 @@ export default {
     }
     if (!this.jobs || this.jobs.length < 1) {
       this.$store.dispatch("getJobsState")
+    }
+    if (!this.mgrs || this.mgrs.length < 1) {
+      this.$store.dispatch("getMgrsState")
     }
   },
    components: {

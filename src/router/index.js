@@ -118,6 +118,22 @@ const router = new VueRouter({
       },
     },
     {
+      path: '/events/:id/timesheets',
+      name: 'eventtimesheets',
+      component: () => import('../views/Shifts/EventShifts.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/timesheets/:id/:day',
+      name: 'daytimesheets',
+      component: () => import('../views/Shifts/DayShifts.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
       path: '/addjob',
       name: 'addjob',
       component: () => import('../views/Jobs/AddJob.vue'),
@@ -137,6 +153,30 @@ const router = new VueRouter({
       path: '/jobs/:id',
       name: 'job',
       component: () => import('../views/Jobs/Job.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/addmgr',
+      name: 'addmgr',
+      component: () => import('../views/Team/AddMgr.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/team',
+      name: 'team',
+      component: () => import('../views/Team/Team.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/team/:id',
+      name: 'mgr',
+      component: () => import('../views/Team/Mgr.vue'),
       meta: {
         requiresAuth: true
       },

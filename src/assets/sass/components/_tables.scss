@@ -27,7 +27,7 @@ table.vgt-table td {
   color: $text;
   vertical-align: bottom;
   border-bottom: 1px solid $textLight;
-  padding-right: 0.5rem;
+  padding-right: 0.15rem;
   // background: $backDark;
 }
 
@@ -51,11 +51,11 @@ table.vgt-table td {
 }
 
 table input, table textarea {
-  background: white !important;
+  background: white;
   border-radius: 0 !important;
 }
 table.vgt-table td {
-    padding: 0.5rem;
+    padding: 0.15rem;
   }
  table .vs__dropdown-toggle {
     background: white !important;

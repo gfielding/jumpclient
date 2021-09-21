@@ -58,6 +58,8 @@ const userNotesCollection = db.collection('userNotes')
 const placementsCollection = db.collection('placements')
 const faqsCollection = db.collection('faqs')
 const oprCollection = db.collection('opr')
+const mgrsCollection = db.collection('mgrs')
+const eventTimesheetNotesCollection = db.collection('eventTimesheetNotes')
 
 export {
   db,
@@ -94,5 +96,7 @@ export {
   faqsCollection,
   seriesCollection,
   seriesDaysCollection,
-  oprCollection
+  oprCollection,
+  eventTimesheetNotesCollection,
+  mgrsCollection
 }

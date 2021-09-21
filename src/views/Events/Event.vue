@@ -12,6 +12,9 @@
           </button>
         </div>
         <div class="flex align-center">
+          <router-link :to="{name: 'eventtimesheets'}">
+          <button class="btn btn__outlined mr-3">Timesheets</button>
+          </router-link>
           <button class="btn btn__outlined mr-3" @click="shifts()">Event Shifts</button>
           <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
         </div>
@@ -44,6 +47,17 @@
                 :options="venues"
                 v-model="event.venue"
                 @input="updateVenue()"
+                >
+              </v-select>
+            </div>
+            <div class="mb-3" v-if="event.venue && mgrs.length >= 1">
+            <label for="mgrs">Managers:</label>
+              <v-select
+                class="mt-2"
+                label="name" 
+                :options="mgrs"
+                multiple
+                v-model="event.venue.mgrs"
                 >
               </v-select>
             </div>
@@ -368,9 +382,12 @@ export default {
     if (!this.jobs || this.jobs.length < 1) {
       this.$store.dispatch("getJobsState")
     }
+    if (!this.mgrs || this.mgrs.length < 1) {
+      this.$store.dispatch("getMgrsState")
+    }
   },
   computed: {
-    ...mapState(['eventInfo', 'venues', 'clients', 'jobs']),
+    ...mapState(['eventInfo', 'venues', 'clients', 'jobs', 'mgrs']),
     event() {
       return this.eventInfo
     },
