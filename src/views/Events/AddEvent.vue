@@ -17,6 +17,10 @@
     					<label for="eventPublished">Published:</label>
     					<input type="checkbox" v-model.trim="event.published" id="eventPublished" class="ml-3" />
     				</div>
+            <div class="mb-3">
+              <label for="venueVisibility">Vaccination Required:</label>
+              <input type="checkbox" v-model.trim="event.requiredVaccine" id="venueVisibility" class="ml-3" />
+            </div>
             <div class="mb-3" v-if="venues.length > 1">
               <label for="venue">Venue:</label>
               <v-select

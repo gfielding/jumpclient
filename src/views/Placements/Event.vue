@@ -1,5 +1,5 @@
-<template>
-	<div class="dashboard">
+f<template>
+	<div class="dashboard" style="width:100%;">
     <div>
       <div class="dashboard__container--header mb-3" v-if="event">
         <div>
@@ -9,10 +9,32 @@
         </span> 
         </div>
       </div>
-      <Loader v-if="!eventUsers || eventUsers.length < 1" />
-      <div class="dashboard__container--body" v-if="eventUsers && eventUsers.length >= 1">
+      
+      <div class="dashboard__container--body">
         <div class="dashboard__container--body--col">
-          <button class="btn btn__outlined mb-2" @click="exportUnplaced()">export unplaced</button>
+          <Loader v-if="!eventUsers || eventUsers.length < 1" />
+
+          <ais-instant-search :search-client="searchClient" index-name="a_users" >
+            <ais-search-box placeholder="Add User..." />
+            <ais-state-results>
+              <template slot-scope="{ state: { query } }">
+                <ais-hits v-show="query.length > 0">
+                  <template v-slot:item="{ item }">
+                    <div>
+                      <button @click="addUser(item)" class="btn btn__icon btn__flat mr-4">
+                        </span>
+                        <i class="fas fa-plus" style="color:blue;" v-if="!performingRequest"></i>
+                        <i class="fa fa-spinner fa-spin" style="color:blue;" v-if="performingRequest"></i>
+                      </button>
+                      <p style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</p style="display: inline;">
+                    </div>
+                  </template>
+                </ais-hits>
+              </template>
+            </ais-state-results>
+          </ais-instant-search>
+
+          <button class="btn btn__outlined mb-2 mt-3" @click="exportUnplaced()">export unplaced</button>
           <vue-good-table
               :columns="columns"
               :rows="filteredUsers"
@@ -35,26 +57,75 @@
                   <i class="far fa-sticky-note"></i>
                 </button>
               </span>
-              <!-- <span v-else-if="props.column.field == 'state'">
+              <!-- <span v-else-if="props.column.field == 'jobs'">
                 <span v-if="(props.row)">
                   <span v-for="u in filteredInfo(props.row)">
-                    <span v-if="u && u.address && u.address.city && u.address.state" style="display:inline;">
-                      <span v-tooltip="u.address.city">{{u.address.state}}</span>
+                    <span v-if="u && u.skills && u.skills.length > 0" style="display:inline;">
+                      <v-popover>
+                        <i class="fad fa-briefcase"></i>
+                        <template slot="popover">
+                        <span v-for="z in u.skills">{{z.title}} / </span>
+                      </template>
+                      </v-popover>
                     </span>
                   </span>
                 </span>
               </span> -->
-              <span v-else-if="props.column.field == 'days'">
+              <span v-else-if="props.column.field == 'extras'">
+                        <span v-if="(props.row)">
+                          <span v-for="u in filteredInfo(props.row)" style="display:flex; justify-content: space-evenly;">
+
+                            <span v-if="u.points" style="display:inline; color:#0d3fd1;" class="ml-2 mr-2">
+                              {{u.points}}
+                            </span>
+
+                            <span v-if="u.rating" style="display:inline; color:#c5950d;" class="ml-2 mr-2">
+                              {{u.rating}}
+                            </span>
+
+                            <span v-if="u.blacklist && u.blacklist.length >=1" style="display:inline;">
+                              <v-popover>
+                                <i class="fas fa-exclamation-triangle ml-2 mr-2" style="color:red;"></i>
+                                <template slot="popover">
+                                <span v-for="z in u.blacklist">{{z.title}}</span>
+                              </template>
+                              </v-popover>
+                            </span>
+
+                            <span v-if="u && u.skills && u.skills.length > 0" style="display:inline;">
+                            <v-popover>
+                                <i class="fad fa-briefcase ml-2 mr-2"></i>
+                                <template slot="popover">
+                                <span v-for="z in u.skills">{{z.title}} / </span>
+                              </template>
+                              </v-popover>
+                            </span>
+
+                            <span v-if="u && u.groups && u.groups.length > 0" style="display:inline;">
+                            <v-popover>
+                                <i class="fad fa-bookmark ml-2 mr-2"></i>
+                                <template slot="popover">
+                                <span v-for="z in u.groups">{{z}} / </span>
+                              </template>
+                              </v-popover>
+                            </span>
+
+                            <span v-if="u && u.fullyVaccinated && u.fullyVaccinated == `yes`" style="display:inline;">
+                              <i class="fas fa-syringe ml-2 mr-2" style="color: green;"></i>
+                            </span>
+
+
+                          </span>
+                        </span>
+                      </span>
+              
+              <!-- <span v-if="props.column.field == 'extras'">
                 <span v-if="(props.row)">
-                  {{props.row.start}}
-                </span>
-              </span>
-              <span v-if="props.column.field == 'extras'">
-                <span v-if="(props.row)">
+                  
                     <span v-for="u in filteredInfo(props.row)">
                       <span v-if="u.blacklist && u.blacklist.length >=1">
                         <v-popover>
-                          <i class="fas fa-exclamation-triangle ml-2 mr-2" style="color:red;"></i>
+                          <i class="fas fa-exclamation-triangle" style="color:red;"></i>
                           <template slot="popover">
                           <span v-for="z in u.blacklist">{{z.title}}</span>
                         </template>
@@ -62,7 +133,12 @@
                       </span>
                     </span>
                   </span>
+                </span> -->
+                <span v-else-if="props.column.field == 'days'">
+                <span v-if="(props.row)">
+                  {{props.row.start}}
                 </span>
+              </span>
               <span v-else-if="props.column.field == 'reservations'">
                   <span v-if="
                     (props.row.dayStatus != 'hired') &&
@@ -108,19 +184,192 @@
               <span v-else-if="props.column.field == 'delete'">
 
                 <button class="icon" v-if="!props.row.showTrash" v-tooltip="'delete instance'" @click="showTrash(props)">
-                  <i class="fas fa-times"></i>
+                  <i class="fas fa-times ml-2 mr-2"></i>
                 </button>
 
                 <button class="icon" v-if="props.row.showTrash" v-tooltip="'cancel'" @click="hideTrash(props)">
-                  <i class="fas fa-times"></i>
+                  <i class="fas fa-times ml-2 mr-2"></i>
                 </button>
 
-                <button class="icon" v-if="props.row.showTrash" v-tooltip="'delete instance'" @click="deleteUser(props.row)" style="margin-left: 1.5rem;">
-                  <i class="fas fa-trash"></i>
+                <button class="icon" v-if="props.row.showTrash" v-tooltip="'delete instance'" @click="deleteUser(props.row)">
+                  <i class="fas fa-trash ml-2 mr-2"></i>
                 </button>
               </span>
+              <span v-else-if="props.column.field == 'requestedJob.title'">
+                <span v-if="props.row.requestedJob && props.row.requestedJob.title">
+                   {{props.row.requestedJob.title}}
+                </span>
+              </span>
               <span v-else>
-                {{props.formattedRow[props.column.field]}}
+                <!-- {{props.formattedRow[props.column.field]}} -->
+              </span>
+            </template>
+          </vue-good-table>
+            <div class="mt-5 mb-5"></div>
+          <h3>Drops</h3>
+          <vue-good-table
+              :columns="columnsD"
+              :rows="eventDrops"
+              :search-options="{
+                enabled: true,
+                placeholder: 'Search this table',
+              }"
+              :pagination-options="{
+                enabled: true,
+                mode: 'records',
+                perPage: 20,
+              }"
+            >
+            <template slot="table-row" slot-scope="props">
+              <span v-if="props.column.field == 'dropped'">
+                <span v-if="props.row.created">{{formatDate(props.row.created)}}</span>
+              </span>
+              <span v-else-if="props.column.field == 'notes'">
+                <button class="icon" v-if="props.row.note" v-tooltip="props.row.note">
+                  <i class="far fa-sticky-note"></i>
+                </button>
+              </span>
+              <!-- <span v-else-if="props.column.field == 'jobs'">
+                <span v-if="(props.row)">
+                  <span v-for="u in filteredInfo(props.row)">
+                    <span v-if="u && u.skills && u.skills.length > 0" style="display:inline;">
+                      <v-popover>
+                        <i class="fad fa-briefcase"></i>
+                        <template slot="popover">
+                        <span v-for="z in u.skills">{{z.title}} / </span>
+                      </template>
+                      </v-popover>
+                    </span>
+                  </span>
+                </span>
+              </span> -->
+              <span v-else-if="props.column.field == 'extras'">
+                        <span v-if="(props.row)">
+                          <span v-for="u in filteredInfo(props.row)" style="display:flex; justify-content: space-evenly;">
+
+                            <span v-if="u.rating" style="display:inline;" class="ml-2 mr-2">
+                              {{u.rating}}
+                            </span>
+
+                            <span v-if="u.blacklist && u.blacklist.length >=1" style="display:inline;">
+                              <v-popover>
+                                <i class="fas fa-exclamation-triangle ml-2 mr-2" style="color:red;"></i>
+                                <template slot="popover">
+                                <span v-for="z in u.blacklist">{{z.title}}</span>
+                              </template>
+                              </v-popover>
+                            </span>
+
+                            <span v-if="u && u.skills && u.skills.length > 0" style="display:inline;">
+                            <v-popover>
+                                <i class="fad fa-briefcase ml-2 mr-2"></i>
+                                <template slot="popover">
+                                <span v-for="z in u.skills">{{z.title}} / </span>
+                              </template>
+                              </v-popover>
+                            </span>
+
+                            <span v-if="u && u.groups && u.groups.length > 0" style="display:inline;">
+                            <v-popover>
+                                <i class="fad fa-bookmark ml-2 mr-2"></i>
+                                <template slot="popover">
+                                <span v-for="z in u.groups">{{z}} / </span>
+                              </template>
+                              </v-popover>
+                            </span>
+
+                            <span v-if="u && u.fullyVaccinated && u.fullyVaccinated == `yes`" style="display:inline;">
+                              <i class="fas fa-syringe ml-2 mr-2" style="color: green;"></i>
+                            </span>
+
+
+                          </span>
+                        </span>
+                      </span>
+              
+              <!-- <span v-if="props.column.field == 'extras'">
+                <span v-if="(props.row)">
+                  
+                    <span v-for="u in filteredInfo(props.row)">
+                      <span v-if="u.blacklist && u.blacklist.length >=1">
+                        <v-popover>
+                          <i class="fas fa-exclamation-triangle" style="color:red;"></i>
+                          <template slot="popover">
+                          <span v-for="z in u.blacklist">{{z.title}}</span>
+                        </template>
+                        </v-popover>
+                      </span>
+                    </span>
+                  </span>
+                </span> -->
+                <span v-else-if="props.column.field == 'days'">
+                <span v-if="(props.row)">
+                  {{props.row.start}}
+                </span>
+              </span>
+              <span v-else-if="props.column.field == 'reservations'">
+                  <span v-if="
+                    (props.row.dayStatus != 'hired') &&
+                    (props.row.dayStatus != 'assigned') &&
+                    (props.row.dayStatus != 'not requested')
+                  " style="display:inline; margin-right: 1.5rem;">
+                    <button class="icon" @click="reserveUser(props.row)" v-tooltip="'reserve user'">
+                      <i class="far fa-calendar"></i>
+                    </button>
+                  </span>
+                  <span v-if="
+                    (props.row.dayStatus == 'hired' || props.row.dayStatus == 'assigned')
+                  " style="display:inline;">
+                    <button class="icon" v-tooltip="'cancel reservation'" @click="unreserveUser(props.row)">
+                      <i class="fas fa-calendar-check" style="color:green;"></i>
+                    </button>
+                  </span>
+
+                  <span v-if="
+                    (props.row.dayStatus != 'hired') &&
+                    (props.row.dayStatus != 'assigned') &&
+                    (props.row.dayStatus != 'not requested')"
+                    style="display:inline;">
+                    <button class="icon" v-tooltip="'not use this staff today'" @click="notRequestUser(props.row)">
+                      <i class="fas fa-calendar-times"></i>
+                    </button>
+                  </span>
+
+                  <span v-if="
+                    (props.row.dayStatus == 'not requested')
+                  " style="display:inline;">
+                    <button class="icon" v-tooltip="'cancel cancellation'" @click="cancelNotRequestUser(props.row)">
+                      <i class="fas fa-calendar-times" style="color:red;"></i>
+                    </button>
+                  </span>
+              </span>
+
+              <span v-else-if="props.column.field == 'fullName'">
+                <router-link :to="'/users/' + props.row.userId">
+                  {{props.row.fullName}}
+                </router-link>
+              </span>
+              <span v-else-if="props.column.field == 'delete'">
+
+                <button class="icon" v-if="!props.row.showTrash" v-tooltip="'delete instance'" @click="showTrash(props)">
+                  <i class="fas fa-times ml-2 mr-2"></i>
+                </button>
+
+                <button class="icon" v-if="props.row.showTrash" v-tooltip="'cancel'" @click="hideTrash(props)">
+                  <i class="fas fa-times ml-2 mr-2"></i>
+                </button>
+
+                <button class="icon" v-if="props.row.showTrash" v-tooltip="'delete instance'" @click="deleteUser(props.row)">
+                  <i class="fas fa-trash ml-2 mr-2"></i>
+                </button>
+              </span>
+              <span v-else-if="props.column.field == 'requestedJob.title'">
+                <span v-if="props.row.requestedJob && props.row.requestedJob.title">
+                   {{props.row.requestedJob.title}}
+                </span>
+              </span>
+              <span v-else>
+                <!-- {{props.formattedRow[props.column.field]}} -->
               </span>
             </template>
           </vue-good-table>
@@ -137,6 +386,7 @@
                 </span>
               </span>
               <div>
+                
                 <button class="btn btn__outlined mb-2 mr-5" @click="exportStaff(shift)">export</button>
                 <button class="btn btn__icon" @click="expand(shift)" v-if="shift.collapse"><i class="fas fa-chevron-up"></i></button>
                 <button class="btn btn__icon" @click="collapse(shift)" v-if="!shift.collapse"><i class="fas fa-chevron-down"></i></button>
@@ -144,7 +394,7 @@
             </div>
             <transition name="fade">
               <div v-if="shift.collapse == true">
-                <div class="pt-2">
+                <div class="pt-2 mb-3">
                   <h4 v-if="shift.name">{{shift.name}}</h4>
                   <!-- <p v-if="shift.position.title">{{shift.position.title}}, 
                     <span v-if="shift.startTime" class="ml-2"> {{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}</span> - 
@@ -152,7 +402,23 @@
                   </p> -->
 
                   <button class="btn btn__flat chip mt-1">{{orderedPlacedUsers(shift).length}} / {{shift.staff}}</button>
+
+                  <button class="btn btn__flat chip mt-1 ml-2" style="color:green; border-color:green;">{{confirmedPlacedUsers(shift).length}}</button>
                 </div>
+
+                <div>
+                <textarea :id="shift" cols="30" rows="2" v-model="shift.newMessage"></textarea>
+                <div class="flex justify-flex-end">
+                  <button class="btn btn__outlined mb-3 mt-3" @click="messageShift(shift)" :disabled="!shift.newMessage">send message
+                    <transition name="fade">
+                      <span class="ml-2" v-if="performingRequest7">
+                      <i class="fa fa-spinner fa-spin"></i>
+                      </span>
+                    </transition>
+                  </button>
+                </div>
+              </div>
+
                 <div class="pt-3" v-if="orderedUsers.length >= 1">
                   <v-select
                     label="fullName" 
@@ -168,9 +434,9 @@
                 </div>
                 <div class="pt-3">
                   <vue-good-table
-                    @on-selected-rows-change="selectAll"
                     :columns="columns2"
-                    id="shift.id"
+                    :id="shift.id"
+                    :ref="shift.id"
                     :rows="orderedPlacedUsers(shift)"
                      :select-options="{
                       enabled: true,
@@ -178,109 +444,172 @@
                     }"
                     >
                     <div slot="selected-row-actions">
-                      <button class="btn btn__small btn__flat" @click="lockAll()">Lock All <i class="ml-2 fas fa-lock-alt"></i></button>
+                      <button class="btn btn__small btn__flat" @click="lockAll(shift)">Lock All <i class="fas fa-lock-alt"></i></button>
                     </div>
                     <template slot="table-row" slot-scope="props">
-                      <span v-if="props.column.field == 'extras'">
+                      <!-- <span v-if="props.column.field == 'extras'">
                         <span v-if="(props.row)">
-                            <span v-for="u in filteredInfo(props.row)">
-                              <span v-if="u.blacklist && u.blacklist.length >=1">
-                                <v-popover>
-                                  <i class="fas fa-exclamation-triangle ml-2 mr-2" style="color:red;"></i>
-                                  <template slot="popover">
-                                  <span v-for="z in u.blacklist">{{z.title}}</span>
-                                </template>
-                                </v-popover>
-                              </span>
+                          <span v-for="u in filteredInfo(props.row)" style="display:flex; justify-content: space-evenly;">
+
+                            <span v-if="u.blacklist && u.blacklist.length >=1">
+                              <v-popover>
+                                <i class="fas fa-exclamation-triangle ml-2 mr-2" style="color:red;"></i>
+                                <template slot="popover">
+                                <span v-for="z in u.blacklist">{{z.title}}</span>
+                              </template>
+                              </v-popover>
+                            </span>
+
+                            <span v-if="u && u.skills && u.skills.length > 0" style="display:inline;">
+                            <v-popover>
+                                <i class="fad fa-briefcase ml-2 mr-2"></i>
+                                <template slot="popover">
+                                <span v-for="z in u.skills">{{z.title}} / </span>
+                              </template>
+                              </v-popover>
+                            </span>
+
+                            <span v-if="u && u.fullyVaccinated && u.fullyVaccinated == `yes`" style="display:inline;">
+                              <i class="fas fa-syringe ml-2 mr-2" style="color: green;"></i>
+                            </span>
+
+
+                          </span>
+                        </span>
+                      </span> -->
+  <!--                   </span> -->
+                      <!-- <span v-else-if="props.column.field == 'jobs'">
+                        <span v-if="(props.row)">
+                          <span v-for="u in filteredInfo(props.row)">
+                            <span v-if="u && u.skills && u.skills.length > 0" style="display:inline;">
+                              <v-popover>
+                                <i class="fad fa-briefcase"></i>
+                                <template slot="popover">
+                                <span v-for="z in u.skills">{{z.title}} / </span>
+                              </template>
+                              </v-popover>
                             </span>
                           </span>
                         </span>
                       </span>
-                      <span v-else-if="props.column.field == 'created'">
-                <span v-if="props.row.created">{{formatDate(props.row.created)}}</span>
-              </span>
+                      <span v-else-if="props.column.field == 'vaccinated'">
+                        <span v-if="(props.row)">
+                          <span v-for="u in filteredInfo(props.row)">
+                            <span v-if="u && u.vaccinated">
+                              <i class="fas fa-syringe" style="color: green;"></i>
+                            </span>
+                          </span>
+                        </span>
+                      </span> -->
+              
+                      <span v-if="props.column.field == 'created'">
+                        <span v-if="props.row.created">{{formatDate(props.row.created)}}</span>
+                      </span>
+
+                      <span v-if="props.column.field == 'phone'">
+                        <span v-if="props.row.phone">
+                          <a :href="'sms:' + props.row.phone">{{props.row.phone}}</a>
+                        </span>
+                      </span>
+
+
                       <span v-else-if="props.column.field == 'reservations'">
-                  <span v-if="
-                    (props.row.dayStatus != 'hired') &&
-                    (props.row.dayStatus != 'assigned') &&
-                    (props.row.dayStatus != 'not requested')
-                  " style="display:inline; margin-right: 1.5rem;">
-                    <button class="icon" @click="reserveUser(props.row)" v-tooltip="'reserve user'">
-                      <i class="far fa-calendar ml-2 mr-2"></i>
-                    </button>
-                  </span>
-                  <span v-if="
-                    (props.row.dayStatus == 'hired' || props.row.dayStatus == 'assigned')
-                  " style="display:inline;">
-                    <button class="icon" v-tooltip="'cancel reservation'" @click="unreserveUser(props.row)">
-                      <i class="fas fa-calendar-check ml-2 mr-2" style="color:green;"></i>
-                    </button>
-                  </span>
+                      <span v-if="
+                        (props.row.dayStatus != 'hired') &&
+                        (props.row.dayStatus != 'assigned') &&
+                        (props.row.dayStatus != 'not requested')
+                      " style="display:inline; margin-right: 1.5rem;">
+                        <button class="icon" @click="reserveUser(props.row)" v-tooltip="'reserve user'">
+                          <i class="far fa-calendar ml-2 mr-2"></i>
+                        </button>
+                      </span>
+                      <span v-if="
+                        (props.row.dayStatus == 'hired' || props.row.dayStatus == 'assigned')
+                      " style="display:inline;">
+                        <button class="icon" v-tooltip="'cancel reservation'" @click="unreserveUser(props.row)">
+                          <i class="fas fa-calendar-check ml-2 mr-2" style="color:green;"></i>
+                        </button>
+                      </span>
 
-                  <span v-if="
-                    (props.row.dayStatus != 'hired') &&
-                    (props.row.dayStatus != 'assigned') &&
-                    (props.row.dayStatus != 'not requested')"
-                    style="display:inline;">
-                    <button class="icon" v-tooltip="'not use this staff today'" @click="notRequestUser(props.row)">
-                      <i class="fas fa-calendar-times ml-2 mr-2"></i>
-                    </button>
-                  </span>
+                      <span v-if="
+                        (props.row.dayStatus != 'hired') &&
+                        (props.row.dayStatus != 'assigned') &&
+                        (props.row.dayStatus != 'not requested')"
+                        style="display:inline;">
+                        <button class="icon" v-tooltip="'not use this staff today'" @click="notRequestUser(props.row)">
+                          <i class="fas fa-calendar-times ml-2 mr-2"></i>
+                        </button>
+                      </span>
 
-                  <span v-if="
-                    (props.row.dayStatus == 'not requested')
-                  " style="display:inline;">
-                    <button class="icon" v-tooltip="'cancel cancellation'" @click="cancelNotRequestUser(props.row)">
-                      <i class="fas fa-calendar-times ml-2 mr-2" style="color:red;"></i>
-                    </button>
-                  </span>
-              </span>
+                      <span v-if="
+                        (props.row.dayStatus == 'not requested')
+                      " style="display:inline;">
+                        <button class="icon" v-tooltip="'cancel cancellation'" @click="cancelNotRequestUser(props.row)">
+                          <i class="fas fa-calendar-times ml-2 mr-2" style="color:red;"></i>
+                        </button>
+                      </span>
 
-              <span v-else-if="props.column.field == 'fullName'">
-                <router-link :to="'/users/' + props.row.userId">
-                  {{props.row.fullName}}
-                </router-link>
-              </span>
-              <span v-else-if="props.column.field == 'notes'">
-                <button class="icon" v-if="props.row.note" v-tooltip="props.row.note">
-                  <i class="far fa-sticky-note ml-2 mr-2"></i>
-                </button>
-              </span>
-              <span v-else-if="props.column.field == 'delete'">
-
-                <button v-if="props.row.dayStatus == 'hired' && props.row.status != 'assigned'" class="icon" v-tooltip="'lock shift'" @click="lockShift(props, shift)" style="display:inline;">
+                        <button v-if="props.row.dayStatus == 'hired' && props.row.status != 'assigned' && props.row.status != 'spinning'" class="icon" v-tooltip="'lock shift'" @click="lockShift(props, shift)" style="display:inline;">
                           <i class="fas fa-lock-open-alt ml-2 mr-2"></i>
                         </button>
+                      
 
-                        <button class="icon" v-if="props.row.dayStatus == 'hired' && props.row.status == 'assigned'" style="display:inline;">
+                      
+                        <span class="icon" v-if="props.row.status == 'spinning'">
+                        <i class="fa fa-spinner fa-spin ml-2 mr-2"></i>
+                        </span>
+                      
+                      
+                        <button class="icon" v-if="props.row.dayStatus == 'hired' && props.row.status == 'assigned'" style="display:inline;" @click="unlock(props, shift)">
                           <i class="fas fa-lock-alt ml-2 mr-2"></i>
                         </button>
-
-                        <button v-if="props.row.status == 'placed'" class="icon ml-4" v-tooltip="'remove'" @click="removePlacement(props.row)">
-                          <i class="fas fa-times ml-2 mr-2"></i>
-                        </button>
-
-                        <button v-if="props.row.status == 'assigned'" class="icon ml-4" v-tooltip="'remove'" @click="removeAssignment(props, shift)">
-                          <i class="fas fa-times ml-2 mr-2"></i>
-                        </button>
-              </span>
                       
-                      <span v-else>
-                        {{props.formattedRow[props.column.field]}}
+                    </span>
+
+                    <span v-else-if="props.column.field == 'confirmed'">
+                      <button v-if="!props.row.confirmed" class="icon" v-tooltip="'confirm'" @click="confirmPlacement(props)">
+                        <i class="fas fa-check ml-2 mr-2" style="opacity: 0.3;"></i>
+                      </button>
+                      <button v-if="props.row.confirmed" class="icon" v-tooltip="'unconfirm'" @click="unConfirmPlacement(props)">
+                        <i class="fas fa-check ml-2 mr-2" style="color:green"></i>
+                      </button>
+                    </span>
+
+                    <span v-else-if="props.column.field == 'fullName'">
+                      <router-link :to="'/users/' + props.row.userId">
+                        {{props.row.fullName}}
+                      </router-link>
+                    </span>
+                    <span v-else-if="props.column.field == 'notes'">
+                      <button class="icon" v-if="props.row.note" v-tooltip="props.row.note">
+                        <i class="far fa-sticky-note ml-2 mr-2"></i>
+                      </button>
+                    </span>
+                    <span v-else-if="props.column.field == 'delete'">
+                      <button v-if="props.row.status == 'placed'" class="icon" v-tooltip="'remove'" @click="removePlacement(props.row)">
+                        <i class="fas fa-times ml-2 mr-2"></i>
+                      </button>
+
+                      <button v-if="props.row.status == 'assigned'" class="icon" v-tooltip="'remove'" @click="removeAssignment(props, shift)">
+                        <i class="fas fa-times ml-2 mr-2"></i>
+                      </button>
+                    </span>
+                      <span v-else-if="props.column.field == 'requestedJob.title'">
+                        <span v-if="props.row.requestedJob && props.row.requestedJob.title">
+                           {{props.row.requestedJob.title}}
+                        </span>
                       </span>
+                      <!-- <span v-else>
+                        {{props.formattedRow[props.column.field]}}
+                      </span> -->
                     </template>
                   </vue-good-table>
                 </div>
               </div>
             </transition>
-
           </div>
-
-            
         </div>
-        
       </div>
-      
     </div>
   </div>
 </template>
@@ -290,6 +619,7 @@ import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import * as moment from 'moment'
 import router from '@/router'
+import algoliasearch from 'algoliasearch/lite';
 import ExportService from "@/services/ExportService"
 const fb = require('../../firebaseConfig.js')
 
@@ -297,31 +627,49 @@ export default {
   name: 'eventplacement',
   data() {
     return {
+      performingRequest: false,
+      performingRequest7: false,
+      searchClient: algoliasearch(
+        '0T1SIY6Y1V',
+        'f03dc899fbdd294d6797791724cdb402',
+      ),
       columns: [
+        {
+          label: 'Name',
+          field: 'fullName',
+        },
+        {
+          label: 'Signed Up',
+          field: 'created',
+          sortable: false,
+        },
+        // {
+        //   label: '',
+        //   field: 'days',
+        // },
+        {
+          label: 'Job',
+          field: 'requestedJob.title',
+          tdClass: 'text-center',
+        },
+        // {
+        //   label: '',
+        //   field: 'jobs',
+        //   tdClass: 'text-center',
+        //   sortable: false,
+        // },
         {
           label: '',
           field: 'extras',
           tdClass: 'text-center',
           sortable: false,
         },
-        {
-          label: 'Name',
-          field: 'fullName',
-        },
-        {
-          label: 'Signed Up',
-          field: 'created',
-          sortable: false,
-        },
-        {
-          label: '',
-          field: 'days',
-        },
-        {
-          label: 'Job',
-          field: 'requestedJob.title',
-          tdClass: 'text-center',
-        },
+        // {
+        //   label: '',
+        //   field: 'vaccinated',
+        //   tdClass: 'text-center',
+        //   sortable: false,
+        // },
         {
           label: '',
           field: 'notes',
@@ -331,30 +679,25 @@ export default {
         {
           label: '',
           field: 'reservations',
+          tdClass: 'text-center',
           sortable: false,
         },
         
         {
           label: '',
           field: 'delete',
-          tdClass: 'text-left',
+          tdClass: 'text-center',
           sortable: false,
         },
       ],
-      columns2: [
-        // {
-        //   label: '',
-        //   field: 'extras',
-        //   tdClass: 'text-center',
-        //   sortable: false,
-        // },
+      columnsD: [
         {
           label: 'Name',
           field: 'fullName',
         },
         {
-          label: 'Signed Up',
-          field: 'created',
+          label: 'Dropped',
+          field: 'dropped',
           sortable: false,
         },
         {
@@ -368,9 +711,63 @@ export default {
           sortable: false,
           tdClass: 'text-center',
         },
+        // {
+        //   label: '',
+        //   field: 'reservations',
+        //   tdClass: 'text-center',
+        //   sortable: false,
+        // },
+        
+        // {
+        //   label: '',
+        //   field: 'delete',
+        //   tdClass: 'text-center',
+        //   sortable: false,
+        // },
+      ],
+      columns2: [
+        {
+          label: 'Name',
+          field: 'fullName',
+        },
+        {
+          label: 'Phone',
+          field: 'phone',
+          sortable: false,
+        },
+        {
+          label: 'Job',
+          field: 'requestedJob.title',
+          tdClass: 'text-center',
+        },
+        // {
+        //   label: '',
+        //   field: 'jobs',
+        //   tdClass: 'text-center',
+        //   sortable: false,
+        // },
+        // {
+        //   label: '',
+        //   field: 'extras',
+        //   tdClass: 'text-center',
+        //   sortable: false,
+        // },
+        // {
+        //   label: '',
+        //   field: 'notes',
+        //   sortable: false,
+        //   tdClass: 'text-center',
+        // },
         {
           label: '',
           field: 'reservations',
+          tdClass: 'text-center',
+          tdClass: 'text-center',
+          sortable: false,
+        },
+        {
+          label: '',
+          field: 'confirmed',
           tdClass: 'text-center',
           sortable: false,
         },
@@ -389,23 +786,23 @@ export default {
   },
   created () {
     this.$store.dispatch("getEventPlacementFromId", this.$route.params.id)
-    this.$store.dispatch("getUserAvailabilityState", this.$route.params.id)
     if (!this.users || this.users.length < 1) {
       this.$store.dispatch("getUsers")
     }
   },
-  watch: {
-    '$route' (to) {
-      this.$store.dispatch("getEventPlacementFromId", this.$route.params.id)
-    }
-  },
-  // mounted() {
-  //   if (!this.users || this.users.length < 1) {
-  //     this.$store.dispatch("getUsers")
+  // watch: {
+  //   '$route' (to) {
+  //     this.$store.dispatch("getEventPlacementFromId", this.$route.params.id)
   //   }
   // },
+  mounted() {
+    // if (!this.users || this.users.length < 1) {
+    //   this.$store.dispatch("getUsers")
+    // }
+    this.$store.dispatch("getUserAvailabilityState", this.$route.params.id)
+  },
   computed: {
-    ...mapState(['eventUsers', 'eventShifts', 'eventInfo', 'users']),
+    ...mapState(['eventUsers', 'eventShifts', 'eventInfo', 'users', 'eventDrops', 'userProfile']),
     event() {
       return this.eventInfo 
     },
@@ -423,15 +820,86 @@ export default {
     },
   },
   methods: {
-    lockAll(params) {
-      console.log(params)
-      console.log(params.selectedRows)
+    // selectAll(params) {
+    //   params.selectedRows.forEach((item) => {
+    //     console.log(item);
+    //   })
+    // },
+
+    messageShift(shift) {
+      this.performingRequest7 = true
+      let payload = {
+        shift: shift,
+        staff: this.orderedPlacedUsers(shift),
+        message: shift.newMessage,
+        from: (this.userProfile.twilioNumber || null)
+      }
+      this.$store.dispatch('updateShiftStaff', payload)
+      setTimeout(() => {
+        this.performingRequest7 = false;
+        shift.newMessage = ''
+      }, 2000)
     },
-    selectAll(params) {
-      params.selectedRows.forEach((item) => {
-        console.log(item);
+    // updateShiftStaff({ commit }, payload) {
+    //   console.log(payload)
+    //   fb.userDaysCollection.where("event", "==", payload.id).onSnapshot(querySnapshot => {
+    //     querySnapshot.forEach(doc => {
+    //       let message = {
+    //         phone: doc.data().phone || null,
+    //         name: doc.data().fullName,
+    //         userId: doc.data().userId,
+    //         // email: doc.data().email || null,
+    //         message: payload.updateMessage,
+    //         event: payload
+    //       }
+    //     })
+    //     fb.smsUpdatesCollection.add(message)
+    //   })
+    //   fb.eventsCollection.doc(payload.id).update({
+    //     updateStaffSent: fb.firestore.FieldValue.serverTimestamp()
+    //   })
+    // },
+    addUser(item) {
+      console.log(item)
+      this.performingRequest = true;
+      let dateObj = new Date(this.event.startDate);
+      let month = dateObj.getUTCMonth() + 1;
+      let day = dateObj.getUTCDate();
+      let year = dateObj.getUTCFullYear();
+      let newdate = month + "/" + day + "/" + year;
+
+      fb.userDaysCollection.add({
+        userId: item.objectID,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        phone: item.phone,
+        day: this.event.startDate,
+        dateFormat: newdate,
+        start: this.event.startDate,
+        preferredEvent: this.event.id,
+        status: "available",
+        requestedJob: {},
+        email: item.email,
+        eventSlug: this.event.slug,
+        eventTitle: this.event.title,
+        fullName: item.firstName + ' ' + item.lastName,
+
+      }).then(
+        doc => {
+          fb.userDaysCollection.doc(doc.id).update({
+          created: fb.firestore.FieldValue.serverTimestamp(),
+          id: doc.id, 
+        })
       })
+      setTimeout(() => {
+        this.performingRequest = false;
+        document
+        .querySelectorAll('.ais-SearchBox-input')
+        .forEach((e) => (e.value = ''))
+        document.querySelectorAll('.ais-Hits-item').forEach((e) => e.remove())
+      }, 250)
     },
+
     exportAll() {
       const exportHeaders = [
         "First Name",
@@ -480,12 +948,13 @@ export default {
         exportService.export();
       });
     },
+
+
     exportStaff(shift) {
       console.log(shift)
       const exportHeaders = [
         "Day",
         "Event",
-
         "Position",
         "Start",
         "End",
@@ -493,28 +962,42 @@ export default {
         "Last Name",
         "Phone",
         "Email",
+        "Confirmed",
+        "DOB",
         "Code",
       ];
       const exportItems = [];
       for (var key in this.orderedPlacedUsers2(shift.id)) {
-        exportItems.push([
-          shift.day,
-          shift.event,
-          shift.position.title,
-          shift.startTime,
-          shift.endTime,
-          this.orderedPlacedUsers2(shift.id)[key].firstName,
-          this.orderedPlacedUsers2(shift.id)[key].lastName,
-          this.orderedPlacedUsers2(shift.id)[key].phone,
-          this.orderedPlacedUsers2(shift.id)[key].email,
-          `=REGEXEXTRACT(H2,"....$")`
-        ])
+
+        let uid = this.orderedPlacedUsers2(shift.id)[key].userId
+
+        let confirmed = this.orderedPlacedUsers2(shift.id)[key].confirmed
+
+        fb.usersCollection.doc(uid).get()
+        .then(doc => {
+          console.log(doc.data())
+          exportItems.push([
+            shift.day,
+            shift.event,
+            shift.position.title,
+            shift.startTime,
+            shift.endTime,
+            doc.data().firstName,
+            doc.data().lastName,
+            doc.data().phone,
+            doc.data().email,
+            confirmed,
+            moment(doc.data().dob).format('M/D/YYYY'),
+            `=REGEXEXTRACT(H2,"....$")`
+          ])
+        
+        console.log(exportItems)
+          this.$gapi.getGapiClient().then(gapi => {
+            const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+            exportService.export();
+          });
+        })
       }
-      console.log(exportItems)
-      this.$gapi.getGapiClient().then(gapi => {
-        const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
-        exportService.export();
-      });
     },
     removeAssignment(props, shift) {
       fb.userDaysCollection.doc(props.row.id).update({status: "available", shift: null})
@@ -593,7 +1076,71 @@ export default {
         return user.shift == shift.id && user.day == shift.day
       });
     },
+    confirmedPlacedUsers(shift) {
+      function compare(a, b) {
+        if (a.firstName < b.firstName)
+          return -1;
+        if (a.firstName > b.firstName)
+          return 1;
+        return 0;
+      }
+      return this.filteredPlacedUsers.sort(compare).filter(user => {
+        return user.shift == shift.id && user.confirmed
+      });
+    },
+    lockAll(shift) {
+      let event = this.event
+      // this.$refs[shift.id][0].selectedRows[0].status = "haha"
+      // console.log(this.$refs[shift.id][0].selectedRows)
+      // this.$refs[shift.id][0].selectedRows.forEach(row => {
+      //   this.$store.dispatch("lockTheShift", {
+      //     shift: shift, 
+      //     event: event, 
+      //     row: row
+      //   })
+      // })
+      this.$refs[shift.id][0].selectedRows.forEach(row => {
+        row.status = "spinning"
+      })
+      this.$store.dispatch("lockTheShifts", {
+        event: event,
+        rows: this.$refs[shift.id][0].selectedRows,
+        shift: shift,
+        shiftStart: this.formatAMPM(shift.startTime) ,
+        shiftEnd:this.formatAMPM(shift.endTime)
+      })
+      // this.$refs[shift.id][0].selectedRows = []
+      
+    },
+    confirmPlacement(props) {
+      fb.userDaysCollection.doc(props.row.id).update({confirmed: true})
+      props.row.confirmed = true
+    },
+    unConfirmPlacement(props) {
+      fb.userDaysCollection.doc(props.row.id).update({confirmed: false})
+      props.row.confirmed = false
+    },
+    unlock(props, shift) {
+      props.row.status = "spinning"
+      fb.userDaysCollection.doc(props.row.id).update({status: "placed"})
+      setTimeout(() => {
+        props.row.status = "placed"
+      }, 2000)
+      // fb.assignmentsCollection.where("shiftId", "==", shift.id).where("userId", "==", props.row.userId).get().then(function(querySnapshot) {
+      //   querySnapshot.forEach(doc => {
+      //     console.log(doc.id)
+      //     fb.assignmentsCollection.doc(doc.id).delete()
+      //   })
+      // })
+      // fb.eventStaffCollection.where("event", "==", shift.eventId).where("user", "==", props.row.userId).get().then(function(querySnapshot) {
+      //   querySnapshot.forEach(doc => {
+      //     fb.eventStaffCollection.doc(doc.id).delete()
+      //   })
+      // })
+    },
     lockShift(props, shift) {
+      props.row.status = "spinning"
+
       let event = this.event
       let shiftDay = shift.day
       let dateObj = new Date(shift.day);
@@ -601,37 +1148,20 @@ export default {
       let day = dateObj.getUTCDate();
       let year = dateObj.getUTCFullYear();
       let newdate = month + "/" + day + "/" + year;
-      let shiftStart = this.formatAMPM(shift.startTime)
-      let shiftEnd = this.formatAMPM(shift.endTime)
+      // let shiftStart = this.formatAMPM(shift.startTime)
+      // let shiftEnd = this.formatAMPM(shift.endTime)
 
-      props.row.status = "assigned"
+      this.$store.dispatch("lockAShift", {
+        event: event,
+        row: props.row,
+        shift: shift,
+        shiftStart: this.formatAMPM(shift.startTime) ,
+        shiftEnd:this.formatAMPM(shift.endTime)
+      })
 
-      let assignment = {
-        shiftId: shift.id,
-        userId: props.row.userId,
-        date: newdate,
-        day: shift.day,
-        eventId: shift.eventId,
-        email: props.row.email,
-        firstName: props.row.firstName,
-        lastName: props.row.lastName,
-        phone: props.row.phone,
-        name:  shift.event,
-        fileId: props.row.employeeNumber || props.row.contractorNumber || '123',
-        position: shift.position.title,
-        start: shiftDay + " " + shift.startTime,
-        end: shiftDay + " " + shift.endTime,
-        startTime: shift.startTime,
-        endTime: shift.endTime,
-        eventInfo: event,
-        shiftStart: shiftStart,
-        shiftEnd: shiftEnd,
-        event: event.id,
-        eventName: event.title,
-        slug: event.slug,
-      }
-      console.log(assignment)
-      this.$store.dispatch("lockShift", assignment)
+      
+      // console.log(assignment)
+      // this.$store.dispatch("lockShift", assignment)
     },
     assignShift(shift) {
       let userId = shift.selectedStaff.userId
@@ -665,13 +1195,6 @@ export default {
       fb.userDaysCollection.doc(user.id).update({dayStatus: null})
     },
     filteredInfo(user) {
-      // fb.usersCollection.doc(user.userId).onSnapshot(function(doc) {
-      //   if (doc.exists) {
-      //     console.log("Document data:", doc.data().id);
-      //     return doc.data().id
-      //   }
-      // })
-
       return this.users.filter(member => {
         return member.id == user.userId
       })

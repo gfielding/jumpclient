@@ -21,6 +21,9 @@
     <div class="mb-3">
     	<div class="flex align-center justify-space-between">
 	      <label for="phone">Cell Phone:</label>
+        <a :href="'sms:' + user.phone">
+          <button class="btn btn__small btn__primary btn__flat mb-2">Send Text <i class="fas fa-external-link ml-2"></i></button>
+        </a>
 	      <span v-if="user.phoneVerified == 'approved'" class="caption mb-2">verified <i style="color: green" class="fas fa-check"></i></span>
 	    </div>
       <input type="phone" autocomplete="tel" placeholder="" v-model.trim="user.phone" v-mask="'(###) ###-####'" placeholder="(999) 999-9999" id="phone" readonly />

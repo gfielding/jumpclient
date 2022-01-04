@@ -1,5 +1,5 @@
 <template>
-	<div class="dashboard">
+	<div class="dashboard"  style="width:100%;">
       <div class="flex justify-space-between align-center mb-3" v-if="day">
         <h2>Staff Placements for {{day | moment("dddd, MMMM Do YYYY") }}</h2>
         <div class="flex align-center"> 
@@ -791,7 +791,7 @@ export default {
     formatDate(q) {
       if(q) {
         const postedDate = new Date(q.seconds) * 1000;
-        return moment(postedDate).format('MMMM Do YYYY, hh:mm a')
+        return moment(postedDate).format('MMM Do YYYY, hh:mm a')
       } else {
         return null
       }

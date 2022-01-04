@@ -1,6 +1,12 @@
 .dashboard {
-	min-height: calc(100vh - 20rem);
-  padding-bottom: 6rem;
+	min-height: 100vh;
+  width: calc(100% - 26rem);
+  padding-bottom: 2rem;
+  @include respond(tablet-port) {
+  	padding-bottom: 6rem;
+  	width: 100%;
+  	min-height: calc(100vh - 16rem);
+  }
 	&__container {
 		@include container;
 		&--header {
@@ -13,7 +19,7 @@
 			display: flex;
 			flex-wrap: wrap;
 			justify-content:space-between;
-			@include respond(phone) {
+			@include respond(tablet-port) {
 				flex-wrap: wrap;
 				display: block;
 			}
@@ -23,7 +29,7 @@
 		    background: white;
 		    margin-bottom: 2rem;
 		    border-radius:$radius;
-				@include respond(phone) {
+				@include respond(tablet-port) {
 					width:calc(100% - 3.2rem);
 					padding: 1.6rem;
 				}

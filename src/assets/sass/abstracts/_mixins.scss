@@ -9,10 +9,10 @@
 		max-width:140rem;
 	}
 	@include respond(desktop) {
-		width:90%;
+		width:calc(100% - 4rem);
 	}
 	@include respond(tablet-land) {
-		width:90%;
+		width:calc(100% - 4rem);
 	}
 	@include respond(phone) {
 		padding:1rem;

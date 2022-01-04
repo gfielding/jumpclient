@@ -3,7 +3,10 @@
     <div class="dashboard__container">
       <Loader v-if="!venue" />
       <div class="dashboard__container--header" v-if="venue">
+        <div>
         <h1>{{venue.title}}</h1>
+        Followers: <span class="caption" v-if="venueFollowers">{{venueFollowers.length}}</span>
+        </div>
         <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
       </div>
       <form ref="form" @submit.prevent>
@@ -46,6 +49,10 @@
     					<label for="venueVisibility">Visibile:</label>
     					<input type="checkbox" v-model.trim="venue.visible" id="venueVisibility" class="ml-3" />
     				</div>
+            <div class="mb-3">
+              <label for="venueVisibility">Vaccination Required:</label>
+              <input type="checkbox" v-model.trim="venue.requiredVaccine" id="venueVisibility" class="ml-3" />
+            </div>
             <div class="mb-3" v-if="clients.length >= 1">
               <label for="client">Default Client:</label>
               <v-select
@@ -279,7 +286,7 @@ export default {
     ]
   }),
    computed: {
-    ...mapState(['venueInfo', 'venueEvents', 'clients', 'jobs', 'mgrs']),
+    ...mapState(['venueInfo', 'venueEvents', 'clients', 'jobs', 'mgrs', 'venueFollowers']),
     venue() {
       return this.venueInfo
     },
@@ -446,6 +453,7 @@ export default {
       router.push(url)
     },
     goBack() {
+      this.$store.dispatch('clearVenueState')
       router.go(-1)
     },
   },

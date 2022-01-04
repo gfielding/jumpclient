@@ -19,11 +19,11 @@
           <div>Staff Requested: {{shift.staff}}</div>
         </div>
         <div class="dashboard__container--body--col pt-5">
-          <button class="btn btn__outlined mr-3 mb-3" @click.prevent="exportReportCont">Contractor Payroll<i class="fas fa-external-link ml-3"></i></button>
+          <button class="btn btn__outlined mr-3 mb-3" @click.prevent="exportReportCont">Export Payroll<i class="fas fa-external-link ml-3"></i></button>
           <div class="caption mb-2" v-if="shift.exportedCont">
             Contractors Exported: {{ shift.exportedCont.toDate() | moment("MMMM Do YYYY, h:mm a") }}
           </div>
-          <button class="btn btn__outlined mr-3 mb-3" @click.prevent="exportReportEmp">Employee Payroll<i class="fas fa-external-link ml-3"></i></button>
+          <!-- <button class="btn btn__outlined mr-3 mb-3" @click.prevent="exportReportEmp">Employee Payroll<i class="fas fa-external-link ml-3"></i></button> -->
           <div class="caption mb-2" v-if="shift.exportedEmp">
             Employees Exported: {{ shift.exportedEmp.toDate() | moment("MMMM Do YYYY, h:mm a") }}
           </div>
@@ -31,6 +31,7 @@
           <div class="caption mb-2" v-if="shift.exportedRegister">
             Register Exported: {{ shift.exportedRegister.toDate() | moment("MMMM Do YYYY, h:mm a") }}
           </div>
+          <button class="btn btn__outlined mr-3 mb-3" @click.prevent="exportDetails">Export Details<i class="fas fa-external-link ml-3"></i></button>
           <hr>
           <div>
             <label for="payrollStatus">Payroll Completed:</label>
@@ -40,6 +41,23 @@
       </div>
       <div class="dashboard__container--body" v-if="shift">
         <div class="dashboard__container--body--col max">
+          <div style="max-width: 30rem; margin-bottom: 1rem;">
+          <ais-instant-search :search-client="searchClient" index-name="a_users" >
+            <ais-search-box placeholder="Add a User" />
+            <ais-state-results>
+              <template slot-scope="{ state: { query } }">
+                <ais-hits v-show="query.length > 0">
+                  <template v-slot:item="{ item }">
+                    <div>
+                      <button class="btn btn__icon btn__flat mr-2 mb-2" @click="addUser(item)"><i class="fad fa-plus"></i></button>
+                      <h4 style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</h4 style="display: inline;">
+                    </div>
+                  </template>
+                </ais-hits>
+              </template>
+            </ais-state-results>
+          </ais-instant-search>
+          </div>
           <vue-good-table
             :columns="columns"
             :rows="shiftAssignments"
@@ -185,10 +203,16 @@ import router from '@/router'
 import ExportService from "@/services/ExportService"
 import TimesheetNote from '@/components/Timesheets/TimesheetNote.vue'
 const fb = require('../../firebaseConfig.js')
+import algoliasearch from 'algoliasearch/lite';
+import 'instantsearch.css/themes/satellite-min.css'
 
 export default {
   name: 'shift',
   data: () => ({
+    searchClient: algoliasearch(
+      '0T1SIY6Y1V',
+      'f03dc899fbdd294d6797791724cdb402'
+    ),
     activeItem: null,
     statuses: ['completed', 'arrived late', 'left early', 'no-show', 'client fired', 'terminated' ],
     paystatuses: ['paid', 'paid tips', 'paid hours', 'not paid' ],
@@ -284,6 +308,49 @@ export default {
     ...mapState(['userProfile', 'shift', 'shiftAssignments']),
   },
   methods: {
+    addUser(item) {
+      console.log(item)
+      this.$store.dispatch("addUserToShift", {
+        shift: this.shift,
+        user: item,
+        shiftStart: this.formatAMPM(this.shift.startTime) ,
+        shiftEnd:this.formatAMPM(this.shift.endTime)
+      })
+      document
+        .querySelectorAll('.ais-SearchBox-input')
+        .forEach((e) => (e.value = ''))
+        document.querySelectorAll('.ais-Hits-item').forEach((e) => e.remove())
+        // this.$refs.searchHits.state.hits = []
+    },
+    formatAMPM(date) {
+      if (typeof date === "string") {
+        let [hours, minutes] = date.split(":");
+        let ampm = "AM";
+
+        if (Number(hours) >= 12) {
+          hours = Number(hours) - 12;
+          ampm = "PM";
+        }
+
+        return `${hours}:${minutes} ${ampm}`;
+
+      } else if (date instanceof Date) {
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+
+        let ampm = hours >= 12 ? "PM" : "AM";
+
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+
+        let strTime = hours + ":" + minutes + " " + ampm;
+
+        return strTime;
+      }
+
+      return date;
+    },
     showNote(r) {
       console.log(r)
       this.activeItem = r
@@ -357,6 +424,31 @@ export default {
     goBack() {
       router.go(-1)
     },
+    exportDetails() {
+      this.performingRequest = true
+      const exportHeaders = [
+        "First Name",
+        "Last Name",
+        "Email",
+        "Phone",
+      ];
+      const exportItems = [];
+      for (var key in this.shiftAssignments) {
+        exportItems.push([
+          this.shiftAssignments[key].firstName,
+          this.shiftAssignments[key].lastName,
+          this.shiftAssignments[key].email,
+          this.shiftAssignments[key].phone,
+        ]);
+      }
+      this.$gapi.getGapiClient().then(gapi => {
+        const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+        exportService.export();
+      });
+      setTimeout(() => {
+        this.performingRequest = false
+      }, 2000)
+    },
     exportRegister() {
       this.performingRequest = true
       const exportHeaders = [
@@ -404,7 +496,7 @@ export default {
       ];
       const exportItems = [];
       for (var key in this.shiftAssignments) {
-        if (this.shiftAssignments[key].fileId && this.shiftAssignments[key].fileId.length < 9) {
+        // if (this.shiftAssignments[key].fileId && this.shiftAssignments[key].fileId.length < 9) {
           exportItems.push([
             "1",
             "307",
@@ -449,13 +541,13 @@ export default {
             "1",
             "309",
             this.shiftAssignments[key].fileId,
-            "1",
+            "0",
             this.shiftAssignments[key].mbp,
             "0"
           ]);
-        } else {
-          console.log("no contractors")
-        }
+        // } else {
+        //   console.log("no contractors")
+        // }
       }
       this.$gapi.getGapiClient().then(gapi => {
         const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
@@ -524,7 +616,7 @@ export default {
             "1",
             "309",
             this.shiftAssignments[key].fileId,
-            "1",
+            "0",
             this.shiftAssignments[key].mbp,
             "0"
           ]);

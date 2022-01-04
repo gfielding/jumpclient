@@ -60,6 +60,18 @@ const faqsCollection = db.collection('faqs')
 const oprCollection = db.collection('opr')
 const mgrsCollection = db.collection('mgrs')
 const eventTimesheetNotesCollection = db.collection('eventTimesheetNotes')
+const accountingNotesCollection = db.collection('accountingNotes')
+const coprCollection = db.collection('copr')
+const payHelpCollection = db.collection('payHelp')
+const groupsCollection = db.collection('groups')
+const reviewsCollection = db.collection('reviews')
+const userMessagesCollection = db.collection('userMessages')
+const shiftUpdatesCollection = db.collection('shiftUpdates')
+const groupUpdatesCollection = db.collection('groupUpdates')
+const dropsCollection = db.collection('drops')
+const contactsCollection = db.collection('contacts')
+const contactNotesCollection = db.collection('contactNotes')
+const clientNotesCollection = db.collection('clientNotes')
 
 export {
   db,
@@ -92,11 +104,22 @@ export {
   textsCollection,
   emailsCollection,
   userNotesCollection,
+  userMessagesCollection,
   placementsCollection,
   faqsCollection,
   seriesCollection,
   seriesDaysCollection,
   oprCollection,
-  eventTimesheetNotesCollection,
-  mgrsCollection
+  accountingNotesCollection,
+  mgrsCollection,
+  coprCollection,
+  payHelpCollection,
+  groupsCollection,
+  reviewsCollection,
+  dropsCollection,
+  shiftUpdatesCollection,
+  groupUpdatesCollection,
+  contactsCollection,
+  contactNotesCollection,
+  clientNotesCollection
 }

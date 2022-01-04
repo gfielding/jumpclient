@@ -44,6 +44,10 @@ export default {
         field: 'title',
       },
       {
+        label: 'Followers',
+        field: 'followers',
+      },
+      {
         label: 'City',
         field: 'address.city',
         thClass: 'hidden-small',

@@ -2,8 +2,8 @@
 	<div class="dashboard">
     <div class="dashboard__container">
     	<div class="flex justify-space-between">
-    		<div class="dashboard__container--body--col">
-    			<p>No Preference By Date</p>
+    		<div class="dashboard__container--body--col hidden-small">
+    			<p>Unplaced By Date</p>
 	    		<v-select
 		        class="mt-2"
 		        :options="eventDays"
@@ -13,7 +13,7 @@
 		      </v-select>
 		    </div>
 		    <div class="dashboard__container--body--col">
-		    	<p>By Preferred Event</p>
+		    	<p>By Event</p>
 		      <v-select
 		        class="mt-2"
 		        label="title" 
@@ -22,7 +22,9 @@
 		        @input="setSelectedEvent" 
 		      >
 			      <template #option="{ title, startDate, venue }">
-				      <span>{{ title }} | {{venue.title}} | Starts: {{startDate | moment("ddd, MMM Do YYYY")}}</span>
+			      	<span v-if="title">
+				      	<span>{{ title }} </span>, {{startDate | moment("ddd, MMM Do YYYY")}}</span>
+				      </span>
 				    </template>
 		      </v-select>
 		    </div>

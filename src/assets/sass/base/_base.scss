@@ -67,8 +67,35 @@ hr {
   }
 }
 
+.hidden-large {
+  @include respond(tablet-land) {
+    display:none;
+  }
+  @include respond(desktop) {
+    display:none;
+  }
+  @include respond(tv) {
+    display:none;
+  }
+  @include respond(tablet-port) {
+    display:block;
+  }
+}
+
 .vs--disabled .vs__clear, .vs--disabled .vs__dropdown-toggle, .vs--disabled .vs__open-indicator, .vs--disabled .vs__search, .vs--disabled .vs__selected {
     cursor: not-allowed;
     background-color: transparent !important;
     border:none;
+}
+
+.points {
+  border-radius: 50%;
+  padding: 1rem;
+  line-height: 1;
+  font-weight:900;
+}
+
+.app-wrapper {
+  display:flex;
+  justify-content:flex-end;
 }

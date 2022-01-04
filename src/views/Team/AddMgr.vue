@@ -28,6 +28,20 @@
               </div>
               <input type="email" autocomplete="email" placeholder="" v-model.trim="mgr.email" id="email" />
             </div>
+            <div class="mb-3">
+            <label for="mgrs">Department:</label>
+            <select v-model="mgr.dpt" id="client">
+              <option v-for="d in departments">
+                {{d}}
+              </option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <div class="flex align-center justify-space-between">
+              <label for="title">Title:</label>
+            </div>
+            <input type="text" placeholder="" v-model.trim="mgr.title" id="title" />
+          </div>
             <button class="btn btn__primary mt-2" @click="addMgr()">
               Add Manager
               <transition name="fade">
@@ -53,6 +67,7 @@ export default {
     croppa: {},
     mgr: {},
     performingRequest:false,
+    departments: ['Staffing', 'Support', 'Payroll', 'Accounting', 'HR', 'Operations']
   }),
   methods: {
     

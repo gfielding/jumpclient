@@ -60,7 +60,7 @@ import router from '@/router'
 export default {
   name: 'mgr',
   data: () => ({
-    departments: ['Staffing', 'Support', 'Payroll', 'Accounting', 'HR']
+    departments: ['Staffing', 'Support', 'Payroll', 'Accounting', 'HR', 'Operations']
   }),
   computed: {
     ...mapState(['mgrInfo']),

@@ -27,7 +27,7 @@
                 <span v-if="props.row.created">{{formatDate(props.row.created)}}</span>
               </span>
               <span v-else-if="props.column.field == 'link'">
-                <router-link :to="`/users/` + props.row.userId" target="_blank">
+                <router-link :to="`/users/` + props.row.id" target="_blank">
                   <i class="fas fa-external-link ml-3 mr-3"></i>
                 </router-link>
               </span>
@@ -134,7 +134,11 @@ export default {
       //   field: 'address.state',
       // },
       {
-        label: 'State Wored',
+        label: 'State',
+        field: 'address.state',
+      },
+      {
+        label: 'State Worked',
         field: 'eventInfo.venue.address.state',
       },
     ]

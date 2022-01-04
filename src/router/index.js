@@ -53,38 +53,88 @@ const router = new VueRouter({
         requiresAuth: true
       },
     },
-    // {
-    //   path: '/addseries',
-    //   name: 'addseries',
-    //   component: () => import('../views/Series/AddSeries.vue'),
-    //   meta: {
-    //     requiresAuth: true
-    //   },
-    // },
-    // {
-    //   path: '/series',
-    //   name: 'series',
-    //   component: () => import('../views/Series/Series.vue'),
-    //   meta: {
-    //     requiresAuth: true
-    //   },
-    // },
-    // {
-    //   path: '/series/:id',
-    //   name: 'seriesInfo',
-    //   component: () => import('../views/Series/SeriesInfo.vue'),
-    //   meta: {
-    //     requiresAuth: true
-    //   },
-    // },
-    // {
-    //   path: '/series/:id/days',
-    //   name: 'seriesDaus',
-    //   component: () => import('../views/Series/SeriesDays.vue'),
-    //   meta: {
-    //     requiresAuth: true
-    //   },
-    // },
+    {
+      path: '/reports',
+      name: 'userReports',
+      component: () => import('../views/Reports/UserReports.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/groups',
+      name: 'groups',
+      component: () => import('../views/Groups/Groups.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/addgroup',
+      name: 'addgroup',
+      component: () => import('../views/Groups/AddGroup.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/groups/grouphome', redirect: '/groups/:id',
+      name: 'groupHome',
+      component: () => import('../views/Groups/GroupHome.vue'),
+      meta: {
+        requiresAuth: true
+      },
+      children: [
+        {
+          path: '/groups/:id',
+          name: 'group',
+          component: () => import('../views/Groups/Group.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/groups/:id/edit',
+          name: 'groupEdit',
+          component: () => import('../views/Groups/EditGroup.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/groups/:id/messages',
+          name: 'groupMessages',
+          component: () => import('../views/Groups/GroupMessages.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+      ]
+    },
+    {
+      path: '/payroll/help',
+      name: 'payrollHelp',
+      component: () => import('../views/PayrollHelp/PayrollHelp.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/accounting/events',
+      name: 'accountingEvents',
+      component: () => import('../views/Accounting/Events.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/accounting/events/:id',
+      name: 'accountingEvent',
+      component: () => import('../views/Accounting/Event.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
     {
       path: '/addevent',
       name: 'addevent',
@@ -222,9 +272,88 @@ const router = new VueRouter({
       },
     },
     {
-      path: '/clients/:id',
-      name: 'client',
-      component: () => import('../views/Clients/Client.vue'),
+      path: '/clients/clienthome', redirect: '/clients/:id',
+      name: 'clientHome',
+      component: () => import('../views/Clients/ClientHome.vue'),
+      meta: {
+        requiresAuth: true
+      },
+      children: [
+        {
+          path: '/clients/:id',
+          name: 'client',
+          component: () => import('../views/Clients/Client.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/clients/:id/summary',
+          name: 'clientSummary',
+          component: () => import('../views/Clients/ClientSummary.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/clients/:id/contacts',
+          name: 'clientContacts',
+          component: () => import('../views/Clients/ClientContacts.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/clients/:id/notes',
+          name: 'clientNotes',
+          component: () => import('../views/Clients/ClientNotes.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/clients/:id/files',
+          name: 'clientFiles',
+          component: () => import('../views/Clients/ClientFiles.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/clients/:id/venues',
+          name: 'clientVenues',
+          component: () => import('../views/Clients/ClientVenues.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+      ]
+    },
+    {
+      path: '/addcontact',
+      name: 'addcontact',
+      component: () => import('../views/Contacts/AddContact.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/contacts',
+      name: 'contacts',
+      component: () => import('../views/Contacts/Contacts.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/contacts/:id',
+      name: 'contact',
+      component: () => import('../views/Contacts/Contact.vue'),
       meta: {
         requiresAuth: true
       },

@@ -137,88 +137,8 @@ export default {
       ),
     };
   },
-  // data: () => ({
-  //   searchClient: algoliasearch(
-  //       'B1G2GM9NG0',
-  //       'aadef574be1f9252bb48d4ea09b5cfe5'
-  //     ),
-  //   search: '',
-  //   empStatuses: ['applied', 'payroll invitation', 'signed offer letter', 'hired', 'not-hired', 'on-hold', 'terminated'],
-  //   columns: [
-  //     {
-  //       field: 'link',
-  //       sortable: false,
-  //     },
-  //     {
-  //       label: 'First Name',
-  //       field: 'firstName',
-  //     },
-  //     {
-  //       label: 'Last Name',
-  //       field: 'lastName',
-  //     },
-  //     {
-  //       label: 'Vax',
-  //       field: 'vax',
-  //     },
-  //     {
-  //       label: 'Status',
-  //       field: 'status',
-  //     },
-  //     {
-  //       label: 'Emp Status',
-  //       field: 'empstatus',
-  //       width: '150px',
-  //     },
-  //     {
-  //       label: 'Pay ID',
-  //       field: 'employeeNumber',
-  //     },
-  //     {
-  //       label: 'City',
-  //       field: 'address.city',
-  //     },
-  //     {
-  //       label: 'State',
-  //       field: 'address.state',
-  //     },
-  //     {
-  //       label: 'Email',
-  //       field: 'email',
-  //     },
-  //     {
-  //       label: 'Phone',
-  //       field: 'phone',
-  //     },
-  //     {
-  //       label: 'Created',
-  //       field: 'created',
-  //     }
-  //   ]
-  // }),
   computed: {
-    // ...mapState(['users']),
-    // searchText() {
-    //   if (this.search) {
-    //     return this.search.toLowerCase().trim()
-    //   }
-    //   if (!this.search || this.search == null) {
-    //     return null
-    //   }
-    // },
-    // filteredInfo(user) {
-    //   return this.availableUsers.filter(member => {
-    //     return member.id == user.userId
-    //   })
-    // },
-    // filteredUsers() {
-    //   if (!this.searchText) {return this.users}
-    //   else {
-    //   return this.users.filter(user => {
-    //     return (user.firstName.toLowerCase().includes(this.searchText) || user.lastName.toLowerCase().includes(this.searchText) || user.address.city.toLowerCase().includes(this.searchText))
-    //   })
-    //   }
-    // },
+    ...mapState(['userProfile']),
   },
   components: {
     Loader,

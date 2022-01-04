@@ -16,6 +16,7 @@
           <button class="btn btn__outlined mr-3">Timesheets</button>
           </router-link>
           <button class="btn btn__outlined mr-3" @click="shifts()">Event Shifts</button>
+          <button class="btn btn__outlined mr-3" @click="placements()">Event placements</button>
           <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
         </div>
       </div>
@@ -38,6 +39,11 @@
     					<label for="eventPublished">Published:</label>
     					<input type="checkbox" v-model.trim="event.published" id="eventPublished" class="ml-3" />
     				</div>
+
+            <div class="mb-3">
+              <label for="venueVisibility">Vaccination Required:</label>
+              <input type="checkbox" v-model.trim="event.requiredVaccine" id="venueVisibility" class="ml-3" />
+            </div>
 
             <div class="mb-3" v-if="venues.length > 1">
               <label for="venue">Venue: (updates on change)</label>
@@ -269,10 +275,24 @@
               <vue-editor id="notes" v-model="event.venue.notes"></vue-editor>
             </div>
           </div>
+        </div>
+        <hr>
+        <div class="dashboard__container--body">
+          <div class="dashboard__container--body--col">
+            <h2>Last Message</h2>
+            <div class="mb-3 mt-1">
+            </div>
+            <div v-if="event.updateMessage">{{event.updateMessage}}</div>
+            <div class="mt-2">
+              <span v-if="event.updateStaffSent" class="caption">
+                Last Sent: {{event.updateStaffSent.toDate() | moment("MMMM Do YYYY, h:mm a") }}
+              </span>
+            </div>
+          </div>
           <div class="dashboard__container--body--col">
             <div class="mb-3">
               <h3>Send Message to Update Staff:</h3>
-              <textarea name="updateMessage" id="updateMessage" cols="30" rows="4" v-model="event.updateMessage"></textarea>
+              <textarea name="updateMessage" id="updateMessage" cols="20" rows="4" v-model="event.updateMessage"></textarea>
             </div>
             <button class="btn btn__outlined btn__large" @click="updateStaff()">
               Update Staff
@@ -282,13 +302,12 @@
                 </span>
               </transition>
             </button>
-            <div class="mt-2">
-              <span v-if="event.updateStaffSent" class="caption">
-              Last Sent: {{event.updateStaffSent.toDate() | moment("MMMM Do YYYY, h:mm a") }}
-            </span>
-            </div>
           </div>
-          <div class="dashboard__container--body--col">
+        </div>
+        <div class="dashboard__container--body">
+          
+          
+          <!-- <div class="dashboard__container--body--col">
             <div class="mb-3">
               <div class="mb-3">
                 <label for="payDate">Pay Date:</label>
@@ -299,7 +318,7 @@
                 <input type="checkbox" v-model.trim="event.paid" id="payProcessed" class="ml-3" />
               </div>
             </div>
-          </div>
+          </div> -->
 
           <div class="dashboard__container--body--col" style="background: transparent;">
             <div class="flex justify-space-between">
@@ -473,6 +492,10 @@ export default {
     },
     shifts() {
       let url = `/events/` + this.$route.params.id + `/shifts`
+      router.push(url)
+    },
+    placements() {
+      let url = `/placements/event/` + this.$route.params.id
       router.push(url)
     },
     deleteEvent() {

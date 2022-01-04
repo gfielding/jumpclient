@@ -46,6 +46,10 @@
 		    					<label for="venueVisibility">Visible:</label>
 	      					<input type="checkbox" v-model.trim="place.visible" id="venueVisibility" class="ml-3" />
 		    				</div>
+                <div class="mb-3">
+                  <label for="venueVisibility">Vaccination Required:</label>
+                  <input type="checkbox" v-model.trim="place.requiredVaccine" id="venueVisibility" class="ml-3" />
+                </div>
                 <div class="mb-3" v-if="clients.length >= 1">
                   <label for="client">Default Client:</label>
                   <v-select
@@ -65,15 +69,15 @@
                       v-model="place.job"
                       >
                     </v-select>
-              <label for="client">Select Managers:</label>
-              <v-select
-                class="mt-2"
-                label="name" 
-                multiple
-                :options="mgrs"
-                v-model="place.mgrs"
-                >
-              </v-select>
+                    <label for="client">Select Managers:</label>
+                    <v-select
+                      class="mt-2"
+                      label="name" 
+                      multiple
+                      :options="mgrs"
+                      v-model="place.mgrs"
+                      >
+                    </v-select>
                 </div>
 	    				</div>
 	    			</transition>

@@ -2,9 +2,9 @@
 	<div>
     <h2>Ask to Complete Payroll</h2>
 		<div class="mb-3 mt-1">
-			 <span v-if="user.updatePayrollReminderSent" class="caption">
+			 <!-- <span v-if="user.updatePayrollReminderSent" class="caption">
         Last Sent: {{user.updatePayrollReminderSent.toDate() | moment("MMMM Do YYYY, h:mm a") }}
-        </span>
+        </span> -->
 		</div>
 		 <div>
       <button class="btn btn__outlined" @click="onTextPayroll">

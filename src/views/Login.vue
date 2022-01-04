@@ -24,9 +24,9 @@
               <button class="btn btn__small btn__flat" @click="showPassword()">
                 Forgot Password
               </button>
-              <button class="btn btn__small btn__flat" @click="toggleForm()">
+              <!-- <button class="btn btn__small btn__flat" @click="toggleForm()">
                 Create an Account
-              </button>
+              </button> -->
             </div>
           </form>
           <form v-else @submit.prevent>
@@ -80,7 +80,7 @@ export default {
         email: '',
         password: ''
       },
-      showLoginForm: false,
+      showLoginForm: true,
       showPasswordReset: false
     }
   },

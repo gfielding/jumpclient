@@ -2,9 +2,9 @@
 	<div>
     <h2>Ask to Update Availability</h2>
 		<div class="mb-3 mt-1">
-			 <span v-if="user.updateAvailabilityReminderSent" class="caption">
+			 <!-- <span v-if="user.updateAvailabilityReminderSent" class="caption">
         Last Sent: {{user.updateAvailabilityReminderSent.toDate() | moment("MMMM Do YYYY, h:mm a") }}
-        </span>
+        </span> -->
 		</div>
 		 <div>
       <button class="btn btn__outlined" @click="onTextAvailability">

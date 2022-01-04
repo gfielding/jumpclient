@@ -14,6 +14,7 @@ import {GmapMarker} from 'vue2-google-maps/src/components/marker'
 import GmapCluster from 'vue2-google-maps/dist/components/cluster'
 import VueMask from 'v-mask'
 import VueGapi from 'vue-gapi'
+import StarRating from 'vue-star-rating'
 import VueClipboard from 'vue-clipboard2'
 import 'vue-good-table/dist/vue-good-table.css'
 import InstantSearch from 'vue-instantsearch';
@@ -22,17 +23,19 @@ import './assets/sass/main.scss'
 const fb = require('./firebaseConfig.js')
 
 Vue.component('v-select', vSelect)
-Vue.use(VueGoodTablePlugin);
-Vue.use(InstantSearch);
-Vue.use(Croppa);
-Vue.use(VueMask);
+Vue.use(VueGoodTablePlugin)
+Vue.use(InstantSearch)
+Vue.use(Croppa)
+Vue.use(VueMask)
+Vue.use(StarRating)
 Vue.use(VTooltip)
 Vue.use(VueClipboard)
 Vue.use(vClickOutside)
 Vue.use(require('vue-moment'))
 Vue.use(VueGoogleMaps, {
   load: {
-    key: 'AIzaSyBvT8-4gdOJ8CRHv2mD_MAohqD8vo0To10',
+    // key: 'AIzaSyBvT8-4gdOJ8CRHv2mD_MAohqD8vo0To10',
+    key: 'AIzaSyA2Zh7agJPBfwU_VX4rHYazUqrFBWEfuuU',
     libraries: 'places' // necessary for places input
   }
 })

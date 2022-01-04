@@ -20,7 +20,7 @@
             :pagination-options="{
               enabled: true,
               mode: 'records',
-              perPage: 30,
+              perPage: 20,
             }"
             @on-row-click="onRowClick"
           >
