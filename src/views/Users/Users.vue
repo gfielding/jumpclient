@@ -3,9 +3,9 @@
     <div class="dashboard__container">
       <div class="dashboard__container--header flex justify-space-between align-center">
         <h1>Users</h1>
-        <div class="flex align-center"> 
+        <!-- <div class="flex align-center"> 
           <button class="btn btn__outlined mb-3" @click="exportAll()">export all</button>
-        </div>
+        </div> -->
       </div>
 
       <ais-instant-search :search-client="searchClient" index-name="a_users" >
@@ -25,95 +25,171 @@
         </template>
       </ais-state-results>
     </ais-instant-search>
-
-
- <!--  <ais-instant-search>
-      <ais-index
-      app-id="0T1SIY6Y1V"
-      api-key="f03dc899fbdd294d6797791724cdb402"
-      index-name="a_users"
-    >
-      <ais-search-box></ais-search-box>
-      <ais-results>
-        <template slot-scope="{ result }">
-          <p>
-            <ais-highlight :result="result" attribute-name="name"></ais-highlight>
-          </p>
-        </template>
-      </ais-results>
-    </ais-index>
-  </ais-instant-search> -->
-      <!-- <div class="dashboard__container--body">
-        <Loader v-if="!users || users.length == 0" />
-        <div class="flex pt-3" v-if="users && users.length >= 1" style="width:100%;"> 
-          <vue-good-table
-            :columns="columns"
-            :rows="users"
-            :search-options="{
-              enabled: true,
-              placeholder: 'Search this table',
-            }"
-            :pagination-options="{
-              enabled: true,
-              mode: 'records',
-              perPage: 20,
-            }"
+    <hr>
+    <div class="dashboard__container--body pt-3" v-if="states">
+        <div class="dashboard__container--body--col">
+          <label for="client">Users By State (CA, FL, TX):</label>
+            <v-select
+              class="mt-2"
+              label="states" 
+              taggable
+              v-model="state"
+              @input="setSelectedState" 
+              >
+            </v-select>
+        </div>
+        <div class="dashboard__container--body--col">
+          <label for="client">Users By City:</label>
+            <v-select
+              class="mt-2"
+              label="states" 
+              taggable
+              v-model="city"
+              @input="setSelectedCity" 
+              >
+            </v-select>
+        </div>
+      </div>
+      <Loader v-if="state && stateUsers.length == 0" />
+      <div class="dashboard__container--body" v-if="stateUsers.length > 0">
+        <span class="flex align-center justify-space-between" style="width:100%;">
+          <h3>Users by State</h3>
+          <button class="btn btn__outlined mb-3 mt-3" @click="exportState()">export by State</button>
+        </span>
+        <vue-good-table
+          :columns="columns"
+          :rows="stateUsers"
+          styleClass="vgt-table striped"
+          :search-options="{
+            enabled: true,
+            placeholder: 'Search this table',
+          }"
+          :pagination-options="{
+            enabled: true,
+            mode: 'records',
+            perPage: 10,
+          }"
           >
           <template slot="table-row" slot-scope="props">
-            <span v-if="props.column.field == 'created'">
-              <span>{{formatDate(props.row.created)}}</span>
-            </span>
-            <span v-else-if="props.column.field == 'link'">
+            <span v-if="props.column.field == 'link'">
                 <router-link :to="`/users/` + props.row.id" target="_blank">
                   <i class="fas fa-external-link ml-3 mr-3"></i>
                 </router-link>
               </span>
-             <span v-else-if="props.column.field == 'vax'">
-              <i class="fas fa-syringe" style="color:#5cb85c;" v-if="props.row.fullyVaccinated == 'yes'"></i>
-              <i class="fas fa-syringe" style="color:#d9534f;" v-if="props.row.fullyVaccinated == 'no'"></i>
-              <i class="fas fa-syringe" v-if="!props.row.fullyVaccinated || props.row.fullyVaccinated == null" style="opacity:0.25;"></i>
-             </span>
-             <span v-else-if="props.column.field == 'status'">
-              <span v-if="props.row.contractorStatus != 'hired as employee'">
-                <span style="display:inline;">
-                  <i class="fas fa-hammer" v-if="props.row.contractorStatus == 'applied' || !props.row.contractorStatus" style="margin-right: 2.5rem; opacity:0.25;"></i>
-                </span>
-                <span  style="display:inline;">
-                  <i class="fas fa-hammer" v-if="props.row.contractorStatus == 'payroll invitation' || props.row.contractorStatus == 'on-hold'" style="color:#f0ad4e; margin-right: 2.5rem;"></i>
-                </span>
-                <span  style="display:inline;">
-                  <i class="fas fa-hammer" v-if="props.row.contractorStatus == 'hired contractor'" style="color:#5cb85c; margin-right: 2.5rem;"></i>
-                </span>
-                <span  style="display:inline;">
-                  <i class="fas fa-hammer" v-if="props.row.contractorStatus == 'terminated' || props.row.contractorStatus == 'not-hired'" style="color:#d9534f; margin-right: 2.5rem;"></i>
-                </span>
+              <span v-else-if="props.column.field == 'created'">
+                <span v-if="props.row.created">{{formatDate(props.row.created)}}</span>
               </span>
-
-      
-
-    
-             </span>
-
-
-             <span v-else-if="props.column.field == 'empstatus'">
-                <v-select
-                  label="status" 
-                  :options="empStatuses"
-                  v-model="props.row.employeeStatus"
-                  @input="onSheetEdit(props.row)"
-                  :clearable=false
-                  >
-                </v-select>
+            <span v-else-if="props.column.field == 'points'">
+              <span v-if="props.row.points" style="display:inline; color:#0d3fd1;" class="ml-2 mr-2">
+                {{props.row.points}}
               </span>
-
-
-             <span v-else>
-                {{props.formattedRow[props.column.field]}}
+            </span>
+            <span v-else-if="props.column.field == 'rating'">
+              <span v-if="props.row.rating" style="display:inline; color:#c5950d;" class="ml-2 mr-2">
+                {{props.row.rating}}
               </span>
+            </span>
+            <span v-else-if="props.column.field == 'blacklist'">
+              <span v-if="props.row.blacklist && props.row.blacklist.length >=1" style="display:inline;">
+                <v-popover>
+                  <i class="fas fa-exclamation-triangle ml-2 mr-2" style="color:red;"></i>
+                  <template slot="popover">
+                  <span v-for="z in props.row.blacklist">{{z.title}}</span>
+                </template>
+                </v-popover>
+              </span>
+            </span>
+            <span v-else-if="props.column.field == 'skills'">
+              <span v-if="props.row.skills && props.row.skills.length > 0" style="display:inline;">
+              <v-popover>
+                  <i class="fad fa-briefcase ml-2 mr-2"></i>
+                  <template slot="popover">
+                  <span v-for="z in props.row.skills">{{z.title}} / </span>
+                </template>
+                </v-popover>
+              </span>
+            </span>
+            <span v-else-if="props.column.field == 'addtogroup'">
+              <v-select :reduce="group => group.title" :options="groups" label="title" taggable multiple push-tags v-model="props.row.groups" @input="updateUser(props.row)" />
+            </span>
+            <span v-else-if="props.column.field == 'vax'">
+              <span v-if="props.row.fullyVaccinated && props.row.fullyVaccinated == `yes`" style="display:inline;">
+                <i class="fas fa-syringe ml-2 mr-2" style="color: green;"></i>
+              </span>
+            </span>
           </template>
-          </vue-good-table>
-        </div>
-      </div> -->
+        </vue-good-table>
+      </div>
+      <div class="dashboard__container--body" v-if="cityUsers.length > 0">
+        <Loader v-if="city && cityUsers.length == 0" />
+        <span class="flex align-center justify-space-between" style="width:100%;">
+          <h3>Users by City</h3>
+          <button class="btn btn__outlined mb-3 mt-3" @click="exportCity()">export by City</button>
+        </span>
+        <vue-good-table
+          :columns="columns"
+          :rows="cityUsers"
+          styleClass="vgt-table striped"
+          :search-options="{
+            enabled: true,
+            placeholder: 'Search this table',
+          }"
+          :pagination-options="{
+            enabled: true,
+            mode: 'records',
+            perPage: 10,
+          }"
+          >
+          <template slot="table-row" slot-scope="props">
+            <span v-if="props.column.field == 'link'">
+                <router-link :to="`/users/` + props.row.id" target="_blank">
+                  <i class="fas fa-external-link ml-3 mr-3"></i>
+                </router-link>
+              </span>
+              <span v-else-if="props.column.field == 'created'">
+                <span v-if="props.row.created">{{formatDate(props.row.created)}}</span>
+              </span>
+            <span v-else-if="props.column.field == 'points'">
+              <span v-if="props.row.points" style="display:inline; color:#0d3fd1;" class="ml-2 mr-2">
+                {{props.row.points}}
+              </span>
+            </span>
+            <span v-else-if="props.column.field == 'rating'">
+              <span v-if="props.row.rating" style="display:inline; color:#c5950d;" class="ml-2 mr-2">
+                {{props.row.rating}}
+              </span>
+            </span>
+            <span v-else-if="props.column.field == 'blacklist'">
+              <span v-if="props.row.blacklist && props.row.blacklist.length >=1" style="display:inline;">
+                <v-popover>
+                  <i class="fas fa-exclamation-triangle ml-2 mr-2" style="color:red;"></i>
+                  <template slot="popover">
+                  <span v-for="z in props.row.blacklist">{{z.title}}</span>
+                </template>
+                </v-popover>
+              </span>
+            </span>
+            <span v-else-if="props.column.field == 'skills'">
+              <span v-if="props.row.skills && props.row.skills.length > 0" style="display:inline;">
+              <v-popover>
+                  <i class="fad fa-briefcase ml-2 mr-2"></i>
+                  <template slot="popover">
+                  <span v-for="z in props.row.skills">{{z.title}} / </span>
+                </template>
+                </v-popover>
+              </span>
+            </span>
+            <span v-else-if="props.column.field == 'addtogroup'">
+              <v-select :reduce="group => group.title" :options="groups" label="title" taggable multiple push-tags v-model="props.row.groups" @input="updateUser(props.row)" />
+            </span>
+            <span v-else-if="props.column.field == 'vax'">
+              <span v-if="props.row.fullyVaccinated && props.row.fullyVaccinated == `yes`" style="display:inline;">
+                <i class="fas fa-syringe ml-2 mr-2" style="color: green;"></i>
+              </span>
+            </span>
+          </template>
+        </vue-good-table>
+      </div>
     </div>
   </div>
 </template>
@@ -135,42 +211,154 @@ export default {
         '0T1SIY6Y1V',
         'f03dc899fbdd294d6797791724cdb402'
       ),
+      states:['CA', 'CO', 'FL'],
+      state: '',
+      city: '',
+      columns: [
+        {
+          label: 'Link',
+          field: 'link',
+        },
+        {
+          label: 'Created',
+          field: 'created',
+        },
+
+        {
+          label: 'First',
+          field: 'firstName',
+        },
+        {
+          label: 'Last',
+          field: 'lastName',
+        },
+        {
+          label: 'Phone',
+          field: 'phone',
+        },
+        {
+          label: 'Email',
+          field: 'email',
+        },
+        {
+          label: 'Groups',
+          field: 'addtogroup',
+          width: '200px'
+        },
+        {
+          label: 'Points',
+          field: 'points',
+        },
+        // {
+        //   label: 'Rating',
+        //   field: 'rating',
+        // },
+        {
+          label: 'Skills',
+          field: 'skills',
+        },
+        {
+          label: 'Blacklist',
+          field: 'blacklist',
+        },
+        {
+          label: 'Vaxed',
+          field: 'vax',
+        },
+        {
+          label: 'city',
+          field: 'address.city',
+        },
+        {
+          label: 'state',
+          field: 'address.state',
+        },
+      ]
     };
   },
   computed: {
-    ...mapState(['userProfile']),
+    ...mapState(['userProfile', 'stateUsers', 'cityUsers', 'groups']),
   },
   components: {
     Loader,
   },
+  // created () {
+  //   if (!this.users || this.users.length < 1) {
+  //     this.$store.dispatch("getUsers")
+  //   }
+  // },
   created () {
-    // if (!this.users || this.users.length < 1) {
-    //   this.$store.dispatch("getUsers")
-    // }
+    if (!this.groups || this.groups.length < 1) {
+      this.$store.dispatch("getGroups")
+    }
   },
   methods: {
-    onSheetEdit(row) {
-      if (row.employeeStatus == `hired` || row.employeeStatus == 'signed offer letter') {
-        row.employeeNumber = row.id.slice(0,10)
-      }
-      this.$store.dispatch('updateUser', row)
+    updateUser(row) {
+      let user = row
+      let userGroups = (row.groups || null)
+      console.log(userGroups)
+      this.$store.dispatch('updateGroups', {
+        groups: userGroups,
+        user: user
+      })
     },
-    exportAll() {
+    setSelectedState(value) {
+      console.log(value)
+      console.log(value)
+      this.$store.dispatch("getUsersByState", value)
+    },
+    setSelectedCity(value) {
+      console.log(value)
+      console.log(value)
+      this.$store.dispatch("getUsersByCity", value)
+    },
+    exportCity() {
       const exportHeaders = [
         "First Name",
         "Last Name",
         "Email",
         "Phone",
+        "Points",
+        "City",
         "State"
       ]
       const exportItems = [];
-      for (var key in this.users) {
+      for (var key in this.cityUsers) {
         exportItems.push([
-          this.users[key].firstName,
-          this.users[key].lastName,
-          this.users[key].email,
-          this.users[key].phone,
-          this.availableUsers[key].address.state || "",
+          this.cityUsers[key].firstName,
+          this.cityUsers[key].lastName,
+          this.cityUsers[key].email,
+          this.cityUsers[key].phone,
+          this.cityUsers[key].points,
+          this.cityUsers[key].address.city,
+          this.cityUsers[key].address.state,
+        ])
+      }
+      this.$gapi.getGapiClient().then(gapi => {
+        const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+        exportService.export();
+      });
+    },
+    exportState() {
+      const exportHeaders = [
+        "First Name",
+        "Last Name",
+        "Email",
+        "Phone",
+        "Points",
+        "City",
+        "State"
+      ]
+      const exportItems = [];
+      for (var key in this.stateUsers) {
+        exportItems.push([
+          this.stateUsers[key].firstName,
+          this.stateUsers[key].lastName,
+          this.stateUsers[key].email,
+          this.stateUsers[key].phone,
+          this.stateUsers[key].points,
+          this.stateUsers[key].address.city,
+          this.stateUsers[key].address.state,
         ])
       }
       this.$gapi.getGapiClient().then(gapi => {
@@ -193,12 +381,10 @@ export default {
     },
   },
   beforeDestroy () {
-    this.columns = []
-    delete this.columns
     this.search = ''
     delete this.search
-    this.$store.dispatch("clearUsersState")
-    console.log(this)
+    this.$store.dispatch("clearUsersByState")
+    this.$store.dispatch("clearUsersByCity")
   }
 }
 </script>

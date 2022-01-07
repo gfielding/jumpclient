@@ -243,6 +243,11 @@
                   timesheets <i class="fas fa-chevron-right"></i>
                 </router-link>
               </div>
+              <div class="mb-3">
+                <router-link :to="{name: 'accountReferrals'}">
+                  referrals <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
             </div>
           </div>
         </div>

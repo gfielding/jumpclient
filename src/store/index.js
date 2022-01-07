@@ -71,7 +71,12 @@ const store = new Vuex.Store({
     contactInfo: {},
     contactNotes: [],
     clientNotes: [],
-    clientVenues: []
+    clientVenues: [],
+    referrals: [],
+    stateUsers: [],
+    cityUsers: [],
+    appUsers: [],
+    empUsers: []
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -215,6 +220,64 @@ const store = new Vuex.Store({
     },
 
 
+    /*USER REPORTS*/
+    getUserReports({ commit, state }) {
+       fb.usersCollection.onSnapshot(querySnapshot => {
+        let usersArray = []
+        let appUsers = []
+        let empUsers = []
+        querySnapshot.forEach(doc => {
+          let user = doc.data()
+          usersArray.push(user)
+          if (doc.data().fcm_token) {
+            appUsers.push(user)
+          }
+          if (doc.data().employeeNumber) {
+            empUsers.push(user)
+          }
+        })
+        commit('setUsers', usersArray)
+        commit('setAppUsers', appUsers)
+        commit('setEmpUsers', empUsers)
+      })
+    },
+    clearUserReports({ commit }) {
+      commit('setUsersByState', [])
+      commit('setUsers', [])
+      commit('setAppUsers', [])
+      commit('setEmpUsers', [])
+    },
+
+    getUsersByState({ commit }, payload) {
+      console.log(payload)
+      fb.usersCollection.where("address.state", "==", payload).orderBy('created', 'desc').onSnapshot(querySnapshot => {
+        let usersArray = []
+        querySnapshot.forEach(doc => {
+          let user = doc.data()
+          usersArray.push(user)
+        })
+        commit('setUsersByState', usersArray)
+      })
+    },
+    clearUsersByState({ commit }) {
+      commit('setUsersByState', [])
+    },
+    getUsersByCity({ commit }, payload) {
+      console.log(payload)
+      fb.usersCollection.where("address.city", "==", payload).orderBy('created', 'desc').onSnapshot(querySnapshot => {
+        let usersArray = []
+        querySnapshot.forEach(doc => {
+          let user = doc.data()
+          usersArray.push(user)
+        })
+        commit('setUsersByCity', usersArray)
+      })
+    },
+    clearUsersByCity({ commit }) {
+      commit('setUsersByCity', [])
+    },
+
+
     /*User Messages*/
     sendUserMessage({ commit }, payload) {
       console.log(payload)
@@ -241,6 +304,37 @@ const store = new Vuex.Store({
         commit('setUserMessages', userMessagesArray)
       })
     },
+
+    /*REFERRALS*/
+    getReferrals({ commit }, payload) {
+      fb.referralsCollection.orderBy('created', 'desc').onSnapshot(querySnapshot => {
+        let referralsArray = []
+
+        querySnapshot.forEach(doc => {
+          let message = doc.data()
+          message.id = doc.id
+          referralsArray.push(message)
+        })
+        commit('setReferrals', referralsArray)
+      })
+    },
+
+    updateReferral({ commit }, payload) {
+      fb.referralsCollection.doc(payload.id).update({
+        status: payload.status,
+        statusChange: fb.firestore.FieldValue.serverTimestamp(),
+      })
+    },
+    lockReferral({ commit }, payload) {
+      fb.referralsCollection.doc(payload).update({ locked: true })
+    },
+    unlockReferral({ commit }, payload) {
+      fb.referralsCollection.doc(payload).update({ locked: false })
+    },
+    clearReferralsState({ commit }) {
+      commit('setReferrals', [])
+    },
+    
 
     /*Groups*/
     addGroup({ commit }, payload) {
@@ -1830,7 +1924,6 @@ const store = new Vuex.Store({
     //   })
     // },
     updateTimesheet({ commit }, payload) {
-      console.log(payload)
       fb.assignmentsCollection.doc(payload.id).update(payload)
     },
     getOprs({ commit }, payload) {
@@ -2215,6 +2308,41 @@ const store = new Vuex.Store({
         state.groups = val
       } else {
         state.groups = []
+      }
+    },
+    setReferrals(state, val) {
+      if (val) {
+        state.referrals = val
+      } else {
+        state.referrals = []
+      }
+    },
+    setUsersByState(state, val) {
+      if (val) {
+        state.stateUsers = val
+      } else {
+        state.stateUsers = []
+      }
+    },
+    setUsersByCity(state, val) {
+      if (val) {
+        state.cityUsers = val
+      } else {
+        state.cityUsers = []
+      }
+    },
+    setAppUsers(state, val) {
+      if (val) {
+        state.appUsers = val
+      } else {
+        state.appUsers = []
+      }
+    },
+    setEmpUsers(state, val) {
+      if (val) {
+        state.empUsers = val
+      } else {
+        state.empUsers = []
       }
     },
   },

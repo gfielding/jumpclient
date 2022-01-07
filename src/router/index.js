@@ -136,6 +136,14 @@ const router = new VueRouter({
       },
     },
     {
+      path: '/accounting/referrals',
+      name: 'accountReferrals',
+      component: () => import('../views/Accounting/Referrals.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
       path: '/addevent',
       name: 'addevent',
       component: () => import('../views/Events/AddEvent.vue'),

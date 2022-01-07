@@ -72,6 +72,7 @@ const dropsCollection = db.collection('drops')
 const contactsCollection = db.collection('contacts')
 const contactNotesCollection = db.collection('contactNotes')
 const clientNotesCollection = db.collection('clientNotes')
+const referralsCollection = db.collection('referrals')
 
 export {
   db,
@@ -121,5 +122,6 @@ export {
   groupUpdatesCollection,
   contactsCollection,
   contactNotesCollection,
-  clientNotesCollection
+  clientNotesCollection,
+  referralsCollection
 }

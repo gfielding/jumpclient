@@ -24,7 +24,9 @@
           <div class="flex justify-space-between">
             <span>
               <div><h3>{{contact.name}}</h3>
-                <div>{{contact.title}}</div>
+                <div v-if="contact.title">{{contact.title}}</div>
+                <div v-if="contact.location">{{contact.location}}</div>
+                <div v-if="contact.venue">{{contact.venue.title}}</div>
                 <div>Cell: {{contact.phone}} / Office: {{contact.phone2}}</div>
                 <div>{{contact.email}}</div>
               </div>
@@ -83,8 +85,9 @@ export default {
       router.push(url)
     },
     pushContact(value) {
-      console.log(value)
-      this.client.contacts.push(value)
+      let client = this.clientInfo
+      console.log(client)
+      client.contacts.push(value)
       this.selected = null
       setTimeout(() => {
         this.updateClient()

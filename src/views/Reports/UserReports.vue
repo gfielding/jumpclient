@@ -2,7 +2,7 @@
   <div class="dashboard">
     <div class="dashboard__container">
       <div class="dashboard__container--header flex justify-space-between align-center">
-        <h1>User Reports</h1>
+        <h1>Reports</h1>
         <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
       </div>
       <Loader v-if="!users || (users && users.length == 0)" />
@@ -15,7 +15,12 @@
       		<h3>App Users</h3>
       		{{appUsers.length}}
       	</div>
+      	<div class="dashboard__container--body--col" v-if="users && empUsers">
+      		<h3>Oboarded Employees</h3>
+      		{{empUsers.length}}
+      	</div>
       </div>
+      
     </div>
   </div>
 	
@@ -34,10 +39,24 @@ export default {
   data() {
     return {
       performingRequest: false,
+      states:['CA', 'CO', 'FL'],
+      state: '',
       columns: [
         {
-          label: 'Name',
-          field: 'fullName',
+          label: 'First',
+          field: 'firstName',
+        },
+        {
+          label: 'Last',
+          field: 'lastName',
+        },
+        {
+          label: 'Phone',
+          field: 'phone',
+        },
+        {
+          label: 'Email',
+          field: 'email',
         },
       ]
     }
@@ -47,16 +66,24 @@ export default {
   },
   created () {
     if (!this.users || this.users.length < 1) {
-      this.$store.dispatch("getUsers")
+      this.$store.dispatch("getUserReports")
     }
   },
   computed: {
-    ...mapState(['users', 'userProfile']),
-    appUsers () {
-      return this.users.filter(user => {
-        return user.fcm_token
-      })
+    ...mapState(['users', 'userProfile', 'stateUsers', 'appUsers', 'empUsers']),
+    inStateUsers() {
+    	return this.stateUsers.length > 0
     },
+    // appUsers () {
+    //   return this.users.filter(user => {
+    //     return user.fcm_token
+    //   })
+    // },
+    // empUsers () {
+    //   return this.users.filter(user => {
+    //     return user.employeeNumber
+    //   })
+    // },
     // filteredPlacedUsers () {
     //   return this.eventUsers.filter(user => {
     //     return ((user.status == 'placed') || (user.status == 'assigned'))
@@ -64,12 +91,18 @@ export default {
     // },
   },
   methods: {
+  	// setSelectedState(value) {
+  	// 	console.log(value[0])
+  	// 	this.$store.dispatch("getUsersByState", value[0])
+  	// },
   	goBack() {
       router.go(-1)
     },
   },
   beforeDestroy () {
     this.$store.dispatch("clearUsersState")
+    this.$store.dispatch("clearUserReports")
+
     console.log(this)
   }
 }

@@ -121,6 +121,11 @@
                   timesheets <i class="fas fa-chevron-right"></i>
                 </router-link>
               </div>
+              <div class="mb-3">
+                <router-link :to="{name: 'accountReferrals'}">
+                  referrals <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
             </div>
           </div>
 
@@ -137,7 +142,7 @@
 
       </div>
       <div class="nav__menu--item">
-            © MVP Event Productions, 2021
+            © MVP Event Productions, 2022
           </div>
     </div>
 </template>
