@@ -65,6 +65,10 @@ export default {
         field: 'company.title',
       },
       {
+        label: 'Venue',
+        field: 'venue.title',
+      },
+      {
         label: 'Phone',
         field: 'phone',
       },
@@ -98,7 +102,7 @@ export default {
     formatDate(q) {
       if(q) {
         const postedDate = new Date(q.seconds) * 1000;
-        return moment(postedDate).format('MMMM Do YYYY, hh:mm a')
+        return moment(postedDate).format('MMM Do YYYY')
       } else {
         return null
       }

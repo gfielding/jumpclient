@@ -76,7 +76,8 @@ const store = new Vuex.Store({
     stateUsers: [],
     cityUsers: [],
     appUsers: [],
-    empUsers: []
+    empUsers: [],
+    clientContacts: []
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -1114,7 +1115,18 @@ const store = new Vuex.Store({
         })
       })
       store.dispatch('getClientNotes', payload)
+      store.dispatch('getClientContacts', payload)
       store.dispatch('getClientVenues', payload)
+    },
+    getClientContacts({ commit }, payload) {
+      fb.contactsCollection.where("company.id", "==", payload).onSnapshot(querySnapshot => {
+        let contactsArray = []
+        querySnapshot.forEach(doc => {
+          let contact = doc.data()
+          contactsArray.push(contact)
+        })
+        commit('setClientContacts', contactsArray)
+      })
     },
     getClientVenues({ commit }, payload) {
       console.log(payload)
@@ -1130,22 +1142,13 @@ const store = new Vuex.Store({
           // console.log(ven)
           if (ven.client && ven.client.length >= 1) {
             let clients = ven.client
-            console.log(clients)
               clients.forEach(client => {
               if (client.id == payload) {
                 newArray.push(ven)
               }
             })
           }
-          
-          
-          // if ((ven.client && ven.client.length >= 1) && (ven.client[i] && ven.client[i].id == payload)) {
-          //   newArray.push(ven)
-          // } else {
-
-          // }
         })
-        console.log(newArray)
         commit('setClientVenues', newArray)
       })
     },
@@ -1164,6 +1167,7 @@ const store = new Vuex.Store({
       commit('setClientInfo', {})
       commit('setClientNotes', [])
       commit('setClientVenues', [])
+      commit('setClientContacts', [])
     },
     clearClientsState({ commit }) {
       commit('setClients', [])
@@ -2301,6 +2305,13 @@ const store = new Vuex.Store({
         state.clientVenues = val
       } else {
         state.clientVenues = []
+      }
+    },
+    setClientContacts(state, val) {
+      if (val) {
+        state.clientContacts = val
+      } else {
+        state.clientContacts = []
       }
     },
     setGroups(state, val) {

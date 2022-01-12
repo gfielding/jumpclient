@@ -79,6 +79,7 @@ import Loader from '@/components/Loader.vue'
 import router from '@/router'
 import ReferralNote from '@/components/Timesheets/ReferralNote.vue'
 import * as moment from 'moment'
+const fb = require('../../firebaseConfig.js')
 
 export default {
   name: 'accountReferrals',

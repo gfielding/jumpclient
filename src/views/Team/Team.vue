@@ -81,5 +81,8 @@ export default {
       router.push(url)
     }
   },
+  beforeDestroy () {
+    this.$store.dispatch('clearMgrsState')
+  }
 }
 </script>

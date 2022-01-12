@@ -73,6 +73,7 @@ const contactsCollection = db.collection('contacts')
 const contactNotesCollection = db.collection('contactNotes')
 const clientNotesCollection = db.collection('clientNotes')
 const referralsCollection = db.collection('referrals')
+const idtriggerCollection = db.collection('idtrigger')
 
 export {
   db,
@@ -123,5 +124,6 @@ export {
   contactsCollection,
   contactNotesCollection,
   clientNotesCollection,
-  referralsCollection
+  referralsCollection,
+  idtriggerCollection
 }

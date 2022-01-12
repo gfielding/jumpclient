@@ -1,6 +1,6 @@
 <template>
   <div class="pt-3">
-      <div class="dashboard__container--body" v-if="isAdmin && isUser">
+      <div class="dashboard__container--body" v-if="isAdmin || isOwner || isUser">
         
         <div class="dashboard__container--body--col" v-if="groupUsers && groupUsers.length > 0">
           <div class="mb-3">
@@ -79,6 +79,9 @@ export default {
   }),
   computed: {
     ...mapState(['group', 'currentUser', 'userProfile', 'groupMessages', 'groupUsers']),
+    isOwner: function() {
+      return this.group.owner == this.currentUser.uid
+    },
     isAdmin: function() {
       if (this.group && this.group.admins && this.group.admins.length > 0) {
         let array = this.group.admins
