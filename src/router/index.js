@@ -112,6 +112,40 @@ const router = new VueRouter({
       ]
     },
     {
+      path: '/followersgroups/grouphome', redirect: '/followergroups/:id',
+      name: 'followersGroupHome',
+      component: () => import('../views/Groups/FollowersGroupHome.vue'),
+      meta: {
+        requiresAuth: true
+      },
+      children: [
+        {
+          path: '/followersgroups/:id',
+          name: 'followersGroup',
+          component: () => import('../views/Groups/FollowersGroup.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/followersgroups/:id/edit',
+          name: 'followersGroupEdit',
+          component: () => import('../views/Groups/EditFollowersGroup.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/followersgroups/:id/messages',
+          name: 'followersGroupMessages',
+          component: () => import('../views/Groups/FollowersGroupMessages.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+      ]
+    },
+    {
       path: '/payroll/help',
       name: 'payrollHelp',
       component: () => import('../views/PayrollHelp/PayrollHelp.vue'),
@@ -235,6 +269,14 @@ const router = new VueRouter({
       path: '/team/:id',
       name: 'mgr',
       component: () => import('../views/Team/Mgr.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/pagetext',
+      name: 'pageText',
+      component: () => import('../views/PageText/PageText.vue'),
       meta: {
         requiresAuth: true
       },
@@ -390,49 +432,49 @@ const router = new VueRouter({
         requiresAuth: true
       },
     },
-    
     {
-      path: '/placements', redirect: '/placements/day',
-      name: 'placementshome',
-      component: () => import('../views/Placements/PlacementsHome.vue'),
+      path: '/eventplacements',
+      name: 'eventplacements',
+      component: () => import('../views/Placements/ByEvent.vue'),
       meta: {
         requiresAuth: true
       },
-      children: [
-        {
-          path: '/placements/day',
-          name: 'placements',
-          component: () => import('../views/Placements/Placements.vue'),
-          meta: {
-            requiresAuth: true
-          },
-        },
-        {
-          path: '/placements/day/:id',
-          name: 'day',
-          component: () => import(/* webpackChunkName: "day" */ '../views/Placements/Day.vue'),
-          meta: {
-            requiresAuth: true
-          }
-        },
-        // {
-        //   path: '/eventplacements',
-        //   name: 'eventplacements',
-        //   component: () => import('../views/Placements/ByEvent.vue'),
-        //   meta: {
-        //     requiresAuth: true
-        //   },
-        // },
-        {
-          path: '/placements/event/:id',
-          name: 'eventplacement',
-          component: () => import('../views/Placements/Event.vue'),
-          meta: {
-            requiresAuth: true
-          },
-        },
-      ]
     },
+    {
+      path: '/eventplacements/:id',
+      name: 'eventplacement',
+      component: () => import('../views/Placements/Event.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    // {
+    //   path: '/placements', redirect: '/placements/day',
+    //   name: 'placementshome',
+    //   component: () => import('../views/Placements/PlacementsHome.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    //   children: [
+    //     {
+    //       path: '/placements/day',
+    //       name: 'placements',
+    //       component: () => import('../views/Placements/Placements.vue'),
+    //       meta: {
+    //         requiresAuth: true
+    //       },
+    //     },
+    //     {
+    //       path: '/placements/day/:id',
+    //       name: 'day',
+    //       component: () => import(/* webpackChunkName: "day" */ '../views/Placements/Day.vue'),
+    //       meta: {
+    //         requiresAuth: true
+    //       }
+    //     },
+        
+    //   ]
+    // },
     {
       path: '/timesheets',
       name: 'shifts',

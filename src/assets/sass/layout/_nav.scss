@@ -160,3 +160,26 @@
 	width: 100% !important;
 	cursor: pointer !important;
 }	
+
+  .dropdown {
+  position: relative;
+  display: inline-block;
+  color: #d0d0d0;
+  transition: 0.2s ease all;
+}
+
+.dropdown-content {
+  display: none;
+  position: relative;
+  background-color: $primary;
+  width:100%;
+  transition: 0.2s ease all;
+  border-radius:$radius;
+  margin-top:0.75rem;
+  padding:1rem 0.5rem 0 0.5rem;
+}
+.dropdown:hover .dropdown-content {
+  display: block;
+  padding-top: 1rem;
+  transition: 0.2s ease all;
+}

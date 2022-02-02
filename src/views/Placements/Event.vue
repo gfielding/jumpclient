@@ -1,12 +1,21 @@
 f<template>
-	<div class="dashboard" style="width:100%;">
-    <div>
+	<div class="dashboard">
+    <div class="dashboard__container">
       <div class="dashboard__container--header mb-3" v-if="event">
         <div>
           <h2 v-if="event &&event.title">Staff Placements for {{event.title}}</h2>
           <span v-if="event && event.venue && event.venue.title">
           <p>{{event.venue.title}}<span v-if="event.venue && event.venue.address"> | {{event.venue.address.city}}, {{event.venue.address.state}}</span> | {{event.startDate | moment("ddd, MMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("ddd, MMM Do YYYY") }}</span></p>
         </span> 
+        </div>
+        <span>
+          <button class="btn btn__outlined mr-3" @click="exportAll()">export all</button>
+          <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
+        </span>
+      </div>
+      <div class="dashboard__container--body mb-3" v-if="event && event.days && event.days.length > 1">
+        <div>
+          <button v-for="(day, index) in event.days" key="index" class="btn mr-3" v-bind:class="{ 'btn__dark': activeDay == day, 'btn__outlined': activeDay != day }" @click="setActiveDay(day)">{{day}}</button>
         </div>
       </div>
       
@@ -49,7 +58,14 @@ f<template>
               }"
             >
             <template slot="table-row" slot-scope="props">
-              <span v-if="props.column.field == 'created'">
+
+              <span v-if="props.column.field == 'preview'">
+                <i class="far fa-search ml-2 mr-2" @click="showModal(props.row)"></i>
+                <UserModal v-if="modalValue == props.row" @close="closeModal" :staff="modalValue" />
+              </span>
+
+              
+              <span v-else-if="props.column.field == 'created'">
                 <span v-if="props.row.created">{{formatDate(props.row.created)}}</span>
               </span>
               <span v-else-if="props.column.field == 'notes'">
@@ -57,6 +73,15 @@ f<template>
                   <i class="far fa-sticky-note"></i>
                 </button>
               </span>
+
+
+
+              <!-- <span v-else-if="props.column.field == 'photoUrl'">
+                <img v-if="props.row.photoUrl" :src="props.row.photoUrl" alt="" style="width:40px;">
+                <img v-if="!props.row.photoUrl" src="https://firebasestorage.googleapis.com/v0/b/mvpes-25aef.appspot.com/o/avatar%20copy.png?alt=media&token=966c07c4-125a-490f-81be-4e2d26bf33fa" alt="" style="width:40px;">
+              </span> -->
+
+              
               <!-- <span v-else-if="props.column.field == 'jobs'">
                 <span v-if="(props.row)">
                   <span v-for="u in filteredInfo(props.row)">
@@ -75,44 +100,44 @@ f<template>
                         <span v-if="(props.row)">
                           <span v-for="u in filteredInfo(props.row)" style="display:flex; justify-content: space-evenly;">
 
-                            <span v-if="u.points" style="display:inline; color:#0d3fd1;" class="ml-2 mr-2">
+                            <!-- <span v-if="u.points" style="display:inline; color:#0d3fd1;" class="ml-2 mr-2">
                               {{u.points}}
                             </span>
 
                             <span v-if="u.rating" style="display:inline; color:#c5950d;" class="ml-2 mr-2">
                               {{u.rating}}
-                            </span>
+                            </span> -->
 
-                            <span v-if="u.blacklist && u.blacklist.length >=1" style="display:inline;">
+                            <!-- <span v-if="u.blacklist && u.blacklist.length >=1" style="display:inline;">
                               <v-popover>
                                 <i class="fas fa-exclamation-triangle ml-2 mr-2" style="color:red;"></i>
                                 <template slot="popover">
                                 <span v-for="z in u.blacklist">{{z.title}}</span>
                               </template>
                               </v-popover>
-                            </span>
+                            </span> -->
 
-                            <span v-if="u && u.skills && u.skills.length > 0" style="display:inline;">
+                            <!-- <span v-if="u && u.skills && u.skills.length > 0" style="display:inline;">
                             <v-popover>
                                 <i class="fad fa-briefcase ml-2 mr-2"></i>
                                 <template slot="popover">
                                 <span v-for="z in u.skills">{{z.title}} / </span>
                               </template>
                               </v-popover>
-                            </span>
+                            </span> -->
 
-                            <span v-if="u && u.groups && u.groups.length > 0" style="display:inline;">
+                            <!-- <span v-if="u && u.groups && u.groups.length > 0" style="display:inline;">
                             <v-popover>
                                 <i class="fad fa-bookmark ml-2 mr-2"></i>
                                 <template slot="popover">
                                 <span v-for="z in u.groups">{{z}} / </span>
                               </template>
                               </v-popover>
-                            </span>
+                            </span> -->
 
-                            <span v-if="u && u.fullyVaccinated && u.fullyVaccinated == `yes`" style="display:inline;">
+                            <!-- <span v-if="u && u.fullyVaccinated && u.fullyVaccinated == `yes`" style="display:inline;">
                               <i class="fas fa-syringe ml-2 mr-2" style="color: green;"></i>
-                            </span>
+                            </span> -->
 
 
                           </span>
@@ -181,6 +206,11 @@ f<template>
                   {{props.row.fullName}}
                 </router-link>
               </span>
+
+              <span v-else-if="props.column.field == 'day'">
+                {{props.row.day}}
+              </span>
+
               <span v-else-if="props.column.field == 'delete'">
 
                 <button class="icon" v-if="!props.row.showTrash" v-tooltip="'delete instance'" @click="showTrash(props)">
@@ -375,8 +405,7 @@ f<template>
           </vue-good-table>
         </div>
         <div class="dashboard__container--body--col alt-col">
-          <button class="btn btn__outlined mb-3" @click="exportAll()">export all</button>
-          <div v-for="shift in eventShifts" :key="shift.id" style=" padding:1.6rem; background: white; margin-bottom:1.6rem;">
+          <div v-for="shift in activeShifts" :key="shift.id" style=" padding:1.6rem; background: white; margin-bottom:1.6rem;">
             <div class="flex align-center justify-space-between">
               <span>
                 <h3>{{shift.day | moment("dddd, MMM Do") }}</h3>
@@ -447,6 +476,10 @@ f<template>
                       <button class="btn btn__small btn__flat" @click="lockAll(shift)">Lock All <i class="fas fa-lock-alt"></i></button>
                     </div>
                     <template slot="table-row" slot-scope="props">
+                      <span v-if="props.column.field == 'preview'">
+                <i class="far fa-search ml-2 mr-2" @click="showModal(props.row)"></i>
+                <UserModal v-if="modalValue == props.row" @close="closeModal" :staff="modalValue" />
+              </span>
                       <!-- <span v-if="props.column.field == 'extras'">
                         <span v-if="(props.row)">
                           <span v-for="u in filteredInfo(props.row)" style="display:flex; justify-content: space-evenly;">
@@ -590,9 +623,9 @@ f<template>
                         <i class="fas fa-times ml-2 mr-2"></i>
                       </button>
 
-                      <button v-if="props.row.status == 'assigned'" class="icon" v-tooltip="'remove'" @click="removeAssignment(props, shift)">
+                      <!-- <button v-if="props.row.status == 'assigned'" class="icon" v-tooltip="'remove'" @click="removeAssignment(props, shift)">
                         <i class="fas fa-times ml-2 mr-2"></i>
-                      </button>
+                      </button> -->
                     </span>
                       <span v-else-if="props.column.field == 'requestedJob.title'">
                         <span v-if="props.row.requestedJob && props.row.requestedJob.title">
@@ -621,6 +654,7 @@ import * as moment from 'moment'
 import router from '@/router'
 import algoliasearch from 'algoliasearch/lite';
 import ExportService from "@/services/ExportService"
+import UserModal from "@/components/UserModal.vue";
 const fb = require('../../firebaseConfig.js')
 
 export default {
@@ -629,11 +663,17 @@ export default {
     return {
       performingRequest: false,
       performingRequest7: false,
+      newActiveDay: '',
+      modalValue: null,
       searchClient: algoliasearch(
         '0T1SIY6Y1V',
         'f03dc899fbdd294d6797791724cdb402',
       ),
       columns: [
+        {
+          label: '',
+          field: 'preview',
+        },
         {
           label: 'Name',
           field: 'fullName',
@@ -643,6 +683,10 @@ export default {
           field: 'created',
           sortable: false,
         },
+        // {
+        //   label: 'Day',
+        //   field: 'day',
+        // },
         // {
         //   label: '',
         //   field: 'days',
@@ -658,12 +702,12 @@ export default {
         //   tdClass: 'text-center',
         //   sortable: false,
         // },
-        {
-          label: '',
-          field: 'extras',
-          tdClass: 'text-center',
-          sortable: false,
-        },
+        // {
+        //   label: '',
+        //   field: 'extras',
+        //   tdClass: 'text-center',
+        //   sortable: false,
+        // },
         // {
         //   label: '',
         //   field: 'vaccinated',
@@ -727,6 +771,10 @@ export default {
       ],
       columns2: [
         {
+          label: '',
+          field: 'preview',
+        },
+        {
           label: 'Name',
           field: 'fullName',
         },
@@ -782,13 +830,14 @@ export default {
     }
   },
   components: {
-    Loader
+    Loader,
+    UserModal
   },
   created () {
     this.$store.dispatch("getEventPlacementFromId", this.$route.params.id)
-    if (!this.users || this.users.length < 1) {
-      this.$store.dispatch("getUsers")
-    }
+    // if (!this.users || this.users.length < 1) {
+    //   this.$store.dispatch("getUsers")
+    // }
   },
   // watch: {
   //   '$route' (to) {
@@ -800,22 +849,38 @@ export default {
     //   this.$store.dispatch("getUsers")
     // }
     this.$store.dispatch("getUserAvailabilityState", this.$route.params.id)
+    // if (this.eventInfo && this.eventInfo.days && this.eventInfo.days[0]) {
+    //   this.setInitialDay(this.eventInfo.days[0])
+    // } else {
+    //   console.log('else')
+    // }
+    // this.setInitialDay()
   },
   computed: {
-    ...mapState(['eventUsers', 'eventShifts', 'eventInfo', 'users', 'eventDrops', 'userProfile']),
+    ...mapState(['eventUsers', 'eventShifts', 'eventInfo', 'eventDrops', 'userProfile']),
     event() {
-      return this.eventInfo 
+      return this.eventInfo
     },
+
+    activeDay() {
+      return this.newActiveDay ? this.newActiveDay : this.eventInfo.days[0]
+    },
+
     filteredUsers () {
       return this.eventUsers.filter(user => {
         // return user.status == 'available'
-        return ((user.status != 'placed') && (user.status != 'assigned'))
+        return ((user.status != 'placed') && (user.status != 'assigned') && (user.day == this.activeDay))
       })
     },
     
     filteredPlacedUsers () {
       return this.eventUsers.filter(user => {
         return ((user.status == 'placed') || (user.status == 'assigned'))
+      })
+    },
+    activeShifts() {
+      return this.eventShifts.filter(shift => {
+        return shift.day == this.activeDay
       })
     },
   },
@@ -825,6 +890,32 @@ export default {
     //     console.log(item);
     //   })
     // },
+
+    // isModalVisible(user) {
+    //   return this.modalValue = user
+    // },
+    
+    showModal(user) {
+      this.modalValue = user;
+    },
+    closeModal() {
+      this.modalValue = null;
+    },
+    beforeOpen(event) {
+      console.log('Event:', event)
+      console.log('Params:', event.params)
+      if (event.params.show === false) {
+        event.cancel()
+      }
+    },
+    // setInitialDay() {
+    //   console.log(this.eventInfo.days[0])
+    //   this.activeDay = this.eventInfo.days[0]
+    // },
+
+    setActiveDay(day) {
+      this.newActiveDay = day
+    },
 
     messageShift(shift) {
       this.performingRequest7 = true
@@ -873,9 +964,9 @@ export default {
         firstName: item.firstName,
         lastName: item.lastName,
         phone: item.phone,
-        day: this.event.startDate,
+        day: this.activeDay,
         dateFormat: newdate,
-        start: this.event.startDate,
+        start: this.activeDay,
         preferredEvent: this.event.id,
         status: "available",
         requestedJob: {},
@@ -964,6 +1055,7 @@ export default {
         "Email",
         "Confirmed",
         "DOB",
+        "Shirt Size",
         "Code",
       ];
       const exportItems = [];
@@ -988,6 +1080,7 @@ export default {
             doc.data().email,
             confirmed,
             moment(doc.data().dob).format('M/D/YYYY'),
+            doc.data().shirtsize,
             `=REGEXEXTRACT(H2,"....$")`
           ])
         
@@ -1112,12 +1205,52 @@ export default {
       // this.$refs[shift.id][0].selectedRows = []
       
     },
+
+
     confirmPlacement(props) {
       fb.userDaysCollection.doc(props.row.id).update({confirmed: true})
+      .then(doc => {
+        fb.assignmentsCollection.where("shiftId", "==", props.row.shift).where("userId", "==", props.row.userId).get()
+        .then(function(querySnapshot) {
+          querySnapshot.forEach(doc => {
+            console.log(doc.data().id)
+            fb.assignmentsCollection.doc(doc.data().id).update({
+              confirmed: true
+            })
+          })
+        })
+      })
       props.row.confirmed = true
+      fb.userDaysCollection.where("confirmed", "==", true).get()
+      .then(function(querySnapshot) {
+        querySnapshot.forEach(doc => {
+        console.log(doc.data())
+          fb.assignmentsCollection.where("shiftId", "==", doc.data().shift).where("userId", "==", doc.data().userId).get()
+          .then(function(querySnapshot) {
+            querySnapshot.forEach(doc => {
+              console.log(doc.data().id)
+              fb.assignmentsCollection.doc(doc.data().id).update({
+                confirmed: true
+              })
+            })
+          })
+        })
+      })
+
     },
     unConfirmPlacement(props) {
       fb.userDaysCollection.doc(props.row.id).update({confirmed: false})
+      .then(doc => {
+        fb.assignmentsCollection.where("shiftId", "==", props.row.shift).where("userId", "==", props.row.userId).get()
+        .then(function(querySnapshot) {
+          querySnapshot.forEach(doc => {
+            console.log(doc.data().id)
+            fb.assignmentsCollection.doc(doc.data().id).update({
+              confirmed: false
+            })
+          })
+        })
+      })
       props.row.confirmed = false
     },
     unlock(props, shift) {
@@ -1126,12 +1259,12 @@ export default {
       setTimeout(() => {
         props.row.status = "placed"
       }, 2000)
-      // fb.assignmentsCollection.where("shiftId", "==", shift.id).where("userId", "==", props.row.userId).get().then(function(querySnapshot) {
-      //   querySnapshot.forEach(doc => {
-      //     console.log(doc.id)
-      //     fb.assignmentsCollection.doc(doc.id).delete()
-      //   })
-      // })
+      fb.assignmentsCollection.where("shiftId", "==", shift.id).where("userId", "==", props.row.userId).get().then(function(querySnapshot) {
+        querySnapshot.forEach(doc => {
+          console.log(doc.id)
+          fb.assignmentsCollection.doc(doc.id).delete()
+        })
+      })
       // fb.eventStaffCollection.where("event", "==", shift.eventId).where("user", "==", props.row.userId).get().then(function(querySnapshot) {
       //   querySnapshot.forEach(doc => {
       //     fb.eventStaffCollection.doc(doc.id).delete()
@@ -1235,6 +1368,9 @@ export default {
       } else {
         return null
       }
+    },
+    goBack() {
+      router.go(-1)
     },
   },
   beforeDestroy () {

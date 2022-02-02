@@ -66,7 +66,7 @@ import router from '@/router'
 import * as moment from 'moment'
 
 export default {
-  name: 'groupEdit',
+  name: 'followersGroupEdit',
   data: () => ({
     message: '',
     showAll: true,

@@ -1,10 +1,25 @@
 <template>
   <div class="pt-3">
       <div class="dashboard__container--header">
-        <span>
-          <!-- <button class="btn btn__outlined mr-3" @click="deleteGroup()" :disabled="!clean">delete group</button> -->
+          <ais-instant-search :search-client="searchClient" index-name="a_users" >
+            <ais-search-box placeholder="Add User..." />
+            <ais-state-results>
+              <template slot-scope="{ state: { query } }">
+                <ais-hits v-show="query.length > 0">
+                  <template v-slot:item="{ item }">
+                    <div>
+                      <button @click="addUser(item)" class="btn btn__icon btn__flat mr-4">
+                        <i class="fas fa-plus" style="color:blue;" v-if="!performingRequest"></i>
+                        <i class="fa fa-spinner fa-spin" style="color:blue;" v-if="performingRequest"></i>
+                      </button>
+                      <p style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</p style="display: inline;">
+                    </div>
+                  </template>
+                </ais-hits>
+              </template>
+            </ais-state-results>
+          </ais-instant-search>
           <button class="btn btn__outlined mr-3" @click="exportGroup()">export group</button>
-        </span>
       </div>
       <div class="dashboard__container--body pt-3">
           <vue-good-table
@@ -20,26 +35,22 @@
                 mode: 'records',
                 perPage: 20,
               }"
-              @on-row-click="onRowClick"
             >
             <template slot="table-row" slot-scope="props">
+              <span v-if="props.column.field == 'link'">
+                <router-link :to="`/users/` + props.row.id" target="_blank">
+                  <i class="fas fa-external-link ml-3 mr-3"></i>
+                </router-link>
+              </span>
               <span v-if="props.column.field == 'skills'">
                 <span v-for="sk in props.row.skills">
                    {{sk.title}} | 
                 </span>
               </span>
-              <span v-else-if="props.column.field == 'published'">
-                <span v-if="props.row.published">
-                  <i class="fas fa-eye"></i>
-                </span>
-                <span v-else>
-                  <i class="fas fa-eye-slash"></i>
-                </span>
-              </span>
-              <span v-else-if="props.column.field == 'paid'">
-                <span v-if="props.row.paid">
-                  <i class="fas fa-check"></i>
-                </span>
+              <span v-else-if="props.column.field == 'delete'">
+                <button class="icon" v-tooltip="'delete instance'" @click="deleteUser(props.row)">
+                  <i class="fas fa-trash ml-2 mr-2"></i>
+                </button>
               </span>
                <span v-else>
                 {{props.formattedRow[props.column.field]}}
@@ -101,6 +112,7 @@
 import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import ExportService from "@/services/ExportService"
+import algoliasearch from 'algoliasearch/lite';
 import router from '@/router'
 import * as moment from 'moment'
 
@@ -109,7 +121,12 @@ export default {
   data: () => ({
     message: '',
     showAll: true,
+    performingRequest: false,
     performingRequest2: false,
+    searchClient: algoliasearch(
+        '0T1SIY6Y1V',
+        'f03dc899fbdd294d6797791724cdb402',
+      ),
     columns2: [
       {
         label: 'Created',
@@ -121,6 +138,11 @@ export default {
       },
     ],
     columns: [
+      {
+        label: 'Link',
+        field: 'link',
+        sortable: false,
+      },
       {
         label: 'First Name',
         field: 'firstName',
@@ -149,6 +171,12 @@ export default {
       {
         label: 'Skills',
         field: 'skills',
+        sortable: false,
+      },
+      {
+        label: 'Delete',
+        field: 'delete',
+        sortable: false,
       }
     ]
   }),
@@ -157,24 +185,11 @@ export default {
     clean() {
       return (!this.groupUsers || this.groupUsers.length == 0)
     },
-    isAdmin: function() {
-      if (this.group && this.group.admins && this.group.admins.length > 0) {
-        let array = this.group.admins
-        if(array.some(person => person.id == this.currentUser.uid)){
-          return true
-        } else {
-          return false
-        }
-      }
+    isAdmin() {
+      return this.group.admins.some(person => person.userId == this.currentUser.uid)
     },
-    isUser: function() {
-      if (this.group && this.group.users && this.group.users.length > 0) {
-        if(array.some(person => person.id == this.currentUser.uid)){
-          return true
-        } else {
-          return false
-        }
-      }
+    isUser() {
+      return this.group.users.some(person => person.userId == this.currentUser.uid)
     }
   },
   components: {
@@ -184,6 +199,29 @@ export default {
     this.$store.dispatch("getGroupFromId", this.$route.params.id);
   },
   methods: {
+    addUser(item) {
+      console.log(item)
+      let group = this.group
+      this.performingRequest = true;
+      this.$store.dispatch("addUserToGroup", {
+        id: item.objectID,
+        group: this.group
+      })
+      setTimeout(() => {
+        this.performingRequest = false;
+        document
+        .querySelectorAll('.ais-SearchBox-input')
+        .forEach((e) => (e.value = ''))
+        document.querySelectorAll('.ais-Hits-item').forEach((e) => e.remove())
+      }, 250)
+    },
+    deleteUser(item) {
+      console.log(item)
+      this.$store.dispatch("removeUserFromGroup", {
+        group: this.group,
+        userId: item.id
+      })
+    },
     formatDate(q) {
       if(q) {
         const postedDate = new Date(q.seconds) * 1000;

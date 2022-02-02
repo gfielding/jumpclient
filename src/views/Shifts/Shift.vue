@@ -19,9 +19,9 @@
           <div>Staff Requested: {{shift.staff}}</div>
         </div>
         <div class="dashboard__container--body--col pt-5">
-          <button class="btn btn__outlined mr-3 mb-3" @click.prevent="exportReportCont">Export Payroll<i class="fas fa-external-link ml-3"></i></button>
-          <div class="caption mb-2" v-if="shift.exportedCont">
-            Contractors Exported: {{ shift.exportedCont.toDate() | moment("MMMM Do YYYY, h:mm a") }}
+          <button class="btn btn__outlined mr-3 mb-3" @click.prevent="exportReportEmp">Export Payroll<i class="fas fa-external-link ml-3"></i></button>
+          <div class="caption mb-2" v-if="shift.exportedEmp">
+            Last Exported: {{ shift.exportedEmp.toDate() | moment("MMMM Do YYYY, h:mm a") }}
           </div>
           <!-- <button class="btn btn__outlined mr-3 mb-3" @click.prevent="exportReportEmp">Employee Payroll<i class="fas fa-external-link ml-3"></i></button> -->
           <div class="caption mb-2" v-if="shift.exportedEmp">
@@ -74,10 +74,10 @@
           
             <template slot="table-row" slot-scope="props">
               <span v-if="props.column.field == 'regRate'">
-                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'dayRate'">
-                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'firstName'">
                 <input type="text" v-model.trim="props.row.firstName" id="firstName" readonly />
@@ -86,7 +86,7 @@
                 <input type="text" v-model.trim="props.row.lastName" id="lastName" readonly />
               </span>
               <!-- <span v-else-if="props.column.field == 'fileId'">
-                <input type="text" v-model.trim="props.row.fileId" id="fileId" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+                <input type="text" v-model.trim="props.row.fileId" id="fileId" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
               </span> -->
               <span v-else-if="props.column.field == 'note'">
                 <button v-show="!props.row.note" class="btn btn__flat btn__icon" @click="showNote(props.row)" v-tooltip="'Leave a note'"><i class="far fa-sticky-note ml-3 mr-3" style="opacity:0.5;"></i></button>
@@ -98,23 +98,27 @@
                 </transition>
               </span>
 
+              <span v-else-if="props.column.field == 'confirmed'">
+                <span v-if="props.row.confirmed">{{props.row.confirmed}}</span>
+              </span>
+
               <span v-else-if="props.column.field == 'regHours'">
-                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'otHours'">
-                <input type="number" v-model.trim="props.row.otHours" id="otHours" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.otHours" id="otHours" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'ot2Hours'">
-                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'mbp'">
-                <input type="number" v-model.trim="props.row.mbp" id="mbp" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.mbp" id="mbp" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'tips'">
-                <input type="number" v-model.trim="props.row.tips" id="tips" @change="onSheetEdit(props.row)" :readonly="props.row.locked"  />
+                <input type="number" v-model.trim="props.row.tips" id="tips" @change="onSheetEditable(props.row)" :readonly="props.row.locked"  />
               </span>
               <span v-else-if="props.column.field == 'state'">
-                <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+                <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'status'">
                 <v-select
@@ -147,7 +151,7 @@
                 </button>
               </span>
               <span v-if="props.column.field == 'fileId'">
-                <input type="text" v-model.trim="props.row.fileId" id="fileId" @change="onSheetEdit(props.row)" :readonly="props.row.locked" />
+                <input type="text" v-model.trim="props.row.fileId" id="fileId" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
               </span>
 
 
@@ -173,6 +177,11 @@
                   <i class="fas fa-external-link ml-3 mr-3"></i>
                 </router-link>
               </span>
+              <span v-else-if="props.column.field == 'save'">
+                <button :disabled="(props.row.locked || !props.row.editable)" class="btn btn__primary btn__small ml-2 mr-2" @click="onSheetEdit(props.row)">
+                  Save
+                </button>
+              </span>
                <span v-else>
                 <!-- {{props.formattedRow[props.column.field]}} -->
               </span>
@@ -193,6 +202,9 @@
 }
 table.vgt-table td {
   padding: 0 !important;
+}
+input, textarea {
+  padding: 0.4rem 0;
 }
 </style>
 
@@ -236,7 +248,8 @@ export default {
         sortable: false,
       },
       {
-        field: 'onpay',
+        label: 'Confirmed',
+        field: 'confirmed',
         sortable: false,
       },
       {
@@ -291,6 +304,10 @@ export default {
       {
         label: 'Tips',
         field: 'tips',
+      },
+      {
+        label: 'Save',
+        field: 'save',
       },
     ]
   }),
@@ -369,8 +386,14 @@ export default {
     //     return member.id == user.userId
     //   })
     // },
+    onSheetEditable(row)  {
+      row = row
+      row.editable = true
+      this.$store.dispatch('updateTimesheet', row)
+    },
     onSheetEdit(row) {
       row = row
+      row.editable = false
       this.$store.dispatch('updateTimesheet', row)
     },
     opr(item) {
@@ -574,7 +597,7 @@ export default {
         if (this.shiftAssignments[key].fileId && this.shiftAssignments[key].fileId.length > 9) {
           exportItems.push([
             "1",
-            "307",
+            "7",
             this.shiftAssignments[key].fileId,
             "1",
             this.shiftAssignments[key].dayRate,
@@ -582,7 +605,7 @@ export default {
           ]);
           exportItems.push([
             "1",
-            "301",
+            "1",
             this.shiftAssignments[key].fileId,
             this.shiftAssignments[key].regHours,
             this.shiftAssignments[key].regRate,
@@ -590,7 +613,7 @@ export default {
           ]);
           exportItems.push([
             "1",
-            "310",
+            "2",
             this.shiftAssignments[key].fileId,
             this.shiftAssignments[key].otHours,
             this.shiftAssignments[key].regRate * 1.5,
@@ -598,7 +621,7 @@ export default {
           ]);
           exportItems.push([
             "1",
-            "300",
+            "22",
             this.shiftAssignments[key].fileId,
             this.shiftAssignments[key].ot2Hours,
             this.shiftAssignments[key].regRate * 2,
@@ -606,7 +629,7 @@ export default {
           ]);
           exportItems.push([
             "1",
-            "308",
+            "125",
             this.shiftAssignments[key].fileId,
             "1",
             this.shiftAssignments[key].tips,
@@ -614,7 +637,7 @@ export default {
           ]);
           exportItems.push([
             "1",
-            "309",
+            "4",
             this.shiftAssignments[key].fileId,
             "0",
             this.shiftAssignments[key].mbp,

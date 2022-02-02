@@ -86,7 +86,7 @@ export default {
   data: () => ({
     showAll: true,
     activeItem: null,
-    statuses: ['new', 'pending', 'cancelled', 'paid'],
+    statuses: ['new', 'worked', 'cancelled', 'paid'],
     columns: [
       {
         field: 'locked',

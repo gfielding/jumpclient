@@ -12,6 +12,11 @@
 			box-shadow:none;
 		}
 	}
+	&__ghost {
+		border:1px solid white;
+		background:transparent;
+		color:white !important;
+	}
 	&__primary {
 		background:$primary;
 		border-color:$primary;
@@ -46,12 +51,12 @@
 		}
 	}
 	&__dark {
-		background:$dark;
-		border-color:$dark;
+		background:$backgroundAlt;
+		border-color:$backgroundAlt;
 		color:white;
 		&:hover {
-			background:$darkDark;
-			border-color:$darkDark;
+			background:$dark;
+			border-color:$dark;
 		}
 	}
 	&__accent {

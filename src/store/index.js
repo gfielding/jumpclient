@@ -77,7 +77,12 @@ const store = new Vuex.Store({
     cityUsers: [],
     appUsers: [],
     empUsers: [],
-    clientContacts: []
+    clientContacts: [],
+    followersGroupUsers: [],
+    followersGroup: {},
+    followersGroupMessages: [],
+    followersGroups: [],
+    pageText: {}
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -145,6 +150,7 @@ const store = new Vuex.Store({
       // clear user data from state
       commit('setUserProfile', {})
       commit('setEvents', [])
+      commit('setCurrentUser', null)
       commit('setVenues', [])
       commit('setJobs', [])
       commit('setClients', [])
@@ -336,8 +342,58 @@ const store = new Vuex.Store({
       commit('setReferrals', [])
     },
     
-
     /*Groups*/
+    getFollowersGroups({ commit }) {
+      fb.venueFollowersCollection.orderBy('venueName', 'asc').onSnapshot(querySnapshot => {
+        let groupsArray = []
+        querySnapshot.forEach(doc => {
+          let group = doc.data()
+          groupsArray.push(group)
+        })
+        const unique = Array.from(new Set(groupsArray.map(a => a.venueName)))
+         .map(venueName => {
+           return groupsArray.find(a => a.venueName === venueName)
+         })
+        commit('setFollowerGroups', unique)
+      })
+    },
+    getFollowersGroupFromId({ commit }, payload) {
+      fb.venuesCollection.doc(payload).get()
+      .then(
+        doc => {
+          commit("setFollowersGroup", doc.data())
+        })
+      store.dispatch('getFollowersGroupUsers', payload)
+      store.dispatch('getFollowersGroupMessages', payload)
+    },
+    getFollowersGroupUsers({ commit }, payload) {
+      fb.venueFollowersCollection.where("venue", "==", payload).onSnapshot(querySnapshot => {
+        let followersArray = []
+        querySnapshot.forEach(doc => {
+          let follower = doc.data()
+          follower.id = doc.id
+          followersArray.push(follower)
+        })
+        fb.venuesCollection.doc(payload).update({
+          followers: followersArray.length
+        })
+        commit('setFollowersGroupUsers', followersArray)
+      })
+    },
+    getFollowersGroupMessages({ commit }, payload) {
+      console.log("getting Messages")
+      fb.groupUpdatesCollection.where("groupId", "==", payload).orderBy('created', 'desc').onSnapshot(querySnapshot => {
+        let groupMessagesArray = []
+
+        querySnapshot.forEach(doc => {
+          let message = doc.data()
+          message.id = doc.id
+          groupMessagesArray.push(message)
+        })
+        let newArray = Object.values(groupMessagesArray.reduce((acc,cur)=>Object.assign(acc,{[cur.message]:cur}),{}))
+        commit('setFollowersGroupMessages', newArray)
+      })
+    },
     addGroup({ commit }, payload) {
       console.log(payload)
       fb.groupsCollection.add(payload)
@@ -356,6 +412,20 @@ const store = new Vuex.Store({
     },
     deleteGroup({ commit }, payload) {
       fb.groupsCollection.doc(payload.id).delete()
+    },
+    addUserToGroup({ commit }, payload) {
+      console.log(payload)
+      fb.usersCollection.doc(payload.id).update({
+        groups: firebase.firestore.FieldValue.arrayUnion(payload.group.title)
+      })
+      store.dispatch('getGroupFromId', payload.group.id)
+    },
+    removeUserFromGroup({ commit }, payload) {
+      console.log(payload)
+      fb.usersCollection.doc(payload.userId).update({
+        groups: firebase.firestore.FieldValue.arrayRemove(payload.group.title)
+      })
+      store.dispatch('getGroupFromId', payload.group.id)
     },
     updateGroups({ commit, state }, payload) {
       console.log(payload)
@@ -432,6 +502,11 @@ const store = new Vuex.Store({
       commit('setGroup', {})
       commit('setGroupUsers', [])
       commit('setGroupMessages', [])
+    },
+    clearFollowersGroupState({ commit }) {
+      commit('setFollowersGroup', {})
+      commit('setFollowersGroupUsers', [])
+      commit('setFollowersGroupMessages', [])
     },
 
 
@@ -995,6 +1070,20 @@ const store = new Vuex.Store({
     },
 
 
+    /*PAGE TEXT*/
+    getPageText({ commit }) {
+      fb.pageTextCollection.doc("XQLfFD57iwjlpMjMlyVw").get()
+      .then(
+        doc => {
+          let pageText = doc.data()
+          commit('setPageText', pageText)
+        }
+      )
+    },
+    updatePageText({ commit }, payload) {
+      fb.pageTextCollection.doc("XQLfFD57iwjlpMjMlyVw").update(payload)
+    },
+
 
     /*FAQS*/
     addFaq({ commit }, payload) {
@@ -1003,13 +1092,14 @@ const store = new Vuex.Store({
         doc => {
           fb.faqsCollection.doc(doc.id).update({
             id: doc.id,
+            order: 0,
             created: fb.firestore.FieldValue.serverTimestamp(),
           })
         }
       )
     },
     getFaqsState({ commit }) {
-      fb.faqsCollection.onSnapshot(querySnapshot => {
+      fb.faqsCollection.orderBy('order', 'asc').onSnapshot(querySnapshot => {
         let faqsArray = []
         querySnapshot.forEach(doc => {
           let faq = doc.data()
@@ -2355,6 +2445,33 @@ const store = new Vuex.Store({
       } else {
         state.empUsers = []
       }
+    },
+    setFollowersGroupUsers(state, val) {
+      if (val) {
+        state.followersGroupUsers = val
+      } else {
+        state.followersGroupUsers = []
+      }
+    },
+    setFollowersGroup(state, val) {
+      state.followersGroup = val
+    },
+    setFollowerGroups(state, val) {
+      if (val) {
+        state.followersGroups = val
+      } else {
+        state.followersGroups = []
+      }
+    },
+    setFollowersGroupMessages(state, val) {
+      if (val) {
+        state.followersGroupMessages = val
+      } else {
+        state.followersGroupMessages = []
+      }
+    },
+    setPageText(state, val) {
+      state.pageText = val
     },
   },
 })

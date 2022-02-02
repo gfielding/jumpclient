@@ -4,8 +4,9 @@
       <div class="dashboard__container--header">
         <h1>Groups</h1>
         <span>
-          <button class="btn btn__outlined" @click="showAll = true" v-if="!showAll">All Groups</button>
-          <button class="btn btn__outlined" @click="showAll = false" v-if="showAll">My Groups</button>
+          <button class="btn mr-3" v-bind:class="{ 'btn__dark': showAllGroups, 'btn__outlined': !showAllGroups }"  @click="showAll()">All Groups</button>
+          <button class="btn mr-3" v-bind:class="{ 'btn__dark': showMyGroups, 'btn__outlined': !showMyGroups }" @click="showMine()">My Groups</button>
+          <button class="btn mr-3" v-bind:class="{ 'btn__dark': showFollower, 'btn__outlined': !showFollower }" @click="showFollowerGroups()">Follower Groups</button>
           <router-link :to="{name: 'addgroup'}" class="color--text">
             <button class="btn btn__flat ml-3"><i class="fas fa-plus fa-2x"></i></button>
           </router-link>
@@ -15,7 +16,7 @@
       <div class="dashboard__container--body pt-4">
           <Loader v-if="!groups || groups.length == 0" />
           <vue-good-table
-            v-if="showAll"
+            v-if="showAllGroups"
               :columns="columns"
               :rows="groups"
                styleClass="vgt-table striped"
@@ -49,7 +50,7 @@
           </vue-good-table>
 
           <vue-good-table
-            v-if="!showAll"
+            v-if="showMyGroups"
               :columns="columns"
               :rows="myGroups"
                styleClass="vgt-table striped"
@@ -81,6 +82,24 @@
               </span>
             </template>
           </vue-good-table>
+
+          <vue-good-table
+          v-if="showFollower"
+            :columns="columns2"
+            :rows="venues"
+            styleClass="vgt-table striped"
+            :search-options="{
+              enabled: true,
+              placeholder: 'Search this table',
+            }"
+            :pagination-options="{
+              enabled: true,
+              mode: 'records',
+              perPage: 10,
+            }"
+            @on-row-click="onRowClick2"
+          >
+        </vue-good-table>
         
       </div>
     </div>
@@ -96,7 +115,9 @@ import router from '@/router'
 export default {
   name: 'groups',
   data: () => ({
-    showAll: true,
+    showAllGroups: true,
+    showMyGroups: false,
+    showFollower: false,
     columns: [
       {
         label: 'Title',
@@ -106,27 +127,70 @@ export default {
         label: 'Created',
         field: 'created',
       },
+    ],
+    columns2: [
+      {
+        label: 'Name',
+        field: 'title',
+      },
+      {
+        label: 'Followers',
+        field: 'followers',
+      },
+      {
+        label: 'City',
+        field: 'address.city',
+        thClass: 'hidden-small',
+        tdClass: 'hidden-small',
+      },
+      {
+        label: 'State',
+        field: 'address.state',
+      },
     ]
   }),
   created () {
     if (!this.groups || this.groups.length < 1) {
       this.$store.dispatch("getGroups")
     }
+    if (!this.venues || this.venues.length < 1) {
+      this.$store.dispatch("getVenues")
+    }
   },
   computed: {
-    ...mapState(['groups', 'currentUser']),
+    ...mapState(['groups', 'currentUser', 'venues']),
     myGroups: function() {
       return this.groups.filter(group => {
         return group.owner == this.currentUser.uid
       })
-    }
+    },
   },
   components: {
     Loader,
   },
   methods: {
+    showFollowerGroups() {
+      this.showFollower = true
+      this.showAllGroups = false
+      this.showMyGroups = false
+    },
+    showMine() {
+      this.showFollower = false
+      this.showAllGroups = false
+      this.showMyGroups = true
+    },
+    showAll() {
+      this.showFollower = false
+      this.showAllGroups = true
+      this.showMyGroups = false
+    },
     onRowClick(params) {
       let url = `/groups/` + params.row.id
+      console.log(url)
+      router.push(url)
+    },
+    onRowClick2(params) {
+      let url = `/followersgroups/` + params.row.id
       console.log(url)
       router.push(url)
     },

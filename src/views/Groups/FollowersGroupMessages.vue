@@ -1,8 +1,8 @@
 <template>
   <div class="pt-3">
-      <div class="dashboard__container--body" v-if="isAdmin || isOwner || isUser">
+      <div class="dashboard__container--body">
         
-        <div class="dashboard__container--body--col" v-if="groupUsers && groupUsers.length > 0">
+        <div class="dashboard__container--body--col" v-if="followersGroupUsers && followersGroupUsers.length > 0">
           <div class="mb-3">
             <h3>Send Message to Group:</h3>
             <textarea name="updateMessage" id="updateMessage" cols="20" rows="4" v-model="message"></textarea>
@@ -23,7 +23,7 @@
 
           <vue-good-table
             :columns="columns2"
-            :rows="groupMessages"
+            :rows="followersGroupMessages"
             compactMode
             :pagination-options="{
               enabled: true,
@@ -59,7 +59,7 @@ import router from '@/router'
 import * as moment from 'moment'
 
 export default {
-  name: 'groupMessages',
+  name: 'followersGroupMessages',
   data: () => ({
     message: '',
     showAll: true,
@@ -78,22 +78,17 @@ export default {
     ],
   }),
   computed: {
-    ...mapState(['group', 'currentUser', 'userProfile', 'groupMessages', 'groupUsers']),
-    isOwner: function() {
-      return this.group.owner == this.currentUser.uid
+    ...mapState(['followersGroup', 'currentUser', 'userProfile', 'followersGroupMessages', 'followersGroupUsers', 'venueInfo']),
+    venue() {
+      return this.venueInfo
     },
-    isAdmin() {
-      return this.group.admins.some(person => person.userId == this.currentUser.uid)
-    },
-    isUser() {
-      return this.group.users.some(person => person.userId == this.currentUser.uid)
-    }
   },
   components: {
     Loader,
   },
   created () {
-    this.$store.dispatch("getGroupFromId", this.$route.params.id);
+    this.$store.dispatch("getFollowersGroupFromId", this.$route.params.id);
+    this.$store.dispatch("getVenueFromId", this.$route.params.id);
   },
   methods: {
     formatDate(q) {
@@ -107,8 +102,8 @@ export default {
     sendMessage () {
       this.performingRequest2 = true
       let newMessage = {
-        groupId: this.group.id,
-        groupUsers: this.groupUsers,
+        groupId: this.followersGroup.id,
+        groupUsers: this.followersGroupUsers,
         message: this.message,
         from: this.userProfile.twilioNumber || null
       }

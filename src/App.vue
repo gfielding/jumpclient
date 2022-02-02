@@ -10,7 +10,7 @@
         <SideNav :userProfile="currentUser" />
       </div>
 
-      <keep-alive  max="5" :include="['users', 'events', 'shifts', 'accountingEvents', 'groups']">
+      <keep-alive  max="5" :include="['users', 'events', 'shifts', 'accountingEvents', 'groups', 'eventplacements']">
         <router-view :key="$route.fullPath"></router-view> 
       </keep-alive>
     </div>

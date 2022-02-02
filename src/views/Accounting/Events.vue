@@ -4,16 +4,19 @@
       <div class="dashboard__container--header">
         <h1>Event Accounting</h1>
         <span>
-          <button class="btn btn__outlined" @click="showAll = true" v-if="!showAll">Show Visible</button>
-          <button class="btn btn__outlined" @click="showAll = false" v-if="showAll">Show Hidden</button>
+          <!-- <button class="btn btn__outlined" @click="showAll = true" v-if="!showAll">Show Visible</button>
+          <button class="btn btn__outlined" @click="showAll = false" v-if="showAll">Show Hidden</button> -->
+          <button class="btn mr-3" v-bind:class="{ 'btn__dark': is2021, 'btn__outlined': !is2021 }" @click="show2021()">2021</button>
+          <button class="btn mr-3" v-bind:class="{ 'btn__dark': is2022, 'btn__outlined': !is2022 }" @click="show2022()">2022</button>
         </span>
+
       </div>
       <div class="dashboard__container--body pt-3">
         <Loader v-if="!events || events.length == 0" />
         <vue-good-table
-           v-if="showAll"
+           v-if="is2022"
             :columns="columns"
-            :rows="allEvents"
+            :rows="events2022"
              styleClass="vgt-table striped"
             :search-options="{
               enabled: true,
@@ -72,9 +75,9 @@
           </template>
         </vue-good-table>
         <vue-good-table
-             v-if="!showAll"
+             v-if="is2021"
               :columns="columns"
-              :rows="hiddenEvents"
+              :rows="events2021"
                styleClass="vgt-table striped"
               :search-options="{
                 enabled: true,
@@ -140,6 +143,8 @@ export default {
   name: 'accountingEvents',
   data: () => ({
     showAll: true,
+    is2021: false,
+    is2022: true,
     columns: [
       {
         label: 'Event',
@@ -209,12 +214,30 @@ export default {
       return this.events.filter(event => {
         return !event.published
       })
-    }
+    },
+    events2021: function() {
+      return this.events.filter(event => {
+        return event.startDate.includes("2021")
+      })
+    },
+    events2022: function() {
+       return this.events.filter(event => {
+        return event.startDate.includes("2022")
+      })
+    },
   },
   components: {
     Loader,
   },
   methods: {
+    show2021() {
+      this.is2021 = true
+      this.is2022 = false
+    },
+    show2022() {
+      this.is2022 = true
+      this.is2021 = false
+    },
     onRowClick(params) {
       let url = `/accounting/events/` + params.row.id
       console.log(url)

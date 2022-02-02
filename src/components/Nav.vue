@@ -152,7 +152,7 @@
             </router-link>
           </div>
           <div class="nav__menu--item">
-            <router-link :to="{name: 'placementshome'}">
+            <router-link :to="{name: 'eventplacements'}">
               placements <i class="fas fa-chevron-right"></i>
             </router-link>
           </div>
@@ -249,6 +249,9 @@
                 </router-link>
               </div>
             </div>
+          </div>
+          <div class="nav__menu--item">
+            <a @click="logout()">logout</a>
           </div>
         </div>
       </div>

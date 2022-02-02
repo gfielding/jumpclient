@@ -1,61 +1,63 @@
 <template>
   <div class="home">
     <div class="home__containerLogin text-center">
-      <router-link :to="{name: 'home'}">
-        <img src="https://firebasestorage.googleapis.com/v0/b/mvpes-25aef.appspot.com/o/MVPTriangleText.svg?alt=media&token=518da9ea-28e1-4f7c-9d89-fc13c303c62b" alt="" class="login-logo mb-4">
-      </router-link>
-      <transition name="fadeStop">
-        <PasswordReset v-if="showPasswordReset" @close="hidePassword()"></PasswordReset>
-      </transition>
-      <transition name="fadeStop">
-        <div :class="{ 'signup-form': !showLoginForm }" v-if="!showPasswordReset">
-          <form v-if="showLoginForm" @submit.prevent>
-            <h2>Welcome Back</h2>
-            <div class="mb-3 mt-2">
-              <label for="email1">Email</label>
-              <input v-model.trim="loginForm.email" autocomplete="email" type="text" placeholder="you@email.com" id="email1" />
-            </div>
-            <div class="mb-3">
-              <label for="password1">Password</label>
-              <input v-model.trim="loginForm.password" autocomplete="current-password" type="password" placeholder="******" id="password1" />
-            </div>
-            <button @click="login()" class="btn btn__primary mt-3" :disabled="!valid">Log In</button>
-            <div class="extras mt-5">
-              <button class="btn btn__small btn__flat" @click="showPassword()">
-                Forgot Password
-              </button>
-              <!-- <button class="btn btn__small btn__flat" @click="toggleForm()">
-                Create an Account
-              </button> -->
-            </div>
-          </form>
-          <form v-else @submit.prevent>
-            <h2>Sign Up To Work</h2>
-            <div class="mb-3">
-              <label for="firstname">First Name</label>
-              <input v-model.trim="signupForm.firstname" autocomplete="given-name" type="text" placeholder="" id="firstname" required />
-            </div>
-            <div class="mb-3">
-              <label for="lastname">Last Name</label>
-              <input v-model.trim="signupForm.lastname" autocomplete="family-name" type="text" placeholder="" id="lastname" required />
-            </div>
-            <div class="mb-3">
-              <label for="email2">Email</label>
-              <input v-model.trim="signupForm.email" autocomplete="email" type="text" placeholder="you@email.com" id="email2" required />
-            </div>
-            <div class="mb-3">
-              <label for="password2">Password</label>
-              <input v-model.trim="signupForm.password" autocomplete="new-password" type="password" placeholder="min 6 characters" id="password2" required />
-            </div>
-            <button @click="signup()" class="btn btn__primary mt-3" :disabled="!valid2">Sign Up</button>
-            <div class="extras mt-5">
-              <button class="btn btn__small btn__flat" @click="toggleForm()">
-                I already have an account
-              </button>
-            </div>
-          </form>
-        </div>
-      </transition>
+      <div>
+        <router-link :to="{name: 'home'}">
+          <img src="https://firebasestorage.googleapis.com/v0/b/mvpes-25aef.appspot.com/o/MVPTriangleText.svg?alt=media&token=518da9ea-28e1-4f7c-9d89-fc13c303c62b" alt="" class="login-logo mb-4">
+        </router-link>
+        <transition name="fadeStop">
+          <PasswordReset v-if="showPasswordReset" @close="hidePassword()"></PasswordReset>
+        </transition>
+        <transition name="fadeStop">
+          <div :class="{ 'signup-form': !showLoginForm }" v-if="!showPasswordReset">
+            <form v-if="showLoginForm" @submit.prevent>
+              <h2>Welcome Back</h2>
+              <div class="mb-3 mt-2">
+                <label for="email1">Email</label>
+                <input v-model.trim="loginForm.email" autocomplete="email" type="text" placeholder="you@email.com" id="email1" />
+              </div>
+              <div class="mb-3">
+                <label for="password1">Password</label>
+                <input v-model.trim="loginForm.password" autocomplete="current-password" type="password" placeholder="******" id="password1" />
+              </div>
+              <button @click="login()" class="btn btn__ghost mt-3" :disabled="!valid">Log In</button>
+              <div class="extras mt-5">
+                <button class="btn btn__small btn__flat" @click="showPassword()">
+                  Forgot Password
+                </button>
+                <!-- <button class="btn btn__small btn__flat" @click="toggleForm()">
+                  Create an Account
+                </button> -->
+              </div>
+            </form>
+            <form v-else @submit.prevent>
+              <h2>Sign Up To Work</h2>
+              <div class="mb-3">
+                <label for="firstname">First Name</label>
+                <input v-model.trim="signupForm.firstname" autocomplete="given-name" type="text" placeholder="" id="firstname" required />
+              </div>
+              <div class="mb-3">
+                <label for="lastname">Last Name</label>
+                <input v-model.trim="signupForm.lastname" autocomplete="family-name" type="text" placeholder="" id="lastname" required />
+              </div>
+              <div class="mb-3">
+                <label for="email2">Email</label>
+                <input v-model.trim="signupForm.email" autocomplete="email" type="text" placeholder="you@email.com" id="email2" required />
+              </div>
+              <div class="mb-3">
+                <label for="password2">Password</label>
+                <input v-model.trim="signupForm.password" autocomplete="new-password" type="password" placeholder="min 6 characters" id="password2" required />
+              </div>
+              <button @click="signup()" class="btn btn__ghost mt-3" :disabled="!valid2">Sign Up</button>
+              <div class="extras mt-5">
+                <button class="btn btn__small btn__flat" @click="toggleForm()">
+                  I already have an account
+                </button>
+              </div>
+            </form>
+          </div>
+        </transition>
+      </div>
     </div>
   </div>
 </template>

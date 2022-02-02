@@ -1,7 +1,7 @@
 /*VARIABLES*/
 
-$primary: #0d3fd1;
-$primaryDark: darken($primary, 20%);
+$primary: #272c49;
+$primaryDark: #0a0f2c;
 
 $accent: #fc3ef9;
 $accentDark: darken($accent, 20%);
@@ -12,10 +12,12 @@ $backDark: darken($background, 5%);
 
 $light: #FFFFFF;
 
-$dark: #212121;
+$backgroundAlt: #272c49;
+
+$dark: #0a0f2c;
 $darkDark: darken($dark, 20%);
 
-$text: #3d3d3d;
+$text: #4d4d4d;
 $textLight: lighten($text, 20%);
 
 $lightText:#d0d0d0;

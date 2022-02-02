@@ -67,6 +67,10 @@
       <label for="dob">Date of Birth:</label>
       <input type="date" placeholder="" v-model.trim="user.dob" id="dob" readonly/>
     </div>
+    <div class="mb-3">
+      <label for="shirtsize">Shirt Size (unisex):</label>
+      <input type="text" placeholder="" v-model.trim="user.shirtsize" id="shirtsize" readonly />
+    </div>
 	</div>
 </template>
 

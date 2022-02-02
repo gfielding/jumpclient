@@ -30,10 +30,20 @@
             </router-link>
           </div>
           <div class="nav__menu--item">
-            <router-link :to="{name: 'placementshome'}">
+            <router-link :to="{name: 'eventplacements'}">
               placements <i class="fas fa-chevron-right"></i>
             </router-link>
           </div>
+          <!-- <div class="nav__menu--item dropdown">
+            <span>Placements</span>
+            <div class="dropdown-content">
+              <div class="mb-3">
+                <router-link :to="{name: 'eventplacements'}">
+                  By Event <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+            </div>
+          </div> -->
           <div class="nav__menu--item">
             <router-link :to="{name: 'users'}">
               users <i class="fas fa-chevron-right"></i>
@@ -70,9 +80,28 @@
           
          
           
-          
+          <div class="nav__menu--item dropdown">
+            <span>App Text</span>
+            <div class="dropdown-content">
+              <div class="mb-3">
+                <router-link :to="{name: 'faqs'}">
+                  faqs <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+              <div class="mb-3">
+                <router-link :to="{name: 'jobs'}">
+                  jobs <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+              <div class="mb-3">
+                <router-link :to="{name: 'pageText'}">
+                  Page Text <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+            </div>
+          </div>
 
-          <div class="nav__menu--item">
+          <!-- <div class="nav__menu--item">
             <router-link :to="{name: 'faqs'}">
               faqs <i class="fas fa-chevron-right"></i>
             </router-link>
@@ -81,7 +110,7 @@
             <router-link :to="{name: 'jobs'}">
               jobs <i class="fas fa-chevron-right"></i>
             </router-link>
-          </div>
+          </div> -->
 
           
           <!-- <div class="nav__menu--item">
@@ -146,28 +175,6 @@
           </div>
     </div>
 </template>
-
-<style scoped>
-  .dropdown {
-  position: relative;
-  display: inline-block;
-  color: #d0d0d0;
-  transition: 0.2s ease all;
-}
-
-.dropdown-content {
-  display: none;
-  position: relative;
-  background-color: #212121;
-  width:100%;
-  transition: 0.2s ease all;
-}
-.dropdown:hover .dropdown-content {
-  display: block;
-  padding-top: 1rem;
-  transition: 0.2s ease all;
-}
-</style>
 
 <script>
 import SVG_TriangleLogo from '@/assets/svgs/SVG_TriangleLogo.vue'

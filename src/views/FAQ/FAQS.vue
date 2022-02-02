@@ -22,15 +22,23 @@
               mode: 'records',
               perPage: 10,
             }"
-            @on-row-click="onRowClick"
           >
             <template slot="table-row" slot-scope="props">
               <span v-if="props.column.field == 'answer'">
                 <span v-html="truncateMethod(props.row.answer)"></span>
               </span>
+              <span v-else-if="props.column.field == 'link'">
+                <router-link :to="`/faqs/` + props.row.id" target="_blank">
+                  <i class="fas fa-external-link ml-3 mr-3"></i>
+                </router-link>
+              </span>
+              <span v-else-if="props.column.field == 'order'">
+                <input type="number" v-model.trim="props.row.order" id="order" @change="onRowEdit(props.row)" />
+              </span>
                <span v-else>
                 {{props.formattedRow[props.column.field]}}
               </span>
+
             </template>
           </vue-good-table>
         </div>
@@ -50,7 +58,15 @@ export default {
     search: '',
     columns: [
       {
-        label: 'Auestion',
+        label: 'Order',
+        field: 'order',
+      },
+      {
+        label: 'Link',
+        field: 'link',
+      },
+      {
+        label: 'Question',
         field: 'question',
       },
       {
@@ -78,7 +94,11 @@ export default {
       let url = `/faqs/` + params.row.id
       console.log(url)
       router.push(url)
-    }
+    },
+    onRowEdit(row) {
+      row = row
+      this.$store.dispatch('updateFaq', row)
+    },
   },
 }
 </script>
