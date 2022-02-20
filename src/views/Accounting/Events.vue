@@ -3,16 +3,15 @@
     <div class="dashboard__container">
       <div class="dashboard__container--header">
         <h1>Event Accounting</h1>
-        <span>
-          <!-- <button class="btn btn__outlined" @click="showAll = true" v-if="!showAll">Show Visible</button>
-          <button class="btn btn__outlined" @click="showAll = false" v-if="showAll">Show Hidden</button> -->
-          <button class="btn mr-3" v-bind:class="{ 'btn__dark': is2021, 'btn__outlined': !is2021 }" @click="show2021()">2021</button>
-          <button class="btn mr-3" v-bind:class="{ 'btn__dark': is2022, 'btn__outlined': !is2022 }" @click="show2022()">2022</button>
+        <span v-if="year">
+          <button class="btn mr-3" v-bind:class="{ 'btn__dark': year == 2021, 'btn__outlined': year != 2021 }" @click="show2021()">2021</button>
+          <button class="btn mr-3" v-bind:class="{ 'btn__dark': year == 2022, 'btn__outlined': year != 2022 }" @click="show2022()">2022</button>
         </span>
 
       </div>
-      <div class="dashboard__container--body pt-3">
-        <Loader v-if="!events || events.length == 0" />
+      <router-view :key="$route.params.id" />
+      <!-- <div class="dashboard__container--body pt-3">
+        <Loader v-if="!events2022 || events2022.length == 0" />
         <vue-good-table
            v-if="is2022"
             :columns="columns"
@@ -25,7 +24,7 @@
             :pagination-options="{
               enabled: true,
               mode: 'records',
-              perPage: 20,
+              perPage: 50,
             }"
             @on-row-click="onRowClick"
           >
@@ -86,7 +85,7 @@
               :pagination-options="{
                 enabled: true,
                 mode: 'records',
-                perPage: 20,
+                perPage: 50,
               }"
               @on-row-click="onRowClick"
             >
@@ -95,6 +94,11 @@
                 {{props.row.startDate | moment("MMM Do, YYYY") }}
                 <span v-if="props.row.endDate">
                     - {{props.row.endDate | moment("MMM Do, YYYY") }}
+                </span>
+              </span>
+              <span v-else-if="props.column.field == 'title'">
+                <span v-if="props.row.paid">
+                  <i class="fas fa-check"></i>
                 </span>
               </span>
               <span v-else-if="props.column.field == 'published'">
@@ -129,7 +133,7 @@
               </span>
             </template>
           </vue-good-table>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -143,111 +147,35 @@ export default {
   name: 'accountingEvents',
   data: () => ({
     showAll: true,
-    is2021: false,
-    is2022: true,
-    columns: [
-      {
-        label: 'Event',
-        field: 'title',
-      },
-      {
-        label: 'Date',
-        field: 'startDate',
-      },
-      // {
-      //   label: 'Visible',
-      //   field: 'published',
-      //   thClass: 'hidden-small',
-      //   tdClass: 'hidden-small',
-      // },
-      {
-        label: 'Venue',
-        field: 'venue.title',
-      },
-      {
-        label: 'Client',
-        field: 'client.title',
-        thClass: 'hidden-small',
-        tdClass: 'hidden-small',
-      },
-      {
-        label: 'State',
-        field: 'venue.address.state',
-      },
-      // {
-      //   label: 'Pay Date',
-      //   field: 'payDate',
-      //   type: 'date',
-      //   dateInputFormat: 'yyyy-MM-dd',
-      //   dateOutputFormat: 'MMM do yyyy',
-      //   thClass: 'hidden-small',
-      //   tdClass: 'hidden-small',
-      // },
-      {
-        label: 'Status',
-        field: 'invoiceStatus',
-        tdClass: 'text-center',
-      },
-      {
-        label: 'New Request',
-        field: 'invoiceRequested',
-        tdClass: 'text-center',
-      },
-
-      // {
-      //   label: 'Complete',
-      //   field: 'paid',
-      //   tdClass: 'text-center',
-      //   thClass: 'hidden-small',
-      //   tdClass: 'hidden-small',
-      // },
-    ]
+    year: ''
   }),
-  computed: {
-    ...mapState(['events']),
-    allEvents: function() {
-      return this.events.filter(event => {
-        return event.published
-      })
-    },
-    hiddenEvents: function() {
-      return this.events.filter(event => {
-        return !event.published
-      })
-    },
-    events2021: function() {
-      return this.events.filter(event => {
-        return event.startDate.includes("2021")
-      })
-    },
-    events2022: function() {
-       return this.events.filter(event => {
-        return event.startDate.includes("2022")
-      })
-    },
-  },
   components: {
     Loader,
   },
+  created () {
+    this.year = this.$route.params.id
+  },
   methods: {
     show2021() {
-      this.is2021 = true
-      this.is2022 = false
+      let url = `/accounting/events/year/2021`
+      router.push(url)
+      this.year = '2021'
     },
     show2022() {
-      this.is2022 = true
-      this.is2021 = false
-    },
-    onRowClick(params) {
-      let url = `/accounting/events/` + params.row.id
-      console.log(url)
+      let url = `/accounting/events/year/2022`
       router.push(url)
-    }
+      this.year = '2022'
+    },
+    // onRowClick(params) {
+    //   let url = `/accounting/events/` + params.row.id
+    //   console.log(url)
+    //   router.push(url)
+    // }
   },
-  created () {
-    if (!this.events || this.events.length < 1) {
-      this.$store.dispatch("getEvents")
-    }
+  beforeDestroy () {
+    this.year = null
+    delete this.year
+    console.log(this)
   }
 }
 </script>

@@ -12,7 +12,9 @@
       <Loader v-if="!shift" />
       <div class="dashboard__container--body" v-if="shift">
         <div class="dashboard__container--body--col">
-          <h2>{{shift.event}}</h2>
+          <div class="flex align-center">
+            <h2>{{shift.event}}</h2>
+          </div>
           <h3 v-if="shift.position">{{shift.position.title}}</h3>
           <h5>{{shift.day | moment("dddd, MMM Do YYYY") }}</h5>
           <span>{{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}</span> - <span>{{ [ shift.endTime, "HH:mm" ] | moment("hh:mm A") }}</span>
@@ -41,26 +43,36 @@
       </div>
       <div class="dashboard__container--body" v-if="shift">
         <div class="dashboard__container--body--col max">
-          <div style="max-width: 30rem; margin-bottom: 1rem;">
-          <ais-instant-search :search-client="searchClient" index-name="a_users" >
-            <ais-search-box placeholder="Add a User" />
-            <ais-state-results>
-              <template slot-scope="{ state: { query } }">
-                <ais-hits v-show="query.length > 0">
-                  <template v-slot:item="{ item }">
-                    <div>
-                      <button class="btn btn__icon btn__flat mr-2 mb-2" @click="addUser(item)"><i class="fad fa-plus"></i></button>
-                      <h4 style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</h4 style="display: inline;">
-                    </div>
+          <div class="flex justify-space-between">
+            <div style="max-width: 30rem; margin-bottom: 1rem;">
+              <ais-instant-search :search-client="searchClient" index-name="a_users" >
+                <ais-search-box placeholder="Add a User" />
+                <ais-state-results>
+                  <template slot-scope="{ state: { query } }">
+                    <ais-hits v-show="query.length > 0">
+                      <template v-slot:item="{ item }">
+                        <div>
+                          <button class="btn btn__icon btn__flat mr-2 mb-2" @click="addUser(item)"><i class="fad fa-plus"></i></button>
+                          <h4 style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</h4 style="display: inline;">
+                        </div>
+                      </template>
+                    </ais-hits>
                   </template>
-                </ais-hits>
-              </template>
-            </ais-state-results>
-          </ais-instant-search>
+                </ais-state-results>
+              </ais-instant-search>
+            </div>
+
+            <div>
+              <button class="btn mr-3" v-bind:class="{ 'btn__dark': isHidden, 'btn__outlined': !isHidden }" @click="showHidden()">Hidden</button>
+              <button class="btn mr-3" v-bind:class="{ 'btn__dark': isVisible, 'btn__outlined': !isVisible }" @click="showVisible()">Visible</button>
+            </div>
+            
           </div>
+          
           <vue-good-table
+            v-if="isVisible"
             :columns="columns"
-            :rows="shiftAssignments"
+            :rows="visibleAssignments"
             :search-options="{
               enabled: true,
               placeholder: 'Search this table',
@@ -68,7 +80,7 @@
             :pagination-options="{
               enabled: true,
               mode: 'records',
-              perPage: 20,
+              perPage: 50,
             }"
           >
           
@@ -96,6 +108,14 @@
                     <TimesheetNote :item="props.row" @close="closeNote(props.row)" />
                   </div>
                 </transition>
+              </span>
+
+              <span v-else-if="props.column.field == 'checkInTimeStamp'">
+                <span v-if="props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp)}}</span>
+              </span>
+
+              <span v-else-if="props.column.field == 'checkOutTimeStamp'">
+                <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
               </span>
 
               <span v-else-if="props.column.field == 'confirmed'">
@@ -165,8 +185,146 @@
               </span>
 
               <span v-else-if="props.column.field == 'delete'">
-                <button :disabled="props.row.locked" class="btn btn__icon" v-tooltip="'remove'" @click="removeEntry(props.row)">
-                  <i class="fas fa-times ml-3 mr-2"></i>
+                <button :disabled="props.row.locked" class="btn btn__primary btn__small ml-2 mr-2" @click="removeEntry(props.row)">
+                  hide
+                </button>
+              </span>
+
+
+              
+              <span v-else-if="props.column.field == 'link'">
+                <router-link :to="`/users/` + props.row.userId" target="_blank">
+                  <i class="fas fa-external-link ml-3 mr-3"></i>
+                </router-link>
+              </span>
+              <span v-else-if="props.column.field == 'save'">
+                <button :disabled="(props.row.locked || !props.row.editable)" class="btn btn__primary btn__small ml-2 mr-2" @click="onSheetEdit(props.row)">
+                  Save
+                </button>
+              </span>
+               <span v-else>
+                <!-- {{props.formattedRow[props.column.field]}} -->
+              </span>
+            </template>
+          </vue-good-table>
+          <vue-good-table
+            v-if="isHidden"
+            :columns="columns"
+            :rows="hiddenAssignments"
+            :search-options="{
+              enabled: true,
+              placeholder: 'Search this table',
+            }"
+            :pagination-options="{
+              enabled: true,
+              mode: 'records',
+              perPage: 50,
+            }"
+          >
+          
+            <template slot="table-row" slot-scope="props">
+              <span v-if="props.column.field == 'regRate'">
+                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'dayRate'">
+                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'firstName'">
+                <input type="text" v-model.trim="props.row.firstName" id="firstName" readonly />
+              </span>
+              <span v-else-if="props.column.field == 'lastName'">
+                <input type="text" v-model.trim="props.row.lastName" id="lastName" readonly />
+              </span>
+              <!-- <span v-else-if="props.column.field == 'fileId'">
+                <input type="text" v-model.trim="props.row.fileId" id="fileId" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span> -->
+              <span v-else-if="props.column.field == 'note'">
+                <button v-show="!props.row.note" class="btn btn__flat btn__icon" @click="showNote(props.row)" v-tooltip="'Leave a note'"><i class="far fa-sticky-note ml-3 mr-3" style="opacity:0.5;"></i></button>
+                <button v-show="props.row.note" class="btn btn__flat btn__icon" @click="showNote(props.row)" v-tooltip="'Leave a note'"><i class="far fa-sticky-note ml-3 mr-3" style="color:blue"></i></button>
+                <transition name="modal">
+                  <div v-if="activeItem == props.row">
+                    <TimesheetNote :item="props.row" @close="closeNote(props.row)" />
+                  </div>
+                </transition>
+              </span>
+
+              <span v-else-if="props.column.field == 'checkInTimeStamp'">
+                <span v-if="props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp)}}</span>
+              </span>
+
+              <span v-else-if="props.column.field == 'checkOutTimeStamp'">
+                <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
+              </span>
+
+              <span v-else-if="props.column.field == 'confirmed'">
+                <span v-if="props.row.confirmed">{{props.row.confirmed}}</span>
+              </span>
+
+              <span v-else-if="props.column.field == 'regHours'">
+                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'otHours'">
+                <input type="number" v-model.trim="props.row.otHours" id="otHours" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'ot2Hours'">
+                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'mbp'">
+                <input type="number" v-model.trim="props.row.mbp" id="mbp" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'tips'">
+                <input type="number" v-model.trim="props.row.tips" id="tips" @change="onSheetEditable(props.row)" :readonly="props.row.locked"  />
+              </span>
+              <span v-else-if="props.column.field == 'state'">
+                <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'status'">
+                <v-select
+                  label="status" 
+                  :options="statuses"
+                  v-model="props.row.status"
+                  @input="onSheetEdit(props.row)"
+                  :disabled="props.row.locked"
+                  :clearable=false
+                  >
+                </v-select>
+              </span>
+              <span v-else-if="props.column.field == 'paystatus'">
+                <v-select
+                  label="status" 
+                  :options="paystatuses"
+                  v-model="props.row.paystatus"
+                  @input="onSheetEdit(props.row)"
+                  :disabled="props.row.locked"
+                  :clearable=true
+                  >
+                </v-select>
+              </span>
+              <span v-else-if="props.column.field == 'locked'">
+                <button class="btn btn__icon" @click="lock(props.row)" v-if="!props.row.locked">
+                  <i class="fas fa-lock-open-alt ml-3 mr-3"></i>
+                </button>
+                <button class="btn btn__icon" @click="unlock(props.row)" v-if="props.row.locked">
+                  <i class="fas fa-lock-alt ml-3 mr-3" style="color:#5cb85c;"></i>
+                </button>
+              </span>
+              <span v-if="props.column.field == 'fileId'">
+                <input type="text" v-model.trim="props.row.fileId" id="fileId" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span>
+
+
+              <span v-if="props.column.field == 'onpay'">
+                <button class="btn btn__icon" @click="opr(props.row)" v-if="!props.row.opr">
+                  <i class="fad fa-money-bill-wave ml-3 mr-3"></i>
+                </button>
+                <button class="btn btn__icon" @click="removeopr(props.row)" v-if="props.row.opr">
+                  <i class="fad fa-money-bill-wave ml-3 mr-3" style="color:#f0ad4e;"></i>
+                </button>
+              </span>
+
+              <span v-else-if="props.column.field == 'delete'">
+                <button :disabled="props.row.locked" class="btn btn__primary btn__small ml-2 mr-2" @click="showEntry(props.row)">
+                  show
                 </button>
               </span>
 
@@ -214,6 +372,7 @@ import Loader from '@/components/Loader.vue'
 import router from '@/router'
 import ExportService from "@/services/ExportService"
 import TimesheetNote from '@/components/Timesheets/TimesheetNote.vue'
+import * as moment from 'moment'
 const fb = require('../../firebaseConfig.js')
 import algoliasearch from 'algoliasearch/lite';
 import 'instantsearch.css/themes/satellite-min.css'
@@ -221,12 +380,14 @@ import 'instantsearch.css/themes/satellite-min.css'
 export default {
   name: 'shift',
   data: () => ({
+    isVisible: true,
+    isHidden: false,
     searchClient: algoliasearch(
       '0T1SIY6Y1V',
       'f03dc899fbdd294d6797791724cdb402'
     ),
     activeItem: null,
-    statuses: ['completed', 'arrived late', 'left early', 'no-show', 'client fired', 'terminated' ],
+    statuses: ['completed', 'no-show', 'no-response', 'arrived late', 'left early', 'client fired', 'terminated' ],
     paystatuses: ['paid', 'paid tips', 'paid hours', 'not paid' ],
     columns: [
       {
@@ -255,59 +416,89 @@ export default {
       {
         label: 'Pay Status',
         field: 'paystatus',
-        width: '150px',
+        width: '140px',
         sortable: false,
       },
       {
         label: 'Event Status',
         field: 'status',
-        width: '120px',
+        width: '140px',
         sortable: false,
       },
       {
         label: 'First',
         field: 'firstName',
+        width: '100px',
       },
       {
         label: 'Last',
         field: 'lastName',
+        width: '100px',
       },
       {
         label: 'ID',
         field: 'fileId',
         sortable: false,
+        width: '100px',
       },
+      
       {
-        label: 'Bonus',
-        field: 'dayRate',
-      },
-      {
-        label: 'Reg Rate',
+        label: 'Rate',
         field: 'regRate',
+        width: '48px',
+        sortable: false,
       },
       {
-        label: 'Reg Hours',
+        label: 'In',
+        field: 'checkInTimeStamp',
+        width: '64px',
+        sortable: false,
+      },
+      {
+        label: 'Out',
+        field: 'checkOutTimeStamp',
+        width: '64px',
+        sortable: false,
+      },
+      {
+        label: 'Hours',
         field: 'regHours',
+        width: '48px',
+        sortable: false,
       },
       {
-        label: 'OT Hours',
+        label: 'OT',
         field: 'otHours',
+        width: '48px',
+        sortable: false,
       },
       {
-        label: '2OT Hours',
+        label: '2OT',
         field: 'ot2Hours',
+        width: '48px',
+        sortable: false,
       },
       {
-        label: 'Meal Break Penalty',
+        label: 'Penalty',
         field: 'mbp',
+        width: '48px',
+        sortable: false,
       },
       {
         label: 'Tips',
         field: 'tips',
+        width: '48px',
+      },
+      {
+        label: 'Bonus',
+        field: 'dayRate',
+        width: '48px',
+        sortable: false,
       },
       {
         label: 'Save',
         field: 'save',
+        sortable: false,
       },
     ]
   }),
@@ -323,8 +514,50 @@ export default {
   },
   computed: {
     ...mapState(['userProfile', 'shift', 'shiftAssignments']),
+    visibleAssignments() {
+      return this.shiftAssignments.filter(item => {
+        return (!item.hidden || item.hidden != true)
+      })
+    },
+    hiddenAssignments() {
+      return this.shiftAssignments.filter(item => {
+        return (item.hidden)
+      })
+    },
   },
+  // mounted () {
+  //   this.hoursCalc()
+  // },
   methods: {
+    showHidden() {
+      this.isHidden = true
+      this.isVisible = false
+    },
+    showVisible() {
+      this.isVisible = true
+      this.isHidden = false
+    },
+    // hoursCalc() {
+    //   this.shiftAssignments.forEach(assignment => {
+    //     console.log(assignment)
+    //     if ((assignment.checkOutTimeStamp && assignment.checkInTimeStamp) && !assignment.regHours) {
+    //       let q = (assignment.checkOutTimeStamp.seconds - assignment.checkInTimeStamp.seconds)
+    //       if (q) {
+    //         const postedDate = new Date(q) * 1000;
+    //         console.log(postedDate)
+    //         let time = new Date(postedDate).toISOString().substr(11, 8)
+    //         console.log(time)
+    //         let hours = moment.duration(time).asHours()
+    //         if (hours) {
+    //           return hours
+    //           fb.assignmentsCollection.doc(assignment.id).update({
+    //             regHours: hours
+    //           })
+    //         }
+    //       }
+    //     }
+    //   })
+    // },
     addUser(item) {
       console.log(item)
       this.$store.dispatch("addUserToShift", {
@@ -338,6 +571,31 @@ export default {
         .forEach((e) => (e.value = ''))
         document.querySelectorAll('.ais-Hits-item').forEach((e) => e.remove())
         // this.$refs.searchHits.state.hits = []
+    },
+    formatDateCalc(q) {
+      if(q) {
+        const postedDate = new Date(q) * 1000;
+        console.log(postedDate)
+        let time = new Date(postedDate).toISOString().substr(11, 8)
+        console.log(time)
+        let hours = moment.duration(time).asHours()
+        return hours
+      } else {
+        return null
+      }
+    },
+    formatDate(q) {
+      if(q) {
+        const postedDate = new Date(q.seconds) * 1000;
+
+        return moment.utc(postedDate).local().format('HH:mm:ss A')
+        // return moment(postedDate).format('HH:MM A')
+      } else {
+        return null
+      }
+    },
+    formatDate2(q) {
+      return moment(q).format('HH:MM A')
     },
     formatAMPM(date) {
       if (typeof date === "string") {
@@ -376,7 +634,14 @@ export default {
       this.activeItem = null
     },
     removeEntry(row) {
-      fb.assignmentsCollection.doc(row.id).delete()
+      fb.assignmentsCollection.doc(row.id).update({
+        hidden:true
+      })
+    },
+    showEntry(row) {
+      fb.assignmentsCollection.doc(row.id).update({
+        hidden:false
+      })
     },
     updateShift() {
       this.$store.dispatch("updateEventShift", this.shift)
@@ -457,12 +722,14 @@ export default {
       ];
       const exportItems = [];
       for (var key in this.shiftAssignments) {
-        exportItems.push([
-          this.shiftAssignments[key].firstName,
-          this.shiftAssignments[key].lastName,
-          this.shiftAssignments[key].email,
-          this.shiftAssignments[key].phone,
-        ]);
+        if (!this.shiftAssignments[key].hidden) {
+          exportItems.push([
+            this.shiftAssignments[key].firstName,
+            this.shiftAssignments[key].lastName,
+            this.shiftAssignments[key].email,
+            this.shiftAssignments[key].phone,
+          ]);
+        }
       }
       this.$gapi.getGapiClient().then(gapi => {
         const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
@@ -486,16 +753,18 @@ export default {
       ];
       const exportItems = [];
       for (var key in this.shiftAssignments) {
-        exportItems.push([
-          this.shiftAssignments[key].firstName,
-          this.shiftAssignments[key].lastName,
-          this.shiftAssignments[key].regRate,
-          this.shiftAssignments[key].regHours,
-          this.shiftAssignments[key].otHours,
-          this.shiftAssignments[key].ot2Hours,
-          this.shiftAssignments[key].mbp,
-          this.shiftAssignments[key].tips
-        ]);
+        if (!this.shiftAssignments[key].hidden) {
+          exportItems.push([
+            this.shiftAssignments[key].firstName,
+            this.shiftAssignments[key].lastName,
+            this.shiftAssignments[key].regRate,
+            this.shiftAssignments[key].regHours,
+            this.shiftAssignments[key].otHours,
+            this.shiftAssignments[key].ot2Hours,
+            this.shiftAssignments[key].mbp,
+            this.shiftAssignments[key].tips
+          ]);
+        }
       }
       this.$gapi.getGapiClient().then(gapi => {
         const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
@@ -594,7 +863,7 @@ export default {
       ];
       const exportItems = [];
       for (var key in this.shiftAssignments) {
-        if (this.shiftAssignments[key].fileId && this.shiftAssignments[key].fileId.length > 9) {
+        if (!this.shiftAssignments[key].hidden && this.shiftAssignments[key].fileId && this.shiftAssignments[key].fileId.length > 9) {
           exportItems.push([
             "1",
             "7",
@@ -659,6 +928,20 @@ export default {
     },
   },
   beforeDestroy () {
+    this.isVisible = null
+    this.isHidden = null
+    this.searchClient = null
+    this.activeItem = null
+    this.statuses = null
+    this.paystatuses = null
+    this.columns = null
+    delete this.isVisible
+    delete this.isHidden
+    delete this.searchClient
+    delete this.activeItem
+    delete this.statuses
+    delete this.paystatuses
+    delete this.columns
     this.$store.dispatch('clearShiftState')
     console.log(this)
   }

@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard">
     <div class="dashboard__container">
-      <div class="dashboard__container--header flex justify-space-between align-center">
+      <div class="dashboard__container--header flex justify-space-between align-center mb-3">
         <h1>Users</h1>
         <!-- <div class="flex align-center"> 
           <button class="btn btn__outlined mb-3" @click="exportAll()">export all</button>

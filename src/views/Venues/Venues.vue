@@ -20,7 +20,7 @@
             :pagination-options="{
               enabled: true,
               mode: 'records',
-              perPage: 10,
+              perPage: 20,
             }"
             @on-row-click="onRowClick"
           >
@@ -81,7 +81,7 @@ export default {
     }
   },
   beforeDestroy () {
-    console.log(this)
+    this.$store.dispatch('clearVenuesState')
   }
 }
 </script>

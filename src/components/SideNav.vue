@@ -30,21 +30,6 @@
             </router-link>
           </div>
           <div class="nav__menu--item">
-            <router-link :to="{name: 'eventplacements'}">
-              placements <i class="fas fa-chevron-right"></i>
-            </router-link>
-          </div>
-          <!-- <div class="nav__menu--item dropdown">
-            <span>Placements</span>
-            <div class="dropdown-content">
-              <div class="mb-3">
-                <router-link :to="{name: 'eventplacements'}">
-                  By Event <i class="fas fa-chevron-right"></i>
-                </router-link>
-              </div>
-            </div>
-          </div> -->
-          <div class="nav__menu--item">
             <router-link :to="{name: 'users'}">
               users <i class="fas fa-chevron-right"></i>
             </router-link>
@@ -59,23 +44,36 @@
               Venues <i class="fas fa-chevron-right"></i>
             </router-link>
           </div>
+          
+          
+        
+          <div class="nav__menu--item dropdown">
+            <span>Customers</span>
+            <div class="dropdown-content">
+              <div class="mb-3">
+                <router-link :to="{name: 'clients'}">
+                  Customers <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+              <div class="mb-3">
+                <router-link :to="{name: 'contacts'}">
+                  leads <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+              <div class="mb-3">
+                <router-link :to="{name: 'clientAccess'}">
+                  client portal access <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+            </div>
+          </div>
+
           <div class="nav__menu--item">
             <router-link :to="{name: 'team'}">
-              company <i class="fas fa-chevron-right"></i>
+              company roster<i class="fas fa-chevron-right"></i>
             </router-link>
           </div>
           
-        
-          <div class="nav__menu--item">
-            <router-link :to="{name: 'clients'}">
-              clients <i class="fas fa-chevron-right"></i>
-            </router-link>
-          </div>
-          <div class="nav__menu--item">
-            <router-link :to="{name: 'contacts'}">
-              contacts <i class="fas fa-chevron-right"></i>
-            </router-link>
-          </div>
 
           
          
@@ -100,25 +98,6 @@
               </div>
             </div>
           </div>
-
-          <!-- <div class="nav__menu--item">
-            <router-link :to="{name: 'faqs'}">
-              faqs <i class="fas fa-chevron-right"></i>
-            </router-link>
-          </div>
-          <div class="nav__menu--item">
-            <router-link :to="{name: 'jobs'}">
-              jobs <i class="fas fa-chevron-right"></i>
-            </router-link>
-          </div> -->
-
-          
-          <!-- <div class="nav__menu--item">
-            <router-link :to="{name: 'series'}">
-              series
-            </router-link>
-          </div> -->
-
           <div class="nav__menu--item">
             <router-link :to="{name: 'userReports'}">
               Reports <i class="fas fa-chevron-right"></i>
@@ -145,11 +124,7 @@
                   Payroll Help <i class="fas fa-chevron-right"></i>
                 </router-link>
               </div>
-              <div class="mb-3">
-                <router-link :to="{name: 'shifts'}">
-                  timesheets <i class="fas fa-chevron-right"></i>
-                </router-link>
-              </div>
+
               <div class="mb-3">
                 <router-link :to="{name: 'accountReferrals'}">
                   referrals <i class="fas fa-chevron-right"></i>

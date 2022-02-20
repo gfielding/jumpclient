@@ -2,7 +2,7 @@
   <div class="dashboard">
     <div class="dashboard__container">
       <div class="dashboard__container--header">
-        <h1>Contacts</h1>
+        <h1>Leads</h1>
         <router-link :to="{name: 'addcontact'}" class="color--text">
           <button class="btn btn__flat"><i class="fas fa-plus fa-2x"></i></button>
         </router-link>

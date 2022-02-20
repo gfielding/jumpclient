@@ -88,7 +88,7 @@
 
           <div class="dashboard__container--body--col">
             <h3>Managers</h3>
-            <div class="mb-3" v-if="mgrs.length >= 1">
+            <div class="mb-5" v-if="mgrs.length >= 1">
               <label for="client">Select Managers:</label>
               <v-select
                 class="mt-2"
@@ -99,6 +99,25 @@
                 >
               </v-select>
             </div>
+            <h3>Client Access</h3>
+            <div class="mb-3">
+              <ais-instant-search :search-client="searchClient" index-name="a_users" >
+                <ais-search-box placeholder="Add a User" />
+                <ais-state-results>
+                  <template slot-scope="{ state: { query } }">
+                    <ais-hits v-show="query.length > 0">
+                      <template v-slot:item="{ item }">
+                        <div>
+                          <button class="btn btn__icon btn__flat mr-2 mb-2" @click="addUser(item)"><i class="fad fa-plus"></i></button>
+                          <h4 style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</h4 style="display: inline;">
+                        </div>
+                      </template>
+                    </ais-hits>
+                  </template>
+                </ais-state-results>
+              </ais-instant-search>
+            </div>
+            
           </div>
 
           <div class="dashboard__container--body--col">
@@ -123,7 +142,7 @@
               </div>
               <div v-if="venue.files && venue.files.length >= 1">
                 <vue-good-table
-                  :columns="columns"
+                  :columns="columns2"
                   :rows="venue.files"
                   >
                   <template slot="table-row" slot-scope="props">
@@ -213,7 +232,7 @@
                   </span>
                 </transition>
               </button>
-              <button class="btn btn__dark" @click="deleteVenue()">delete</button>
+              <!-- <button class="btn btn__dark" @click="deleteVenue()">delete</button> -->
             </div>
           </div>
       	</div>
@@ -258,10 +277,16 @@ import Loader from '@/components/Loader.vue'
 import router from '@/router'
 import { VueEditor } from "vue2-editor";
 const fb = require('../../firebaseConfig.js')
+import algoliasearch from 'algoliasearch/lite';
+import 'instantsearch.css/themes/satellite-min.css'
 
 export default {
   name: 'venue',
   data: () => ({
+    searchClient: algoliasearch(
+      '0T1SIY6Y1V',
+      'f03dc899fbdd294d6797791724cdb402'
+    ),
     center: { lat: 45.508, lng: -73.587 },
     marker: {},
     address: {},
@@ -282,6 +307,24 @@ export default {
       {
         label: 'Date',
         field: 'startDate',
+      },
+    ],
+    columns2: [
+      {
+        label: 'Link',
+        field: 'url',
+      },
+      {
+        label: 'Title',
+        field: 'title',
+      },
+      {
+        label: 'Description',
+        field: 'Description',
+      },
+      {
+        label: '',
+        field: 'extras',
       },
     ]
   }),
@@ -311,6 +354,28 @@ export default {
     VueEditor
   },
   methods: {
+    deleteAccess(index) {
+      let venue = this.venue
+      venue.access.splice(index, 1)
+      this.$store.dispatch('updateVenue', venue)
+    },
+    // addDay() {
+    //   let venue = this.venue
+    //   venue.access.push(this.item)
+    //   this.$store.dispatch('updateVenue', venue)
+    // },
+    addUser(item) {
+      let venue = this.venue
+      this.$store.dispatch('updateVenueAccess', {
+        venue: venue,
+        user: item
+      })
+      document
+        .querySelectorAll('.ais-SearchBox-input')
+        .forEach((e) => (e.value = ''))
+        document.querySelectorAll('.ais-Hits-item').forEach((e) => e.remove())
+        // this.$refs.searchHits.state.hits = []
+    },
     previewImage(venue) {
       this.uploadValue=0;
       this.imageData=venue.target.files[0]

@@ -16,6 +16,7 @@
       </select>
     </div>
 	</div>
+
 </template>
 
 <script>
@@ -35,6 +36,7 @@ export default {
       // user.blacklist = blacklist
       if (!user.blacklist) {
       	user.blacklist = []
+        user.blacklist.push(newBlack)
       } else {
       	user.blacklist.push(newBlack)
       }

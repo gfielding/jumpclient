@@ -146,14 +146,9 @@
           </div>
          
 
-          <div class="nav__menu--item">
+          <div class="nav__menu--item mt-5">
             <router-link :to="{name: 'events'}">
               events <i class="fas fa-chevron-right"></i>
-            </router-link>
-          </div>
-          <div class="nav__menu--item">
-            <router-link :to="{name: 'eventplacements'}">
-              placements <i class="fas fa-chevron-right"></i>
             </router-link>
           </div>
           <div class="nav__menu--item">
@@ -171,47 +166,60 @@
               Venues <i class="fas fa-chevron-right"></i>
             </router-link>
           </div>
+          
+          
+        
+          <div class="nav__menu--item dropdown">
+            <span>Customers</span>
+            <div class="dropdown-content">
+              <div class="mb-3">
+                <router-link :to="{name: 'clients'}">
+                  Customers <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+              <div class="mb-3">
+                <router-link :to="{name: 'contacts'}">
+                  leads <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+              <div class="mb-3">
+                <router-link :to="{name: 'clientAccess'}">
+                  client portal access <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+            </div>
+          </div>
+
           <div class="nav__menu--item">
             <router-link :to="{name: 'team'}">
-              company <i class="fas fa-chevron-right"></i>
+              company roster<i class="fas fa-chevron-right"></i>
             </router-link>
           </div>
           
-        
-          <div class="nav__menu--item">
-            <router-link :to="{name: 'clients'}">
-              clients <i class="fas fa-chevron-right"></i>
-            </router-link>
-          </div>
-          <div class="nav__menu--item">
-            <router-link :to="{name: 'contacts'}">
-              contacts <i class="fas fa-chevron-right"></i>
-            </router-link>
-          </div>
 
           
          
           
-          
-
-          <div class="nav__menu--item">
-            <router-link :to="{name: 'faqs'}">
-              faqs <i class="fas fa-chevron-right"></i>
-            </router-link>
+          <div class="nav__menu--item dropdown">
+            <span>App Text</span>
+            <div class="dropdown-content">
+              <div class="mb-3">
+                <router-link :to="{name: 'faqs'}">
+                  faqs <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+              <div class="mb-3">
+                <router-link :to="{name: 'jobs'}">
+                  jobs <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+              <div class="mb-3">
+                <router-link :to="{name: 'pageText'}">
+                  Page Text <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+            </div>
           </div>
-          <div class="nav__menu--item">
-            <router-link :to="{name: 'jobs'}">
-              jobs <i class="fas fa-chevron-right"></i>
-            </router-link>
-          </div>
-
-          
-          <!-- <div class="nav__menu--item">
-            <router-link :to="{name: 'series'}">
-              series
-            </router-link>
-          </div> -->
-
           <div class="nav__menu--item">
             <router-link :to="{name: 'userReports'}">
               Reports <i class="fas fa-chevron-right"></i>
@@ -238,11 +246,7 @@
                   Payroll Help <i class="fas fa-chevron-right"></i>
                 </router-link>
               </div>
-              <div class="mb-3">
-                <router-link :to="{name: 'shifts'}">
-                  timesheets <i class="fas fa-chevron-right"></i>
-                </router-link>
-              </div>
+
               <div class="mb-3">
                 <router-link :to="{name: 'accountReferrals'}">
                   referrals <i class="fas fa-chevron-right"></i>

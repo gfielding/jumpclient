@@ -409,29 +409,29 @@ export default {
       let day = this.day
       event.days.push(day)
       day = ''
-      this.$store.dispatch('updateEvent', event)
+      // this.$store.dispatch('updateEvent', event)
     },
     addJob() {
       let event = this.event
       event.jobs.push(this.job)
       this.job = ''
-      this.$store.dispatch('updateEvent', event)
+      // this.$store.dispatch('updateEvent', event)
     },
     deleteUploadedFile(u, index) {
       console.log(u)
       let event = this.event
       event.files.splice(index, 1)
-      this.$store.dispatch('updateEvent', event)
+      // this.$store.dispatch('updateEvent', event)
     },
     deleteDay(index) {
       let event = this.event
       event.days.splice(index, 1)
-      this.$store.dispatch('updateEvent', event)
+      // this.$store.dispatch('updateEvent', event)
     },
     deleteJob(index) {
       let event = this.event
       event.jobs.splice(index, 1)
-      this.$store.dispatch('updateEvent', event)
+      // this.$store.dispatch('updateEvent', event)
     },
     addEvent() {
       this.performingRequest = true
@@ -480,13 +480,23 @@ export default {
     },
   },
   beforeDestroy () {
-    this.event = null
+    this.showBar = null
+    this.uploadValue = null
+    this.fileDescription = null
+    this.job = null
+    this.event = {}
     this.croppa = null
-    this.day = null
-    delete this.day
+    this.day = nul;
     this.multiDay = null
     this.performingRequest = null
+    delete this.day
+    delete this.showBar
+    delete this.uploadValue
+    delete this.fileDescription
+    delete this.fileTitle
     delete this.event
+    delete this.job
+    delete this.imageData
     delete this.croppa
     delete this.multiDay
     delete this.performingRequest

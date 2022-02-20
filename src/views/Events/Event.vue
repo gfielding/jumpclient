@@ -4,11 +4,14 @@
       <div class="dashboard__container--header">
         <div class="flex align-center">
           <h1>Edit Event</h1>
-          <button class="btn btn__large btn__success ml-5" v-if="event && event.published">
+          <button class="btn btn__large btn__success ml-5" v-if="event && event.published" :disabled="event.cancelled">
             Published
           </button>
-          <button class="btn btn__large btn__warning ml-5" v-if="event && !event.published">
+          <button class="btn btn__large btn__warning ml-5" v-if="event && !event.published" :disabled="event.status == 'cancelled'">
             Draft
+          </button>
+          <button class="btn btn__large btn__danger ml-5" v-if="event && event.status == 'cancelled'">
+            Cancelled
           </button>
         </div>
         <div class="flex align-center">
@@ -17,12 +20,12 @@
           </router-link>
           <button class="btn btn__outlined mr-3" @click="shifts()">Event Shifts</button>
           <button class="btn btn__outlined mr-3" @click="placements()">Event placements</button>
-          <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
+          <button class="btn btn__flat" @click="goBack()"><i class="fas fa-arrow-left fa-2x"></i></button>
         </div>
       </div>
       <form ref="form" @submit.prevent>
-        <Loader v-if="!event" />
-      	<div class="dashboard__container--body" v-if="event">
+        <Loader v-if="!eventInfo || !eventInfo.id" />
+      	<div class="dashboard__container--body mt-3" v-if="eventInfo">
       		<div class="dashboard__container--body--col">
 
     				<div class="mb-3">
@@ -40,9 +43,10 @@
     					<input type="checkbox" v-model.trim="event.published" id="eventPublished" class="ml-3" />
     				</div>
 
-            <div class="mb-3">
+            <div class="mb-3" v-if="event && event.venue">
               <label for="venueVisibility">Vaccination Required:</label>
-              <input type="checkbox" v-model.trim="event.requiredVaccine" id="venueVisibility" class="ml-3" />
+              <input v-if="!event.requiredVaccine" type="checkbox" v-model.trim="event.venue.requiredVaccine" id="venueVisibility" class="ml-3" />
+              <input v-if="event.requiredVaccine" type="checkbox" v-model.trim="event.requiredVaccine" id="venueVisibility" class="ml-3" />
             </div>
 
             <div class="mb-3" v-if="venues.length > 1">
@@ -326,10 +330,28 @@
               export Staff
 
               </button> -->
-              <button class="btn btn__primary btn__large" @click="updateEvent()">
+              <button class="btn btn__primary btn__large" @click="updateEvent()" :disabled="event.status == 'cancelled'">
               Update Event
                 <transition name="fade">
                   <span class="ml-2" v-if="performingRequest">
+                  <i class="fa fa-spinner fa-spin"></i>
+                  </span>
+                </transition>
+              </button>
+
+
+              <button class="btn btn__danger btn__large" @click="cancelEvent()" v-if="event.status != 'cancelled'">
+                Cancel Event
+                <transition name="fade">
+                  <span class="ml-2" v-if="performingRequest4">
+                  <i class="fa fa-spinner fa-spin"></i>
+                  </span>
+                </transition>
+              </button>
+              <button class="btn btn__success btn__large" @click="activateEvent()" v-if="event.status == 'cancelled'">
+                 Activate Event
+                <transition name="fade">
+                  <span class="ml-2" v-if="performingRequest4">
                   <i class="fa fa-spinner fa-spin"></i>
                   </span>
                 </transition>
@@ -360,6 +382,7 @@ export default {
     performingRequest: false,
     performingRequest2: false,
     performingRequest3: false,
+    performingRequest4: false,
     imageData: null,
     fileTitle: '',
     fileDescription: '',
@@ -392,6 +415,8 @@ export default {
   },
   created () {
     this.$store.dispatch("getEventFromId", this.$route.params.id);
+  },
+  beforeMount() {
     if (!this.venues || this.venues.length < 1) {
       this.$store.dispatch("getVenues")
     }
@@ -495,7 +520,7 @@ export default {
       router.push(url)
     },
     placements() {
-      let url = `/placements/event/` + this.$route.params.id
+      let url = `/eventplacements/` + this.$route.params.id
       router.push(url)
     },
     deleteEvent() {
@@ -512,6 +537,24 @@ export default {
     updateStaff() {
       let event = this.event
       this.$store.dispatch('updateEventStaff', event)
+    },
+    cancelEvent() {
+      this.performingRequest4 = true
+      this.event.status = 'cancelled'
+      let event = this.event
+      this.$store.dispatch('updateEvent', event)
+      setTimeout(() => {
+        this.performingRequest4 = false
+      }, 500)
+    },
+    activateEvent() {
+      this.performingRequest4 = true
+      this.event.status = 'active'
+      let event = this.event
+      this.$store.dispatch('updateEvent', event)
+      setTimeout(() => {
+        this.performingRequest4 = false
+      }, 500)
     },
     updateEvent() {
       this.performingRequest = true
@@ -536,8 +579,8 @@ export default {
         setTimeout(() => {
           this.performingRequest = false
           croppa.remove()
-          let url = `/events`
-          router.push(url)
+          // let url = `/events`
+          // router.push(url)
         }, 5000)
       } else {
         console.log(event)
@@ -545,22 +588,30 @@ export default {
         setTimeout(() => {
           croppa.remove()
           this.performingRequest = false
-          let url = `/events`
-          router.push(url)
+          // let url = `/events`
+          // router.push(url)
         }, 2000)
       }
     }
   },
   beforeDestroy () {
     this.croppa = null
+    this.imageData = null
+    this.showBar = null
+    this.job = null
     this.multiDay = null
     this.fileTitle = null
     this.fileDescription = null
     this.performingRequest = null
     this.performingRequest2 = null
+    this.performingRequest3 = null
     this.performingRequest4 = null
     this.day = null
+    this.uploadValue = null
+    this.columns = null
+    delete this.imageData
     delete this.day
+    delete this.job
     delete this.croppa
     delete this.multiDay
     delete this.fileTitle
@@ -568,8 +619,13 @@ export default {
     delete this.performingRequest
     delete this.performingRequest2
     delete this.performingRequest3
+    delete this.performingRequest4
+    delete this.uploadValue
+    delete this.showBar
+    delete this.columns
   	this.$store.dispatch('clearErrors')
     this.$store.dispatch('clearEventState')
+    console.log(this)
   }
 }
 </script>

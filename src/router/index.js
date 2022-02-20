@@ -153,13 +153,27 @@ const router = new VueRouter({
         requiresAuth: true
       },
     },
+
+ 
+
+
     {
-      path: '/accounting/events',
+      path: '/accounting/events', redirect: '/accounting/events/year/2022',
       name: 'accountingEvents',
       component: () => import('../views/Accounting/Events.vue'),
       meta: {
         requiresAuth: true
       },
+      children: [
+        {
+          path: '/accounting/events/year/:id',
+          name: 'accountingEventsTable',
+          component: () => import('../views/Accounting/EventsTable.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+      ]
     },
     {
       path: '/accounting/events/:id',
@@ -433,6 +447,34 @@ const router = new VueRouter({
       },
     },
     {
+      path: '/clientaccess',
+      name: 'clientAccess',
+      component: () => import('../views/ClientAccess/ClientAccess.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/clientaccess/new',
+      name: 'giveClientAccess',
+      component: () => import('../views/ClientAccess/GiveAccess.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/clientaccess/:id',
+      name: 'manageAccess',
+      component: () => import('../views/ClientAccess/ManageAccess.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+
+
+
+    
+    {
       path: '/eventplacements',
       name: 'eventplacements',
       component: () => import('../views/Placements/ByEvent.vue'),
@@ -475,14 +517,14 @@ const router = new VueRouter({
         
     //   ]
     // },
-    {
-      path: '/timesheets',
-      name: 'shifts',
-      component: () => import('../views/Shifts/Shifts.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
+    // {
+    //   path: '/timesheets',
+    //   name: 'shifts',
+    //   component: () => import('../views/Shifts/Shifts.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    // },
     {
       path: '/timesheets/:id',
       name: 'shift',

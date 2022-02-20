@@ -10,7 +10,10 @@
         <SideNav :userProfile="currentUser" />
       </div>
 
-      <keep-alive  max="5" :include="['users', 'events', 'shifts', 'accountingEvents', 'groups', 'eventplacements']">
+     <!--  <keep-alive  max="5" :include="['users', 'events', 'shifts', 'accountingEvents', 'groups', 'eventplacements', 'accountingEventsTable']">
+        <router-view :key="$route.fullPath"></router-view> 
+      </keep-alive> -->
+      <keep-alive  max="3" :include="['events', 'shifts', 'accountingEvents', 'groups', 'eventplacements']">
         <router-view :key="$route.fullPath"></router-view> 
       </keep-alive>
     </div>
@@ -55,6 +58,11 @@ export default {
   // beforeMount(){
   //   this.cred()
   // },
+  // async mounted() {
+  //   if (!this.userProfile) {
+  //     this.$store.dispatch("getUserProfile");
+  //   }
+  // },
   computed: {
     ...mapState(['currentUser', 'errorMessage', 'userProfile']),
     showNav() {
@@ -66,26 +74,5 @@ export default {
     },
     
   },
-  methods: {
-    // cred() {
-    //   if (this.currentUser && this.currentUser.email && !this.currentUser.email.endsWith('mvpeventstaffing.com')) {
-    //     console.log('if')
-    //     this.$store.dispatch('logout')
-    //   } else {
-    //     console.log('else')
-       
-    //   }
-    // },
-    // logout() {
-    //   this.$store.dispatch('logout')
-    // },
-    redirect() {
-      // console.log('redirecting')
-      // location.href = "https://mvpeventstaffing.com";
-      // let url = 'https://mvpeventstaffing.com'
-      // window.open(url)
-      // router.push(url)
-    }
-  }
 }
 </script>

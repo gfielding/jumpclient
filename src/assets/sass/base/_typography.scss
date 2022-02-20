@@ -93,9 +93,12 @@ src: url('./fonts/D-DINExp-Bold.woff') format('woff');
 a {
   cursor: pointer;
   text-decoration:none;
-  color: $primary;
+  color: $accent;
   &.color--text {
     color:$text;
+  }
+  &:hover {
+    color: $accentDark;
   }
 }
 

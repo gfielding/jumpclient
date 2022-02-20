@@ -65,7 +65,7 @@ export default {
     Loader
   },
   created () {
-    if (!this.users || this.users.length < 1) {
+    if (!this.users || this.users.length < 2) {
       this.$store.dispatch("getUserReports")
     }
   },

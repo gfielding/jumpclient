@@ -5,6 +5,9 @@
         <h1>Dashboard</h1>
       </div>
       <div class="dashboard__container--body" v-if="userProfile">
+        
+
+
         <!-- <div class="dashboard__container--body--col">
           <ProfileImage :userProfile="userProfile" />
         </div>
@@ -34,14 +37,38 @@
 <script>
 import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
+import firebase from 'firebase/app';
 
 export default {
   name: 'dashboard',
+  data: () => ({
+    newUser: {}
+  }),
   computed: {
     ...mapState(['userProfile']),
   },
   components: {
     Loader,
+  },
+  methods: {
+    // addUser() {
+    //   var createUser = firebase.functions().httpsCallable('createUser');
+    //   createUser({ 
+    //     email: this.newUser.email,
+    //     password: this.newUser.password,
+    //     displayName: this.newUser.displayName
+    //   })
+    //   .then((result) => {
+    //     console.log(result)
+    //   })
+    // }
+    // addUser() {
+    //   var addUser = firebase.functions().httpsCallable('createUser');
+    //   createUser({ data: newUser })
+    //   .then(function (result) {
+    //       console.log(result.data)
+    //   });
+    // }
   },
   // created () {
   //   if (!this.userProfile) {

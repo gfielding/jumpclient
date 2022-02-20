@@ -1,7 +1,7 @@
 <template>
 	<div class="dashboard">
     <div class="dashboard__container">
-    	<Loader v-if="!event" />
+    	<Loader v-if="!eventInfo" />
       <div class="dashboard__container--header" v-if="event">
         <div class="flex align-center justify-space-between align-center" style="width:100%;">
           <h1>{{event.title}}</h1>
@@ -21,7 +21,7 @@
          
         </div>
       </div>
-      <div class="dashboard__container--body">
+      <div class="dashboard__container--body pt-3">
       	<div class="dashboard__container--body--col">
       		<div class="dashboard__container--body--col--inner">
 	  				<div class="mb-3">
@@ -447,6 +447,38 @@ export default {
   	}
 	},
 	beforeDestroy () {
+		this.uploadValue = null
+		this.showBar = null
+		this.timesheetsUrl = null
+		this.newNote = null
+		this.newNote = null
+		this.imageData = null
+		this.performingRequest = null
+  	this.performingRequest2 = null
+  	this.performingRequest3 = null
+  	this.performingRequest4 = null
+  	this.newInvoice = null
+  	this.statuses = null
+  	this.evStatuses = null
+  	this.columns = null
+  	this.columns2 = null
+  	this.columns3 = null
+  	delete this.uploadValue
+		delete this.showBar
+		delete this.timesheetsUrl
+		delete this.newNote
+		delete this.newNote
+		delete this.imageData
+		delete this.performingRequest
+  	delete this.performingRequest2
+  	delete this.performingRequest3
+  	delete this.performingRequest4
+  	delete this.newInvoice
+  	delete this.statuses
+  	delete this.evStatuses
+  	delete this.columns
+  	delete this.columns2
+  	delete this.columns3
 		this.$store.dispatch('clearEventState')
 		this.$store.dispatch('clearAccountingNotes')
 		this.$store.dispatch("clearEventShifts")

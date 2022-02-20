@@ -47,6 +47,8 @@
 		border-color:$danger;
 		color:white;
 		&:hover {
+			background:$dangerDark;
+			border-color:$dangerDark;
 			box-shadow:none;
 		}
 	}

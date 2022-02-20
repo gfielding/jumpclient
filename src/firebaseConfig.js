@@ -75,6 +75,9 @@ const clientNotesCollection = db.collection('clientNotes')
 const referralsCollection = db.collection('referrals')
 const idtriggerCollection = db.collection('idtrigger')
 const pageTextCollection = db.collection('pageText')
+const clientAccessCollection = db.collection('clientAccess')
+const accessNotesCollection = db.collection('accessNotes')
+const checkInMasterCollection = db.collection('checkInMaster')
 
 export {
   db,
@@ -127,5 +130,9 @@ export {
   clientNotesCollection,
   referralsCollection,
   idtriggerCollection,
-  pageTextCollection
+  pageTextCollection,
+  clientAccessCollection,
+  accessNotesCollection,
+  checkInMasterCollection,
+  eventTimesheetNotesCollection
 }

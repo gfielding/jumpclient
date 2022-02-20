@@ -165,18 +165,23 @@ export default {
       // },
     ]
   }),
+  created () {
+    if (!this.events || this.events.length < 1) {
+      this.$store.dispatch("getEvents")
+    }
+  },
   computed: {
     ...mapState(['events']),
-     allEvents: function() {
-      return this.events.filter(event => {
-        return event.published
-      })
-    },
-    hiddenEvents: function() {
-      return this.events.filter(event => {
-        return !event.published
-      })
-    },
+    //  allEvents: function() {
+    //   return this.events.filter(event => {
+    //     return event.published
+    //   })
+    // },
+    // hiddenEvents: function() {
+    //   return this.events.filter(event => {
+    //     return !event.published
+    //   })
+    // },
     events2021: function() {
       return this.events.filter(event => {
         return event.startDate.includes("2021")
@@ -206,10 +211,8 @@ export default {
       router.push(url)
     }
   },
-  created () {
-    if (!this.events || this.events.length < 1) {
-      this.$store.dispatch("getEvents")
-    }
+  beforeDestroy () {
+    this.$store.dispatch('clearEventsState')
   }
 }
 </script>

@@ -2,7 +2,7 @@
   <div class="dashboard">
     <div class="dashboard__container">
       <div class="dashboard__container--header">
-        <h1>Clients</h1>
+        <h1>Customers</h1>
         <span class="flex align-center">
           <button class="btn btn__outlined" @click="showAll = true" v-if="!showAll">All Clients</button>
           <button class="btn btn__outlined" @click="showAll = false" v-if="showAll">My Clients</button>

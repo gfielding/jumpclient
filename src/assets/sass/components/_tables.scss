@@ -49,6 +49,9 @@ table.vgt-table td {
   position: relative;
   border-radius: 50%;
 }
+.vgt-input {
+  max-width: 480px;
+}
 
 table input, table textarea {
   background: white;

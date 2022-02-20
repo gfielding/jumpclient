@@ -96,6 +96,8 @@ export default {
     }
   },
   beforeDestroy () {
+    this.columns = null
+    delete this.columns
     this.$store.dispatch('clearShiftsState')
     console.log(this)
   }

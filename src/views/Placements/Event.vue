@@ -3,7 +3,13 @@ f<template>
     <div class="dashboard__container">
       <div class="dashboard__container--header mb-3" v-if="event">
         <div>
-          <h2 v-if="event &&event.title">Staff Placements for {{event.title}}</h2>
+          <div class="flex align-center">
+          <h1>{{eventInfo.title}} Staff Placements</h1>
+          <button class="btn btn__large btn__danger ml-5" v-if="eventInfo && eventInfo.cancelled">
+            Cancelled
+          </button>
+        </div>
+          <!-- <h2 v-if="event &&event.title">Staff Placements for {{event.title}}</h2> -->
           <span v-if="event && event.venue && event.venue.title">
           <p>{{event.venue.title}}<span v-if="event.venue && event.venue.address"> | {{event.venue.address.city}}, {{event.venue.address.state}}</span> | {{event.startDate | moment("ddd, MMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("ddd, MMM Do YYYY") }}</span></p>
         </span> 
@@ -96,9 +102,9 @@ f<template>
                   </span>
                 </span>
               </span> -->
-              <span v-else-if="props.column.field == 'extras'">
+<!--               <span v-else-if="props.column.field == 'extras'">
                         <span v-if="(props.row)">
-                          <span v-for="u in filteredInfo(props.row)" style="display:flex; justify-content: space-evenly;">
+                          <span v-for="u in filteredInfo(props.row)" style="display:flex; justify-content: space-evenly;"> -->
 
                             <!-- <span v-if="u.points" style="display:inline; color:#0d3fd1;" class="ml-2 mr-2">
                               {{u.points}}
@@ -139,11 +145,11 @@ f<template>
                               <i class="fas fa-syringe ml-2 mr-2" style="color: green;"></i>
                             </span> -->
 
-
+<!-- 
                           </span>
                         </span>
                       </span>
-              
+               -->
               <!-- <span v-if="props.column.field == 'extras'">
                 <span v-if="(props.row)">
                   
@@ -202,7 +208,7 @@ f<template>
               </span>
 
               <span v-else-if="props.column.field == 'fullName'">
-                <router-link :to="'/users/' + props.row.userId">
+                <router-link :to="'/users/' + props.row.userId" >
                   {{props.row.fullName}}
                 </router-link>
               </span>
@@ -424,7 +430,7 @@ f<template>
             <transition name="fade">
               <div v-if="shift.collapse == true">
                 <div class="pt-2 mb-3">
-                  <h4 v-if="shift.name">{{shift.name}}</h4>
+                  <h4 v-if="shift.name">{{shift.name}} <span v-if="shift.location">/ {{shift.location}}</span></h4>
                   <!-- <p v-if="shift.position.title">{{shift.position.title}}, 
                     <span v-if="shift.startTime" class="ml-2"> {{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}</span> - 
                     <span v-if="shift.endTime">{{ [ shift.endTime, "HH:mm" ] | moment("hh:mm A") }}</span>
@@ -812,6 +818,7 @@ export default {
           tdClass: 'text-center',
           tdClass: 'text-center',
           sortable: false,
+          width: '60px',
         },
         {
           label: '',
@@ -1053,6 +1060,7 @@ export default {
         "Last Name",
         "Phone",
         "Email",
+        "Points",
         "Confirmed",
         "DOB",
         "Shirt Size",
@@ -1078,6 +1086,7 @@ export default {
             doc.data().lastName,
             doc.data().phone,
             doc.data().email,
+            doc.data().points,
             confirmed,
             moment(doc.data().dob).format('M/D/YYYY'),
             doc.data().shirtsize,
@@ -1272,6 +1281,8 @@ export default {
       // })
     },
     lockShift(props, shift) {
+      console.log(props)
+      console.log(shift)
       props.row.status = "spinning"
 
       let event = this.event

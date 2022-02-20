@@ -3,10 +3,6 @@
     <div class="dashboard__container">
       <div class="dashboard__container--header">
         <h1>Referrals</h1>
-        <!-- <span>
-          <button class="btn btn__outlined" @click="showAll = true" v-if="!showAll">Show Visible</button>
-          <button class="btn btn__outlined" @click="showAll = false" v-if="showAll">Show Hidden</button>
-        </span> -->
       </div>
       <div class="dashboard__container--body pt-3">
         <Loader v-if="!referrals || referrals.length == 0" />
@@ -33,6 +29,17 @@
               <span v-if="props.row.statusChange">{{formatDate2(props.row.paid)}}
               </span>
             </span>
+            <span v-else-if="props.column.field == 'referrer'">
+              <router-link :to="`/users/` + props.row.referrer_userId" target="_blank">
+                <button class="btn btn__icon btn__flat mr-4"><i class="fad fa-external-link"></i></button>
+              </router-link>
+            </span>
+            <span v-else-if="props.column.field == 'friend'">
+              <router-link :to="`/users/` + props.row.friend_userId" target="_blank">
+                <button class="btn btn__icon btn__flat mr-4"><i class="fad fa-external-link"></i></button>
+              </router-link>
+            </span>
+
             <span v-else-if="props.column.field == 'locked'">
               <button class="btn btn__icon" @click="lock(props.row)" v-if="!props.row.locked">
                 <i class="fas fa-lock-open-alt ml-3 mr-3"></i>
@@ -111,10 +118,10 @@ export default {
         label: 'Friend',
         field: 'friend',
       },
-      {
-        label: 'Value',
-        field: 'value',
-      },
+      // {
+      //   label: 'Value',
+      //   field: 'value',
+      // },
       {
         label: 'Created',
         field: 'created',
@@ -132,16 +139,6 @@ export default {
   },
   computed: {
     ...mapState(['referrals']),
-    // allEvents: function() {
-    //   return this.events.filter(event => {
-    //     return event.published
-    //   })
-    // },
-    // hiddenEvents: function() {
-    //   return this.events.filter(event => {
-    //     return !event.published
-    //   })
-    // }
   },
   components: {
     Loader,
@@ -182,6 +179,14 @@ export default {
     },
   },
   beforeDestroy () {
+    this.showAll = null
+    this.activeItem = null
+    this.statuses = null
+    this.columns = null
+    delete this.showAll
+    delete this.activeItem
+    delete this.statuses
+    delete this.columns
     this.$store.dispatch("clearReferralsState")
   }
 }

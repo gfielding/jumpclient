@@ -116,6 +116,8 @@ export default {
   beforeDestroy () {
     this.event = null
     delete this.contact
+    this.$store.dispatch('clearContactsState')
+    this.$store.dispatch('clearVenuesState')
     this.$store.dispatch('clearErrors')
   }
 }

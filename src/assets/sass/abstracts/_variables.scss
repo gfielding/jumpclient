@@ -25,5 +25,8 @@ $lightText:#d0d0d0;
 $radius: 0.5rem;
 
 $success:#5cb85c;
+$successDark: darken($success, 20%);
 $warning:#f0ad4e;
+$warningDark: darken($warning, 20%);
 $danger:#d9534f;
+$dangerDark: darken($danger, 20%);
