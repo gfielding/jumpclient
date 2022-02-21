@@ -1369,7 +1369,6 @@ export default {
 
         return strTime;
       }
-
       return date;
     },
     formatDate(q) {
