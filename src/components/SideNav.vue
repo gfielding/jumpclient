@@ -107,8 +107,8 @@
           
           
           <div class="nav__menu--item">
-            <router-link :to="{name: 'opr'}">
-              opr <i class="fas fa-chevron-right"></i>
+            <router-link :to="{name: 'verifications'}">
+              verifications <i class="fas fa-chevron-right"></i>
             </router-link>
           </div>
           <div class="nav__menu--item dropdown">

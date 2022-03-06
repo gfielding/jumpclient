@@ -541,6 +541,14 @@ const router = new VueRouter({
         requiresAuth: true
       },
     },
+    {
+      path: '/verifications',
+      name: 'verifications',
+      component: () => import('../views/Verifications/Verifications.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
   ]
 })
 

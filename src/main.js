@@ -18,6 +18,7 @@ import StarRating from 'vue-star-rating'
 import VueClipboard from 'vue-clipboard2'
 import 'vue-good-table/dist/vue-good-table.css'
 import InstantSearch from 'vue-instantsearch';
+import VueCryptojs from 'vue-cryptojs'
 import 'instantsearch.css/themes/satellite-min.css';
 import './assets/sass/main.scss'
 const fb = require('./firebaseConfig.js')
@@ -27,6 +28,7 @@ Vue.use(VueGoodTablePlugin)
 Vue.use(InstantSearch)
 Vue.use(Croppa)
 Vue.use(VueMask)
+Vue.use(VueCryptojs)
 Vue.use(StarRating)
 Vue.use(VTooltip)
 Vue.use(VueClipboard)
@@ -73,7 +75,7 @@ auth.onAuthStateChanged(user => {
     }).$mount('#app')
   }
 
-  if (user) {
-    store.dispatch('fetchUserProfile', user)
-  }
+  // if (user) {
+  //   store.dispatch('fetchUserProfile', user)
+  // }
 })

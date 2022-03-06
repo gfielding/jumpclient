@@ -59,9 +59,7 @@ export default {
   methods: {
   	formatDate(q) {
       if(q) {
-        console.log(q)
         const postedDate = new Date(q.seconds) * 1000;
-        console.log(postedDate)
         return moment(postedDate).format('MMMM Do YYYY')
       } else {
         return null

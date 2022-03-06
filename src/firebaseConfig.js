@@ -78,6 +78,7 @@ const pageTextCollection = db.collection('pageText')
 const clientAccessCollection = db.collection('clientAccess')
 const accessNotesCollection = db.collection('accessNotes')
 const checkInMasterCollection = db.collection('checkInMaster')
+const verificationsCollection = db.collection('verifications')
 
 export {
   db,
@@ -134,5 +135,6 @@ export {
   clientAccessCollection,
   accessNotesCollection,
   checkInMasterCollection,
-  eventTimesheetNotesCollection
+  eventTimesheetNotesCollection,
+  verificationsCollection
 }

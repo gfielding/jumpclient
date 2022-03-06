@@ -1,6 +1,10 @@
 <template>
 	<div>
-    <h2>Employment Status</h2>
+    <h2>Onboarding Status:</h2>
+    <div class="mb-3" v-if="decryptedText">
+      <label for="ssn">Social Security Number:</label>
+      <input style="width: 100%;" v-mask="'###-##-####'" placeholder="###-##-####" :value="decryptedText" type="text" maxlength = "11" id="ssn" readonly  />
+    </div>
     <div v-if="!user.employeeStatus || user.employeeStatus == `applied`">
   		<div class="mb-3">
   			<label for="cont">Contractor Status:</label>
@@ -101,7 +105,7 @@
     <hr v-if="user.employeeStatus == `hired` || user.employeeStatus == `terminated` || user.employeeStatus == 'signed offer letter'">
     <transition name="fade">
 	    <div class="mb-3" v-if="user.employeeStatus == `hired` || user.employeeStatus == `terminated` || user.employeeStatus == 'signed offer letter'">
-	      <label for="empNum">Employee Number:</label>
+	      <label for="empNum">OnPay Employee Number:</label>
 	      <input type="text" v-model.trim="user.employeeNumber" id="empNum" @change="updateUserFile2()" />
         <button class="btn btn__outlined btn__small mt-3" v-clipboard:copy="user.employeeNumber" v-clipboard:success="onCopy">Copy <i class="fas fa-copy ml-2"></i></button>
 	    </div>
@@ -129,6 +133,7 @@ const fb = require('../../firebaseConfig.js')
 export default {
   props: ['user'],
   data: () => ({
+    encryptionKey: 'SKD433{}{[SKD433{}{[SKD433{}{[32',
     empStatuses: ['applied', 'payroll invitation', 'signed offer letter', 'hired', 'not-hired', 'on-hold', 'terminated'],
     contStatuses: ['applied', 'payroll invitation', 'hired contractor', 'not-hired', 'on-hold', 'terminated', 'hired as employee'],
     positions: ['regular staff', 'shift-lead', 'assistant manager', 'manager', 'admin'],
@@ -143,6 +148,11 @@ export default {
     },
     empNum() {
       return this.user.id.slice(0,10)
+    },
+    decryptedText() {
+      if (this.user && this.user.ssn) {
+      return (this.$CryptoJS.AES.decrypt(this.user.ssn, this.encryptionKey).toString(this.CryptoJS.enc.Utf8) || this.$CryptoJS.AES.encrypt(this.ssn, this.encryptionKey).toString())
+      }
     }
   },
   methods: {

@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard">
+    <Loader v-if="performingRequest" />
     <div class="dashboard__container">
       <div class="dashboard__container--header mb-3">
         <h1>Events</h1>
@@ -28,7 +29,6 @@
                 mode: 'records',
                 perPage: 50,
               }"
-              @on-row-click="onRowClick"
             >
             <template slot="table-row" slot-scope="props">
               <span v-if="props.column.field == 'startDate'">
@@ -185,6 +185,7 @@ import router from '@/router'
 export default {
   name: 'events',
   data: () => ({
+    performingRequest: false,
     is2021: false,
     is2022: true,
     showAll: true,
@@ -242,9 +243,7 @@ export default {
     ]
   }),
   created () {
-    if (!this.events || this.events.length < 1) {
-      this.$store.dispatch("getEvents")
-    }
+    this.$store.dispatch("get2022Events")
   },
   computed: {
     ...mapState(['events2021', 'events2022']),
@@ -254,15 +253,32 @@ export default {
   },
   methods: {
     show2021() {
-      this.is2021 = true
+      this.performingRequest = true
       this.is2022 = false
+      this.$store.dispatch('clear2022EventsState')
+      this.$store.dispatch("get2021Events")
+      
+      setTimeout(() => {
+        
+        this.is2021 = true
+        this.performingRequest = false
+      }, 2000)
     },
     show2022() {
-      this.is2022 = true
+      this.performingRequest = true
       this.is2021 = false
+      this.$store.dispatch('clear2021EventsState')
+      this.$store.dispatch("get2022Events")
+      
+      setTimeout(() => {
+        
+        this.is2022 = true
+        this.performingRequest = false
+      }, 2000)
     },
   },
   beforeDestroy () {
+    this.performingRequest = false
     this.is2021 = false
     this.is2022 = false
     this.showAll = false
@@ -271,6 +287,7 @@ export default {
     delete this.is2022
     delete this.showAll
     delete this.columns
+    delete this.performingRequest
     console.log(this)
     this.$store.dispatch('clearEventsState')
   }

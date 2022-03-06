@@ -23,6 +23,10 @@
           <ProfileImage :user="user" />
         </div>
         <div class="dashboard__container--body--col">
+          <h2 class="mb-3">I-9 Verifications</h2>
+          <ProfileVerifications :user="user" :verifications="userVerifications" />
+        </div>
+        <div class="dashboard__container--body--col">
           <ProfileStatus :user="user" />
         </div>
         <div class="dashboard__container--body--col">
@@ -124,6 +128,7 @@ import ProfileCerts from '@/components/Profile/ProfileCerts.vue'
 import ProfileSkills from '@/components/Profile/ProfileSkills.vue'
 import ProfileBlacklist from '@/components/Profile/ProfileBlacklist.vue'
 import ProfileTags from '@/components/Profile/ProfileTags.vue'
+import Verification from '@/components/Profile/Verification.vue'
 import ProfileStatus from '@/components/Profile/ProfileStatus.vue'
 import ProfileMessage from '@/components/Profile/ProfileMessage.vue'
 import MessageTable from '@/components/Profile/MessageTable.vue'
@@ -137,12 +142,13 @@ import ReviewsTable from '@/components/Profile/ReviewsTable.vue'
 import UserEvents from '@/components/Profile/UserEvents.vue'
 import UserAssignments from '@/components/Profile/UserAssignments.vue'
 import Rewards from '@/components/Rewards.vue'
+import ProfileVerifications from '@/components/Profile/ProfileVerifications.vue'
 import router from '@/router'
 
 export default {
   name: 'user',
   computed: {
-    ...mapState(['userInfo', 'reviews', 'userNotes', 'userProfile', 'userEvents', 'userAssignments', 'groups', 'userMessages']),
+    ...mapState(['userInfo', 'reviews', 'userNotes', 'userProfile', 'userEvents', 'userVerifications', 'userAssignments', 'groups', 'userMessages']),
     user() {
       return this.userInfo
     }
@@ -178,7 +184,9 @@ export default {
     ProfileTags,
     ProfileMessage,
     MessageTable,
-    Rewards
+    Rewards,
+    Verification,
+    ProfileVerifications
   },
   methods: {
     goBack() {
