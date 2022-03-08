@@ -60,6 +60,18 @@
                 >
               </v-select>
             </div>
+
+            <div class="mb-3" v-if="event.venue && tags.length > 1">
+              <label for="tags">Tags:</label>
+              <v-select
+                class="mt-2"
+                label="title" 
+                :options="tags"
+                multiple
+                v-model="event.tags"
+                >
+              </v-select>
+            </div>
             <div class="mb-3" v-if="event.venue && mgrs.length >= 1">
             <label for="mgrs">Managers:</label>
               <v-select
@@ -378,6 +390,7 @@ export default {
     croppa: {},
     day:'',
     job: '',
+    tags: ['#concert', '#musicfestival', '#pga', '#nfl', '#nba', '#nhl', '#mlb', '#mls', '#minorleaguebaseball', '#ncaabasketball', '#ncaafootball'],
     multiDay: false,
     performingRequest: false,
     performingRequest2: false,

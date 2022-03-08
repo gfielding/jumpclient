@@ -336,6 +336,32 @@ const router = new VueRouter({
       },
     },
     {
+      path: '/eventshome', redirect: '/eventshome/year/2022',
+      name: 'eventsHome',
+      component: () => import('../views/Events/EventsHome.vue'),
+      meta: {
+        requiresAuth: true
+      },
+      children: [
+        {
+          path: '/eventshome/year/2022',
+          name: 'events2022',
+          component: () => import('../views/Events/Events2022.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/eventshome/:id',
+          name: 'eventsByMonth',
+          component: () => import('../views/Events/EventsByMonth.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+      ]
+    },
+    {
       path: '/clients/clienthome', redirect: '/clients/:id',
       name: 'clientHome',
       component: () => import('../views/Clients/ClientHome.vue'),

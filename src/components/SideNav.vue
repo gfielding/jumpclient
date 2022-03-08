@@ -25,7 +25,7 @@
           </div>
 
           <div class="nav__menu--item">
-            <router-link :to="{name: 'events'}">
+            <router-link :to="{name: 'eventsHome'}">
               events <i class="fas fa-chevron-right"></i>
             </router-link>
           </div>

@@ -21,6 +21,17 @@
               <label for="venueVisibility">Vaccination Required:</label>
               <input type="checkbox" v-model.trim="event.requiredVaccine" id="venueVisibility" class="ml-3" />
             </div>
+            <div class="mb-3" v-if="tags.length > 1">
+              <label for="tags">Tags:</label>
+              <v-select
+                class="mt-2"
+                label="title" 
+                :options="tags"
+                multiple
+                v-model="event.tags"
+                >
+              </v-select>
+            </div>
             <div class="mb-3" v-if="venues.length > 1">
               <label for="venue">Venue:</label>
               <v-select
@@ -296,6 +307,7 @@ export default {
     event: {
       days:[],
       jobs:[],
+      tags: ['#concert', '#musicfestival', '#pga', '#nfl', '#nba', '#nhl', '#mlb', '#mls', '#minorleaguebaseball', '#ncaabasketball', '#ncaafootball'],
       published: true,
     },
     croppa: {},
