@@ -1936,9 +1936,9 @@ const store = new Vuex.Store({
     },
     getEventUsers({ commit }, payload) {
       fb.userDaysCollection.where("preferredEvent", "==", payload).orderBy('created', 'asc')
-      .get().then((querySnapshot) => {
+      .onSnapshot(querySnapshot => {
         let eventUsersArray = []
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach(doc => {
           let user = doc.data()
           eventUsersArray.push(user)
         })
@@ -1947,9 +1947,9 @@ const store = new Vuex.Store({
     },
     getEventDrops({ commit }, payload) {
       fb.dropsCollection.where("preferredEvent", "==", payload).orderBy('created', 'asc')
-      .get().then((querySnapshot) => {
+      .onSnapshot(querySnapshot => {
         let eventUsersArray = []
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach(doc => {
           let user = doc.data()
           eventUsersArray.push(user)
         })
@@ -1982,9 +1982,9 @@ const store = new Vuex.Store({
     },
     getEventShiftsState({ commit }, payload) {
       fb.shiftsCollection.where("eventId", "==", payload).orderBy('day', 'asc').orderBy('startTime', 'asc')
-      .get().then((querySnapshot) => {
+     .onSnapshot(querySnapshot => {
         let eventShiftsArray = []
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach(doc => {
           let eventShift = doc.data()
           eventShift.id = doc.id
           eventShiftsArray.push(eventShift)
