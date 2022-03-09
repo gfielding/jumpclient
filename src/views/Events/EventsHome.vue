@@ -5,10 +5,6 @@
       <!-- <Loader v-if="!events" /> -->
       <div class="topheader dashboard__container--header flex align-center justify-space-between mb-3">
         <h1 class="mt-3">Events</h1>
-        
-          <!-- <router-link to="/eventshome/2022-02">
-            <button class="btn  ml-3">Feb</button>
-          </router-link> -->
           <span class="flex" v-if="!showDate">
             <v-select
             class="mt-3"
