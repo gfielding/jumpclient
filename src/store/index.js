@@ -91,7 +91,9 @@ const store = new Vuex.Store({
     clientAccessInfo: {},
     accessNotes: [],
     verifications: [],
-    userVerifications: []
+    userVerifications: [],
+    eventsByMonth: [],
+    eventsByVenue: []
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -1510,8 +1512,39 @@ const store = new Vuex.Store({
     clearEventsByYear({ commit }) {
       commit('setEventsByYear', [])
     },
+    getEventsByVenue({ commit }, payload) {
+      console.log(payload)
+      fb.eventsCollection.orderBy('startDate', 'asc').get().then((querySnapshot) => {
+        let eventsArray = []
+        querySnapshot.forEach((doc) => {
+          let event = doc.data()
+          if (doc.data().venueId == payload) {
+            eventsArray.push(event)
+          }
+        })
+        commit('setEventsByVenue', eventsArray)
+      })
+    },
+    clearEventsByVenue({ commit }) {
+      commit('setEventsByVenue', [])
+    },
+    getEventsByMonth({ commit }, payload) {
+      console.log(payload)
+      fb.eventsCollection.orderBy('startDate', 'asc').get().then((querySnapshot) => {
+        let eventsArray = []
+        querySnapshot.forEach((doc) => {
+          let event = doc.data()
+          if (doc.data().startDate.includes(payload)) {
+            eventsArray.push(event)
+          }
+        })
+        commit('setEventsByMonth', eventsArray)
+      })
+    },
+    clearEventsByMonth({ commit }) {
+      commit('setEventsByMonth', [])
+    },
     get2022Events({ commit }) {
-      console.log('getting events')
       fb.eventsCollection.orderBy('startDate', 'asc').get().then((querySnapshot) => {
         let events2022Array = []
         querySnapshot.forEach((doc) => {
@@ -1525,7 +1558,6 @@ const store = new Vuex.Store({
       })
     },
     get2021Events({ commit }) {
-      console.log('getting events')
       fb.eventsCollection.orderBy('startDate', 'asc')
       .get().then((querySnapshot) => {
         let events2021Array = []
@@ -1608,6 +1640,18 @@ const store = new Vuex.Store({
         querySnapshot.forEach((doc) => {
           let shift = doc.data()
           shift.id = doc.id
+          fb.assignmentsCollection.where("shiftId", "==", shift.id).get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+              if (doc.exists) {
+                console.log("exists")
+                return shift.disabled = true
+              } else {
+                console.log("not exists")
+                return shift.disabled = false
+              }
+            })
+
+          })
           shiftsArray.push(shift)
         })
         commit('setEventShifts', shiftsArray)
@@ -2677,6 +2721,20 @@ const store = new Vuex.Store({
         state.userVerifications = val
       } else {
         state.userVerifications = []
+      }
+    },
+    setEventsByMonth(state, val) {
+      if (val) {
+        state.eventsByMonth = val
+      } else {
+        state.eventsByMonth = []
+      }
+    },
+    setEventsByVenue(state, val) {
+      if (val) {
+        state.eventsByVenue = val
+      } else {
+        state.eventsByVenue = []
       }
     },
   },

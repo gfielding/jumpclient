@@ -129,7 +129,7 @@
 		                </span>
 		              </transition>
 			          </button>
-			          <!-- <button class="btn btn__dark ml-2" @click="deleteShift(eventShift)">Delete</button> -->
+			          <button :disabled="eventShift.disabled = true" class="btn btn__danger ml-2" @click="deleteShift(eventShift)">Delete</button>
 			  			</li>
 			  		</ul>
 			  	</div>
@@ -165,6 +165,9 @@ export default {
     if (!this.jobs || this.jobs.length < 1) {
       this.$store.dispatch("getJobsState")
     }
+   //  if (this.eventShifts && this.eventShifts.length > 1) {
+	  //  	this.emptyCheck(this.eventShifts)
+	  // }
   },
   computed: {
     ...mapState(['eventInfo', 'jobs', 'eventShifts']),
@@ -176,6 +179,19 @@ export default {
     }
   },
   methods: {
+  	// emptyCheck(row) {
+	  // 		fb.assignmentsCollection.where("shiftId", "==", row.id).get().then((querySnapshot) => {
+	  // 			querySnapshot.forEach((doc) => {
+	  // 				if (doc.exists) {
+	  // 					console.log("exists")
+	  // 					return row.disabled = true
+	  // 				} else {
+	  // 					console.log("not exists")
+	  // 					return false
+	  // 				}
+		 //  		})
+	  // 		})
+  	// },
   	goBack() {
       router.go(-1)
     },

@@ -199,16 +199,16 @@ const router = new VueRouter({
         requiresAuth: true
       },
     },
+    // {
+    //   path: '/events',
+    //   name: 'events',
+    //   component: () => import('../views/Events/Events.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    // },
     {
-      path: '/events',
-      name: 'events',
-      component: () => import('../views/Events/Events.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
-    {
-      path: '/events/:id',
+      path: '/events/edit/:id',
       name: 'event',
       component: () => import('../views/Events/Event.vue'),
       meta: {
@@ -216,7 +216,7 @@ const router = new VueRouter({
       },
     },
     {
-      path: '/events/:id/shifts',
+      path: '/events/edit/:id/shifts',
       name: 'eventshifts',
       component: () => import('../views/Events/EventShifts.vue'),
       meta: {
@@ -224,7 +224,7 @@ const router = new VueRouter({
       },
     },
     {
-      path: '/events/:id/timesheets',
+      path: '/events/edit/:id/timesheets',
       name: 'eventtimesheets',
       component: () => import('../views/Shifts/EventShifts.vue'),
       meta: {
@@ -334,6 +334,32 @@ const router = new VueRouter({
       meta: {
         requiresAuth: true
       },
+    },
+    {
+      path: '/events', redirect: '/events/2022-04',
+      name: 'eventsHome',
+      component: () => import('../views/Events/EventsHome.vue'),
+      meta: {
+        requiresAuth: true
+      },
+      children: [
+        {
+          path: '/events/:id',
+          name: 'eventsByMonth',
+          component: () => import('../views/Events/EventsByMonth.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/events/venue/:id',
+          name: 'eventsByVenue',
+          component: () => import('../views/Events/EventsByVenue.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+      ]
     },
     {
       path: '/clients/clienthome', redirect: '/clients/:id',

@@ -13,10 +13,11 @@
      <!--  <keep-alive  max="5" :include="['users', 'events', 'shifts', 'accountingEvents', 'groups', 'eventplacements', 'accountingEventsTable']">
         <router-view :key="$route.fullPath"></router-view> 
       </keep-alive> -->
-      <!-- <keep-alive  max="3" :include="['shifts', 'groups', 'eventplacements']">
-        <router-view :key="$route.fullPath"></router-view> 
+     <!--  <keep-alive  max="3" :include="['eventsHome', 'eventsByMonth']">
+        
       </keep-alive> -->
       <router-view :key="$route.fullPath"></router-view> 
+     <!--  <router-view :key="$route.fullPath"></router-view>  -->
     </div>
 
    <!--  <keep-alive include="users, events" max="1"> 
