@@ -92,7 +92,8 @@ const store = new Vuex.Store({
     accessNotes: [],
     verifications: [],
     userVerifications: [],
-    eventsByMonth: []
+    eventsByMonth: [],
+    eventsByVenue: []
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -1511,6 +1512,22 @@ const store = new Vuex.Store({
     clearEventsByYear({ commit }) {
       commit('setEventsByYear', [])
     },
+    getEventsByVenue({ commit }, payload) {
+      console.log(payload)
+      fb.eventsCollection.orderBy('startDate', 'asc').get().then((querySnapshot) => {
+        let eventsArray = []
+        querySnapshot.forEach((doc) => {
+          let event = doc.data()
+          if (doc.data().venueId == payload) {
+            eventsArray.push(event)
+          }
+        })
+        commit('setEventsByVenue', eventsArray)
+      })
+    },
+    clearEventsByVenue({ commit }) {
+      commit('setEventsByVenue', [])
+    },
     getEventsByMonth({ commit }, payload) {
       console.log(payload)
       fb.eventsCollection.orderBy('startDate', 'asc').get().then((querySnapshot) => {
@@ -2711,6 +2728,13 @@ const store = new Vuex.Store({
         state.eventsByMonth = val
       } else {
         state.eventsByMonth = []
+      }
+    },
+    setEventsByVenue(state, val) {
+      if (val) {
+        state.eventsByVenue = val
+      } else {
+        state.eventsByVenue = []
       }
     },
   },

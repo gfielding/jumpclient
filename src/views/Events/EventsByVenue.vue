@@ -73,7 +73,7 @@ import Loader from '@/components/Loader.vue'
 import router from '@/router'
 
 export default {
-  name: 'eventsByMonth',
+  name: 'eventsByVenue',
   data: () => ({
     performingRequest: false,
     columns: [
@@ -130,23 +130,25 @@ export default {
     ]
   }),
   async mounted() {
-    this.$store.dispatch("getEventsByMonth", this.$route.params.id);
+    this.$store.dispatch("getEventsByVenue", this.$route.params.id);
   },
   computed: {
-    ...mapState(['eventsByMonth']),
+    ...mapState(['eventsByVenue']),
     events() {
-      return this.eventsByMonth
+      return this.eventsByVenue
     }
   },
   components: {
     Loader,
   },
+  
   beforeDestroy () {
     this.performingRequest = false
     this.columns = false
     delete this.columns
     delete this.performingRequest
-    this.$store.dispatch('clearEventsByMonth')
+    console.log(this)
+    this.$store.dispatch('clearEventsByVenue')
   }
 }
 </script>

@@ -529,7 +529,7 @@ export default {
       this.$store.dispatch('updateEvent', event)
     },
     shifts() {
-      let url = `/events/` + this.$route.params.id + `/shifts`
+      let url = `/events/edit/` + this.$route.params.id + `/shifts`
       router.push(url)
     },
     placements() {

@@ -106,7 +106,7 @@
           </div>
 
           <div class="nav__menu--item desktop">
-            <router-link :to="{name: 'events'}">
+            <router-link :to="{name: 'eventsHome'}">
               events
             </router-link>
           </div>
@@ -147,7 +147,7 @@
          
 
           <div class="nav__menu--item mt-5">
-            <router-link :to="{name: 'events'}">
+            <router-link :to="{name: 'eventsHome'}">
               events <i class="fas fa-chevron-right"></i>
             </router-link>
           </div>

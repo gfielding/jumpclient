@@ -21,7 +21,7 @@
               <label for="venueVisibility">Vaccination Required:</label>
               <input type="checkbox" v-model.trim="event.requiredVaccine" id="venueVisibility" class="ml-3" />
             </div>
-            <div class="mb-3" v-if="tags.length > 1">
+            <div class="mb-3" v-if="tags && tags.length > 1">
               <label for="tags">Tags:</label>
               <v-select
                 class="mt-2"
@@ -32,7 +32,7 @@
                 >
               </v-select>
             </div>
-            <div class="mb-3" v-if="venues.length > 1">
+            <div class="mb-3" v-if="venues && venues.length > 1">
               <label for="venue">Venue:</label>
               <v-select
                 class="mt-2"
@@ -307,9 +307,9 @@ export default {
     event: {
       days:[],
       jobs:[],
-      tags: ['#concert', '#musicfestival', '#pga', '#nfl', '#nba', '#nhl', '#mlb', '#mls', '#minorleaguebaseball', '#ncaabasketball', '#ncaafootball'],
       published: true,
     },
+    tags: ['#concert', '#musicfestival', '#pga', '#nfl', '#nba', '#nhl', '#mlb', '#mls', '#minorleaguebaseball', '#ncaabasketball', '#ncaafootball'],
     croppa: {},
     day:'',
     job:'',
@@ -498,7 +498,7 @@ export default {
     this.job = null
     this.event = {}
     this.croppa = null
-    this.day = nul;
+    this.day = null
     this.multiDay = null
     this.performingRequest = null
     delete this.day

@@ -1,60 +1,122 @@
 <template>
   <div class="dashboard">
-    <div class="dashboard__container">
+    <Loader v-if="performingRequest" />
+    <div class="dashboard__container pt-2">
       <!-- <Loader v-if="!events" /> -->
-      <div class="dashboard__container--header">
-        <h1>Events Home</h1>
-
-        <span class="flex align-center">
+      <div class="topheader dashboard__container--header flex align-center justify-space-between mb-3">
+        <h1 class="mt-3">Events</h1>
+        
           <!-- <router-link to="/eventshome/2022-02">
             <button class="btn  ml-3">Feb</button>
           </router-link> -->
-          <button class="btn  ml-3" @click="prev">prev</button>
-          <div class="mb-3">
-            <label for="status">Choose Month:</label>
+          <span class="flex" v-if="!showDate">
             <v-select
-              class="mt-2"
+            class="mt-3"
               label="title" 
               :clearable=false
               :options="months"
-              v-model="activeMonth"
+              placeholder="choose month"
               @input="setSelected"
+              style="min-width:240px"
+              >
+            </v-select>
+          </span>
+          <span class="flex mt-3" v-if="showDate">
+            <button class="btn btn__primary mr-3" @click="prev">prev</button>
+            <h3>{{date | moment("MMMM, YYYY") }}</h3>
+            <!-- <div class="mb-3">
+              <label for="status">Choose Month:</label>
+              <v-select
+                class="mt-2"
+                label="title" 
+                :clearable=false
+                :options="months"
+    
+                @input="setSelected"
+                >
+              </v-select>
+            </div> -->
+            <button class="btn btn__primary ml-3 mt-3" @click="next">Next</button>
+          </span>
+          <div>
+            <v-select
+              class="mt-3"
+              label="title" 
+              :clearable=false
+              :options="venues"
+              placeholder="choose venue"
+              @input="setSelectedVenue"
+              style="min-width:240px"
               >
             </v-select>
           </div>
-          <button class="btn  ml-3" @click="next">Next</button>
-        </span>
-        
+          <router-link :to="{name: 'addevent'}" class="color--text">
+            <button class="btn btn__flat ml-3"><i class="fas fa-plus fa-2x"></i></button>
+          </router-link>
+
       </div>
       <router-view :key="$route.params.id" />
     </div>
   </div>
 </template>
 
+<style scoped>
+  .topheader {
+    flex-direction: row;
+  }
+  @media only screen and (max-width: 899px) {
+    .topheader {
+      flex-direction: column;
+    }
+  }
+</style>
+
 <script>
 import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import router from '@/router'
+import * as moment from 'moment'
 
 export default {
   name: 'eventsHome',
    data: () => ({
-    activeMonth: '',
+    performingRequest: false,
+    showDate: true,
     months: [
+      {  
+        title: "August 2021",
+        value: "2021-08"
+      },
       {
-        title: "Jan 2022",
+        title: "September 2021",
+        value: "2021-09"
+      },
+      {
+        title: "October 2021",
+        value: "2021-10"
+      },
+      {
+        title: "November 2021",
+        value: "2021-11"
+      },
+      {
+        title: "December 2021",
+        value: "2021-12"
+      },
+      {
+        title: "January 2022",
         value: "2022-01"
       },
       {
-        title: "Feb 2022",
-        value: "2022-02"
-      },
-      {
-        title: "Mar 2022",
+        title: "February 2022",
         value: "2022-03"
       },
       {
-        title: "Apr 2022",
+        title: "March 2022",
+        value: "2022-03"
+      },
+      {
+        title: "April 2022",
         value: "2022-04"
       },
       {
@@ -62,21 +124,80 @@ export default {
         value: "2022-05"
       },
       {
-        title: "Jun 2022",
+        title: "June 2022",
         value: "2022-06"
-      }
+      },
+      {
+        title: "August 2022",
+        value: "2022-08"
+      },
+      {
+        title: "September 2022",
+        value: "2022-09"
+      },
+      {
+        title: "October 2022",
+        value: "2022-10"
+      },
+      {
+        title: "November 2022",
+        value: "2022-11"
+      },
+      {
+        title: "December 2022",
+        value: "2022-12"
+      },
     ]
   }),
+  created () {
+    if (!this.venues || this.venues.length < 1) {
+      this.$store.dispatch("getVenues")
+    }
+  },
+  // async mounted() {
+  //   this.setSelected(this.$route.params.id)
+  // },
   computed: {
+    ...mapState(['venues']),
+    date() {
+      if (this.$route.params.id.length > 10) {
+        return this.showDate = false
+      } else {
+        return this.$route.params.id
+      }
+    },
     plus() {
-      var last2 = this.$route.params.id.slice(-2);
+      let id = this.$route.params.id
+      var last2 = id.slice(-2);
+      var first4 = id.slice(0,4);
+
       var integer = parseFloat(last2);
-      return integer + 1
+      var integer1 = parseFloat(first4);
+
+      var next4 = (integer1 + 1).toString()
+
+      var madeupname = (integer + 1).toString().padStart(2,'0')
+      if (madeupname < 13) {
+        return first4 + `-` + madeupname
+      } 
+      if (madeupname = 13) {
+        return next4 + `-` + `01`
+      } 
     },
     minus() {
-      var last2 = this.$route.params.id.slice(-2);
+      let id = this.$route.params.id
+      var first4 = id.slice(0,4);
+      var last2 = id.slice(-2);
+      var integer1 = parseFloat(first4);
+      var next4 = (integer1 - 1).toString()
       var integer = parseFloat(last2);
-      var newNumber = (integer - 1).toString()
+      var madeupname = (integer - 1).toString().padStart(2,'0')
+      if (madeupname >= 1) {
+        return first4 + `-` + madeupname
+      }
+      if (madeupname == 0) {
+        return next4 + `-` + `12`
+      } 
     }
   },
    components: {
@@ -84,25 +205,45 @@ export default {
   },
   methods: {
     next() {
-      let url = `/eventshome/` + this.plus
+      this.performingRequest = true
+      let url = `/events/` + this.plus
       router.push(url)
+      setTimeout(() => {
+        this.performingRequest = false
+        router.push(url)
+      }, 1000)
     },
     prev() {
-      let url = `/eventshome/` + this.minus
-      router.push(url)
+      this.performingRequest = true
+      let url = `/events/` + this.minus
+      setTimeout(() => {
+        this.performingRequest = false
+        router.push(url)
+      }, 1000)
     },
     goBack() {
       router.go(-1)
     },
+    setSelectedVenue(value) {
+      this.performingRequest = true
+      let url = `/events/venue/` + value.id
+      setTimeout(() => {
+        this.performingRequest = false
+        router.push(url)
+      }, 1000)
+    },
     setSelected(value) {
-      let url = `/eventshome/` + value.value
-      this.activeMonth = ''
-      router.push(url)
+      this.performingRequest = true
+      let url = `/events/` + value.value
+      setTimeout(() => {
+        this.performingRequest = false
+        router.push(url)
+      }, 1000)
     }
   },
-  beforeDestroy () {
-    this.$store.dispatch('clearEventsState')
-    this.$store.dispatch('clearErrors')
-  }
+  // beforeDestroy () {
+  //   this.$store.dispatch('clearEventsState')
+  //   this.$store.dispatch('clearErrors')
+  // }
 }
 </script>
