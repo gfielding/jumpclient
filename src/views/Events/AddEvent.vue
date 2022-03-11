@@ -309,7 +309,7 @@ export default {
       jobs:[],
       published: true,
     },
-    tags: ['#concert', '#musicfestival', '#pga', '#nfl', '#nba', '#nhl', '#mlb', '#mls', '#minorleaguebaseball', '#ncaabasketball', '#ncaafootball'],
+    tags: ['#concert', '#comedy', '#musicfestival', '#pga', '#nfl', '#nba', '#nhl', '#mlb', '#mls', '#minorleaguebaseball', '#ncaabasketball', '#ncaafootball'],
     croppa: {},
     day:'',
     job:'',

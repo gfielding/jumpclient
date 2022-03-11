@@ -1630,9 +1630,9 @@ const store = new Vuex.Store({
     getEventShifts({ commit }, payload) {
       console.log(payload)
       fb.shiftsCollection.where("eventId", "==", payload).orderBy('day', 'desc')
-      .get().then((querySnapshot) => {
+      .onSnapshot(querySnapshot => {
         let shiftsArray = []
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach(doc => {
           let shift = doc.data()
           shift.id = doc.id
           fb.assignmentsCollection.where("shiftId", "==", shift.id).get().then((querySnapshot) => {

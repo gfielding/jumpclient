@@ -390,7 +390,7 @@ export default {
     croppa: {},
     day:'',
     job: '',
-    tags: ['#concert', '#musicfestival', '#pga', '#nfl', '#nba', '#nhl', '#mlb', '#mls', '#minorleaguebaseball', '#ncaabasketball', '#ncaafootball'],
+    tags: ['#concert', '#comedy', '#musicfestival', '#pga', '#nfl', '#nba', '#nhl', '#mlb', '#mls', '#minorleaguebaseball', '#ncaabasketball', '#ncaafootball'],
     multiDay: false,
     performingRequest: false,
     performingRequest2: false,

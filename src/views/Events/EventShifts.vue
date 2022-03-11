@@ -24,7 +24,7 @@
 	          <button class="btn btn__primary mt-3 ml-1" @click="updateEvent" :disabled="eventInfo.cancelled">Save</button>
 	        </form>
 	      </div>
-	      <div class="dashboard__container--body--col">
+	      <div class="dashboard__container--body--col" style="max-height: 48vh; overflow: auto;">
 	    		<h2>Choose Jobs</h2>
     			<div v-for="(job, index) in jobs" :key="job.id">
     				<input type="checkbox" :id="index" :value="job" v-model="event.jobs" @change="updateEvent()">
@@ -101,7 +101,7 @@
 			            <label for="job">Select Job:</label>
 			            <input type="text" v-model="eventShift.position.title" readonly />
 			          </div>
-			          <div class="mb-3 pr-3 pl-3">
+			          <div class="mb-3 pr-3 pl-3" style="min-width: 140px;">
 			            <label for="day">Select day:</label>
 			            <select v-model="eventShift.day" id="day" >
 			              <option v-for="(day, index) in event.days" :key="index" v-bind:value="day">
@@ -129,7 +129,7 @@
 		                </span>
 		              </transition>
 			          </button>
-			          <button :disabled="eventShift.disabled = true" class="btn btn__danger ml-2" @click="deleteShift(eventShift)">Delete</button>
+			          <button class="btn btn__danger ml-2" @click="deleteShift(eventShift)">Delete</button>
 			  			</li>
 			  		</ul>
 			  	</div>
