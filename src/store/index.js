@@ -1411,6 +1411,7 @@ const store = new Vuex.Store({
       store.dispatch('alertFollowers', payload)
     },
     alertFollowers({ commit }, payload) {
+      console.log(payload)
       fb.venueFollowersCollection.where("venue", "==", payload.venue.id).onSnapshot(querySnapshot => {
         querySnapshot.forEach(doc => {
           let message = {
