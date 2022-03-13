@@ -117,8 +117,8 @@
 
             <h3>Days to Staff</h3>
             <transition name="fadeStop">
-              <div class="mb-2 mt-2 flex" v-if="event.days && event.days.length >= 1">
-                <button class="chip mr-2" v-for="(day, index) in event.days" :key="day" @click="deleteDay(index)">{{day}} <i class="far fa-times-circle ml-2"></i></button>
+              <div class="mt-2 flex" style="flex-wrap: wrap;" v-if="event.days && event.days.length >= 1">
+                <button class="chip mr-2 mb-2" v-for="(day, index) in event.days" :key="day" @click="deleteDay(index)">{{day}} <i class="far fa-times-circle ml-2"></i></button>
               </div>
             </transition> 
             <transition name="fadeStop">
@@ -309,7 +309,7 @@ export default {
       jobs:[],
       published: true,
     },
-    tags: ['#concert', '#musicfestival', '#pga', '#nfl', '#nba', '#nhl', '#mlb', '#mls', '#minorleaguebaseball', '#ncaabasketball', '#ncaafootball'],
+    tags: ['#concert', '#comedy', '#convention', '#musicfestival', '#pga', '#nfl', '#nba', '#nhl', '#mlb', '#mls', '#minorleaguebaseball', '#ncaabasketball', '#ncaafootball'],
     croppa: {},
     day:'',
     job:'',

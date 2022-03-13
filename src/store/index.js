@@ -929,8 +929,6 @@ const store = new Vuex.Store({
       )
     },
     getClientNotes({ commit }, payload) {
-      console.log("getting notes")
-      console.log(payload)
       fb.clientNotesCollection.where("userId", "==", payload).orderBy('created', 'desc').onSnapshot(querySnapshot => {
         let userNotesArray = []
 
@@ -957,8 +955,6 @@ const store = new Vuex.Store({
       )
     },
     getAccessNotes({ commit }, payload) {
-      console.log("getting notes")
-      console.log(payload)
       fb.accessNotesCollection.where("userId", "==", payload).orderBy('created', 'desc').onSnapshot(querySnapshot => {
         let userNotesArray = []
 
@@ -971,7 +967,6 @@ const store = new Vuex.Store({
       })
     },
     addUserNote({ commit, state }, payload) {
-      console.log(payload)
       fb.userNotesCollection.add(payload)
       .then(
         doc => {
@@ -1416,6 +1411,7 @@ const store = new Vuex.Store({
       store.dispatch('alertFollowers', payload)
     },
     alertFollowers({ commit }, payload) {
+      console.log(payload)
       fb.venueFollowersCollection.where("venue", "==", payload.venue.id).onSnapshot(querySnapshot => {
         querySnapshot.forEach(doc => {
           let message = {
@@ -1635,9 +1631,9 @@ const store = new Vuex.Store({
     getEventShifts({ commit }, payload) {
       console.log(payload)
       fb.shiftsCollection.where("eventId", "==", payload).orderBy('day', 'desc')
-      .get().then((querySnapshot) => {
+      .onSnapshot(querySnapshot => {
         let shiftsArray = []
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach(doc => {
           let shift = doc.data()
           shift.id = doc.id
           fb.assignmentsCollection.where("shiftId", "==", shift.id).get().then((querySnapshot) => {
@@ -1704,11 +1700,10 @@ const store = new Vuex.Store({
       store.dispatch('getAssignmentsForShift', payload)
     },
     getAssignmentsForShift({ commit }, payload) {
-      console.log(payload)
       fb.assignmentsCollection.where("shiftId", "==", payload).orderBy('firstName', 'asc')
-      .get().then((querySnapshot) => {
+      .onSnapshot(querySnapshot => {
         let assignmentsArray = []
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach(doc => {
           let assignment = doc.data()
           assignment.id = doc.id
           assignmentsArray.push(assignment)
@@ -1719,9 +1714,9 @@ const store = new Vuex.Store({
     getAssignmentsForDay({ commit }, payload) {
       console.log(payload)
       fb.assignmentsCollection.where("eventId", "==", payload.event).where("day", "==", payload.day).orderBy('firstName', 'asc')
-      .get().then((querySnapshot) => {
+      .onSnapshot(querySnapshot => {
         let assignmentsArray = []
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach(doc => {
           let assignment = doc.data()
           assignment.id = doc.id
           assignmentsArray.push(assignment)
@@ -1821,9 +1816,9 @@ const store = new Vuex.Store({
     getEventTimesheetNotes({ commit }, payload) {
       console.log(payload)
       fb.eventTimesheetNotesCollection.where("eventId", "==", payload).orderBy('created', 'desc')
-      .get().then((querySnapshot) => {
+      .onSnapshot(querySnapshot => {
         let userNotesArray = []
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach(doc => {
           let note = doc.data()
           note.id = doc.id
           userNotesArray.push(note)

@@ -16,6 +16,7 @@ f<template>
         </div>
         <span>
           <button class="btn btn__outlined mr-3" @click="exportAll()">export all</button>
+          <!-- <button class="btn btn__outlined mr-3" @click="exportPlaced()">export placed</button> -->
           <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
         </span>
       </div>
@@ -1022,6 +1023,63 @@ export default {
         exportService.export();
       });
     },
+    // exportPlaced() {
+    //   const exportHeaders = [
+    //     "Day",
+    //     "Shift Name",
+    //     "Event",
+    //     "Position",
+    //     "Start",
+    //     "End",
+    //     "First Name",
+    //     "Last Name",
+    //     "Phone",
+    //     "Email",
+    //     "Points",
+    //     "Confirmed",
+    //     "DOB",
+    //     "Shirt Size",
+    //     "Code",
+    //   ];
+    //   const exportItems = [];
+    //   console.log(exportItems)
+    //   this.eventShifts.forEach(shift => {
+
+    //     for (var key in this.orderedPlacedUsers3(shift.id)) {
+          
+    //       let uid = this.orderedPlacedUsers3(shift.id)[key].userId
+
+    //       let confirmed = this.orderedPlacedUsers3(shift.id)[key].confirmed
+
+    //       fb.usersCollection.doc(uid).get()
+    //       .then(doc => {
+    //         console.log(doc.data())
+    //         exportItems.push([
+    //           shift.day,
+    //           shift.name,
+    //           shift.event,
+    //           shift.position.title,
+    //           shift.startTime,
+    //           shift.endTime,
+    //           doc.data().firstName,
+    //           doc.data().lastName,
+    //           doc.data().phone,
+    //           doc.data().email,
+    //           doc.data().points,
+    //           confirmed,
+    //           moment(doc.data().dob).format('M/D/YYYY'),
+    //           doc.data().shirtsize,
+    //           `=REGEXEXTRACT(H2,"....$")`
+    //         ])
+    //       })
+    //     }
+    //   })
+      
+    //   this.$gapi.getGapiClient().then(gapi => {
+    //     const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+    //     exportService.export();
+    //   })
+    // },
     exportUnplaced() {
       const exportHeaders = [
         "First Name",
@@ -1176,6 +1234,18 @@ export default {
       }
       return this.filteredPlacedUsers.sort(compare).filter(user => {
         return user.shift == shift.id && user.day == shift.day
+      });
+    },
+    orderedPlacedUsers3 (shift) {
+      function compare(a, b) {
+        if (a.firstName < b.firstName)
+          return -1;
+        if (a.firstName > b.firstName)
+          return 1;
+        return 0;
+      }
+      return this.filteredPlacedUsers.sort(compare).filter(user => {
+        return user.shift == shift.id
       });
     },
     confirmedPlacedUsers(shift) {

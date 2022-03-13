@@ -18,7 +18,7 @@
             </v-select>
           </span>
           <span class="flex mt-3" v-if="showDate">
-            <button class="btn btn__primary mr-3" @click="prev">prev</button>
+            <button class="btn btn__primary mr-5" @click="prev">prev</button>
             <h3>{{date | moment("MMMM, YYYY") }}</h3>
             <!-- <div class="mb-3">
               <label for="status">Choose Month:</label>
@@ -32,7 +32,7 @@
                 >
               </v-select>
             </div> -->
-            <button class="btn btn__primary ml-3 mt-3" @click="next">Next</button>
+            <button class="btn btn__primary ml-5" @click="next">Next</button>
           </span>
           <div>
             <v-select
