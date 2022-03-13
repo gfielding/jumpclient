@@ -1677,9 +1677,9 @@ const store = new Vuex.Store({
 
     getShifts({ commit }, payload) {
       fb.shiftsCollection.orderBy('day', 'desc')
-      .get().then((querySnapshot) => {
+      .onSnapshot(querySnapshot => {
         let shiftsArray = []
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach(doc => {
           let shift = doc.data()
           shift.id = doc.id
           shiftsArray.push(shift)
@@ -1920,8 +1920,8 @@ const store = new Vuex.Store({
     getEventPlacementFromId({ commit }, payload) {
       console.log(payload)
       fb.eventsCollection.where("id", "==", payload)
-      .get().then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
+      .onSnapshot(querySnapshot => {
+        querySnapshot.forEach(doc => {
           commit("setEventInfo", doc.data())
           store.dispatch('getEventUsers', doc.data().id)
           store.dispatch('getEventDrops', doc.data().id)
@@ -1953,9 +1953,9 @@ const store = new Vuex.Store({
     },
     getDayShiftsState({ commit }, payload) {
       fb.shiftsCollection.where("day", "==", payload).orderBy('startTime', 'asc')
-      .get().then((querySnapshot) => {
+      .onSnapshot(querySnapshot => {
         let dayShiftsArray = []
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach(doc => {
           let dayShift = doc.data()
           dayShift.id = doc.id
           dayShiftsArray.push(dayShift)
