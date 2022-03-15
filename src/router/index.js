@@ -320,6 +320,14 @@ const router = new VueRouter({
       },
     },
     {
+      path: '/internalDocuments/:id',
+      name: 'internalDocuments',
+      component: () => import('../views/InternalDocuments/internalDocuments.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
       path: '/addclient',
       name: 'addclient',
       component: () => import('../views/Clients/AddClient.vue'),
