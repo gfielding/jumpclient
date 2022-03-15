@@ -98,6 +98,16 @@
               </div>
             </div>
           </div>
+          <div class="nav__menu--item dropdown">
+            <span>Internal Documents</span>
+            <div class="dropdown-content">
+              <div class="mb-3">
+                <router-link :to="{name: 'internalDocuments'}">
+                  Internal Documents <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+            </div>
+          </div>
           <div class="nav__menu--item">
             <router-link :to="{name: 'userReports'}">
               Reports <i class="fas fa-chevron-right"></i>
