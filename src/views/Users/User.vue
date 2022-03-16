@@ -36,10 +36,10 @@
         <div class="dashboard__container--body--col">
           <ProfileMessagingProfile :user="user" />
         </div>
-        <div class="dashboard__container--body--col">
+        <!-- <div class="dashboard__container--body--col">
           <ProfileMessagingPay :user="user" />
         </div>
-        <!-- <div class="dashboard__container--body--col">
+         <div class="dashboard__container--body--col">
           <ProfileMessagingAvailability :user="user" />
         </div> -->
         <div class="dashboard__container--body--col">
@@ -133,7 +133,7 @@ import ProfileStatus from '@/components/Profile/ProfileStatus.vue'
 import ProfileMessage from '@/components/Profile/ProfileMessage.vue'
 import MessageTable from '@/components/Profile/MessageTable.vue'
 import ProfileMessagingProfile from '@/components/Profile/ProfileMessagingProfile.vue'
-import ProfileMessagingPay from '@/components/Profile/ProfileMessagingPay.vue'
+// import ProfileMessagingPay from '@/components/Profile/ProfileMessagingPay.vue'
 import ProfileMessagingAvailability from '@/components/Profile/ProfileMessagingAvailability.vue'
 import UserNote from '@/components/Profile/UserNote.vue'
 import UserReview from '@/components/Profile/UserReview.vue'
@@ -173,7 +173,7 @@ export default {
     ProfileBlacklist,
     ProfileStatus,
     ProfileMessagingProfile,
-    ProfileMessagingPay,
+    // ProfileMessagingPay,
     ProfileMessagingAvailability,
     UserNote,
     NotesTable,
