@@ -30,6 +30,9 @@
           <ProfileStatus :user="user" />
         </div>
         <div class="dashboard__container--body--col">
+          <ProfileSSN :userProfile="userProfile" />
+        </div>
+        <div class="dashboard__container--body--col">
           <ProfileBlacklist :user="user" />
         </div>
         
@@ -121,6 +124,7 @@ import Loader from '@/components/Loader.vue'
 import ProfileImage from '@/components/Profile/ProfileImage.vue'
 import ProfileContact from '@/components/Profile/ProfileContact.vue'
 import ProfileAddress from '@/components/Profile/ProfileAddress.vue'
+import ProfileSSN from '@/components/Profile/ProfileSSN.vue'
 import ProfileEmergency from '@/components/Profile/ProfileEmergency.vue'
 import ProfileBio from '@/components/Profile/ProfileBio.vue'
 import ProfileSocial from '@/components/Profile/ProfileSocial.vue'
@@ -168,6 +172,7 @@ export default {
     ProfileEmergency,
     ProfileBio,
     ProfileSocial,
+    ProfileSSN,
     ProfileCerts,
     ProfileSkills,
     ProfileBlacklist,
