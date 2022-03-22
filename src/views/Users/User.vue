@@ -30,16 +30,19 @@
           <ProfileStatus :user="user" />
         </div>
         <div class="dashboard__container--body--col">
+          <ProfileSSN :userProfile="userProfile" />
+        </div>
+        <div class="dashboard__container--body--col">
           <ProfileBlacklist :user="user" />
         </div>
         
         <div class="dashboard__container--body--col">
           <ProfileMessagingProfile :user="user" />
         </div>
-        <div class="dashboard__container--body--col">
+        <!-- <div class="dashboard__container--body--col">
           <ProfileMessagingPay :user="user" />
         </div>
-        <!-- <div class="dashboard__container--body--col">
+         <div class="dashboard__container--body--col">
           <ProfileMessagingAvailability :user="user" />
         </div> -->
         <div class="dashboard__container--body--col">
@@ -121,6 +124,7 @@ import Loader from '@/components/Loader.vue'
 import ProfileImage from '@/components/Profile/ProfileImage.vue'
 import ProfileContact from '@/components/Profile/ProfileContact.vue'
 import ProfileAddress from '@/components/Profile/ProfileAddress.vue'
+import ProfileSSN from '@/components/Profile/ProfileSSN.vue'
 import ProfileEmergency from '@/components/Profile/ProfileEmergency.vue'
 import ProfileBio from '@/components/Profile/ProfileBio.vue'
 import ProfileSocial from '@/components/Profile/ProfileSocial.vue'
@@ -133,7 +137,7 @@ import ProfileStatus from '@/components/Profile/ProfileStatus.vue'
 import ProfileMessage from '@/components/Profile/ProfileMessage.vue'
 import MessageTable from '@/components/Profile/MessageTable.vue'
 import ProfileMessagingProfile from '@/components/Profile/ProfileMessagingProfile.vue'
-import ProfileMessagingPay from '@/components/Profile/ProfileMessagingPay.vue'
+// import ProfileMessagingPay from '@/components/Profile/ProfileMessagingPay.vue'
 import ProfileMessagingAvailability from '@/components/Profile/ProfileMessagingAvailability.vue'
 import UserNote from '@/components/Profile/UserNote.vue'
 import UserReview from '@/components/Profile/UserReview.vue'
@@ -168,12 +172,13 @@ export default {
     ProfileEmergency,
     ProfileBio,
     ProfileSocial,
+    ProfileSSN,
     ProfileCerts,
     ProfileSkills,
     ProfileBlacklist,
     ProfileStatus,
     ProfileMessagingProfile,
-    ProfileMessagingPay,
+    // ProfileMessagingPay,
     ProfileMessagingAvailability,
     UserNote,
     NotesTable,
