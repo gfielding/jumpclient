@@ -21,7 +21,8 @@
           <div>Staff Requested: {{shift.staff}}</div>
         </div>
         <div class="dashboard__container--body--col pt-5">
-          <button class="btn btn__outlined mr-3 mb-3" @click.prevent="exportReportEmp">Export Payroll<i class="fas fa-external-link ml-3"></i></button>
+          <button class="btn btn__outlined mr-3 mb-3" @click.prevent="exportReportEmp">Export Payroll-OnPay<i class="fas fa-external-link ml-3"></i></button>
+          <button class="btn btn__outlined mr-3 mb-3" @click.prevent="exportReportEmp2">Export Payroll-Peoplease<i class="fas fa-external-link ml-3"></i></button>
           <div class="caption mb-2" v-if="shift.exportedEmp">
             Last Exported: {{ shift.exportedEmp.toDate() | moment("MMMM Do YYYY, h:mm a") }}
           </div>
@@ -53,7 +54,7 @@
                       <template v-slot:item="{ item }">
                         <div>
                           <button class="btn btn__icon btn__flat mr-2 mb-2" @click="addUser(item)"><i class="fad fa-plus"></i></button>
-                          <h4 style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</h4 style="display: inline;">
+                          <h4 style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}} | {{item.ssn}}</h4>
                         </div>
                       </template>
                     </ais-hits>
@@ -373,6 +374,7 @@ import router from '@/router'
 import ExportService from "@/services/ExportService"
 import TimesheetNote from '@/components/Timesheets/TimesheetNote.vue'
 import * as moment from 'moment'
+import ProfileSSN from '@/components/Profile/ProfileSSN.vue'
 const fb = require('../../firebaseConfig.js')
 import algoliasearch from 'algoliasearch/lite';
 import 'instantsearch.css/themes/satellite-min.css'
@@ -380,6 +382,7 @@ import 'instantsearch.css/themes/satellite-min.css'
 export default {
   name: 'shift',
   data: () => ({
+    encryptionKey: 'SKD433{}{[SKD433{}{[SKD433{}{[32',
     isVisible: true,
     isHidden: false,
     searchClient: algoliasearch(
@@ -513,7 +516,7 @@ export default {
     // }
   },
   computed: {
-    ...mapState(['userProfile', 'shift', 'shiftAssignments']),
+    ...mapState(['users', 'userProfile', 'stateUsers', 'shift', 'shiftAssignments']),
     visibleAssignments() {
       return this.shiftAssignments.filter(item => {
         return (!item.hidden || item.hidden != true)
@@ -524,6 +527,11 @@ export default {
         return (item.hidden)
       })
     },
+    decryptedText() {
+      if (this.userProfile.ssn) {
+      return (this.$CryptoJS.AES.decrypt(this.userProfile.ssn, this.encryptionKey).toString(this.CryptoJS.enc.Utf8) || this.$CryptoJS.AES.encrypt(this.ssn, this.encryptionKey).toString())
+      }
+    }
   },
   // mounted () {
   //   this.hoursCalc()
@@ -719,7 +727,7 @@ export default {
         "Last Name",
         "Email",
         "Phone",
-      ];
+      ];  
       const exportItems = [];
       for (var key in this.shiftAssignments) {
         if (!this.shiftAssignments[key].hidden) {
@@ -926,7 +934,140 @@ export default {
         this.performingRequest = false
       }, 2000)
     },
+    exportReportEmp2(item) {
+      this.performingRequest = true
+      const exportHeaders = [
+        "type",
+        "id",
+        "ssn",
+        "hours",
+        "rate",
+        "treat_as_cash",
+        "day_worked",
+        "venue_id",
+        "wc_code"
+      ];
+      const exportItems = [];
+      for (var key in this.shiftAssignments) {
+        let wcCode = this.getwcCode[key]
+         fb.usersCollection.doc(item.id).get()
+        .then(doc => {
+          console.log(doc.data())
+          exportItems.push([
+            "1",
+            "7",
+            this.decryptedText,
+            "1",
+            this.shiftAssignments[key].dayRate,
+            "1",
+            this.shiftAssignments[key].day,
+            this.shiftAssignments[key].eventInfo.venueId,
+            wcCode
+          ]);
+          exportItems.push([
+            "1",
+            "1",
+            this.decryptedText,
+            this.shiftAssignments[key].regHours,
+            this.shiftAssignments[key].regRate,
+            "0",
+            this.shiftAssignments[key].day,
+            this.shiftAssignments[key].eventInfo.venueId,
+            wcCode
+          ]);
+          exportItems.push([
+            "1",
+            "2",
+            this.decryptedText,
+            this.shiftAssignments[key].otHours,
+            this.shiftAssignments[key].regRate * 1.5,
+            "0",
+            this.shiftAssignments[key].day,
+            this.shiftAssignments[key].eventInfo.venueId,
+            wcCode
+          ]);
+          exportItems.push([
+            "1",
+            "22",
+            this.decryptedText,
+            this.shiftAssignments[key].ot2Hours,
+            this.shiftAssignments[key].regRate * 2,
+            "0",
+            this.shiftAssignments[key].day,
+            this.shiftAssignments[key].eventInfo.venueId,
+            wcCode
+          ]);
+          exportItems.push([
+            "1",
+            "125",
+            this.decryptedText,
+            "1",
+            this.shiftAssignments[key].tips,
+            "1",
+            this.shiftAssignments[key].day,
+            this.shiftAssignments[key].eventInfo.venueId,
+            wcCode
+          ]);
+          exportItems.push([
+            "1",
+            "4",
+            this.decryptedText,
+            "0",
+            this.shiftAssignments[key].mbp,
+            "0",
+            this.shiftAssignments[key].day,
+            this.shiftAssignments[key].eventInfo.venueId,
+            wcCode
+          ]);
+
+        console.log(exportItems)
+          this.$gapi.getGapiClient().then(gapi => {
+            const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+            exportService.export();
+          });
+        })
+        
+      }
+      fb.shiftsCollection.doc(this.shift.id).update({ exportedEmp: fb.firestore.FieldValue.serverTimestamp() })
+      setTimeout(() => {
+        this.$store.dispatch("getShiftFromId", this.$route.params.id)
+        this.performingRequest = false
+      }, 2000)
+    },
+    getwcCode(wcCode){
+      if (this.shiftAssignments[key].eventInfo.venue.address.state =('AL'||'AK'||'AR'||'CO'||'CT'||'FL'||'GA'||'HI'||'ID'||'IL'||'IN'||'IA'||'KS'||'KY'||'MN'||'MO'||'MS'||'MT'||'NE'||'NV'||'NC'||'NH'||'NM'||'OK'||'OR'||'RI'||'SC'||'SD'||'TN'||'UT'||'VT'||'WI'||'WV')){
+        return wcCode = '9082'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('AZ'||'LA'||'VA')){
+             return wcCode = '9083'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('CA'||'TX')){
+            return wcCode ='9079'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('DE'|| 'PA')){
+            return wcCode ='9045'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('ME')){
+            return wcCode ='9084'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('MD')){
+            return wcCode ='9086'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('MI'||'NY')){
+            return wcCode ='9058'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('MA')){
+            return wcCode ='9085'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('ND'|| 'OH'|| 'WA'|| 'WY')){
+            return wcCode ='9082OC'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('NJ')){
+            return wcCode ='9078'
+          }
+    },
   },
+    
   beforeDestroy () {
     this.isVisible = null
     this.isHidden = null
