@@ -199,16 +199,16 @@ const router = new VueRouter({
         requiresAuth: true
       },
     },
-    // {
-    //   path: '/events',
-    //   name: 'events',
-    //   component: () => import('../views/Events/Events.vue'),
-    //   meta: {
-    //     requiresAuth: true
-    //   },
-    // },
     {
-      path: '/events/edit/:id',
+      path: '/events',
+      name: 'events',
+      component: () => import('../views/Events/Events.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/events/:id',
       name: 'event',
       component: () => import('../views/Events/Event.vue'),
       meta: {
@@ -216,7 +216,7 @@ const router = new VueRouter({
       },
     },
     {
-      path: '/events/edit/:id/shifts',
+      path: '/events/:id/shifts',
       name: 'eventshifts',
       component: () => import('../views/Events/EventShifts.vue'),
       meta: {
@@ -224,7 +224,7 @@ const router = new VueRouter({
       },
     },
     {
-      path: '/events/edit/:id/timesheets',
+      path: '/events/:id/timesheets',
       name: 'eventtimesheets',
       component: () => import('../views/Shifts/EventShifts.vue'),
       meta: {
@@ -243,6 +243,22 @@ const router = new VueRouter({
       path: '/addjob',
       name: 'addjob',
       component: () => import('../views/Jobs/AddJob.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/tags',
+      name: 'tags',
+      component: () => import('../views/Tags/Tags.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/addtag',
+      name: 'addtag',
+      component: () => import('../views/Tags/AddTag.vue'),
       meta: {
         requiresAuth: true
       },
@@ -343,32 +359,32 @@ const router = new VueRouter({
         requiresAuth: true
       },
     },
-    {
-      path: '/events', redirect: '/events/2022-04',
-      name: 'eventsHome',
-      component: () => import('../views/Events/EventsHome.vue'),
-      meta: {
-        requiresAuth: true
-      },
-      children: [
-        {
-          path: '/events/:id',
-          name: 'eventsByMonth',
-          component: () => import('../views/Events/EventsByMonth.vue'),
-          meta: {
-            requiresAuth: true
-          },
-        },
-        {
-          path: '/events/venue/:id',
-          name: 'eventsByVenue',
-          component: () => import('../views/Events/EventsByVenue.vue'),
-          meta: {
-            requiresAuth: true
-          },
-        },
-      ]
-    },
+    // {
+    //   path: '/events', redirect: '/events/2022-04',
+    //   name: 'eventsHome',
+    //   component: () => import('../views/Events/EventsHome.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    //   children: [
+    //     {
+    //       path: '/events/:id',
+    //       name: 'eventsByMonth',
+    //       component: () => import('../views/Events/EventsByMonth.vue'),
+    //       meta: {
+    //         requiresAuth: true
+    //       },
+    //     },
+    //     {
+    //       path: '/events/venue/:id',
+    //       name: 'eventsByVenue',
+    //       component: () => import('../views/Events/EventsByVenue.vue'),
+    //       meta: {
+    //         requiresAuth: true
+    //       },
+    //     },
+    //   ]
+    // },
     {
       path: '/clients/clienthome', redirect: '/clients/:id',
       name: 'clientHome',

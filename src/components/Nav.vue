@@ -147,7 +147,7 @@
          
 
           <div class="nav__menu--item mt-5">
-            <router-link :to="{name: 'eventsHome'}">
+            <router-link :to="{name: 'events'}">
               events <i class="fas fa-chevron-right"></i>
             </router-link>
           </div>
@@ -203,6 +203,11 @@
           <div class="nav__menu--item dropdown">
             <span>App Text</span>
             <div class="dropdown-content">
+              <div class="mb-3">
+                <router-link :to="{name: 'tags'}">
+                  tags <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
               <div class="mb-3">
                 <router-link :to="{name: 'faqs'}">
                   faqs <i class="fas fa-chevron-right"></i>

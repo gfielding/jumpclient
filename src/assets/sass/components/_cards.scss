@@ -3,3 +3,13 @@
 .card {
 	@include card;
 }
+
+.eventCardContainer {
+	flex-direction:column;
+}
+.eventCard {
+	background: white;
+  padding: 1rem;
+  border-radius:$radius;
+  margin-bottom:1rem;
+}

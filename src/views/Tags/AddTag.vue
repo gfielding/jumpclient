@@ -2,7 +2,7 @@
 	<div class="dashboard">
     <div class="dashboard__container">
       <div class="dashboard__container--header">
-        <h1>Add FAQ</h1>
+        <h1>Add Tag</h1>
         <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
       </div>
       <form ref="form" @submit.prevent>
@@ -10,16 +10,16 @@
           <div class="dashboard__container--body--col">
             <form ref="form" @submit.prevent>
               <div class="mb-3">
-                <label for="question">Question:</label>
-                <input type="text" v-model.trim="freq.question" id="question" />
+                <label for="title">Title:</label>
+                <input type="text" v-model.trim="tag.title" id="title" />
               </div>
               <div class="mb-3">
-                <label for="desc">Answer:</label>
-                <vue-editor id="desc" v-model="freq.answer" required></vue-editor>
+                <label for="featured">Featured:</label>
+                <input type="checkbox" v-model.trim="tag.featured" id="featured" class="ml-3" />
               </div>
 
-              <button class="btn btn__primary mt-2" @click="addFaq()">
-                Add FAQ
+              <button class="btn btn__primary mt-2" @click="addTag()">
+                Add Tag
                 <transition name="fade">
                   <span class="ml-2" v-if="performingRequest">
                   <i class="fa fa-spinner fa-spin"></i>
@@ -38,25 +38,21 @@
 <script>
 import { mapState } from 'vuex'
 import router from '@/router'
-import { VueEditor } from "vue2-editor";
 
 export default {
-  name: 'addfaq',
+  name: 'addtag',
   data: () => ({
-    freq: {},
+    tag: {},
     performingRequest: false,
   }),
-  components: {
-    VueEditor
-  },
   methods: {
-    addFaq() {
+    addTag() {
       this.performingRequest = true
-      let freq = this.freq
+      let tag = this.tag
       let store = this.$store
-      store.dispatch('addFaq', freq)
+      store.dispatch('addTag', tag)
       setTimeout(() => {
-        let url = `/faqs`
+        let url = `/tags`
         router.push(url)
         this.performingRequest = false
       }, 1000)
@@ -66,10 +62,10 @@ export default {
     },
   },
   beforeDestroy () {
-    this.freq = null
+    this.tag = null
     this.performingRequest = false
     delete this.performingRequest
-    delete this.freq
+    delete this.tag
     this.$store.dispatch('clearErrors')
   }
 }

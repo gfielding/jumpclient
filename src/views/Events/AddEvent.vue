@@ -309,7 +309,7 @@ export default {
       jobs:[],
       published: true,
     },
-    tags: ['#concert', '#comedy', '#convention', '#musicfestival', '#pga', '#nfl', '#nba', '#nhl', '#mlb', '#mls', '#minorleaguebaseball', '#ncaabasketball', '#ncaafootball'],
+    // tags: ['#concert', '#comedy', '#convention', '#musicfestival', '#pga', '#nfl', '#nba', '#nhl', '#mlb', '#mls', '#minorleaguebaseball', '#ncaabasketball', '#ncaafootball'],
     croppa: {},
     day:'',
     job:'',
@@ -338,9 +338,12 @@ export default {
     if (!this.mgrs || this.mgrs.length < 1) {
       this.$store.dispatch("getMgrsState")
     }
+    if (!this.tags || this.tags.length < 1) {
+      this.$store.dispatch("getTagsState")
+    }
   },
   computed: {
-    ...mapState(['venues', 'clients', 'jobs', 'mgrs']),
+    ...mapState(['venues', 'clients', 'jobs', 'mgrs', 'tags']),
     backgroundUrl() {
       return this.event.photoUrl || 'https://firebasestorage.googleapis.com/v0/b/mvpes-25aef.appspot.com/o/stadium.png?alt=media&token=89f2362c-d1bc-4338-a837-fad1d664c51d'
     },
@@ -512,6 +515,7 @@ export default {
     delete this.croppa
     delete this.multiDay
     delete this.performingRequest
+    this.$store.dispatch("clearTagsState")
   	this.$store.dispatch('clearErrors')
   }
 }

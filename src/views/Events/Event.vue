@@ -390,7 +390,7 @@ export default {
     croppa: {},
     day:'',
     job: '',
-    tags: ['#concert', '#comedy', '#convention', '#musicfestival', '#pga', '#nfl', '#nba', '#nhl', '#mlb', '#mls', '#minorleaguebaseball', '#ncaabasketball', '#ncaafootball'],
+    // tags: ['#concert', '#comedy', '#convention', '#musicfestival', '#pga', '#nfl', '#nba', '#nhl', '#mlb', '#mls', '#minorleaguebaseball', '#ncaabasketball', '#ncaafootball'],
     multiDay: false,
     performingRequest: false,
     performingRequest2: false,
@@ -442,9 +442,12 @@ export default {
     if (!this.mgrs || this.mgrs.length < 1) {
       this.$store.dispatch("getMgrsState")
     }
+     if (!this.tags || this.tags.length < 1) {
+      this.$store.dispatch("getTagsState")
+    }
   },
   computed: {
-    ...mapState(['eventInfo', 'venues', 'clients', 'jobs', 'mgrs']),
+    ...mapState(['eventInfo', 'venues', 'clients', 'jobs', 'mgrs', 'tags']),
     event() {
       return this.eventInfo
     },
@@ -637,8 +640,8 @@ export default {
     delete this.showBar
     delete this.columns
   	this.$store.dispatch('clearErrors')
+    this.$store.dispatch('clearTagsState')
     this.$store.dispatch('clearEventState')
-    console.log(this)
   }
 }
 </script>
