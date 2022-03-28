@@ -42,6 +42,10 @@
 		    					<label for="venueName">Venue Name:</label>
 	      					<input type="text" v-model.trim="place.name" id="venueName" />
 		    				</div>
+                <div class="mb-3">
+                  <label for="venueFeatured">Featured:</label>
+                  <input type="checkbox" v-model.trim="place.featured" id="venueFeatured" class="ml-3" />
+                </div>
 		    				<div class="mb-3">
 		    					<label for="venueVisibility">Visible:</label>
 	      					<input type="checkbox" v-model.trim="place.visible" id="venueVisibility" class="ml-3" />

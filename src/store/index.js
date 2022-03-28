@@ -1645,7 +1645,7 @@ const store = new Vuex.Store({
     // },
     getInfiniteEvents({ commit }) {
       console.log('getting initial')
-      fb.eventsCollection.where("published", "==", true).orderBy('startDate', 'asc')
+      fb.eventsCollection.orderBy('startDate', 'asc')
       .onSnapshot(querySnapshot => {
         var lastVisibleEventSnapShot = {};
         var firstVisibleEventSnapShot = {};
@@ -1709,6 +1709,25 @@ const store = new Vuex.Store({
         commit('setTaggedEvents', taggedEventsArray)
       })
     },
+    getVenueEventsSearchResults({ commit }, payload) {
+      fb.eventsCollection.where("venueId", "==", payload).orderBy('startDate', 'asc').onSnapshot(querySnapshot => {
+        let yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 1);
+        let venueEventsArray = []
+        querySnapshot.forEach((doc) => {
+          let startComp = new Date(doc.data().startDate)
+          let endComp = new Date(doc.data().endDate)
+          let event = doc.data()
+          if ((endComp >= yesterday || startComp >= yesterday)) {
+            venueEventsArray.push(event)
+          }
+        })
+        commit('setVenueEventsSearchResults', venueEventsArray)
+      })
+    },
+    clearVenueEventsSearchResults({ commit }) {
+      commit('setVenueEventsSearchResults', [])
+    },
     clearTaggedEvents({ commit }) {
       commit('setTaggedEvents', [])
     },
@@ -1732,6 +1751,7 @@ const store = new Vuex.Store({
       commit('setPrevInfiniteEvents', [])
       commit('setLastVisibleEventSnapShot', {})
       commit('setFirstVisibleEventSnapShot', {})
+      commit('setVenueEventsSearchResults', [])
     },
 
 

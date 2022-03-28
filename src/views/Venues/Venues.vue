@@ -50,6 +50,10 @@ export default {
         field: 'title',
       },
       {
+        label: 'Featured',
+        field: 'featured',
+      },
+      {
         label: 'Followers',
         field: 'followers',
       },

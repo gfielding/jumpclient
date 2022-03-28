@@ -2,39 +2,45 @@
   <div class="dashboard">
     <Loader v-if="performingRequest" />
     <div class="dashboard__container">
-      <div class="dashboard__container--header mb-3">
-        <h1>Events</h1>
+      <div class="dashboard__container--header mb-3 eventsHeader">
+        <span style="display: flex;
+    width: 100%;
+    justify-content: space-between;">
+          <h1>Events</h1>
+          <router-link :to="{name: 'addevent'}" class="hidden-large color--text">
+            <button class="btn btn__flat ml-3"><i class="fas fa-plus fa-2x"></i></button>
+          </router-link>
+        </span>
+        
         <span class="search flex">
           
-          <input type="text" placeholder="search" v-model.trim="searchText" style="background: white; padding: 0 1rem;" class="mr-5" />
-          <div v-if="searchText.length > 1">
-            <button class="btn btn__accent" @click="clearSearch()">clear</button>
+          <input type="text" placeholder="search" v-model.trim="searchText" style="background: white; padding: 0 1rem; min-height: 38px; min-width: 120px;" class="mr-3" />
+          <div style="margin:auto;" v-if="showSearch">
+            <button class="btn btn__small btn__primary mr-5" @click="clearSearch()">clear</button>
           </div>
-          <div>
-            <button class="btn btn__accent" @click="updateSearch()">submit</button>
+          <div style="margin:auto;" v-if="searchText.length > 1 && !showSearch">
+            <button class="btn btn__small btn__accent mr-5" @click="updateSearch()">submit</button>
           </div>
-        
+
           <v-select
+            id="searchbox"
             label="title" 
             :options="venues"
             placeholder="choose venue"
             @input="setSelectedVenue"
-            style="min-width:320px"
             >
           </v-select>
 
 
-          <router-link :to="{name: 'addevent'}" class="color--text">
+          <router-link :to="{name: 'addevent'}" class="hidden-small color--text">
             <button class="btn btn__flat ml-3"><i class="fas fa-plus fa-2x"></i></button>
           </router-link>
         </span>
       </div>
 
+ <!-- (!venueEventsSearchResults || venueEventsSearchResults.length == 0) && !results && (!taggedEvents || taggedEvents.length == 0) && !showVenues && (infiniteEvents && infiniteEvents.length > 0) -->
 
-      <div class="mb-3 mt-3 flex justify-space-between" v-if="(!venueEventsSearchResults || venueEventsSearchResults.length == 0) && !results && (!taggedEvents || taggedEvents.length == 0) && !showVenues && (infiniteEvents && infiniteEvents.length > 0)">
-        <button class="btn btn__accent" @click="loadPrev()">Prev</button>
-        <button class="btn btn__accent" @click="loadNext()">Next</button>
-      </div>
+      
 
 
       <div class="dashboard__container--bodys eventCardContainer">
@@ -48,23 +54,79 @@
             </div>
         </div> -->
 
-        <div v-for="event in filteredEvents" :key="event.id" class="eventCard" v-if="showSearch">
-          <h3>{{event.title}}</h3>
+        <div v-for="event in venueEventsSearchResults" :key="event.id" class="eventCard" v-if="venueEventsSearchResults.length > 0 && !results && taggedEvents.length == 0 && showVenues">
+          <span class="flex align-center">
+            <h3>{{event.title}}</h3>
+            <span v-if="event.published" style="color:#5cb85c;">
+              <i class="fas fa-eye ml-3"></i>
+            </span>
+            <span v-if="!event.published" style="color: #d9534f;">
+              <i class="fas fa-eye-slash ml-3"></i>
+            </span>
+            <span v-if="event.status == 'cancelled'" class="ml-3 errorText">
+              Cancelled
+            </span>
+          </span>
           <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}</span>
           </div>
           <div class="flex mt-2">
-            <router-link :to="`/events/` + event.id">
-              <button class="btn btn__small btn__outlined mr-3">Edit</button>
-            </router-link>
-            <router-link :to="`/events/` + event.id + `/timesheets`">
-              <button class="btn btn__small btn__outlined mr-3" >Timesheets</button>
-            </router-link>
-            <router-link :to="`/events/` + event.id + `/shifts`">
-              <button class="btn btn__small btn__outlined mr-3" >Shifts</button>
-            </router-link>
-            <router-link :to="`/eventplacements/` + event.id">
-              <button class="btn btn__small btn__outlined mr-3" >Placements</button>
-            </router-link>
+            <div class="flex">
+              <router-link :to="`/events/` + event.id">
+                <button class="btn btn__small btn__outlined mr-3">Edit</button>
+              </router-link>
+              <router-link :to="`/events/` + event.id + `/timesheets`">
+                <button class="btn btn__small btn__outlined mr-3" >Timesheets</button>
+              </router-link>
+              <router-link :to="`/events/` + event.id + `/shifts`">
+                <button class="btn btn__small btn__outlined mr-3" >Shifts</button>
+              </router-link>
+              <router-link :to="`/eventplacements/` + event.id">
+                <button class="btn btn__small btn__outlined mr-3" >Placements</button>
+              </router-link>
+            </div>
+            <div class="flex">
+              <button class="btn btn__small btn__flat" style="color:blue !important;" v-for="tag in event.tags" :key="tag.id">
+                {{tag.title}}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div v-for="event in filteredEvents" :key="event.id" class="eventCard" v-if="showSearch">
+          <span class="flex align-center">
+            <h3>{{event.title}}</h3>
+            <span v-if="event.published" style="color:#5cb85c;">
+              <i class="fas fa-eye ml-3"></i>
+            </span>
+            <span v-if="!event.published" style="color: #d9534f;">
+              <i class="fas fa-eye-slash ml-3"></i>
+            </span>
+            <span v-if="event.status == 'cancelled'" class="ml-3 errorText">
+              Cancelled
+            </span>
+          </span>
+          <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}</span>
+          </div>
+          <div class="flex mt-2">
+            <div class="flex">
+              <router-link :to="`/events/` + event.id">
+                <button class="btn btn__small btn__outlined mr-3">Edit</button>
+              </router-link>
+              <router-link :to="`/events/` + event.id + `/timesheets`">
+                <button class="btn btn__small btn__outlined mr-3" >Timesheets</button>
+              </router-link>
+              <router-link :to="`/events/` + event.id + `/shifts`">
+                <button class="btn btn__small btn__outlined mr-3" >Shifts</button>
+              </router-link>
+              <router-link :to="`/eventplacements/` + event.id">
+                <button class="btn btn__small btn__outlined mr-3" >Placements</button>
+              </router-link>
+            </div>
+            <div class="flex">
+              <button class="btn btn__small btn__flat" style="color:blue !important;" v-for="tag in event.tags" :key="tag.id">
+                {{tag.title}}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -75,49 +137,93 @@
             </div>
         </div> -->
 
-        <div v-for="event in infiniteEvents" :key="event.id" class="eventCard" v-if="(!venueEventsSearchResults || venueEventsSearchResults.length == 0) && !results && (!taggedEvents || taggedEvents.length == 0) && !showVenues && !showPrevNext">
+
+<!-- v-if="(!venueEventsSearchResults || venueEventsSearchResults.length == 0) && !results && (!taggedEvents || taggedEvents.length == 0) && !showVenues && !showPrevNext" -->
+
+        <div v-for="event in infiniteEvents" :key="event.id" class="eventCard" v-if="showInfinite">
           <!-- <img :data-src="(event.photoUrl || event.venue.photoUrl)" alt=""> -->
-          <h3>{{event.title}}</h3>
+          <span class="flex align-center">
+            <h3>{{event.title}}</h3>
+            <span v-if="event.published" style="color:#5cb85c;">
+              <i class="fas fa-eye ml-3"></i>
+            </span>
+            <span v-if="!event.published" style="color: #d9534f;">
+              <i class="fas fa-eye-slash ml-3"></i>
+            </span>
+            <span v-if="event.status == 'cancelled'" class="ml-3 errorText">
+              Cancelled
+            </span>
+          </span>
           <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}</span>
             </div>
           <div class="flex mt-2">
-            <router-link :to="`/events/` + event.id">
-              <button class="btn btn__small btn__outlined mr-3">Edit</button>
-            </router-link>
-            <router-link :to="`/events/` + event.id + `/timesheets`">
-              <button class="btn btn__small btn__outlined mr-3" >Timesheets</button>
-            </router-link>
-            <router-link :to="`/events/` + event.id + `/shifts`">
-              <button class="btn btn__small btn__outlined mr-3" >Shifts</button>
-            </router-link>
-            <router-link :to="`/eventplacements/` + event.id">
-              <button class="btn btn__small btn__outlined mr-3" >Placements</button>
-            </router-link>
+            <div class="flex">
+              <router-link :to="`/events/` + event.id">
+                <button class="btn btn__small btn__outlined mr-3">Edit</button>
+              </router-link>
+              <router-link :to="`/events/` + event.id + `/timesheets`">
+                <button class="btn btn__small btn__outlined mr-3" >Timesheets</button>
+              </router-link>
+              <router-link :to="`/events/` + event.id + `/shifts`">
+                <button class="btn btn__small btn__outlined mr-3" >Shifts</button>
+              </router-link>
+              <router-link :to="`/eventplacements/` + event.id">
+                <button class="btn btn__small btn__outlined mr-3" >Placements</button>
+              </router-link>
+            </div>
+            <div class="flex">
+              <button class="btn btn__small btn__flat" style="color:blue !important;" v-for="tag in event.tags" :key="tag.id">
+                {{tag.title}}
+              </button>
+            </div>
           </div>
         </div>
 
         <div v-for="event in visibleEvents" :key="event.id" class="eventCard" v-if="(!venueEventsSearchResults || venueEventsSearchResults.length == 0) && !results && (!taggedEvents || taggedEvents.length == 0) && !showVenues && showPrevNext">
           <!-- <img :data-src="(event.photoUrl || event.venue.photoUrl)" alt=""> -->
-          <h3>{{event.title}}</h3>
+          <span class="flex align-center">
+            <h3>{{event.title}}</h3>
+            <span v-if="event.published" style="color:#5cb85c;">
+              <i class="fas fa-eye ml-3"></i>
+            </span>
+            <span v-if="!event.published" style="color: #d9534f;">
+              <i class="fas fa-eye-slash ml-3"></i>
+            </span>
+            <span v-if="event.status == 'cancelled'" class="ml-3 errorText">
+              Cancelled
+            </span>
+          </span>
           <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}</span>
           </div>
           <div class="flex mt-2">
-            <router-link :to="`/events/` + event.id">
-              <button class="btn btn__small btn__outlined mr-3">Edit</button>
-            </router-link>
-            <router-link :to="`/events/` + event.id + `/timesheets`">
-              <button class="btn btn__small btn__outlined mr-3" >Timesheets</button>
-            </router-link>
-            <router-link :to="`/events/` + event.id + `/shifts`">
-              <button class="btn btn__small btn__outlined mr-3" >Shifts</button>
-            </router-link>
-            <router-link :to="`/eventplacements/` + event.id">
-              <button class="btn btn__small btn__outlined mr-3" >Placements</button>
-            </router-link>
+            <div class="flex">
+              <router-link :to="`/events/` + event.id">
+                <button class="btn btn__small btn__outlined mr-3">Edit</button>
+              </router-link>
+              <router-link :to="`/events/` + event.id + `/timesheets`">
+                <button class="btn btn__small btn__outlined mr-3" >Timesheets</button>
+              </router-link>
+              <router-link :to="`/events/` + event.id + `/shifts`">
+                <button class="btn btn__small btn__outlined mr-3" >Shifts</button>
+              </router-link>
+              <router-link :to="`/eventplacements/` + event.id">
+                <button class="btn btn__small btn__outlined mr-3" >Placements</button>
+              </router-link>
+            </div>
+            <div class="flex">
+              <button class="btn btn__small btn__flat" style="color:blue !important;" v-for="tag in event.tags" :key="tag.id">
+                {{tag.title}}
+              </button>
+            </div>
           </div>
 
         </div>
         
+      </div>
+
+      <div class="mb-3 mt-3 flex justify-space-between" v-if="showInfinite || showPrevNext">
+        <button class="btn btn__accent" @click="loadPrev()">Prev</button>
+        <button class="btn btn__accent" @click="loadNext()">Next</button>
       </div>
       
     </div>
@@ -149,6 +255,7 @@ export default {
   data: () => ({
     searchText: '',
     results: null,
+    showInfinite: true,
     showSearch: false,
     activeTag: '',
     showPrevNext: false,
@@ -161,14 +268,16 @@ export default {
   // },
   created () {
     this.$store.dispatch("getInfiniteEvents")
+    this.$store.dispatch("getTagsState")
     // window.addEventListener("scroll", this.handleScroll, false);
     
   },
   async mounted() {
+    this.$store.dispatch("getTagsState")
     this.$store.dispatch("getVenues")
   },
   computed: {
-    ...mapState(['infiniteEvents', 'prevInfiniteEvents', 'nextInfiniteEvents', 'lastVisibleEventSnapShot', 'firstVisibleEventSnapShot', 'allEvents', 'taggedEvents', 'venues', 'venueEventsSearchResults']),
+    ...mapState(['infiniteEvents', 'prevInfiniteEvents', 'nextInfiniteEvents', 'lastVisibleEventSnapShot', 'firstVisibleEventSnapShot', 'allEvents', 'taggedEvents', 'venues', 'venueEventsSearchResults', 'tags']),
     // ...mapState(['events2021', 'events2022']),
     filteredEvents() {
       return this.allEvents.filter(
@@ -195,11 +304,15 @@ export default {
     //     this.performingRequest = false
     //   }, 1000)
     // },
+    // setTag(value) {
+    //   this.$store.dispatch('updateEvent', value)
+    // },
     loadPrev() {
       this.visibleEvents = []
       this.$store.dispatch("getPrevInfiniteEvents")
       this.performingRequest = true
       this.showPrevNext = true
+      this.showInfinite = false
       this.visibleEvents.push(...this.prevInfiniteEvents);
       setTimeout(() => {
         this.performingRequest = false
@@ -209,6 +322,7 @@ export default {
       this.visibleEvents = []
       this.$store.dispatch("getNextInfiniteEvents")
       this.performingRequest = true
+      this.showInfinite = false
       this.showPrevNext = true
       this.visibleEvents.push(...this.nextInfiniteEvents);
       setTimeout(() => {
@@ -218,20 +332,30 @@ export default {
     setSelectedVenue(value) {
       this.showPrevNext = false
       this.showVenues = true
+      this.showInfinite = false
       this.showSearch = false
       this.performingRequest = true
       this.activeTag = ''
       this.searchText = ''
       if (value && value.id) {
         this.$store.dispatch("getVenueEventsSearchResults", value.id)
+          setTimeout(() => {
+          this.performingRequest = false
+        }, 2500)
       }
       if (!value) {
         this.$store.dispatch("clearVenueEventsSearchResults")
         this.showVenues = false
+        this.performingRequest = true
+        this.showInfinite = true
+        this.searchText = ''
+        this.showSearch = false
+        this.visibleEvents.push(...this.infiniteEvents);
+        setTimeout(() => {
+          this.performingRequest = false
+        }, 1000)
       }
-      setTimeout(() => {
-        this.performingRequest = false
-      }, 5000)
+      
     },
     // onRowClick(item) {
     //   let url = `/events/` + item.slug
@@ -264,6 +388,7 @@ export default {
     },
     choseTag(tag){
       this.performingRequest = true
+      this.showInfinite = false
       this.searchText = ''
       this.showVenues = false
       this.showSearch = false
@@ -275,6 +400,7 @@ export default {
     },
     clearSearch() {
       this.performingRequest = true
+      this.showInfinite = true
       this.searchText = ''
       this.showSearch = false
       this.visibleEvents.push(...this.infiniteEvents);
@@ -286,6 +412,7 @@ export default {
       this.performingRequest = true
       this.activeTag = ''
       this.showVenues = false
+      this.showInfinite = false
       this.showPrevNext = false
       this.showSearch = true
       this.$store.dispatch("clearTaggedEvents")
@@ -324,14 +451,22 @@ export default {
   },
   beforeDestroy () {
     this.performingRequest = false
-    this.is2021 = false
-    this.is2022 = false
-    this.showAll = false
-    this.columns = false
-    delete this.is2021
-    delete this.is2022
-    delete this.showAll
-    delete this.columns
+    this.searchText = false
+    this.results = null
+    this.showInfinite = false
+    this.showSearch = false
+    this.activeTag = ''
+    this.showPrevNext = false
+    this.showVenues = false
+    this.visibleEvents = []
+    delete this.searchText
+    delete this.results
+    delete this.showInfinite
+    delete this.showSearch
+    delete this.activeTag
+    delete this.showPrevNext
+    delete this.showVenues
+    delete this.visibleEvents
     delete this.performingRequest
     console.log(this)
     this.$store.dispatch('clearEventsState')
