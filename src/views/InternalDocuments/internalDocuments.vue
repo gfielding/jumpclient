@@ -168,6 +168,7 @@ import Loader from "@/components/Loader.vue";
 import router from "@/router";
 
 export default {
+  name: 'internalDocuments',
   components: {
     Loader
   },
