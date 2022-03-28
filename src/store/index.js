@@ -40,7 +40,7 @@ const store = new Vuex.Store({
     eventsByDay: [],
     eventUsers: [],
     eventDrops: [],
-    currentEvents: [],
+    allEvents: [],
     pastEvents: [],
     jobs:[],
     jobInfo: {},
@@ -93,7 +93,16 @@ const store = new Vuex.Store({
     verifications: [],
     userVerifications: [],
     eventsByMonth: [],
-    eventsByVenue: []
+    eventsByVenue: [],
+    tags: [],
+    tagInfo: {},
+    infiniteEvents: [],
+    nextInfiniteEvents: [],
+    prevInfiniteEvents: [],
+    lastVisibleEventSnapShot: {},
+    firstVisibleEventSnapShot: {},
+    taggedEvents: [],
+    venueEventsSearchResults: []
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -1073,6 +1082,51 @@ const store = new Vuex.Store({
       commit('setUsers', [])
     },
 
+    /*TAGS*/
+    getTagsState({ commit }, payload) {
+      fb.tagsCollection.onSnapshot(querySnapshot => {
+        let tagsArray = []
+        querySnapshot.forEach(doc => {
+          let tag = doc.data()
+          tagsArray.push(tag)
+        })
+        commit('setTags', tagsArray)
+      })
+    },
+    addTag({ commit }, payload) {
+      console.log(payload)
+      fb.tagsCollection.add(payload)
+      .then(
+        doc => {
+          fb.tagsCollection.doc(doc.id).update({
+            id: doc.id,
+            created: fb.firestore.FieldValue.serverTimestamp(),
+          })
+        }
+      )
+    },
+    geTagFromId({ commit }, payload) {
+      fb.tagsCollection.where("id", "==", payload).onSnapshot(querySnapshot => {
+        querySnapshot.forEach(function (doc) {
+          commit("setTagInfo", doc.data())
+        })
+      })
+    },
+    deleteTag({ commit }, payload) {
+      fb.tagsCollection.doc(payload).delete()
+    },
+    updateTag({ commit }, payload) {
+      fb.tagsCollection.doc(payload.id).update(payload)
+    },
+    clearTagState({ commit }) {
+      commit('setTagInfo', {})
+    },
+    clearTagsState({ commit }) {
+      commit('setTags', [])
+    },
+
+
+
 
     /*MGRS*/
     getMgrsState({ commit }, payload) {
@@ -1577,6 +1631,106 @@ const store = new Vuex.Store({
       )
       store.dispatch('getEventShifts', payload)
     },  
+    // getAllEvents({ commit }) {
+    //   console.log('getting all')
+    //   fb.eventsCollection.where("published", "==", true).orderBy('startDate', 'asc')
+    //   .onSnapshot(querySnapshot => {
+    //     let allEventsArray = []
+    //     querySnapshot.forEach((doc) => {
+    //       let event = doc.data()
+    //       allEventsArray.push(event)
+    //     })
+    //     commit('setAllEvents', allEventsArray)
+    //   })
+    // },
+    getInfiniteEvents({ commit }) {
+      console.log('getting initial')
+      fb.eventsCollection.orderBy('startDate', 'asc')
+      .onSnapshot(querySnapshot => {
+        var lastVisibleEventSnapShot = {};
+        var firstVisibleEventSnapShot = {};
+        let yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 1);
+        let currentEventsArray = []
+        let allEventsArray = []
+        querySnapshot.forEach((doc) => {
+          let startComp = new Date(doc.data().startDate)
+          let endComp = new Date(doc.data().endDate)
+          let event = doc.data()
+          if ((endComp >= yesterday || startComp >= yesterday)) {
+            currentEventsArray.push(event)
+          }
+          allEventsArray.push(event)
+        })
+        let twelve = currentEventsArray.slice(0, 12);
+        // firstVisibleEventSnapShot = currentEventsArray.slice(0, 1);
+        // lastVisibleEventSnapShot = currentEventsArray.slice(11, 12);
+        firstVisibleEventSnapShot = twelve[twelve.length - 12];
+        lastVisibleEventSnapShot = twelve[twelve.length - 1];
+        commit('setLastVisibleEventSnapShot', lastVisibleEventSnapShot)
+        commit('setFirstVisibleEventSnapShot', firstVisibleEventSnapShot)
+        commit('setAllEvents', allEventsArray)
+        // commit('setPastEvents', pastEventsArray)
+        commit('setInfiniteEvents', twelve)
+      })
+    },
+    getNextInfiniteEvents({ commit, state }) {
+      const isLast = (element) => element == state.lastVisibleEventSnapShot;
+      const lastIndex = state.allEvents.findIndex(isLast)
+      var size = lastIndex + 13;
+      var items = state.allEvents.slice(lastIndex + 1, size)
+      commit('setLastVisibleEventSnapShot', items.at(-1))
+      commit('setFirstVisibleEventSnapShot', items.at(+1))
+      commit('setNextInfiniteEvents', items)
+    },
+    getPrevInfiniteEvents({ commit, state }) {
+      console.log(state.firstVisibleEventSnapShot)
+      const isFirst = (element) => element == state.firstVisibleEventSnapShot;
+      const firstIndex = state.allEvents.findIndex(isFirst)
+      var size = firstIndex - 13;
+      var items = state.allEvents.slice(size, firstIndex - 1)
+      // console.log(items)
+      commit('setLastVisibleEventSnapShot', items.at(-1))
+      commit('setFirstVisibleEventSnapShot', items.at(+1))
+      commit('setPrevInfiniteEvents', items)
+    },
+    getSearchEvents({ commit }, payload) {
+      console.log('getting search')
+      fb.eventsCollection.where("published", "==", true).orderBy('startDate', 'asc').where("title")
+    },
+    getTaggedEvents({ commit }, payload) {
+      console.log('getting tagged')
+      fb.eventsCollection.where("published", "==", true).where("tags", "array-contains", payload).orderBy('startDate', 'asc')
+      .onSnapshot(querySnapshot => {
+        let taggedEventsArray = []
+        querySnapshot.forEach((doc) => {
+          taggedEventsArray.push(doc.data())
+        })
+        commit('setTaggedEvents', taggedEventsArray)
+      })
+    },
+    getVenueEventsSearchResults({ commit }, payload) {
+      fb.eventsCollection.where("venueId", "==", payload).orderBy('startDate', 'asc').onSnapshot(querySnapshot => {
+        let yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 1);
+        let venueEventsArray = []
+        querySnapshot.forEach((doc) => {
+          let startComp = new Date(doc.data().startDate)
+          let endComp = new Date(doc.data().endDate)
+          let event = doc.data()
+          if ((endComp >= yesterday || startComp >= yesterday)) {
+            venueEventsArray.push(event)
+          }
+        })
+        commit('setVenueEventsSearchResults', venueEventsArray)
+      })
+    },
+    clearVenueEventsSearchResults({ commit }) {
+      commit('setVenueEventsSearchResults', [])
+    },
+    clearTaggedEvents({ commit }) {
+      commit('setTaggedEvents', [])
+    },
     clearEventState({ commit }) {
       commit('setEventInfo', {})
     },
@@ -1590,8 +1744,14 @@ const store = new Vuex.Store({
       commit('setEvents', [])
       commit('set2021Events', [])
       commit('set2022Events', [])
-      commit('setCurrentEvents', [])
-      commit('setPastEvents', [])
+      commit('setAllEvents', [])
+      commit('setTaggedEvents', [])
+      commit('setInfiniteEvents', [])
+      commit('setNextInfiniteEvents', [])
+      commit('setPrevInfiniteEvents', [])
+      commit('setLastVisibleEventSnapShot', {})
+      commit('setFirstVisibleEventSnapShot', {})
+      commit('setVenueEventsSearchResults', [])
     },
 
 
@@ -2364,11 +2524,11 @@ const store = new Vuex.Store({
         state.dayEvents = []
       }
     },
-    setCurrentEvents(state, val) {
+    setAllEvents(state, val) {
       if (val) {
-        state.currentEvents = val
+        state.allEvents = val
       } else {
-        state.currentEvents = []
+        state.allEvents = []
       }
     },
     setPastEvents(state, val) {
@@ -2730,6 +2890,57 @@ const store = new Vuex.Store({
         state.eventsByVenue = val
       } else {
         state.eventsByVenue = []
+      }
+    },
+    setTagInfo(state, val) {
+      state.tagInfo = val
+    },
+    setTags(state, val) {
+      if (val) {
+        state.tags = val
+      } else {
+        state.tags = []
+      }
+    },
+    setInfiniteEvents(state, val) {
+      if (val) {
+        state.infiniteEvents = val
+      } else {
+        state.infiniteEvents = []
+      }
+    },
+    setNextInfiniteEvents(state, val) {
+      if (val) {
+        state.nextInfiniteEvents = val
+      } else {
+        state.nextInfiniteEvents = []
+      }
+    },
+    setPrevInfiniteEvents(state, val) {
+      if (val) {
+        state.prevInfiniteEvents = val
+      } else {
+        state.prevInfiniteEvents = []
+      }
+    },
+    setLastVisibleEventSnapShot(state, val) {
+      state.lastVisibleEventSnapShot = val
+    },
+    setFirstVisibleEventSnapShot(state, val) {
+      state.firstVisibleEventSnapShot = val
+    },
+    setVenueEventsSearchResults(state, val) {
+      if (val) {
+        state.venueEventsSearchResults = val
+      } else {
+        state.venueEventsSearchResults = []
+      }
+    },
+    setTaggedEvents(state, val) {
+      if (val) {
+        state.taggedEvents = val
+      } else {
+        state.taggedEvents = []
       }
     },
   },

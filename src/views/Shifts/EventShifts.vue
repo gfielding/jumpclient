@@ -4,7 +4,7 @@
     <div class="dashboard__container" v-if="eventInfo && eventInfo.id">
       <div class="dashboard__container--header">
         <div class="flex align-center">
-          <h1>{{eventInfo.title}} Timesheets</h1>
+          <h1 v-if="eventInfo.title">{{eventInfo.title}} Timesheets</h1>
           <button class="btn btn__large btn__danger ml-5" v-if="eventInfo && eventInfo.cancelled">
             Cancelled
           </button>

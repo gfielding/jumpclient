@@ -68,3 +68,48 @@ progress {
 .vs__dropdown-menu {
   z-index: 20;
 }
+
+
+.search #searchbox {
+  padding: 3px 0;
+  padding-left:0.5rem;
+  background:white;
+  border-radius:$radius;
+  min-width: 320px;
+}
+    
+.search vs__selected-options {
+  background-color:white;
+}
+.search .vs__actions {
+  display: flex;
+  background-color: white;
+  align-items: center;
+  padding: 4px 8px;
+  color:$text;
+}
+.search .vs__clear, .search .vs__open-indicator {
+  fill: grey;
+  margin: 0 8px;
+}
+.search .vs__selected {
+  background-color: white;
+  border-color: transparent;
+  padding: 0;
+  border-radius: $radius 0 0 $radius;
+  margin:0;
+}
+
+.search .vs__dropdown-toggle {
+  padding: 0 !important;
+  border: none;
+}
+.search .vs__search {
+  background: white;
+  margin: 0;
+  height: 34px !important;
+  padding: 0 6px;
+}
+.search .vs__dropdown-toggle {
+  background-color: white;
+}

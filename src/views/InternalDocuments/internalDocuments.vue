@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard">
     <div class="dashboard__container">
-      <Loader v-if="!internalDocuments" />
+      <!-- <Loader v-if="!internalDocuments" /> -->
       <div class="dashboard__container--header">
         <h1>Expected Deliverables from Staffing Managers</h1>
         <button class="btn btn__flat" @click="goBack">

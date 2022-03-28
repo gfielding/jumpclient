@@ -46,3 +46,22 @@
 		width:100%;
 	}
 }
+
+.eventsHeader {
+	display:flex;
+	flex-direction:row;
+	@include respond(tablet-port) {
+		flex-direction:column;
+	}
+}
+.eventsHeader .search {
+	margin:1rem;
+	@include respond(tablet-port) {
+		flex-direction:column;
+	}
+}
+.eventsHeader .search .v-select{
+	@include respond(tablet-port) {
+		margin-top:1.6rem;
+	}
+}

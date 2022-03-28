@@ -2,12 +2,14 @@
 	<div class="dashboard">
     <div class="dashboard__container">
       <Loader v-if="!venue" />
-      <div class="dashboard__container--header" v-if="venue">
+      <div class="dashboard__container--header pb-3" v-if="venue">
         <div>
         <h1>{{venue.title}}</h1>
-        Followers: <span class="caption" v-if="venueFollowers">{{venueFollowers.length}}</span>
         </div>
-        <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
+        <span class="flex align-center">
+          <button class="btn btn__outlined" @click="exportFollowers()">Followers: <span class="caption" v-if="venueFollowers">{{venueFollowers.length}}</span></button>
+          <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
+        </span>
       </div>
       <form ref="form" @submit.prevent>
       	<div class="dashboard__container--body" v-if="venue">
@@ -45,8 +47,12 @@
     					<label for="venueName">Venue Name:</label>
     					<input type="text" v-model.trim="venue.title" id="venueName" />
     				</div>
+            <div class="mb-3">
+              <label for="venueFeatured">Featured:</label>
+              <input type="checkbox" v-model.trim="venue.featured" id="venueFeatured" class="ml-3" />
+            </div>
     				<div class="mb-3">
-    					<label for="venueVisibility">Visibile:</label>
+    					<label for="venueVisibility">Visible:</label>
     					<input type="checkbox" v-model.trim="venue.visible" id="venueVisibility" class="ml-3" />
     				</div>
             <div class="mb-3">
@@ -54,7 +60,7 @@
               <input type="checkbox" v-model.trim="venue.requiredVaccine" id="venueVisibility" class="ml-3" />
             </div>
             <div class="mb-3" v-if="clients.length >= 1">
-              <label for="client">Default Client:</label>
+              <label for="client">Clients:</label>
               <v-select
                 class="mt-2"
                 label="title" 
@@ -237,7 +243,7 @@
           </div>
       	</div>
       </form>
-      <div class="dashboard__container--body" v-if="venueEvents && venueEvents.length >= 1">
+     <!--  <div class="dashboard__container--body" v-if="venueEvents && venueEvents.length >= 1">
         <h3>Events for this Venue</h3>
          <vue-good-table
             :columns="columns"
@@ -266,7 +272,7 @@
             </span>
           </template>
         </vue-good-table>
-      </div>
+      </div> -->
     </div>
 	</div>
 </template>
@@ -277,6 +283,7 @@ import Loader from '@/components/Loader.vue'
 import router from '@/router'
 import { VueEditor } from "vue2-editor";
 const fb = require('../../firebaseConfig.js')
+import ExportService from "@/services/ExportService"
 import algoliasearch from 'algoliasearch/lite';
 import 'instantsearch.css/themes/satellite-min.css'
 
@@ -329,7 +336,8 @@ export default {
     ]
   }),
    computed: {
-    ...mapState(['venueInfo', 'venueEvents', 'clients', 'jobs', 'mgrs', 'venueFollowers']),
+    ...mapState(['venueInfo', 'clients', 'jobs', 'mgrs', 'venueFollowers']),
+    // ...mapState(['venueInfo', 'venueEvents', 'clients', 'jobs', 'mgrs', 'venueFollowers']),
     venue() {
       return this.venueInfo
     },
@@ -339,6 +347,9 @@ export default {
   },
   created () {
     this.$store.dispatch("getVenueFromId", this.$route.params.id);
+    
+  },
+  beforeMount() {
     if (!this.clients || this.clients.length < 1) {
       this.$store.dispatch("getClients")
     }
@@ -349,7 +360,7 @@ export default {
       this.$store.dispatch("getMgrsState")
     }
   },
-   components: {
+  components: {
     Loader,
     VueEditor
   },
@@ -510,6 +521,28 @@ export default {
           router.push(url)
         }, 2000)
       }
+    },
+    exportFollowers() {
+      const exportHeaders = [
+        "First Name",
+        "Email",
+        "Phone",
+        "Venue",
+      ]
+      const exportItems = [];
+      for (var key in this.venueFollowers) {
+        exportItems.push([
+          this.venueFollowers[key].name,
+          this.venueFollowers[key].email,
+          this.venueFollowers[key].phone,
+          this.venueFollowers[key].venueName,
+        ])
+      }
+      console.log(exportItems)
+      this.$gapi.getGapiClient().then(gapi => {
+        const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+        exportService.export();
+      });
     },
     deleteVenue() {
       let venue = this.venueInfo
