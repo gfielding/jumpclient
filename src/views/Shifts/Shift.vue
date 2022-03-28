@@ -943,12 +943,13 @@ export default {
         "hours",
         "rate",
         "treat_as_cash",
+        "day_worked",
         "venue_id",
         "wc_code"
       ];
       const exportItems = [];
       for (var key in this.shiftAssignments) {
-        let wcCode = this.getWCcode[key]
+        let wcCode = this.getwcCode[key]
          fb.usersCollection.doc(item.id).get()
         .then(doc => {
           console.log(doc.data())
@@ -959,6 +960,7 @@ export default {
             "1",
             this.shiftAssignments[key].dayRate,
             "1",
+            this.shiftAssignments[key].day,
             this.shiftAssignments[key].eventInfo.venueId,
             wcCode
           ]);
@@ -969,6 +971,7 @@ export default {
             this.shiftAssignments[key].regHours,
             this.shiftAssignments[key].regRate,
             "0",
+            this.shiftAssignments[key].day,
             this.shiftAssignments[key].eventInfo.venueId,
             wcCode
           ]);
@@ -979,6 +982,7 @@ export default {
             this.shiftAssignments[key].otHours,
             this.shiftAssignments[key].regRate * 1.5,
             "0",
+            this.shiftAssignments[key].day,
             this.shiftAssignments[key].eventInfo.venueId,
             wcCode
           ]);
@@ -989,6 +993,7 @@ export default {
             this.shiftAssignments[key].ot2Hours,
             this.shiftAssignments[key].regRate * 2,
             "0",
+            this.shiftAssignments[key].day,
             this.shiftAssignments[key].eventInfo.venueId,
             wcCode
           ]);
@@ -999,6 +1004,7 @@ export default {
             "1",
             this.shiftAssignments[key].tips,
             "1",
+            this.shiftAssignments[key].day,
             this.shiftAssignments[key].eventInfo.venueId,
             wcCode
           ]);
@@ -1009,6 +1015,7 @@ export default {
             "0",
             this.shiftAssignments[key].mbp,
             "0",
+            this.shiftAssignments[key].day,
             this.shiftAssignments[key].eventInfo.venueId,
             wcCode
           ]);
@@ -1027,43 +1034,40 @@ export default {
         this.performingRequest = false
       }, 2000)
     },
-    getWCcode(key){
-      this.$store.dispatch("getUsersByState", this.$route.params.id)
-      if (this.stateUsers[key].address.state === AL || this.stateUsers[key].address.state === AK | this.stateUsers[key].address.state === AR | this.stateUsers[key].address.state === CO | this.stateUsers[key].address.state === CT | this.stateUsers[key].address.state === FL | this.stateUsers[key].address.state === GA | this.stateUsers[key].address.state === HI | this.stateUsers[key].address.state === ID | this.stateUsers[key].address.state === IL | this.stateUsers[key].address.state === IN | this.stateUsers[key].address.state === IA | this.stateUsers[key].address.state === KS | this.stateUsers[key].address.state === KY | this.stateUsers[key].address.state === MN | this.stateUsers[key].address.state === MO | this.stateUsers[key].address.state === MS | this.stateUsers[key].address.state === MT | this.stateUsers[key].address.state === NE | this.stateUsers[key].address.state === NV | this.stateUsers[key].address.state === NC | this.stateUsers[key].address.state === NH | this.stateUsers[key].address.state === NM | this.stateUsers[key].address.state === OK | this.stateUsers[key].address.state === OR | this.stateUsers[key].address.state === RI | this.stateUsers[key].address.state === SC | this.stateUsers[key].address.state === SD | this.stateUsers[key].address.state === TN | this.stateUsers[key].address.state === UT | this.stateUsers[key].address.state === VT | this.stateUsers[key].address.state === WI | this.stateUsers[key].address.state === WV) {
-      return '9082'
-    } 
-    else if (this.users[key].address.state === AZ | this.users[key].address.state === LA | this.users[key].address.state === VA){
-      return '9083'
-    }
-    else if (this.users[key].address.state === CA | this.users[key].address.state === TX){
-      return '9079'
-    }
-    else if (this.users[key].address.state === DE | this.users[key].address.state === PA){
-      return '9045'
-    }
-    else if (this.users[key].address.state === ME){
-      return '9084'
-    }
-    else if (this.users[key].address.state === MD){
-      return '9086'
-    }
-    else if (this.stateUsers[key].address.state === MI | this.users[key].address.state === NY){
-      return '9058'
-    }
-    else if (this.users[key].address.state === MA){
-      return '9085'
-    }
-    else if(this.users[key].address.state === ND | this.users[key].address.state === OH | this.users[key].address.state === WA | this.users[key].address.state === WY){
-      return '9082OC'
-    }
-    else if (this.users[key].address.state === NJ){
-      return '9078'
-    }
-    else {
-    console.log('null state')
-     }
-    }
+    getwcCode(wcCode){
+      if (this.shiftAssignments[key].eventInfo.venue.address.state =('AL'||'AK'||'AR'||'CO'||'CT'||'FL'||'GA'||'HI'||'ID'||'IL'||'IN'||'IA'||'KS'||'KY'||'MN'||'MO'||'MS'||'MT'||'NE'||'NV'||'NC'||'NH'||'NM'||'OK'||'OR'||'RI'||'SC'||'SD'||'TN'||'UT'||'VT'||'WI'||'WV')){
+        return wcCode = '9082'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('AZ'||'LA'||'VA')){
+             return wcCode = '9083'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('CA'||'TX')){
+            return wcCode ='9079'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('DE'|| 'PA')){
+            return wcCode ='9045'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('ME')){
+            return wcCode ='9084'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('MD')){
+            return wcCode ='9086'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('MI'||'NY')){
+            return wcCode ='9058'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('MA')){
+            return wcCode ='9085'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('ND'|| 'OH'|| 'WA'|| 'WY')){
+            return wcCode ='9082OC'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('NJ')){
+            return wcCode ='9078'
+          }
+    },
   },
+    
   beforeDestroy () {
     this.isVisible = null
     this.isHidden = null
