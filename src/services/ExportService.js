@@ -16,7 +16,7 @@ export default class ExportService {
     createSpreadsheet() {
         this.gapi.client.sheets.spreadsheets.create({
             properties: {
-                title: 'New Report'
+                title: 'MVP Data Export'
             }
         }).then((response) => {
             this.spreadsheetId = response.result.spreadsheetId;
@@ -26,10 +26,11 @@ export default class ExportService {
     }
 
     writeRows() {
+        console.log(this.data)
         this.data.unshift(this.columns);
         this.gapi.client.sheets.spreadsheets.values.append({
             spreadsheetId: this.spreadsheetId,
-            range: 'A1:F1',
+            range: 'A1:K1',
             valueInputOption: 'USER_ENTERED',
             resource: {
                 values: this.data
