@@ -336,7 +336,7 @@ const router = new VueRouter({
       },
     },
     {
-      path: '/internalDocuments/:id',
+      path: '/internalDocuments',
       name: 'internalDocuments',
       component: () => import('../views/InternalDocuments/internalDocuments.vue'),
       meta: {

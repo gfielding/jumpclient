@@ -234,6 +234,10 @@ address, .caption {
   color: $danger;
 }
 
+.strike {
+  text-decoration: line-through;
+  color:$danger;
+}
 // .fa-2x {
 //   font-size: 1.6rem !important;
 // }

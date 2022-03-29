@@ -56,16 +56,19 @@
 
         <div v-for="event in venueEventsSearchResults" :key="event.id" class="eventCard" v-if="venueEventsSearchResults.length > 0 && !results && taggedEvents.length == 0 && showVenues">
           <span class="flex align-center">
-            <h3>{{event.title}}</h3>
-            <span v-if="event.published" style="color:#5cb85c;">
-              <i class="fas fa-eye ml-3"></i>
-            </span>
-            <span v-if="!event.published" style="color: #d9534f;">
-              <i class="fas fa-eye-slash ml-3"></i>
-            </span>
-            <span v-if="event.status == 'cancelled'" class="ml-3 errorText">
-              Cancelled
-            </span>
+            <h3 v-bind:class="{ strike: event.status == 'cancelled' }">{{event.title}}</h3>
+            <button v-if="event.published" class="btn btn__icon ml-5" @click="unpublish(event)">
+              <i class="fas fa-eye" style="color:#5cb85c;"></i>
+            </button>
+            <button v-if="!event.published" class="btn btn__icon ml-5" @click="publish(event)">
+              <i class="fas fa-eye-slash" style="color:#d9534f;"></i>
+            </button>
+            <button v-if="(!event.status || event.status != 'cancelled')" class="btn btn__icon ml-5" @click="cancel(event)">
+              <i class="fas fa-times" style="color:#d9534f;"></i>
+            </button>
+            <button v-if="event.status == 'cancelled'" class="btn btn__small btn__success ml-3" @click="activate(event)">
+              activate
+            </button>
           </span>
           <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}</span>
           </div>
@@ -85,25 +88,37 @@
               </router-link>
             </div>
             <div class="flex">
-              <button class="btn btn__small btn__flat" style="color:blue !important;" v-for="tag in event.tags" :key="tag.id">
+              <!-- <button class="btn btn__small btn__flat" style="color:blue !important;" v-for="tag in event.tags" :key="tag.id">
                 {{tag.title}}
-              </button>
+              </button> -->
+              <v-select
+                  label="title" 
+                  :options="tags"
+                  multiple
+                  v-model="event.tags"
+                  @input="setTag(event)"
+                  style="min-width: 160px;"
+                  >
+                </v-select>
             </div>
           </div>
         </div>
 
         <div v-for="event in filteredEvents" :key="event.id" class="eventCard" v-if="showSearch">
           <span class="flex align-center">
-            <h3>{{event.title}}</h3>
-            <span v-if="event.published" style="color:#5cb85c;">
-              <i class="fas fa-eye ml-3"></i>
-            </span>
-            <span v-if="!event.published" style="color: #d9534f;">
-              <i class="fas fa-eye-slash ml-3"></i>
-            </span>
-            <span v-if="event.status == 'cancelled'" class="ml-3 errorText">
-              Cancelled
-            </span>
+            <h3 v-bind:class="{ strike: event.status == 'cancelled' }">{{event.title}}</h3>
+            <button v-if="event.published" class="btn btn__icon ml-5" @click="unpublish(event)">
+              <i class="fas fa-eye" style="color:#5cb85c;"></i>
+            </button>
+            <button v-if="!event.published" class="btn btn__icon ml-5" @click="publish(event)">
+              <i class="fas fa-eye-slash" style="color:#d9534f;"></i>
+            </button>
+            <button v-if="(!event.status || event.status != 'cancelled')" class="btn btn__icon ml-5" @click="cancel(event)">
+              <i class="fas fa-times" style="color:#d9534f;"></i>
+            </button>
+            <button v-if="event.status == 'cancelled'" class="btn btn__small btn__success ml-3" @click="activate(event)">
+              activate
+            </button>
           </span>
           <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}</span>
           </div>
@@ -123,9 +138,18 @@
               </router-link>
             </div>
             <div class="flex">
-              <button class="btn btn__small btn__flat" style="color:blue !important;" v-for="tag in event.tags" :key="tag.id">
+              <!-- <button class="btn btn__small btn__flat" style="color:blue !important;" v-for="tag in event.tags" :key="tag.id">
                 {{tag.title}}
-              </button>
+              </button> -->
+              <v-select
+                  label="title" 
+                  :options="tags"
+                  multiple
+                  v-model="event.tags"
+                  @input="setTag(event)"
+                  style="min-width: 160px;"
+                  >
+                </v-select>
             </div>
           </div>
         </div>
@@ -143,16 +167,19 @@
         <div v-for="event in infiniteEvents" :key="event.id" class="eventCard" v-if="showInfinite">
           <!-- <img :data-src="(event.photoUrl || event.venue.photoUrl)" alt=""> -->
           <span class="flex align-center">
-            <h3>{{event.title}}</h3>
-            <span v-if="event.published" style="color:#5cb85c;">
-              <i class="fas fa-eye ml-3"></i>
-            </span>
-            <span v-if="!event.published" style="color: #d9534f;">
-              <i class="fas fa-eye-slash ml-3"></i>
-            </span>
-            <span v-if="event.status == 'cancelled'" class="ml-3 errorText">
-              Cancelled
-            </span>
+            <h3 v-bind:class="{ strike: event.status == 'cancelled' }">{{event.title}}</h3>
+            <button v-if="event.published" class="btn btn__icon ml-5" @click="unpublish(event)">
+              <i class="fas fa-eye" style="color:#5cb85c;"></i>
+            </button>
+            <button v-if="!event.published" class="btn btn__icon ml-5" @click="publish(event)">
+              <i class="fas fa-eye-slash" style="color:#d9534f;"></i>
+            </button>
+            <button v-if="(!event.status || event.status != 'cancelled')" class="btn btn__icon ml-5" @click="cancel(event)">
+              <i class="fas fa-times" style="color:#d9534f;"></i>
+            </button>
+            <button v-if="event.status == 'cancelled'" class="btn btn__small btn__success ml-3" @click="activate(event)">
+              activate
+            </button>
           </span>
           <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}</span>
             </div>
@@ -172,9 +199,18 @@
               </router-link>
             </div>
             <div class="flex">
-              <button class="btn btn__small btn__flat" style="color:blue !important;" v-for="tag in event.tags" :key="tag.id">
+              <!-- <button class="btn btn__small btn__flat" style="color:blue !important;" v-for="tag in event.tags" :key="tag.id">
                 {{tag.title}}
-              </button>
+              </button> -->
+              <v-select
+                  label="title" 
+                  :options="tags"
+                  multiple
+                  v-model="event.tags"
+                  @input="setTag(event)"
+                  style="min-width: 160px;"
+                  >
+                </v-select>
             </div>
           </div>
         </div>
@@ -182,16 +218,19 @@
         <div v-for="event in visibleEvents" :key="event.id" class="eventCard" v-if="(!venueEventsSearchResults || venueEventsSearchResults.length == 0) && !results && (!taggedEvents || taggedEvents.length == 0) && !showVenues && showPrevNext">
           <!-- <img :data-src="(event.photoUrl || event.venue.photoUrl)" alt=""> -->
           <span class="flex align-center">
-            <h3>{{event.title}}</h3>
-            <span v-if="event.published" style="color:#5cb85c;">
-              <i class="fas fa-eye ml-3"></i>
-            </span>
-            <span v-if="!event.published" style="color: #d9534f;">
-              <i class="fas fa-eye-slash ml-3"></i>
-            </span>
-            <span v-if="event.status == 'cancelled'" class="ml-3 errorText">
-              Cancelled
-            </span>
+            <h3 v-bind:class="{ strike: event.status == 'cancelled' }">{{event.title}}</h3>
+            <button v-if="event.published" class="btn btn__icon ml-5" @click="unpublish(event)">
+              <i class="fas fa-eye" style="color:#5cb85c;"></i>
+            </button>
+            <button v-if="!event.published" class="btn btn__icon ml-5" @click="publish(event)">
+              <i class="fas fa-eye-slash" style="color:#d9534f;"></i>
+            </button>
+            <button v-if="(!event.status || event.status != 'cancelled')" class="btn btn__icon ml-5" @click="cancel(event)">
+              <i class="fas fa-times" style="color:#d9534f;"></i>
+            </button>
+            <button v-if="event.status == 'cancelled'" class="btn btn__small btn__success ml-3" @click="activate(event)">
+              activate
+            </button>
           </span>
           <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}</span>
           </div>
@@ -211,9 +250,18 @@
               </router-link>
             </div>
             <div class="flex">
-              <button class="btn btn__small btn__flat" style="color:blue !important;" v-for="tag in event.tags" :key="tag.id">
+              <v-select
+                  label="title" 
+                  :options="tags"
+                  multiple
+                  v-model="event.tags"
+                  @input="setTag(event)"
+                  style="min-width: 160px;"
+                  >
+                </v-select>
+              <!-- <button class="btn btn__small btn__flat" style="color:blue !important;" v-for="tag in event.tags" :key="tag.id">
                 {{tag.title}}
-              </button>
+              </button> -->
             </div>
           </div>
 
@@ -249,6 +297,7 @@ input, textarea {
 import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import router from '@/router'
+const fb = require('../../firebaseConfig.js')
 
 export default {
   name: 'events',
@@ -304,9 +353,30 @@ export default {
     //     this.performingRequest = false
     //   }, 1000)
     // },
-    // setTag(value) {
-    //   this.$store.dispatch('updateEvent', value)
-    // },
+    unpublish(event) {
+      event.published = false
+      fb.eventsCollection.doc(event.id).update(event)
+    },
+    publish(event) {
+      event.published = true
+      fb.eventsCollection.doc(event.id).update(event)
+    },
+    cancel(event) {
+      event.status = 'cancelled'
+      event.published = false
+      fb.eventsCollection.doc(event.id).update(event)
+    },
+    activate(event) {
+      event.status = 'active'
+      event.published = true
+      fb.eventsCollection.doc(event.id).update(event)
+    },
+    updateEvent(event) {
+      this.$store.dispatch('updateEvent', event)
+    },
+    setTag(value) {
+      this.$store.dispatch('updateEvent', value)
+    },
     loadPrev() {
       this.visibleEvents = []
       this.$store.dispatch("getPrevInfiniteEvents")

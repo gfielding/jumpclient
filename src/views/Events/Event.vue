@@ -557,6 +557,7 @@ export default {
     cancelEvent() {
       this.performingRequest4 = true
       this.event.status = 'cancelled'
+      this.event.published = false
       let event = this.event
       this.$store.dispatch('updateEvent', event)
       setTimeout(() => {
@@ -566,6 +567,7 @@ export default {
     activateEvent() {
       this.performingRequest4 = true
       this.event.status = 'active'
+      this.event.published = true
       let event = this.event
       this.$store.dispatch('updateEvent', event)
       setTimeout(() => {
