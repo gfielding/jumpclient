@@ -844,6 +844,16 @@ export default {
 
       for (var key in this.eventAssignments) {
         let uid = this.eventAssignments[key].userId
+        let regRate = this.eventAssignments[key].regRate
+        let regHours = this.eventAssignments[key].regHours
+        let otHours = this.eventAssignments[key].otHours
+        let ot2Hours = this.eventAssignments[key].ot2Hours
+        let mbp = this.eventAssignments[key].mbp
+        let tips = this.eventAssignments[key].tips
+        let event = this.eventAssignments[key].event
+        let dayRate = this.eventAssignments[key].dayRate
+        let venueId = this.eventAssignments[key].eventInfo.venueId
+
          fb.usersCollection.doc(uid).get()
 
           .then(doc => {
@@ -894,10 +904,10 @@ export default {
             "7",
             social || '',
             "1",
-            this.eventAssignments[key].dayRate || '',
+            dayRate || '',
             "1",
-            this.eventAssignments[key].day || '',
-            this.eventAssignments[key].eventInfo.venueId,
+            event || '',
+            venueId,
             wcCode || ''
           ]);
           exportItems.push([
@@ -906,11 +916,11 @@ export default {
             "1",
             "1",
             social || '',
-            this.eventAssignments[key].regHours || '',
-            this.eventAssignments[key].regRate || '',
+            regHours || '',
+            regRate || '',
             "0",
-            this.eventAssignments[key].day,
-            this.eventAssignments[key].eventInfo.venueId,
+            event,
+            venueId,
             wcCode || ''
           ]);
           exportItems.push([
@@ -919,11 +929,11 @@ export default {
             "1",
             "2",
             social || '',
-            this.eventAssignments[key].otHours || '',
-            this.eventAssignments[key].regRate * 1.5 || '',
+            otHours || '',
+            regRate * 1.5 || '',
             "0",
-            this.eventAssignments[key].day,
-            this.eventAssignments[key].eventInfo.venueId,
+            event,
+            venueId,
             wcCode || ''
           ]);
           exportItems.push([
@@ -932,11 +942,11 @@ export default {
             "1",
             "22",
             social || '',
-            this.eventAssignments[key].ot2Hours || '',
-            this.eventAssignments[key].regRate * 2 || '',
+            ot2Hours || '',
+            regRate * 2 || '',
             "0",
-            this.eventAssignments[key].day,
-            this.eventAssignments[key].eventInfo.venueId,
+            event,
+            venueId,
             wcCode || ''
           ]);
           exportItems.push([
@@ -946,10 +956,10 @@ export default {
             "125",
             social || '',
             "1",
-            this.eventAssignments[key].tips || '',
+            tips || '',
             "1",
-            this.eventAssignments[key].day,
-            this.eventAssignments[key].eventInfo.venueId,
+            event,
+            venueId,
             wcCode || ''
           ]);
           exportItems.push([
@@ -959,10 +969,10 @@ export default {
             "4",
             social || '',
             "0",
-            this.eventAssignments[key].mbp || '',
+            mbp || '',
             "0",
-            this.eventAssignments[key].day,
-            this.eventAssignments[key].eventInfo.venueId,
+            event,
+            venueId,
             wcCode || ''
           ]);
           this.$gapi.getGapiClient().then(gapi => {
