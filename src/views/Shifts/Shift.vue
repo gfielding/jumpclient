@@ -929,6 +929,8 @@ export default {
           console.log("no employees")
         }
       }
+      console.log(exportItems)
+      console.log(exportHeaders)
       this.$gapi.getGapiClient().then(gapi => {
         const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
         exportService.export();
@@ -942,6 +944,8 @@ export default {
     exportReportEmp2(item) {
       this.performingRequest = true
       const exportHeaders = [
+        "first_name",
+        "last_name",
         "type",
         "id",
         "ssn",
@@ -954,131 +958,142 @@ export default {
       ];
       const exportItems = [];
 
+      
+
       for (var key in this.shiftAssignments) {
         let uid = this.shiftAssignments[key].userId
-        // let wcCode = this.getwcCode[key]
-
-        
-
          fb.usersCollection.doc(uid).get()
-        .then(doc => {
 
+          .then(doc => {
+          
           let wcCode
 
-        if (this.shiftAssignments[key].eventInfo.venue.address.state =('AL'||'AK'||'AR'||'CO'||'CT'||'FL'||'GA'||'HI'||'ID'||'IL'||'IN'||'IA'||'KS'||'KY'||'MN'||'MO'||'MS'||'MT'||'NE'||'NV'||'NC'||'NH'||'NM'||'OK'||'OR'||'RI'||'SC'||'SD'||'TN'||'UT'||'VT'||'WI'||'WV')){
-          wcCode = '9082'
-        }
-        else if (this.shiftAssignments[key].eventInfo.venue.address.state =('AZ'||'LA'||'VA')){
-           wcCode = '9083'
-        }
-        else if (this.shiftAssignments[key].eventInfo.venue.address.state =('CA'||'TX')){
-          wcCode ='9079'
-        }
-        else if (this.shiftAssignments[key].eventInfo.venue.address.state =('DE'|| 'PA')){
-          wcCode ='9045'
-        }
-        else if (this.shiftAssignments[key].eventInfo.venue.address.state =('ME')){
-          wcCode ='9084'
-        }
-        else if (this.shiftAssignments[key].eventInfo.venue.address.state =('MD')){
-          wcCode ='9086'
-        }
-        else if (this.shiftAssignments[key].eventInfo.venue.address.state =('MI'||'NY')){
-          wcCode ='9058'
-        }
-        else if (this.shiftAssignments[key].eventInfo.venue.address.state =('MA')){
-          wcCode ='9085'
-        }
-        else if (this.shiftAssignments[key].eventInfo.venue.address.state =('ND'|| 'OH'|| 'WA'|| 'WY')){
-          wcCode ='9082OC'
-        }
-        else if (this.shiftAssignments[key].eventInfo.venue.address.state =('NJ')){
-          wcCode ='9078'
-        }
+          if (this.shiftAssignments[key].eventInfo.venue.address.state =('AL'||'AK'||'AR'||'CO'||'CT'||'FL'||'GA'||'HI'||'ID'||'IL'||'IN'||'IA'||'KS'||'KY'||'MN'||'MO'||'MS'||'MT'||'NE'||'NV'||'NC'||'NH'||'NM'||'OK'||'OR'||'RI'||'SC'||'SD'||'TN'||'UT'||'VT'||'WI'||'WV')){
+            wcCode = '9082'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('AZ'||'LA'||'VA')){
+             wcCode = '9083'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('CA'||'TX')){
+            wcCode ='9079'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('DE'|| 'PA')){
+            wcCode ='9045'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('ME')){
+            wcCode ='9084'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('MD')){
+            wcCode ='9086'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('MI'||'NY')){
+            wcCode ='9058'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('MA')){
+            wcCode ='9085'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('ND'|| 'OH'|| 'WA'|| 'WY')){
+            wcCode ='9082OC'
+          }
+          else if (this.shiftAssignments[key].eventInfo.venue.address.state =('NJ')){
+            wcCode ='9078'
+          }
 
-          var social = ''
+          
+          var social
           if (doc.data().ssn) {
             social = (this.$CryptoJS.AES.decrypt(doc.data().ssn, this.encryptionKey).toString(this.CryptoJS.enc.Utf8))
-          } else {
-            social = ''
           }
 
           exportItems.push([
+            doc.data().firstName || '',
+            doc.data().lastName || '',
             "1",
             "7",
-            social,
+            social || '',
             "1",
-            this.shiftAssignments[key].dayRate,
+            this.shiftAssignments[key].dayRate || '',
             "1",
-            this.shiftAssignments[key].day,
+            this.shiftAssignments[key].day || '',
             this.shiftAssignments[key].eventInfo.venueId,
-            wcCode
+            wcCode || ''
           ]);
           exportItems.push([
+            doc.data().firstName || '',
+            doc.data().lastName || '',
             "1",
             "1",
-            social,
-            this.shiftAssignments[key].regHours,
-            this.shiftAssignments[key].regRate,
+            social || '',
+            this.shiftAssignments[key].regHours || '',
+            this.shiftAssignments[key].regRate || '',
             "0",
             this.shiftAssignments[key].day,
             this.shiftAssignments[key].eventInfo.venueId,
-            wcCode
+            wcCode || ''
           ]);
           exportItems.push([
+            doc.data().firstName || '',
+            doc.data().lastName || '',
             "1",
             "2",
-            social,
-            this.shiftAssignments[key].otHours,
-            this.shiftAssignments[key].regRate * 1.5,
+            social || '',
+            this.shiftAssignments[key].otHours || '',
+            this.shiftAssignments[key].regRate * 1.5 || '',
             "0",
             this.shiftAssignments[key].day,
             this.shiftAssignments[key].eventInfo.venueId,
-            wcCode
+            wcCode || ''
           ]);
           exportItems.push([
+            doc.data().firstName || '',
+            doc.data().lastName || '',
             "1",
             "22",
-            social,
-            this.shiftAssignments[key].ot2Hours,
-            this.shiftAssignments[key].regRate * 2,
+            social || '',
+            this.shiftAssignments[key].ot2Hours || '',
+            this.shiftAssignments[key].regRate * 2 || '',
             "0",
             this.shiftAssignments[key].day,
             this.shiftAssignments[key].eventInfo.venueId,
-            wcCode
+            wcCode || ''
           ]);
           exportItems.push([
+            doc.data().firstName || '',
+            doc.data().lastName || '',
             "1",
             "125",
-            social,
+            social || '',
             "1",
-            this.shiftAssignments[key].tips,
+            this.shiftAssignments[key].tips || '',
             "1",
             this.shiftAssignments[key].day,
             this.shiftAssignments[key].eventInfo.venueId,
-            wcCode
+            wcCode || ''
           ]);
           exportItems.push([
+            doc.data().firstName || '',
+            doc.data().lastName || '',
             "1",
             "4",
-            social,
+            social || '',
             "0",
-            this.shiftAssignments[key].mbp,
+            this.shiftAssignments[key].mbp || '',
             "0",
             this.shiftAssignments[key].day,
             this.shiftAssignments[key].eventInfo.venueId,
-            wcCode
+            wcCode || ''
           ]);
+          this.$gapi.getGapiClient().then(gapi => {
+            const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+            exportService.export();
+          });
         })
+
       }
-      console.log(exportItems)
-      this.$gapi.getGapiClient().then(gapi => {
-        const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
-        exportService.export();
-      });
+      
       fb.shiftsCollection.doc(this.shift.id).update({ exportedEmp: fb.firestore.FieldValue.serverTimestamp() })
       setTimeout(() => {
-        this.$store.dispatch("getShiftFromId", this.$route.params.id)
+        // this.$store.dispatch("getShiftFromId", this.$route.params.id)
         this.performingRequest = false
       }, 2000)
     },
