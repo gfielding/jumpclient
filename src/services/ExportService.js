@@ -26,7 +26,6 @@ export default class ExportService {
     }
 
     writeRows() {
-        console.log(this.data)
         this.data.unshift(this.columns);
         this.gapi.client.sheets.spreadsheets.values.append({
             spreadsheetId: this.spreadsheetId,

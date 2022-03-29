@@ -1104,7 +1104,7 @@ export default {
         "hours",
         "rate",
         "treat_as_cash",
-        "day_worked",
+        "event",
         "venue_id",
         "wc_code"
       ];
@@ -1114,6 +1114,16 @@ export default {
 
       for (var key in this.shiftAssignments) {
         let uid = this.shiftAssignments[key].userId
+        let regRate = this.shiftAssignments[key].regRate
+        let regHours = this.shiftAssignments[key].regHours
+        let otHours = this.shiftAssignments[key].otHours
+        let ot2Hours = this.shiftAssignments[key].ot2Hours
+        let mbp = this.shiftAssignments[key].mbp
+        let tips = this.shiftAssignments[key].tips
+        let event = this.shiftAssignments[key].event
+        let dayRate = this.shiftAssignments[key].dayRate
+        let venueId = this.shiftAssignments[key].eventInfo.venueId
+
          fb.usersCollection.doc(uid).get()
 
           .then(doc => {
@@ -1157,83 +1167,85 @@ export default {
             social = (this.$CryptoJS.AES.decrypt(doc.data().ssn, this.encryptionKey).toString(this.CryptoJS.enc.Utf8))
           }
 
+
+
           exportItems.push([
-            doc.data().firstName || '',
-            doc.data().lastName || '',
+            doc.data().firstName,
+            doc.data().lastName,
             "1",
             "7",
-            social || '',
+            social,
             "1",
-            this.shiftAssignments[key].dayRate || '',
+            dayRate,
             "1",
-            this.shiftAssignments[key].day || '',
-            this.shiftAssignments[key].eventInfo.venueId,
-            wcCode || ''
+            event,
+            venueId,
+            wcCode
           ]);
           exportItems.push([
-            doc.data().firstName || '',
-            doc.data().lastName || '',
+            doc.data().firstName,
+            doc.data().lastName,
             "1",
             "1",
-            social || '',
-            this.shiftAssignments[key].regHours || '',
-            this.shiftAssignments[key].regRate || '',
+            social,
+            regHours,
+            regRate,
             "0",
-            this.shiftAssignments[key].day,
-            this.shiftAssignments[key].eventInfo.venueId,
-            wcCode || ''
+            event,
+            venueId,
+            wcCode
           ]);
           exportItems.push([
-            doc.data().firstName || '',
-            doc.data().lastName || '',
+            doc.data().firstName,
+            doc.data().lastName,
             "1",
             "2",
-            social || '',
-            this.shiftAssignments[key].otHours || '',
-            this.shiftAssignments[key].regRate * 1.5 || '',
+            social,
+            otHours,
+            regRate * 1.5,
             "0",
-            this.shiftAssignments[key].day,
-            this.shiftAssignments[key].eventInfo.venueId,
-            wcCode || ''
+            event,
+            venueId,
+            wcCode
           ]);
           exportItems.push([
-            doc.data().firstName || '',
-            doc.data().lastName || '',
+            doc.data().firstName,
+            doc.data().lastName,
             "1",
             "22",
-            social || '',
-            this.shiftAssignments[key].ot2Hours || '',
-            this.shiftAssignments[key].regRate * 2 || '',
+            social,
+            ot2Hours,
+            regRate * 2,
             "0",
-            this.shiftAssignments[key].day,
-            this.shiftAssignments[key].eventInfo.venueId,
-            wcCode || ''
+            event,
+            venueId,
+            wcCode
           ]);
           exportItems.push([
-            doc.data().firstName || '',
-            doc.data().lastName || '',
+            doc.data().firstName,
+            doc.data().lastName,
             "1",
             "125",
-            social || '',
+            social,
             "1",
-            this.shiftAssignments[key].tips || '',
+            tips,
             "1",
-            this.shiftAssignments[key].day,
-            this.shiftAssignments[key].eventInfo.venueId,
-            wcCode || ''
+            event,
+            venueId,
+            wcCode
           ]);
           exportItems.push([
-            doc.data().firstName || '',
-            doc.data().lastName || '',
+            doc.data().firstName,
+            doc.data().lastName,
             "1",
             "4",
-            social || '',
+            social,
             "0",
-            this.shiftAssignments[key].mbp || '',
+            mbp,
             "0",
-            this.shiftAssignments[key].day,
-            this.shiftAssignments[key].eventInfo.venueId,
-            wcCode || ''
+            event,
+            venueId,
+            wcCode
           ]);
           this.$gapi.getGapiClient().then(gapi => {
             const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);

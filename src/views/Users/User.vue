@@ -30,7 +30,7 @@
           <ProfileStatus :user="user" />
         </div>
         <div class="dashboard__container--body--col">
-          <ProfileSSN :userProfile="userProfile" />
+          <ProfileSSN :userProfile="user" />
         </div>
         <div class="dashboard__container--body--col">
           <ProfileBlacklist :user="user" />
