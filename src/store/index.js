@@ -102,7 +102,8 @@ const store = new Vuex.Store({
     lastVisibleEventSnapShot: {},
     firstVisibleEventSnapShot: {},
     taggedEvents: [],
-    venueEventsSearchResults: []
+    venueEventsSearchResults: [],
+    eventAssignments: []
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -1799,14 +1800,11 @@ const store = new Vuex.Store({
           fb.assignmentsCollection.where("shiftId", "==", shift.id).get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
               if (doc.exists) {
-                console.log("exists")
                 return shift.disabled = true
               } else {
-                console.log("not exists")
                 return shift.disabled = false
               }
             })
-
           })
           shiftsArray.push(shift)
         })
@@ -1815,6 +1813,19 @@ const store = new Vuex.Store({
     },
     clearEventShifts({ commit }) {
       commit('setEventShifts', [])
+    },
+    getEventAssignments({ commit }, payload) {
+      fb.assignmentsCollection.where("eventId", "==", payload).onSnapshot(querySnapshot => {
+        let assignmentsArray = []
+        querySnapshot.forEach(doc => {
+          let assignment = doc.data()
+          assignmentsArray.push(assignment)
+        })
+        commit('setEventAssignments', assignmentsArray)
+      })
+    },
+    clearEventAssignments({ commit }) {
+      commit('setEventAssignments', [])
     },
     getDayShifts({ commit }, payload) {
       console.log(payload)
@@ -2941,6 +2952,13 @@ const store = new Vuex.Store({
         state.taggedEvents = val
       } else {
         state.taggedEvents = []
+      }
+    },
+    setEventAssignments(state, val) {
+      if (val) {
+        state.eventAssignments = val
+      } else {
+        state.eventAssignments = []
       }
     },
   },

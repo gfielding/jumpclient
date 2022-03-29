@@ -64,8 +64,10 @@
             </div>
 
             <div>
-              <button class="btn mr-3" v-bind:class="{ 'btn__dark': isHidden, 'btn__outlined': !isHidden }" @click="showHidden()">Hidden</button>
+              
               <button class="btn mr-3" v-bind:class="{ 'btn__dark': isVisible, 'btn__outlined': !isVisible }" @click="showVisible()">Visible</button>
+              <button class="btn mr-3" v-bind:class="{ 'btn__dark': isPaid, 'btn__outlined': !isPaid }" @click="showPaid()">Paid</button>
+              <button class="btn mr-3" v-bind:class="{ 'btn__dark': isHidden, 'btn__outlined': !isHidden }" @click="showHidden()">Hidden</button>
             </div>
             
           </div>
@@ -84,7 +86,6 @@
               perPage: 50,
             }"
           >
-          
             <template slot="table-row" slot-scope="props">
               <span v-if="props.column.field == 'regRate'">
                 <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
@@ -172,7 +173,7 @@
                 </button>
               </span>
               <span v-if="props.column.field == 'fileId'">
-                <input type="text" v-model.trim="props.row.fileId" id="fileId" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <span v-if="props.row.fileId">HAS SSN</span>
               </span>
 
 
@@ -310,7 +311,147 @@
                 </button>
               </span>
               <span v-if="props.column.field == 'fileId'">
+                HAS SSN
+              </span>
+
+
+              <span v-if="props.column.field == 'onpay'">
+                <button class="btn btn__icon" @click="opr(props.row)" v-if="!props.row.opr">
+                  <i class="fad fa-money-bill-wave ml-3 mr-3"></i>
+                </button>
+                <button class="btn btn__icon" @click="removeopr(props.row)" v-if="props.row.opr">
+                  <i class="fad fa-money-bill-wave ml-3 mr-3" style="color:#f0ad4e;"></i>
+                </button>
+              </span>
+
+              <span v-else-if="props.column.field == 'delete'">
+                <button :disabled="props.row.locked" class="btn btn__primary btn__small ml-2 mr-2" @click="showEntry(props.row)">
+                  show
+                </button>
+              </span>
+
+
+              
+              <span v-else-if="props.column.field == 'link'">
+                <router-link :to="`/users/` + props.row.userId" target="_blank">
+                  <i class="fas fa-external-link ml-3 mr-3"></i>
+                </router-link>
+              </span>
+              <span v-else-if="props.column.field == 'save'">
+                <button :disabled="(props.row.locked || !props.row.editable)" class="btn btn__primary btn__small ml-2 mr-2" @click="onSheetEdit(props.row)">
+                  Save
+                </button>
+              </span>
+               <span v-else>
+                <!-- {{props.formattedRow[props.column.field]}} -->
+              </span>
+            </template>
+          </vue-good-table>
+
+          <vue-good-table
+            v-if="isPaid"
+            :columns="columns"
+            :rows="paidAssignments"
+            :search-options="{
+              enabled: true,
+              placeholder: 'Search this table',
+            }"
+            :pagination-options="{
+              enabled: true,
+              mode: 'records',
+              perPage: 50,
+            }"
+          >
+          
+            <template slot="table-row" slot-scope="props">
+              <span v-if="props.column.field == 'regRate'">
+                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'dayRate'">
+                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'firstName'">
+                <input type="text" v-model.trim="props.row.firstName" id="firstName" readonly />
+              </span>
+              <span v-else-if="props.column.field == 'lastName'">
+                <input type="text" v-model.trim="props.row.lastName" id="lastName" readonly />
+              </span>
+              <!-- <span v-else-if="props.column.field == 'fileId'">
                 <input type="text" v-model.trim="props.row.fileId" id="fileId" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span> -->
+              <span v-else-if="props.column.field == 'note'">
+                <button v-show="!props.row.note" class="btn btn__flat btn__icon" @click="showNote(props.row)" v-tooltip="'Leave a note'"><i class="far fa-sticky-note ml-3 mr-3" style="opacity:0.5;"></i></button>
+                <button v-show="props.row.note" class="btn btn__flat btn__icon" @click="showNote(props.row)" v-tooltip="'Leave a note'"><i class="far fa-sticky-note ml-3 mr-3" style="color:blue"></i></button>
+                <transition name="modal">
+                  <div v-if="activeItem == props.row">
+                    <TimesheetNote :item="props.row" @close="closeNote(props.row)" />
+                  </div>
+                </transition>
+              </span>
+
+              <span v-else-if="props.column.field == 'checkInTimeStamp'">
+                <span v-if="props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp)}}</span>
+              </span>
+
+              <span v-else-if="props.column.field == 'checkOutTimeStamp'">
+                <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
+              </span>
+
+              <span v-else-if="props.column.field == 'confirmed'">
+                <span v-if="props.row.confirmed">{{props.row.confirmed}}</span>
+              </span>
+
+              <span v-else-if="props.column.field == 'regHours'">
+                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'otHours'">
+                <input type="number" v-model.trim="props.row.otHours" id="otHours" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'ot2Hours'">
+                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'mbp'">
+                <input type="number" v-model.trim="props.row.mbp" id="mbp" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'tips'">
+                <input type="number" v-model.trim="props.row.tips" id="tips" @change="onSheetEditable(props.row)" :readonly="props.row.locked"  />
+              </span>
+              <span v-else-if="props.column.field == 'state'">
+                <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'status'">
+                <v-select
+                  label="status" 
+                  :options="statuses"
+                  v-model="props.row.status"
+                  @input="onSheetEdit(props.row)"
+                  :disabled="props.row.locked"
+                  :clearable=false
+                  >
+                </v-select>
+              </span>
+              <span v-else-if="props.column.field == 'paystatus'">
+                <v-select
+                  label="status" 
+                  :options="paystatuses"
+                  v-model="props.row.paystatus"
+                  @input="onSheetEdit(props.row)"
+                  :disabled="props.row.locked"
+                  :clearable=true
+                  >
+                </v-select>
+              </span>
+              <span v-else-if="props.column.field == 'locked'">
+                <button class="btn btn__icon" @click="lock(props.row)" v-if="!props.row.locked">
+                  <i class="fas fa-lock-open-alt ml-3 mr-3"></i>
+                </button>
+                <button class="btn btn__icon" @click="unlock(props.row)" v-if="props.row.locked">
+                  <i class="fas fa-lock-alt ml-3 mr-3" style="color:#5cb85c;"></i>
+                </button>
+              </span>
+              <span v-if="props.column.field == 'fileId'">
+                <span v-if="props.row.fileId">HAS SSN</span>
+                <!-- <input type="text" v-model.trim="props.row.fileId" id="fileId" @change="onSheetEditable(props.row)" :readonly="props.row.locked" /> -->
               </span>
 
 
@@ -374,7 +515,6 @@ import router from '@/router'
 import ExportService from "@/services/ExportService"
 import TimesheetNote from '@/components/Timesheets/TimesheetNote.vue'
 import * as moment from 'moment'
-import ProfileSSN from '@/components/Profile/ProfileSSN.vue'
 const fb = require('../../firebaseConfig.js')
 import algoliasearch from 'algoliasearch/lite';
 import 'instantsearch.css/themes/satellite-min.css'
@@ -385,6 +525,7 @@ export default {
     encryptionKey: 'SKD433{}{[SKD433{}{[SKD433{}{[32',
     isVisible: true,
     isHidden: false,
+    isPaid: false,
     searchClient: algoliasearch(
       '0T1SIY6Y1V',
       'f03dc899fbdd294d6797791724cdb402'
@@ -441,7 +582,6 @@ export default {
       {
         label: 'ID',
         field: 'fileId',
-        sortable: false,
         width: '100px',
       },
       
@@ -519,12 +659,17 @@ export default {
     ...mapState(['users', 'userProfile', 'stateUsers', 'shift', 'shiftAssignments']),
     visibleAssignments() {
       return this.shiftAssignments.filter(item => {
-        return (!item.hidden || item.hidden != true)
+        return ((!item.hidden || item.hidden != true) && (!item.paystatus || item.paystatus != 'paid'))
       })
     },
     hiddenAssignments() {
       return this.shiftAssignments.filter(item => {
         return (item.hidden)
+      })
+    },
+    paidAssignments() {
+      return this.shiftAssignments.filter(item => {
+        return (item.paystatus == 'paid')
       })
     },
     // decryptedText() {
@@ -545,9 +690,16 @@ export default {
     showHidden() {
       this.isHidden = true
       this.isVisible = false
+      this.isPaid = false
     },
     showVisible() {
       this.isVisible = true
+      this.isHidden = false
+      this.isPaid = false
+    },
+    showPaid() {
+      this.isPaid = true
+      this.isVisible = false
       this.isHidden = false
     },
     // hoursCalc() {
@@ -700,7 +852,7 @@ export default {
           console.log(doc.data().employeeNumber || null)
           fb.assignmentsCollection.doc(item.id).update({ 
             locked: true, 
-            fileId: doc.data().employeeNumber || doc.data().contractorNumber || null
+            fileId: doc.data().ssn || null
           })
         }
       )
