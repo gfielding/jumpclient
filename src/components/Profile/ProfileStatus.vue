@@ -1,10 +1,10 @@
 <template>
 	<div>
     <h2>Onboarding Status:</h2>
-    <div class="mb-3" v-if="decryptedText">
+    <!-- <div class="mb-3" v-if="decryptedText">
       <label for="ssn">Social Security Number:</label>
       <input style="width: 100%;" v-mask="'###-##-####'" placeholder="###-##-####" :value="decryptedText" type="text" maxlength = "11" id="ssn" readonly  />
-    </div>
+    </div> -->
     <div class="mb-3">
 			<label for="emp">Employee Status:</label>
       <select v-model="user.employeeStatus" id="emp" @change="showButton2 = true">

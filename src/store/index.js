@@ -1646,15 +1646,14 @@ const store = new Vuex.Store({
     // },
     getInfiniteEvents({ commit }) {
       console.log('getting initial')
-      fb.eventsCollection.orderBy('startDate', 'asc')
-      .onSnapshot(querySnapshot => {
+      fb.eventsCollection.orderBy('startDate', 'asc').get().then((querySnapshot) => {
         var lastVisibleEventSnapShot = {};
         var firstVisibleEventSnapShot = {};
         let yesterday = new Date()
         yesterday.setDate(yesterday.getDate() - 1);
         let currentEventsArray = []
         let allEventsArray = []
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach(doc => {
           let startComp = new Date(doc.data().startDate)
           let endComp = new Date(doc.data().endDate)
           let event = doc.data()
