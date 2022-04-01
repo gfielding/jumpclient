@@ -206,6 +206,7 @@ export default {
         startTime: this.newShift.start || null,
         endTime: this.newShift.end || null,
         name: this.newShift.name,
+        location: this.newShift.location,
         staff: this.newShift.staffReqested,
         eventId: this.event.id,
         event: this.event.title,

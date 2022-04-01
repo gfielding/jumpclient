@@ -115,7 +115,7 @@ const store = new Vuex.Store({
         })
 
       // fetch user profile and set in state
-      if (user && user.email && user.email.endsWith('mvpeventstaffing.com') && (user.email != 'd.brown@mvpeventstaffing.com' || user.email != 'jlax@mvpeventstaffing.com')) {
+      if (user && user.email && user.email.endsWith('mvpeventstaffing.com') && (user.email != 'd.brown@mvpeventstaffing.com' || user.email != 'jlax@mvpeventstaffing.com' || user.email != 'selina@mvpeventstaffing.com')) {
         dispatch('fetchUserProfile', user)
       } else {
         store.dispatch('logout')
@@ -1718,9 +1718,10 @@ const store = new Vuex.Store({
           let startComp = new Date(doc.data().startDate)
           let endComp = new Date(doc.data().endDate)
           let event = doc.data()
-          if ((endComp >= yesterday || startComp >= yesterday)) {
-            venueEventsArray.push(event)
-          }
+          venueEventsArray.push(event)
+          // if ((endComp >= yesterday || startComp >= yesterday)) {
+          //   venueEventsArray.push(event)
+          // }
         })
         commit('setVenueEventsSearchResults', venueEventsArray)
       })
@@ -2381,7 +2382,20 @@ const store = new Vuex.Store({
     //   })
     // },
     updateTimesheet({ commit }, payload) {
+      console.log(payload)
       fb.assignmentsCollection.doc(payload.id).update(payload)
+    },
+    updateTimesheetPay({ commit }, payload) {
+      console.log(payload)
+      fb.assignmentsCollection.doc(payload.id).update({
+        paystatus: payload.paystatus
+      })
+    },
+    updateTimesheetStatus({ commit }, payload) {
+      console.log(payload)
+      fb.assignmentsCollection.doc(payload.id).update({
+        status: payload.status
+      })
     },
     getOprs({ commit }, payload) {
       fb.oprCollection.orderBy('created', 'desc').onSnapshot(querySnapshot => {
