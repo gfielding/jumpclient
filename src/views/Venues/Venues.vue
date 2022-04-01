@@ -88,6 +88,7 @@ export default {
       const exportHeaders = [
         "ID",
         "Title",
+        "Clients",
         "Address",
         "Street",
         "City",
@@ -100,6 +101,7 @@ export default {
         exportItems.push([
           this.venues[key].id,
           this.venues[key].title,
+          this.venues[key].client,
           this.venues[key].email,
           this.venues[key].address.street_number,
           this.venues[key].address.street,
@@ -108,7 +110,9 @@ export default {
           this.venues[key].address.zip,
           moment.unix(this.venues[key].created.seconds).format('MM/DD/YYYY'),
         ])
+        console.log(exportItems)
       }
+
       this.$gapi.getGapiClient().then(gapi => {
         const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
         exportService.export();

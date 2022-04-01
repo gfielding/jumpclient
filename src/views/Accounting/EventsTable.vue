@@ -14,7 +14,6 @@
           mode: 'records',
           perPage: 50,
         }"
-        @on-row-click="onRowClick"
       >
       <template slot="table-row" slot-scope="props">
         <span v-if="props.column.field == 'startDate'">
@@ -35,6 +34,14 @@
           <span v-if="props.row.paid">
             <i class="fas fa-check"></i>
           </span>
+        </span>
+        <span v-if="props.column.field == 'title'">
+          <span>{{props.row.title}} 
+            <router-link :to="`/accounting/events/` + props.row.id">
+              <i class="fas fa-external-link ml-3"></i>
+            </router-link>
+          </span>
+          
         </span>
         <span v-else-if="props.column.field == 'invoiced'">
             <input type="text" v-model.trim="props.row.invoiced" id="invoiced" />

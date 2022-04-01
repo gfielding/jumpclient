@@ -147,7 +147,7 @@
                   label="status" 
                   :options="statuses"
                   v-model="props.row.status"
-                  @input="onSheetEdit(props.row)"
+                  @input="onUpdateStatus(props.row)"
                   :disabled="props.row.locked"
                   :clearable=false
                   >
@@ -158,7 +158,7 @@
                   label="status" 
                   :options="paystatuses"
                   v-model="props.row.paystatus"
-                  @input="onSheetEdit(props.row)"
+                  @input="onUpdatePay(props.row)"
                   :disabled="props.row.locked"
                   :clearable=true
                   >
@@ -285,7 +285,7 @@
                   label="status" 
                   :options="statuses"
                   v-model="props.row.status"
-                  @input="onSheetEdit(props.row)"
+                  @input="onUpdateStatus(props.row)"
                   :disabled="props.row.locked"
                   :clearable=false
                   >
@@ -296,7 +296,7 @@
                   label="status" 
                   :options="paystatuses"
                   v-model="props.row.paystatus"
-                  @input="onSheetEdit(props.row)"
+                  @input="onUpdatePay(props.row)"
                   :disabled="props.row.locked"
                   :clearable=true
                   >
@@ -424,7 +424,7 @@
                   label="status" 
                   :options="statuses"
                   v-model="props.row.status"
-                  @input="onSheetEdit(props.row)"
+                  @input="onUpdateStatus(props.row)"
                   :disabled="props.row.locked"
                   :clearable=false
                   >
@@ -435,7 +435,7 @@
                   label="status" 
                   :options="paystatuses"
                   v-model="props.row.paystatus"
-                  @input="onSheetEdit(props.row)"
+                  @input="onUpdatePay(props.row)"
                   :disabled="props.row.locked"
                   :clearable=true
                   >
@@ -655,6 +655,11 @@ export default {
     //   this.$store.dispatch("getUsers")
     // }
   },
+  // mounted() {
+  //   this.shiftAssignments.forEach(shift => {
+  //     this.decryptLoad(row)
+  //   })
+  // },
   computed: {
     ...mapState(['users', 'userProfile', 'stateUsers', 'shift', 'shiftAssignments']),
     visibleAssignments() {
@@ -702,27 +707,6 @@ export default {
       this.isVisible = false
       this.isHidden = false
     },
-    // hoursCalc() {
-    //   this.shiftAssignments.forEach(assignment => {
-    //     console.log(assignment)
-    //     if ((assignment.checkOutTimeStamp && assignment.checkInTimeStamp) && !assignment.regHours) {
-    //       let q = (assignment.checkOutTimeStamp.seconds - assignment.checkInTimeStamp.seconds)
-    //       if (q) {
-    //         const postedDate = new Date(q) * 1000;
-    //         console.log(postedDate)
-    //         let time = new Date(postedDate).toISOString().substr(11, 8)
-    //         console.log(time)
-    //         let hours = moment.duration(time).asHours()
-    //         if (hours) {
-    //           return hours
-    //           fb.assignmentsCollection.doc(assignment.id).update({
-    //             regHours: hours
-    //           })
-    //         }
-    //       }
-    //     }
-    //   })
-    // },
     addUser(item) {
       console.log(item)
       this.$store.dispatch("addUserToShift", {
@@ -825,6 +809,18 @@ export default {
       row = row
       row.editable = false
       this.$store.dispatch('updateTimesheet', row)
+    },
+    onUpdatePay(row) {
+      this.$store.dispatch('updateTimesheetPay', {
+        id: row.id,
+        paystatus: row.paystatus
+      })
+    },
+    onUpdateStatus(row) {
+      this.$store.dispatch('updateTimesheetStatus', {
+        id: row.id,
+        status: row.status
+      })
     },
     opr(item) {
       fb.assignmentsCollection.doc(item.id).update({ opr: true })
@@ -1093,6 +1089,15 @@ export default {
         this.performingRequest = false
       }, 2000)
     },
+    decryptLoad(row) {
+      fb.usersCollection.doc(row.userId).get()
+      .then(doc => {
+        console.log(doc.data())
+        if (doc.data().ssn) {
+          return (this.$CryptoJS.AES.decrypt(doc.data().ssn, this.encryptionKey).toString(this.CryptoJS.enc.Utf8))
+        }
+      })
+    },
     exportReportEmp2(item) {
       this.performingRequest = true
       const exportHeaders = [
@@ -1120,7 +1125,7 @@ export default {
         let ot2Hours = this.shiftAssignments[key].ot2Hours
         let mbp = this.shiftAssignments[key].mbp
         let tips = this.shiftAssignments[key].tips
-        let event = this.shiftAssignments[key].event
+        let event = this.shiftAssignments[key].name
         let dayRate = this.shiftAssignments[key].dayRate
         let venueId = this.shiftAssignments[key].eventInfo.venueId
 
