@@ -16,18 +16,19 @@ f<template>
         </div>
         <span>
           <button class="btn btn__outlined mr-3" @click="exportAll()">export all</button>
+          <button class="btn btn__outlined mr-3" @click="exportPlaced()">export placed</button>
           <!-- <button class="btn btn__outlined mr-3" @click="exportPlaced()">export placed</button> -->
           <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
         </span>
       </div>
       <div class="dashboard__container--body mb-3" v-if="event && event.days && event.days.length > 1">
         <div>
-          <button v-for="(day, index) in event.days" key="index" class="btn mr-3" v-bind:class="{ 'btn__dark': activeDay == day, 'btn__outlined': activeDay != day }" @click="setActiveDay(day)">{{day}}</button>
+          <button v-for="(day, index) in event.days" :key="index" class="btn mr-3" v-bind:class="{ 'btn__dark': activeDay == day, 'btn__outlined': activeDay != day }" @click="setActiveDay(day)">{{day}}</button>
         </div>
       </div>
       
       <div class="dashboard__container--body">
-        <div class="dashboard__container--body--col">
+        <div class="dashboard__container--body--col" style="width:100%;">
           <Loader v-if="!eventUsers || eventUsers.length < 1" />
 
           <ais-instant-search :search-client="searchClient" index-name="a_users" >
@@ -80,6 +81,29 @@ f<template>
                   <i class="far fa-sticky-note"></i>
                 </button>
               </span>
+
+              <span v-if="props.column.field == 'phone'">
+                        <span v-if="props.row.phone">
+                          <a :href="'sms:' + props.row.phone">{{props.row.phone}}</a>
+                        </span>
+                      </span>
+
+                      <span v-if="props.column.field == 'assigned'">
+                        <v-select
+                          label="label" 
+                          :options="event.venue.job"
+                          v-model="props.row.job"
+                          @input="updateAssignment(props.row)"
+                          >
+                        </v-select>
+                      </span>
+
+                      <span v-if="props.column.field == 'start'">
+                        <input type="time" v-model.trim="props.row.start" id="start" @change="updateAssignment(props.row)" />
+                      </span>
+                      <span v-if="props.column.field == 'end'">
+                        <input type="time" v-model.trim="props.row.end" id="end" @change="updateAssignment(props.row)" />
+                      </span>
 
 
 
@@ -242,7 +266,268 @@ f<template>
               </span>
             </template>
           </vue-good-table>
-            <div class="mt-5 mb-5"></div>
+        </div>
+        
+        <div class="dashboard__container--body--col alt-col" style="width:100%;">
+          <div v-for="shift in activeShifts" :key="shift.id" style=" padding:1.6rem; background: white; margin-bottom:1.6rem;">
+            <div class="flex align-center justify-space-between mb-1">
+              <span>
+                <h3>{{shift.name}}</h3>
+                <span>{{shift.day | moment("dddd, MMM Do") }}</span>
+                <span v-if="shift.startTime" class="ml-2"> {{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}</span>
+                <span v-if="shift.endTime"> - {{ [ shift.endTime, "HH:mm" ] | moment("hh:mm A") }}</span>
+
+              </span>
+              <div>
+                
+                <button class="btn btn__outlined mb-2 mr-5" @click="exportStaff(shift)">export</button>
+                <button class="btn btn__icon" @click="expand(shift)" v-if="shift.collapse"><i class="fas fa-chevron-up"></i></button>
+                <button class="btn btn__icon" @click="collapse(shift)" v-if="!shift.collapse"><i class="fas fa-chevron-down"></i></button>
+              </div>
+            </div>
+            <transition name="fade">
+              <div v-if="shift.collapse == true">
+                <div class="mb-2">
+                  <!-- <h4 v-if="shift.name">{{shift.name}} <span v-if="shift.location">/ {{shift.location}}</span></h4> -->
+                  <!-- <p v-if="shift.position.title">{{shift.position.title}}, 
+                    <span v-if="shift.startTime" class="ml-2"> {{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}</span> - 
+                    <span v-if="shift.endTime">{{ [ shift.endTime, "HH:mm" ] | moment("hh:mm A") }}</span>
+                  </p> -->
+
+                  <button class="btn btn__flat chip mt-1">{{orderedPlacedUsers(shift).length}} / {{shift.staff}}</button>
+
+                  <button class="btn btn__flat chip mt-1 ml-2" style="color:green; border-color:green;">{{confirmedPlacedUsers(shift).length}}</button>
+                </div>
+                <div>
+                  <span v-if="shift.details">{{shift.details}}</span>
+                </div>
+
+                <div>
+                <!-- <textarea :id="shift" cols="30" rows="2" v-model="shift.newMessage"></textarea>
+                <div class="flex justify-flex-end">
+                  <button class="btn btn__outlined mb-3 mt-3" @click="messageShift(shift)" :disabled="!shift.newMessage">send message
+                    <transition name="fade">
+                      <span class="ml-2" v-if="performingRequest7">
+                      <i class="fa fa-spinner fa-spin"></i>
+                      </span>
+                    </transition>
+                  </button>
+                </div> -->
+              </div>
+
+                <div class="pt-3" v-if="orderedUsers.length >= 1" style="width:50%; min-width: 30rem;">
+                  <v-select
+                    label="fullName" 
+                    :options="orderedUsers(shift)"
+                    v-model="shift.selectedStaff"
+                    @input="assignShift(shift)"
+                    
+                    >
+                    <template #option="{ fullName, day, requestedJob }">
+                      <span>{{ fullName }}<span v-if="requestedJob"> | {{requestedJob.title}}</span></span>
+                    </template>
+                  </v-select>
+                </div>
+                <div class="pt-3">
+                  <vue-good-table
+                    :columns="columns2"
+                    :id="shift.id"
+                    :ref="shift.id"
+                    :rows="orderedPlacedUsers(shift)"
+                     :select-options="{
+                      enabled: true,
+                      selectOnCheckboxOnly: true,
+                    }"
+                    >
+                    <div slot="selected-row-actions">
+                      <button class="btn btn__small btn__flat" @click="lockAll(shift)">Lock All <i class="fas fa-lock-alt"></i></button>
+                    </div>
+                    <template slot="table-row" slot-scope="props">
+                      <span v-if="props.column.field == 'preview'">
+                <i class="far fa-search ml-2 mr-2" @click="showModal(props.row)"></i>
+                <UserModal v-if="modalValue == props.row" @close="closeModal" :staff="modalValue" />
+              </span>
+                      <!-- <span v-if="props.column.field == 'extras'">
+                        <span v-if="(props.row)">
+                          <span v-for="u in filteredInfo(props.row)" style="display:flex; justify-content: space-evenly;">
+
+                            <span v-if="u.blacklist && u.blacklist.length >=1">
+                              <v-popover>
+                                <i class="fas fa-exclamation-triangle ml-2 mr-2" style="color:red;"></i>
+                                <template slot="popover">
+                                <span v-for="z in u.blacklist">{{z.title}}</span>
+                              </template>
+                              </v-popover>
+                            </span>
+
+                            <span v-if="u && u.skills && u.skills.length > 0" style="display:inline;">
+                            <v-popover>
+                                <i class="fad fa-briefcase ml-2 mr-2"></i>
+                                <template slot="popover">
+                                <span v-for="z in u.skills">{{z.title}} / </span>
+                              </template>
+                              </v-popover>
+                            </span>
+
+                            <span v-if="u && u.fullyVaccinated && u.fullyVaccinated == `yes`" style="display:inline;">
+                              <i class="fas fa-syringe ml-2 mr-2" style="color: green;"></i>
+                            </span>
+
+
+                          </span>
+                        </span>
+                      </span> -->
+  <!--                   </span> -->
+                      <!-- <span v-else-if="props.column.field == 'jobs'">
+                        <span v-if="(props.row)">
+                          <span v-for="u in filteredInfo(props.row)">
+                            <span v-if="u && u.skills && u.skills.length > 0" style="display:inline;">
+                              <v-popover>
+                                <i class="fad fa-briefcase"></i>
+                                <template slot="popover">
+                                <span v-for="z in u.skills">{{z.title}} / </span>
+                              </template>
+                              </v-popover>
+                            </span>
+                          </span>
+                        </span>
+                      </span>
+                      <span v-else-if="props.column.field == 'vaccinated'">
+                        <span v-if="(props.row)">
+                          <span v-for="u in filteredInfo(props.row)">
+                            <span v-if="u && u.vaccinated">
+                              <i class="fas fa-syringe" style="color: green;"></i>
+                            </span>
+                          </span>
+                        </span>
+                      </span> -->
+              
+                      <span v-if="props.column.field == 'created'">
+                        <span v-if="props.row.created">{{formatDate(props.row.created)}}</span>
+                      </span>
+
+                      <span v-if="props.column.field == 'phone'">
+                        <span v-if="props.row.phone">
+                          <a :href="'sms:' + props.row.phone">{{props.row.phone}}</a>
+                        </span>
+                      </span>
+
+                      <span v-if="props.column.field == 'start'">
+                        <input type="time" v-model.trim="props.row.start" id="start" @change="updateAssignment(props.row)" />
+                      </span>
+                      <span v-if="props.column.field == 'end'">
+                        <input type="time" v-model.trim="props.row.end" id="end" @change="updateAssignment(props.row)" />
+                      </span>
+
+                      <span v-if="props.column.field == 'assigned'">
+                        <v-select
+                          label="label" 
+                          :options="event.venue.job"
+                          v-model="props.row.job"
+                          @input="updateAssignment(props.row)"
+                          >
+                        </v-select>
+                      </span>
+
+
+                      <span v-else-if="props.column.field == 'reservations'">
+                      <span v-if="
+                        (props.row.dayStatus != 'hired') &&
+                        (props.row.dayStatus != 'assigned') &&
+                        (props.row.dayStatus != 'not requested')
+                      " style="display:inline; margin-right: 1.5rem;">
+                        <button class="icon" @click="reserveUser(props.row)" v-tooltip="'reserve user'">
+                          <i class="far fa-calendar ml-2 mr-2"></i>
+                        </button>
+                      </span>
+                      <span v-if="
+                        (props.row.dayStatus == 'hired' || props.row.dayStatus == 'assigned')
+                      " style="display:inline;">
+                        <button class="icon" v-tooltip="'cancel reservation'" @click="unreserveUser(props.row)">
+                          <i class="fas fa-calendar-check ml-2 mr-2" style="color:green;"></i>
+                        </button>
+                      </span>
+
+                      <span v-if="
+                        (props.row.dayStatus != 'hired') &&
+                        (props.row.dayStatus != 'assigned') &&
+                        (props.row.dayStatus != 'not requested')"
+                        style="display:inline;">
+                        <button class="icon" v-tooltip="'not use this staff today'" @click="notRequestUser(props.row)">
+                          <i class="fas fa-calendar-times ml-2 mr-2"></i>
+                        </button>
+                      </span>
+
+                      <span v-if="
+                        (props.row.dayStatus == 'not requested')
+                      " style="display:inline;">
+                        <button class="icon" v-tooltip="'cancel cancellation'" @click="cancelNotRequestUser(props.row)">
+                          <i class="fas fa-calendar-times ml-2 mr-2" style="color:red;"></i>
+                        </button>
+                      </span>
+
+                        <button v-if="props.row.dayStatus == 'hired' && props.row.status != 'assigned' && props.row.status != 'spinning' && props.row.start && props.row.end && props.row.job" class="icon" v-tooltip="'lock shift'" @click="lockShift(props, shift)" style="display:inline;">
+                          <i class="fas fa-lock-open-alt ml-2 mr-2"></i>
+                        </button>
+                      
+
+                      
+                        <span class="icon" v-if="props.row.status == 'spinning'">
+                        <i class="fa fa-spinner fa-spin ml-2 mr-2"></i>
+                        </span>
+                      
+                      
+                        <button class="icon" v-if="props.row.dayStatus == 'hired' && props.row.status == 'assigned'" style="display:inline;" @click="unlock(props, shift)">
+                          <i class="fas fa-lock-alt ml-2 mr-2"></i>
+                        </button>
+                      
+                    </span>
+
+                    <span v-else-if="props.column.field == 'confirmed'">
+                      <button v-if="!props.row.confirmed" class="icon" v-tooltip="'confirm'" @click="confirmPlacement(props)">
+                        <i class="fas fa-check ml-2 mr-2" style="opacity: 0.3;"></i>
+                      </button>
+                      <button v-if="props.row.confirmed" class="icon" v-tooltip="'unconfirm'" @click="unConfirmPlacement(props)">
+                        <i class="fas fa-check ml-2 mr-2" style="color:green"></i>
+                      </button>
+                    </span>
+
+                    <span v-else-if="props.column.field == 'fullName'">
+                      <router-link :to="'/users/' + props.row.userId">
+                        {{props.row.fullName}}
+                      </router-link>
+                    </span>
+                    <span v-else-if="props.column.field == 'notes'">
+                      <button class="icon" v-if="props.row.note" v-tooltip="props.row.note">
+                        <i class="far fa-sticky-note ml-2 mr-2"></i>
+                      </button>
+                    </span>
+                    <span v-else-if="props.column.field == 'delete'">
+                      <button v-if="props.row.status == 'placed'" class="icon" v-tooltip="'remove'" @click="removePlacement(props.row)">
+                        <i class="fas fa-times ml-2 mr-2"></i>
+                      </button>
+
+                      <!-- <button v-if="props.row.status == 'assigned'" class="icon" v-tooltip="'remove'" @click="removeAssignment(props, shift)">
+                        <i class="fas fa-times ml-2 mr-2"></i>
+                      </button> -->
+                    </span>
+                      <span v-else-if="props.column.field == 'requestedJob.title'">
+                        <span v-if="props.row.requestedJob && props.row.requestedJob.title">
+                           {{props.row.requestedJob.title}}
+                        </span>
+                      </span>
+                      <!-- <span v-else>
+                        {{props.formattedRow[props.column.field]}}
+                      </span> -->
+                    </template>
+                  </vue-good-table>
+                </div>
+              </div>
+            </transition>
+          </div>
+        </div>
+
+        <div class="dashboard__container--body--col" style="width:100%;">
           <h3>Drops</h3>
           <vue-good-table
               :columns="columnsD"
@@ -411,244 +696,7 @@ f<template>
             </template>
           </vue-good-table>
         </div>
-        <div class="dashboard__container--body--col alt-col">
-          <div v-for="shift in activeShifts" :key="shift.id" style=" padding:1.6rem; background: white; margin-bottom:1.6rem;">
-            <div class="flex align-center justify-space-between">
-              <span>
-                <h3>{{shift.day | moment("dddd, MMM Do") }}</h3>
-                <span v-if="shift.position.title">{{shift.position.title}}, 
-                  <span v-if="shift.startTime" class="ml-2"> {{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}</span> - 
-                  <span v-if="shift.endTime">{{ [ shift.endTime, "HH:mm" ] | moment("hh:mm A") }}</span>
-                </span>
-              </span>
-              <div>
-                
-                <button class="btn btn__outlined mb-2 mr-5" @click="exportStaff(shift)">export</button>
-                <button class="btn btn__icon" @click="expand(shift)" v-if="shift.collapse"><i class="fas fa-chevron-up"></i></button>
-                <button class="btn btn__icon" @click="collapse(shift)" v-if="!shift.collapse"><i class="fas fa-chevron-down"></i></button>
-              </div>
-            </div>
-            <transition name="fade">
-              <div v-if="shift.collapse == true">
-                <div class="pt-2 mb-3">
-                  <h4 v-if="shift.name">{{shift.name}} <span v-if="shift.location">/ {{shift.location}}</span></h4>
-                  <!-- <p v-if="shift.position.title">{{shift.position.title}}, 
-                    <span v-if="shift.startTime" class="ml-2"> {{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}</span> - 
-                    <span v-if="shift.endTime">{{ [ shift.endTime, "HH:mm" ] | moment("hh:mm A") }}</span>
-                  </p> -->
 
-                  <button class="btn btn__flat chip mt-1">{{orderedPlacedUsers(shift).length}} / {{shift.staff}}</button>
-
-                  <button class="btn btn__flat chip mt-1 ml-2" style="color:green; border-color:green;">{{confirmedPlacedUsers(shift).length}}</button>
-                </div>
-
-                <div>
-                <textarea :id="shift" cols="30" rows="2" v-model="shift.newMessage"></textarea>
-                <div class="flex justify-flex-end">
-                  <button class="btn btn__outlined mb-3 mt-3" @click="messageShift(shift)" :disabled="!shift.newMessage">send message
-                    <transition name="fade">
-                      <span class="ml-2" v-if="performingRequest7">
-                      <i class="fa fa-spinner fa-spin"></i>
-                      </span>
-                    </transition>
-                  </button>
-                </div>
-              </div>
-
-                <div class="pt-3" v-if="orderedUsers.length >= 1">
-                  <v-select
-                    label="fullName" 
-                    :options="orderedUsers(shift)"
-                    v-model="shift.selectedStaff"
-                    @input="assignShift(shift)"
-                    
-                    >
-                    <template #option="{ fullName, day, requestedJob }">
-                      <span>{{ fullName }}<span v-if="requestedJob"> | {{requestedJob.title}}</span></span>
-                    </template>
-                  </v-select>
-                </div>
-                <div class="pt-3">
-                  <vue-good-table
-                    :columns="columns2"
-                    :id="shift.id"
-                    :ref="shift.id"
-                    :rows="orderedPlacedUsers(shift)"
-                     :select-options="{
-                      enabled: true,
-                      selectOnCheckboxOnly: true,
-                    }"
-                    >
-                    <div slot="selected-row-actions">
-                      <button class="btn btn__small btn__flat" @click="lockAll(shift)">Lock All <i class="fas fa-lock-alt"></i></button>
-                    </div>
-                    <template slot="table-row" slot-scope="props">
-                      <span v-if="props.column.field == 'preview'">
-                <i class="far fa-search ml-2 mr-2" @click="showModal(props.row)"></i>
-                <UserModal v-if="modalValue == props.row" @close="closeModal" :staff="modalValue" />
-              </span>
-                      <!-- <span v-if="props.column.field == 'extras'">
-                        <span v-if="(props.row)">
-                          <span v-for="u in filteredInfo(props.row)" style="display:flex; justify-content: space-evenly;">
-
-                            <span v-if="u.blacklist && u.blacklist.length >=1">
-                              <v-popover>
-                                <i class="fas fa-exclamation-triangle ml-2 mr-2" style="color:red;"></i>
-                                <template slot="popover">
-                                <span v-for="z in u.blacklist">{{z.title}}</span>
-                              </template>
-                              </v-popover>
-                            </span>
-
-                            <span v-if="u && u.skills && u.skills.length > 0" style="display:inline;">
-                            <v-popover>
-                                <i class="fad fa-briefcase ml-2 mr-2"></i>
-                                <template slot="popover">
-                                <span v-for="z in u.skills">{{z.title}} / </span>
-                              </template>
-                              </v-popover>
-                            </span>
-
-                            <span v-if="u && u.fullyVaccinated && u.fullyVaccinated == `yes`" style="display:inline;">
-                              <i class="fas fa-syringe ml-2 mr-2" style="color: green;"></i>
-                            </span>
-
-
-                          </span>
-                        </span>
-                      </span> -->
-  <!--                   </span> -->
-                      <!-- <span v-else-if="props.column.field == 'jobs'">
-                        <span v-if="(props.row)">
-                          <span v-for="u in filteredInfo(props.row)">
-                            <span v-if="u && u.skills && u.skills.length > 0" style="display:inline;">
-                              <v-popover>
-                                <i class="fad fa-briefcase"></i>
-                                <template slot="popover">
-                                <span v-for="z in u.skills">{{z.title}} / </span>
-                              </template>
-                              </v-popover>
-                            </span>
-                          </span>
-                        </span>
-                      </span>
-                      <span v-else-if="props.column.field == 'vaccinated'">
-                        <span v-if="(props.row)">
-                          <span v-for="u in filteredInfo(props.row)">
-                            <span v-if="u && u.vaccinated">
-                              <i class="fas fa-syringe" style="color: green;"></i>
-                            </span>
-                          </span>
-                        </span>
-                      </span> -->
-              
-                      <span v-if="props.column.field == 'created'">
-                        <span v-if="props.row.created">{{formatDate(props.row.created)}}</span>
-                      </span>
-
-                      <span v-if="props.column.field == 'phone'">
-                        <span v-if="props.row.phone">
-                          <a :href="'sms:' + props.row.phone">{{props.row.phone}}</a>
-                        </span>
-                      </span>
-
-
-                      <span v-else-if="props.column.field == 'reservations'">
-                      <span v-if="
-                        (props.row.dayStatus != 'hired') &&
-                        (props.row.dayStatus != 'assigned') &&
-                        (props.row.dayStatus != 'not requested')
-                      " style="display:inline; margin-right: 1.5rem;">
-                        <button class="icon" @click="reserveUser(props.row)" v-tooltip="'reserve user'">
-                          <i class="far fa-calendar ml-2 mr-2"></i>
-                        </button>
-                      </span>
-                      <span v-if="
-                        (props.row.dayStatus == 'hired' || props.row.dayStatus == 'assigned')
-                      " style="display:inline;">
-                        <button class="icon" v-tooltip="'cancel reservation'" @click="unreserveUser(props.row)">
-                          <i class="fas fa-calendar-check ml-2 mr-2" style="color:green;"></i>
-                        </button>
-                      </span>
-
-                      <span v-if="
-                        (props.row.dayStatus != 'hired') &&
-                        (props.row.dayStatus != 'assigned') &&
-                        (props.row.dayStatus != 'not requested')"
-                        style="display:inline;">
-                        <button class="icon" v-tooltip="'not use this staff today'" @click="notRequestUser(props.row)">
-                          <i class="fas fa-calendar-times ml-2 mr-2"></i>
-                        </button>
-                      </span>
-
-                      <span v-if="
-                        (props.row.dayStatus == 'not requested')
-                      " style="display:inline;">
-                        <button class="icon" v-tooltip="'cancel cancellation'" @click="cancelNotRequestUser(props.row)">
-                          <i class="fas fa-calendar-times ml-2 mr-2" style="color:red;"></i>
-                        </button>
-                      </span>
-
-                        <button v-if="props.row.dayStatus == 'hired' && props.row.status != 'assigned' && props.row.status != 'spinning'" class="icon" v-tooltip="'lock shift'" @click="lockShift(props, shift)" style="display:inline;">
-                          <i class="fas fa-lock-open-alt ml-2 mr-2"></i>
-                        </button>
-                      
-
-                      
-                        <span class="icon" v-if="props.row.status == 'spinning'">
-                        <i class="fa fa-spinner fa-spin ml-2 mr-2"></i>
-                        </span>
-                      
-                      
-                        <button class="icon" v-if="props.row.dayStatus == 'hired' && props.row.status == 'assigned'" style="display:inline;" @click="unlock(props, shift)">
-                          <i class="fas fa-lock-alt ml-2 mr-2"></i>
-                        </button>
-                      
-                    </span>
-
-                    <span v-else-if="props.column.field == 'confirmed'">
-                      <button v-if="!props.row.confirmed" class="icon" v-tooltip="'confirm'" @click="confirmPlacement(props)">
-                        <i class="fas fa-check ml-2 mr-2" style="opacity: 0.3;"></i>
-                      </button>
-                      <button v-if="props.row.confirmed" class="icon" v-tooltip="'unconfirm'" @click="unConfirmPlacement(props)">
-                        <i class="fas fa-check ml-2 mr-2" style="color:green"></i>
-                      </button>
-                    </span>
-
-                    <span v-else-if="props.column.field == 'fullName'">
-                      <router-link :to="'/users/' + props.row.userId">
-                        {{props.row.fullName}}
-                      </router-link>
-                    </span>
-                    <span v-else-if="props.column.field == 'notes'">
-                      <button class="icon" v-if="props.row.note" v-tooltip="props.row.note">
-                        <i class="far fa-sticky-note ml-2 mr-2"></i>
-                      </button>
-                    </span>
-                    <span v-else-if="props.column.field == 'delete'">
-                      <button v-if="props.row.status == 'placed'" class="icon" v-tooltip="'remove'" @click="removePlacement(props.row)">
-                        <i class="fas fa-times ml-2 mr-2"></i>
-                      </button>
-
-                      <!-- <button v-if="props.row.status == 'assigned'" class="icon" v-tooltip="'remove'" @click="removeAssignment(props, shift)">
-                        <i class="fas fa-times ml-2 mr-2"></i>
-                      </button> -->
-                    </span>
-                      <span v-else-if="props.column.field == 'requestedJob.title'">
-                        <span v-if="props.row.requestedJob && props.row.requestedJob.title">
-                           {{props.row.requestedJob.title}}
-                        </span>
-                      </span>
-                      <!-- <span v-else>
-                        {{props.formattedRow[props.column.field]}}
-                      </span> -->
-                    </template>
-                  </vue-good-table>
-                </div>
-              </div>
-            </transition>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -686,9 +734,23 @@ export default {
           field: 'fullName',
         },
         {
+          label: 'Phone',
+          field: 'phone',
+          sortable: false,
+        },
+
+        {
           label: 'Signed Up',
           field: 'created',
           sortable: false,
+        },
+        {
+          label: 'Start Time',
+          field: 'start',
+        },
+        {
+          label: 'End Time',
+          field: 'end',
         },
         // {
         //   label: 'Day',
@@ -699,9 +761,12 @@ export default {
         //   field: 'days',
         // },
         {
-          label: 'Job',
+          label: 'Requested Job',
           field: 'requestedJob.title',
-          tdClass: 'text-center',
+        },
+        {
+          label: 'Assigned Job',
+          field: 'assigned',
         },
         // {
         //   label: '',
@@ -752,9 +817,8 @@ export default {
           sortable: false,
         },
         {
-          label: 'Job',
+          label: 'Requested Job',
           field: 'requestedJob.title',
-          tdClass: 'text-center',
         },
         {
           label: '',
@@ -791,9 +855,20 @@ export default {
           sortable: false,
         },
         {
-          label: 'Job',
+          label: 'Start Time',
+          field: 'start',
+        },
+        {
+          label: 'End Time',
+          field: 'end',
+        },
+        {
+          label: 'Requested Job',
           field: 'requestedJob.title',
-          tdClass: 'text-center',
+        },
+        {
+          label: 'Assigned Job',
+          field: 'assigned',
         },
         // {
         //   label: '',
@@ -893,6 +968,9 @@ export default {
     },
   },
   methods: {
+    updateAssignment(row) {
+      this.$store.dispatch('updateAssignment', row)
+    },
     // selectAll(params) {
     //   params.selectedRows.forEach((item) => {
     //     console.log(item);
@@ -1023,63 +1101,46 @@ export default {
         exportService.export();
       });
     },
-    // exportPlaced() {
-    //   const exportHeaders = [
-    //     "Day",
-    //     "Shift Name",
-    //     "Event",
-    //     "Position",
-    //     "Start",
-    //     "End",
-    //     "First Name",
-    //     "Last Name",
-    //     "Phone",
-    //     "Email",
-    //     "Points",
-    //     "Confirmed",
-    //     "DOB",
-    //     "Shirt Size",
-    //     "Code",
-    //   ];
-    //   const exportItems = [];
-    //   console.log(exportItems)
-    //   this.eventShifts.forEach(shift => {
-
-    //     for (var key in this.orderedPlacedUsers3(shift.id)) {
-          
-    //       let uid = this.orderedPlacedUsers3(shift.id)[key].userId
-
-    //       let confirmed = this.orderedPlacedUsers3(shift.id)[key].confirmed
-
-    //       fb.usersCollection.doc(uid).get()
-    //       .then(doc => {
-    //         console.log(doc.data())
-    //         exportItems.push([
-    //           shift.day,
-    //           shift.name,
-    //           shift.event,
-    //           shift.position.title,
-    //           shift.startTime,
-    //           shift.endTime,
-    //           doc.data().firstName,
-    //           doc.data().lastName,
-    //           doc.data().phone,
-    //           doc.data().email,
-    //           doc.data().points,
-    //           confirmed,
-    //           moment(doc.data().dob).format('M/D/YYYY'),
-    //           doc.data().shirtsize,
-    //           `=REGEXEXTRACT(H2,"....$")`
-    //         ])
-    //       })
-    //     }
-    //   })
-      
-    //   this.$gapi.getGapiClient().then(gapi => {
-    //     const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
-    //     exportService.export();
-    //   })
-    // },
+    exportPlaced() {
+      const exportHeaders = [
+        "First Name",
+        "Last Name",
+        "Phone",
+        "Email",
+        "Day",
+        "Event",
+        "Shift Name",
+        "Position",
+        "Start",
+        "End",
+        "Confirmed",
+        // "DOB",
+        // "Shirt Size",
+        "Code",
+      ];
+      const exportItems = [];
+      for (var key in this.filteredPlacedUsers) {
+        exportItems.push([
+          this.filteredPlacedUsers[key].firstName,
+          this.filteredPlacedUsers[key].lastName,
+          this.filteredPlacedUsers[key].phone,
+          this.filteredPlacedUsers[key].email,
+          this.filteredPlacedUsers[key].day,
+          this.filteredPlacedUsers[key].eventName,
+          this.filteredPlacedUsers[key].shiftName,
+          this.filteredPlacedUsers[key].job.title,
+          this.filteredPlacedUsers[key].start,
+          this.filteredPlacedUsers[key].end,
+          this.filteredPlacedUsers[key].confirmed,
+          `=REGEXEXTRACT(C2,"....$")`
+        ])
+      }
+      this.$gapi.getGapiClient().then(gapi => {
+        const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+        exportService.export();
+      });
+    },
+    
     exportUnplaced() {
       const exportHeaders = [
         "First Name",
@@ -1278,8 +1339,8 @@ export default {
         event: event,
         rows: this.$refs[shift.id][0].selectedRows,
         shift: shift,
-        shiftStart: this.formatAMPM(shift.startTime) ,
-        shiftEnd:this.formatAMPM(shift.endTime)
+        // shiftStart: this.formatAMPM(shift.startTime) ,
+        // shiftEnd:this.formatAMPM(shift.endTime)
       })
       // this.$refs[shift.id][0].selectedRows = []
       
@@ -1369,8 +1430,8 @@ export default {
         event: event,
         row: props.row,
         shift: shift,
-        shiftStart: this.formatAMPM(shift.startTime) ,
-        shiftEnd:this.formatAMPM(shift.endTime)
+        shiftStart: this.formatAMPM(props.row.start) ,
+        shiftEnd:this.formatAMPM(props.row.end)
       })
 
       

@@ -16,7 +16,7 @@
         </div>
         <div class="flex align-center">
           <router-link :to="{name: 'eventtimesheets'}">
-          <button class="btn btn__outlined mr-3">Timesheets</button>
+          <button class="btn btn__outlined mr-3" @click="sheets()">Timesheets</button>
           </router-link>
           <button class="btn btn__outlined mr-3" @click="shifts()">Event Shifts</button>
           <button class="btn btn__outlined mr-3" @click="placements()">Event placements</button>
@@ -57,6 +57,17 @@
                 :options="venues"
                 v-model="event.venue"
                 @input="updateVenue()"
+                >
+              </v-select>
+            </div>
+            <div class="mb-3" v-if="event.venue">
+              <label for="clients">Clients:</label>
+              <v-select
+                class="mt-2"
+                label="title"
+                multiple
+                :options="clients"
+                v-model="event.venue.client"
                 >
               </v-select>
             </div>
@@ -136,24 +147,35 @@
           </div>
 
           <div class="dashboard__container--body--col" v-if="event.venue">
-
             <h3>Jobs to Staff</h3>
+            <div class="mb-3">
+              <label for="pickDate">Choose Jobs:</label>
+              <v-select
+                class="mt-2"
+                label="title" 
+                :options="jobs"
+                v-model="event.venue.job"
+                multiple
+                >
+              </v-select>
+            </div>
             <transition name="fadeStop">
-              <div class="mb-3">
-                <label for="pickDate">Choose Jobs:</label>
-                <v-select
-                  class="mt-2"
-                  label="title" 
-                  :options="jobs"
-                  v-model="event.venue.job"
-                  multiple
-                  >
-                </v-select>
+              <div class="mb-3" v-if="event.venue.job && event.venue.job.length >= 1">
+                <div v-for="job in event.venue.job" class="mb-3 flex justify-space-between">
+                  <input type="text" readonly v-model.trim="job.title" />
+                  <input class="ml-3" type="number" step=".01" placeholder="pay rate" v-model.trim="job.rate" />
+                  <input class="ml-3" type="text" placeholder="new label" v-model.trim="job.label" />
+                  <div class="ml-3">
+                    <label for="tipped">Tipped?</label>
+                    <input class="ml-3" type="checkbox" v-model="job.tipped" id="tipped" />
+                  </div>
+                  <!-- <button class="btn btn__accent btn__small ml-3">save</button> -->
+                </div>
               </div>
             </transition>
           </div>
 
-          <div class="dashboard__container--body--col" v-if="event.venue">
+          <!-- <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3" v-if="clients.length >= 1">
               <h3>Client</h3>
               <v-select
@@ -166,7 +188,7 @@
               </v-select>
             </div>
           </div>
-          
+           -->
           <div class="dashboard__container--body--col">
             <h3>Attach Files</h3>
 
@@ -342,7 +364,7 @@
               export Staff
 
               </button> -->
-              <button class="btn btn__primary btn__large" @click="updateEvent()" :disabled="event.status == 'cancelled'">
+              <button class="btn btn__success btn__large" @click="updateEvent()" :disabled="event.status == 'cancelled'">
               Update Event
                 <transition name="fade">
                   <span class="ml-2" v-if="performingRequest">
@@ -351,8 +373,7 @@
                 </transition>
               </button>
 
-
-              <button class="btn btn__danger btn__large" @click="cancelEvent()" v-if="event.status != 'cancelled'">
+              <button class="btn btn__danger btn__large" @click="showCancellation = true" v-if="!showCancellation">
                 Cancel Event
                 <transition name="fade">
                   <span class="ml-2" v-if="performingRequest4">
@@ -360,7 +381,26 @@
                   </span>
                 </transition>
               </button>
-              <button class="btn btn__success btn__large" @click="activateEvent()" v-if="event.status == 'cancelled'">
+
+              <button class="btn btn__primary btn__large" @click="showCancellation = false" v-if="showCancellation">
+                No Don't Cancel
+                <transition name="fade">
+                  <span class="ml-2" v-if="performingRequest4">
+                  <i class="fa fa-spinner fa-spin"></i>
+                  </span>
+                </transition>
+              </button>
+
+
+              <button class="btn btn__danger btn__large" @click="cancelEvent()" v-if="showCancellation">
+                Yes, Cancel Event
+                <transition name="fade">
+                  <span class="ml-2" v-if="performingRequest4">
+                  <i class="fa fa-spinner fa-spin"></i>
+                  </span>
+                </transition>
+              </button>
+              <button class="btn btn__success" @click="activateEvent()" v-if="event.status == 'cancelled'">
                  Activate Event
                 <transition name="fade">
                   <span class="ml-2" v-if="performingRequest4">
@@ -389,6 +429,7 @@ export default {
   data: () => ({
     croppa: {},
     day:'',
+    showCancellation: false,
     job: '',
     // tags: ['#concert', '#comedy', '#convention', '#musicfestival', '#pga', '#nfl', '#nba', '#nhl', '#mlb', '#mls', '#minorleaguebaseball', '#ncaabasketball', '#ncaafootball'],
     multiDay: false,
@@ -531,8 +572,12 @@ export default {
       event.files.splice(index, 1)
       this.$store.dispatch('updateEvent', event)
     },
+    sheets() {
+      let url = `/events/` + this.$route.params.id + `/timesheets`
+      router.push(url)
+    },
     shifts() {
-      let url = `/events/edit/` + this.$route.params.id + `/shifts`
+      let url = `/events/` + this.$route.params.id + `/shifts`
       router.push(url)
     },
     placements() {
@@ -556,6 +601,7 @@ export default {
     },
     cancelEvent() {
       this.performingRequest4 = true
+      this.showCancellation = false
       this.event.status = 'cancelled'
       this.event.published = false
       let event = this.event

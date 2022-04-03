@@ -103,7 +103,8 @@ const store = new Vuex.Store({
     firstVisibleEventSnapShot: {},
     taggedEvents: [],
     venueEventsSearchResults: [],
-    eventAssignments: []
+    eventAssignments: [],
+    cancelledEvents: []
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -1652,15 +1653,21 @@ const store = new Vuex.Store({
         let yesterday = new Date()
         yesterday.setDate(yesterday.getDate() - 1);
         let currentEventsArray = []
+        let cancelledEventsArray = []
         let allEventsArray = []
         querySnapshot.forEach(doc => {
           let startComp = new Date(doc.data().startDate)
           let endComp = new Date(doc.data().endDate)
           let event = doc.data()
-          if ((endComp >= yesterday || startComp >= yesterday)) {
+          if ((endComp >= yesterday || startComp >= yesterday) && (event.status != 'cancelled')) {
             currentEventsArray.push(event)
           }
-          allEventsArray.push(event)
+          if (event.status != 'cancelled') {
+            allEventsArray.push(event)
+          }
+          if (event.status == 'cancelled') {
+            cancelledEventsArray.push(event)
+          }
         })
         let twelve = currentEventsArray.slice(0, 12);
         // firstVisibleEventSnapShot = currentEventsArray.slice(0, 1);
@@ -1670,7 +1677,7 @@ const store = new Vuex.Store({
         commit('setLastVisibleEventSnapShot', lastVisibleEventSnapShot)
         commit('setFirstVisibleEventSnapShot', firstVisibleEventSnapShot)
         commit('setAllEvents', allEventsArray)
-        // commit('setPastEvents', pastEventsArray)
+        commit('setCancelledEvents', cancelledEventsArray)
         commit('setInfiniteEvents', twelve)
       })
     },
@@ -1749,6 +1756,7 @@ const store = new Vuex.Store({
       commit('setTaggedEvents', [])
       commit('setInfiniteEvents', [])
       commit('setNextInfiniteEvents', [])
+      commit('setCancelledEvents', [])
       commit('setPrevInfiniteEvents', [])
       commit('setLastVisibleEventSnapShot', {})
       commit('setFirstVisibleEventSnapShot', {})
@@ -1823,6 +1831,10 @@ const store = new Vuex.Store({
         })
         commit('setEventAssignments', assignmentsArray)
       })
+    },
+    updateAssignment({ commit }, payload) {
+      console.log(payload)
+      fb.userDaysCollection.doc(payload.id).update(payload)
     },
     clearEventAssignments({ commit }) {
       commit('setEventAssignments', [])
@@ -1997,7 +2009,36 @@ const store = new Vuex.Store({
         commit('setEventTimesheetNotes', userNotesArray)
       })
     },
+    formatAMPM(date) {
+        if (typeof date === "string") {
+          let [hours, minutes] = date.split(":");
+          let ampm = "AM";
+
+          if (Number(hours) >= 12) {
+            hours = Number(hours) - 12;
+            ampm = "PM";
+          }
+
+          return `${hours}:${minutes} ${ampm}`;
+
+        } else if (date instanceof Date) {
+          let hours = date.getHours();
+          let minutes = date.getMinutes();
+
+          let ampm = hours >= 12 ? "PM" : "AM";
+
+          hours = hours % 12;
+          hours = hours ? hours : 12;
+          minutes = minutes < 10 ? "0" + minutes : minutes;
+
+          let strTime = hours + ":" + minutes + " " + ampm;
+
+          return strTime;
+        }
+        return date;
+      },
     lockTheShifts({ commit }, payload) {
+      console.log(payload)
       let event = payload.event
       let shift = payload.shift
       let shiftDay = payload.shift.day
@@ -2006,10 +2047,13 @@ const store = new Vuex.Store({
       let day = dateObj.getUTCDate();
       let year = dateObj.getUTCFullYear();
       let newdate = month + "/" + day + "/" + year;
-      let shiftStart = payload.shiftStart
-      let shiftEnd = payload.shiftEnd
 
       payload.rows.forEach(row => {
+
+        // let shiftStartTime = formatAMPM(row.start)
+        // let shiftEndTime = formatAMPM(row.end)
+
+        console.log(row)
         let assignment = {
           shiftId: shift.id,
           userId: row.userId,
@@ -2021,19 +2065,20 @@ const store = new Vuex.Store({
           lastName: row.lastName,
           phone: row.phone,
           name: shift.event,
-          fileId: row.employeeNumber || row.contractorNumber || '123',
-          position: shift.position.title,
+          fileId: row.ssn || '123',
+          position: row.job.title,
           start: shiftDay + " " + shift.startTime,
           end: shiftDay + " " + shift.endTime,
-          startTime: shift.startTime,
-          endTime: shift.endTime,
+          startTime: row.start,
+          endTime: row.end,
           eventInfo: event,
-          shiftStart: shiftStart,
-          shiftEnd: shiftEnd,
+          shiftStart: row.start,
+          shiftEnd: row.end,
           event: event.id,
           eventName: event.title,
           slug: event.slug,
-          status: "assigned"
+          status: "assigned",
+          shiftName: row.shiftName
         }
         // fb.userDaysCollection.doc(userId).update({
         //   event: assignment.event,
@@ -2055,7 +2100,8 @@ const store = new Vuex.Store({
               fileId: assignment.fileId,
               eventName: assignment.eventName,
               status: "assigned",
-              shift: assignment.shiftId
+              shift: assignment.shiftId,
+              shiftName: assignment.shiftName
             })
           })
         })
@@ -2247,10 +2293,12 @@ const store = new Vuex.Store({
       let newdate = month + "/" + day + "/" + year;
       let shiftStart = payload.shiftStart
       let shiftEnd = payload.shiftEnd
+      let userId = payload.row.userId
+
 
       let assignment = {
         shiftId: shift.id,
-        userId: payload.row.userId,
+        userId: userId,
         date: newdate,
         day: shift.day,
         eventId: shift.eventId,
@@ -2287,10 +2335,11 @@ const store = new Vuex.Store({
       //   event: assignment.event,
       //   slug: assignment.slug,
       //   event: assignment.eventId,
-      //   fileId: assignment.fileId,
+      //   // fileId: assignment.fileId,
       //   eventName: assignment.eventName,
       //   status: "assigned",
-      //   shift: assignment.shiftId
+      //   shift: assignment.shiftId,
+      //   shiftName: assignment.shiftId
       // })
       fb.userDaysCollection.where("userId", "==", assignment.userId).where("day", "==", assignment.day).get()
       .then(function (querySnapshot) {
@@ -2302,7 +2351,8 @@ const store = new Vuex.Store({
             fileId: assignment.fileId,
             eventName: assignment.eventName,
             status: "assigned",
-            shift: assignment.shiftId
+            shift: assignment.shiftId,
+            shiftName: payload.shift.name
           })
         })
       })
@@ -2318,7 +2368,8 @@ const store = new Vuex.Store({
             fileId: payload.fileId,
             eventName: payload.eventName,
             status: "assigned",
-            shift: payload.shiftId
+            shift: payload.shiftId,
+            shiftName: payload.shift.name
           })
         })
       })
@@ -2958,6 +3009,13 @@ const store = new Vuex.Store({
         state.venueEventsSearchResults = val
       } else {
         state.venueEventsSearchResults = []
+      }
+    },
+    setCancelledEvents(state, val) {
+      if (val) {
+        state.cancelledEvents = val
+      } else {
+        state.cancelledEvents = []
       }
     },
     setTaggedEvents(state, val) {

@@ -103,7 +103,7 @@
                   label="status" 
                   :options="statuses"
                   v-model="props.row.status"
-                  @input="onSheetEdit(props.row)"
+                  @input="onUpdateStatus(props.row)"
                   :disabled="props.row.locked"
                   :clearable=false
                   >
@@ -114,7 +114,7 @@
                   label="status" 
                   :options="paystatuses"
                   v-model="props.row.paystatus"
-                  @input="onSheetEdit(props.row)"
+                  @input="onUpdatePay(props.row)"
                   :disabled="props.row.locked"
                   :clearable=true
                   >
@@ -246,7 +246,7 @@
                   label="status" 
                   :options="statuses"
                   v-model="props.row.status"
-                  @input="onSheetEdit(props.row)"
+                  @input="onUpdateStatus(props.row)"
                   :disabled="props.row.locked"
                   :clearable=false
                   >
@@ -257,7 +257,7 @@
                   label="status" 
                   :options="paystatuses"
                   v-model="props.row.paystatus"
-                  @input="onSheetEdit(props.row)"
+                  @input="onUpdatePay(props.row)"
                   :disabled="props.row.locked"
                   :clearable=true
                   >
@@ -390,7 +390,7 @@
                   label="status" 
                   :options="statuses"
                   v-model="props.row.status"
-                  @input="onSheetEdit(props.row)"
+                  @input="onUpdateStatus(props.row)"
                   :disabled="props.row.locked"
                   :clearable=false
                   >
@@ -401,7 +401,7 @@
                   label="status" 
                   :options="paystatuses"
                   v-model="props.row.paystatus"
-                  @input="onSheetEdit(props.row)"
+                  @input="onUpdatePay(props.row)"
                   :disabled="props.row.locked"
                   :clearable=true
                   >
@@ -767,6 +767,18 @@ export default {
       }
 
       return date;
+    },
+    onUpdatePay(row) {
+      this.$store.dispatch('updateTimesheetPay', {
+        id: row.id,
+        paystatus: row.paystatus
+      })
+    },
+    onUpdateStatus(row) {
+      this.$store.dispatch('updateTimesheetStatus', {
+        id: row.id,
+        status: row.status
+      })
     },
     showNote(r) {
       console.log(r)
