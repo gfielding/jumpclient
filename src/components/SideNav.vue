@@ -130,6 +130,11 @@
             <span>Accounting</span>
             <div class="dropdown-content">
               <div class="mb-3">
+                <router-link :to="{name: 'allPayroll'}">
+                  payroll <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+              <div class="mb-3">
                 <router-link :to="{name: 'accountingEvents'}">
                   Event Accounting <i class="fas fa-chevron-right"></i>
                 </router-link>

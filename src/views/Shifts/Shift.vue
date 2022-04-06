@@ -588,7 +588,7 @@ export default {
       {
         label: 'Rate',
         field: 'regRate',
-        width: '48px',
+        width: '68px',
         sortable: false,
       },
       {
@@ -606,36 +606,36 @@ export default {
       {
         label: 'Hours',
         field: 'regHours',
-        width: '48px',
+        width: '68px',
         sortable: false,
       },
       {
         label: 'OT',
         field: 'otHours',
-        width: '48px',
+        width: '68px',
         sortable: false,
       },
       {
         label: '2OT',
         field: 'ot2Hours',
-        width: '48px',
+        width: '68px',
         sortable: false,
       },
       {
         label: 'Penalty',
         field: 'mbp',
-        width: '48px',
+        width: '68px',
         sortable: false,
       },
       {
         label: 'Tips',
         field: 'tips',
-        width: '48px',
+        width: '68px',
       },
       {
         label: 'Bonus',
         field: 'dayRate',
-        width: '48px',
+        width: '68px',
         sortable: false,
       },
       {

@@ -127,7 +127,7 @@ export default {
         field: 'created',
       },
       {
-        label: 'Paid/Cancelled',
+        label: 'Last Updated',
         field: 'statusChange',
       }
     ]

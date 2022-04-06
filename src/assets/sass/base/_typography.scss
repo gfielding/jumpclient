@@ -195,9 +195,9 @@ h5 {
   font-size:1.2rem;
 }
 address, .caption {
-  font-size:1.3rem;
+  font-size:1.2rem;
   @include respond(phone) { 
-    font-size: 1.4rem !important;
+    font-size: 1.2rem !important;
   }
 }
 .bold {

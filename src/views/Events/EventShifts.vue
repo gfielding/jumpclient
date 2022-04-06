@@ -8,7 +8,10 @@
             Cancelled
           </button>
         </div>
+        <span>
+        <button class="btn btn__outlined mr-3" @click="placements()">Event placements</button>
         <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
+        </span>
       </div>
 
 
@@ -65,8 +68,10 @@
      	<transition name="fade">
 		    <div class="dashboard__container--body pt-3" style="justify-content: space-evenly;" v-if="event && event.venue && event.venue.job && event.venue.job.length > 0">
 		    	<div class="dashboard__container--body--col" style="width:calc(100% - 3.2rem);">
+
 			    	<div class="list">
-			    		<h2 class="mb-1">Create New Shift</h2>
+			    		<h2>Create New Shift</h2>
+			    		<span class="caption mb-3">*You can enter these shift defaults just as before, then override them per person when you place them if needed.</span>
 	  					<div class="flex">
 	  						<div>
 	  							<label for="name">Shift Name:</label>
@@ -77,20 +82,50 @@
 			            </select>
 	  						</div>
 	  						<div class="pl-3">
-		            <label for="day">Select day:</label>
+	  							<label for="day">Select day:</label>
+	  							<v-select
+			              label="title" 
+			              :options="event.days"
+			              v-model="newShift.day"
+			              multiple
+			              style="min-width: 180px;"
+			              >
+			            </v-select>
+		            <!-- <label for="day">Select day:</label>
 		            <select v-model="newShift.day" id="day" required>
 		              <option v-for="(day, index) in event.days" :key="index" v-bind:value="day">
 		                {{day}}
 		              </option>
-		            </select>
+		            </select> -->
 		          </div>
 	  						<div class="pl-3">
 	  							<label for="staff">Total Staff Requested:</label>
 		            	<input type="number" v-model.trim="newShift.staffReqested" id="staff" />
 	  						</div>
 	  					</div>
+	  					<div class="flex mb-3">
+	  						<div>
+			            <label for="job">Set Default Job for Shift:</label>
+			            <select v-model="newShift.job" id="job">
+			              <option v-for="(job, index) in event.venue.job" :key="index" v-bind:value="job">
+			              	<span v-if="job.label">{{job.label}}</span>
+			              	<span v-if="!job.label">{{job.title}}</span>
+			              </option>
+			            </select>
+			          </div>
+	  						<div class="pl-3">
+		            <label for="start">Default Start Time:</label>
+			            <input type="time" v-model.trim="newShift.start" id="start" />
+			          </div>
+			          <div class="pl-3">
+			            <label for="end">Default End Time:</label>
+			            <input type="time" v-model.trim="newShift.end" id="end" />
+			          </div>
+
+	  					</div>
+
 	  					<div class="mb-3">
-		            <label for="details">Details from Client:</label>
+		            <label for="details">Shift-Specific Details From Client:</label>
 		            <textarea name="details" id="details" cols="30" rows="2" v-model.lazy="newShift.details" style="background: #efefef;"></textarea>
 		          </div>
 		          <!-- <div class="mb-3 pr-3 pl-3">
@@ -129,7 +164,7 @@
 		            <input type="time" v-model.trim="newShift.end" id="end" />
 		          </div> -->
 		          <div>
-		          <button class="btn btn__success mt-2" @click="addNewShift" :disabled="event.cancelled">Add Shift</button>
+		          <button :disabled="!newShift.staffReqested || !newShift.day || !newShift.name || event.cancelled" class="btn btn__success mt-2" @click="addNewShift">Add Shift</button>
 		          </div>
 						</div>
 					</div>
@@ -160,13 +195,16 @@
 			            <input v-if="eventShift.position.label" type="text" v-model="eventShift.position.label" readonly />
 			            <input v-if="!eventShift.position.label" type="text" v-model="eventShift.position.title" readonly />
 			          </div> -->
-			          <div class="mb-3 pl-3" style="min-width: 140px;">
-			            <label for="day">Select day:</label>
-			            <select v-model="eventShift.day" id="day" >
-			              <option v-for="(day, index) in event.days" :key="index" v-bind:value="day">
-			                {{eventShift.day}}
-			              </option>
-			            </select>
+			          <div class="mb-3 pl-3">
+			          	<label for="day">Select day:</label>
+			            <v-select
+			              label="title" 
+			              :options="event.days"
+			              v-model="eventShift.day"
+			              multiple
+			              style="min-width: 180px;"
+			              >
+			            </v-select>
 			          </div>
 			          <div class="mb-3 pl-3">
 			            <label for="staff">Total Staff Requested:</label>
@@ -186,6 +224,26 @@
 				          <button v-if="eventShift.showDelete == true" class="btn btn__danger ml-2" @click="deleteShift(eventShift)">Yes Actually Delete</button>
 			          </div>
 			        </div>
+			        <div class="flex mb-3">
+	  						<div v-if="event.venue && event.venue.job && event.venue.job.length > 0">
+			            <label for="job">Set Default Job for Shift:</label>
+			            <select v-model="eventShift.job" id="job">
+			              <option v-for="(job, index) in event.venue.job" :key="index" v-bind:value="job">
+			              	<span v-if="job.label">{{job.label}}</span>
+			              	<span v-if="!job.label">{{job.title}}</span>
+			              </option>
+			            </select>
+			          </div>
+	  						<div class="pl-3">
+		            <label for="start">Default Start Time:</label>
+			            <input type="time" v-model.trim="eventShift.start" id="start" />
+			          </div>
+			          <div class="pl-3">
+			            <label for="end">Default End Time:</label>
+			            <input type="time" v-model.trim="eventShift.end" id="end" />
+			          </div>
+
+	  					</div>
 			        <div>
 		            <label for="details">Details from Client:</label>
 		            <textarea name="details" id="details" cols="30" rows="2" v-model.lazy="eventShift.details" style="background: #efefef;"></textarea>
@@ -327,6 +385,10 @@ export default {
     deleteShift(eventShift) {
       console.log(eventShift)
       this.$store.dispatch("deleteShift", eventShift.id)
+    },
+    placements() {
+      let url = `/eventplacements/` + this.$route.params.id
+      router.push(url)
     },
   },
   beforeDestroy () {

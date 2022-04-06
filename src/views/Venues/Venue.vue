@@ -69,7 +69,7 @@
                 v-model="venue.client"
                 >
               </v-select>
-              <label for="pickDate">Default Jobs:</label>
+              <!-- <label for="pickDate">Default Jobs:</label>
                 <v-select
                   class="mt-2"
                   label="title" 
@@ -77,9 +77,38 @@
                   multiple
                   v-model="venue.job"
                   >
-                </v-select>
+                </v-select> -->
             </div>
       		</div>
+
+          <div class="dashboard__container--body--col" v-if="venue">
+            <h3>Jobs to Staff</h3>
+            <div class="mb-3">
+              <label for="pickDate">Choose Jobs:</label>
+              <v-select
+                class="mt-2"
+                label="title" 
+                :options="jobs"
+                v-model="venue.job"
+                multiple
+                >
+              </v-select>
+            </div>
+            <transition name="fadeStop">
+              <div class="mb-3" v-if="venue.job && venue.job.length >= 1">
+                <div v-for="job in venue.job" class="mb-3 flex justify-space-between">
+                  <input type="text" readonly v-model.trim="job.title" />
+                  <input class="ml-3" type="number" step=".01" placeholder="pay rate" v-model.trim="job.rate" />
+                  <input class="ml-3" type="text" placeholder="new label" v-model.trim="job.label" />
+                  <div class="ml-3">
+                    <label for="tipped">Tipped?</label>
+                    <input class="ml-3" type="checkbox" v-model="job.tipped" id="tipped" />
+                  </div>
+                  <!-- <button class="btn btn__accent btn__small ml-3">save</button> -->
+                </div>
+              </div>
+            </transition>
+          </div>
           
           
       		<div class="dashboard__container--body--col">

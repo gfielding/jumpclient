@@ -16,10 +16,10 @@
           
           <input type="text" placeholder="search" v-model.trim="searchText" style="background: white; padding: 0 1rem; min-height: 38px; min-width: 120px;" class="mr-3" />
           <div style="margin:auto;" v-if="showSearch">
-            <button class="btn btn__small btn__primary mr-5" @click="clearSearch()">clear</button>
+            <button class="btn btn__primary mr-5" @click="clearSearch()">clear</button>
           </div>
           <div style="margin:auto;" v-if="searchText.length > 1 && !showSearch">
-            <button class="btn btn__small btn__accent mr-5" @click="updateSearch()">submit</button>
+            <button class="btn btn__accent mr-5" @click="updateSearch()">submit</button>
           </div>
 
           <v-select
