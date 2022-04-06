@@ -2009,7 +2009,11 @@ const store = new Vuex.Store({
       .onSnapshot(querySnapshot => {
         let assignmentsArray = []
         querySnapshot.forEach(doc => {
-           assignmentsArray.push(doc.data())
+          let docDate = new Date(doc.data().date)
+          let Feb = new Date("2/1/2022")
+          if (docDate > Feb) {
+            assignmentsArray.push(doc.data())
+          }
         })
         commit('setAllPayroll', assignmentsArray)
       })
