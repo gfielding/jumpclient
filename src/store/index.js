@@ -103,7 +103,9 @@ const store = new Vuex.Store({
     firstVisibleEventSnapShot: {},
     taggedEvents: [],
     venueEventsSearchResults: [],
-    eventAssignments: []
+    eventAssignments: [],
+    cancelledEvents: [],
+    allPayroll: []
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -115,7 +117,7 @@ const store = new Vuex.Store({
         })
 
       // fetch user profile and set in state
-      if (user && user.email && user.email.endsWith('mvpeventstaffing.com') && (user.email != 'd.brown@mvpeventstaffing.com' || user.email != 'jlax@mvpeventstaffing.com' || user.email != 'selina@mvpeventstaffing.com')) {
+      if (user && user.email && user.emailVerified && user.email.endsWith('mvpeventstaffing.com') && (user.email != 'd.brown@mvpeventstaffing.com' || user.email != 'jlax@mvpeventstaffing.com' || user.email != 'selina@mvpeventstaffing.com')) {
         dispatch('fetchUserProfile', user)
       } else {
         store.dispatch('logout')
@@ -1491,6 +1493,12 @@ const store = new Vuex.Store({
     updateEvent({ commit }, payload) {
       fb.eventsCollection.doc(payload.id).update(payload)
     },
+    updateEventJobs({ commit }, payload) {
+      console.log(payload)
+      fb.eventsCollection.doc(payload.eventId).update({
+          venue: payload.venue
+      })
+    },
     updateEventStaff({ commit }, payload) {
       console.log(payload)
       fb.userDaysCollection.where("event", "==", payload.id).onSnapshot(querySnapshot => {
@@ -1652,15 +1660,21 @@ const store = new Vuex.Store({
         let yesterday = new Date()
         yesterday.setDate(yesterday.getDate() - 1);
         let currentEventsArray = []
+        let cancelledEventsArray = []
         let allEventsArray = []
         querySnapshot.forEach(doc => {
           let startComp = new Date(doc.data().startDate)
           let endComp = new Date(doc.data().endDate)
           let event = doc.data()
-          if ((endComp >= yesterday || startComp >= yesterday)) {
+          if ((endComp >= yesterday || startComp >= yesterday) && (event.status != 'cancelled')) {
             currentEventsArray.push(event)
           }
-          allEventsArray.push(event)
+          if (event.status != 'cancelled') {
+            allEventsArray.push(event)
+          }
+          if (event.status == 'cancelled') {
+            cancelledEventsArray.push(event)
+          }
         })
         let twelve = currentEventsArray.slice(0, 12);
         // firstVisibleEventSnapShot = currentEventsArray.slice(0, 1);
@@ -1670,7 +1684,7 @@ const store = new Vuex.Store({
         commit('setLastVisibleEventSnapShot', lastVisibleEventSnapShot)
         commit('setFirstVisibleEventSnapShot', firstVisibleEventSnapShot)
         commit('setAllEvents', allEventsArray)
-        // commit('setPastEvents', pastEventsArray)
+        commit('setCancelledEvents', cancelledEventsArray)
         commit('setInfiniteEvents', twelve)
       })
     },
@@ -1749,6 +1763,7 @@ const store = new Vuex.Store({
       commit('setTaggedEvents', [])
       commit('setInfiniteEvents', [])
       commit('setNextInfiniteEvents', [])
+      commit('setCancelledEvents', [])
       commit('setPrevInfiniteEvents', [])
       commit('setLastVisibleEventSnapShot', {})
       commit('setFirstVisibleEventSnapShot', {})
@@ -1823,6 +1838,10 @@ const store = new Vuex.Store({
         })
         commit('setEventAssignments', assignmentsArray)
       })
+    },
+    updateAssignment({ commit }, payload) {
+      console.log(payload)
+      fb.userDaysCollection.doc(payload.id).update(payload)
     },
     clearEventAssignments({ commit }) {
       commit('setEventAssignments', [])
@@ -1963,12 +1982,6 @@ const store = new Vuex.Store({
           })
         })
       })
-      
-      
-      
-
-      
-      
     },
     addEventTimesheetNote({ commit }, payload) {
       console.log(payload)
@@ -1997,81 +2010,24 @@ const store = new Vuex.Store({
         commit('setEventTimesheetNotes', userNotesArray)
       })
     },
-    lockTheShifts({ commit }, payload) {
-      let event = payload.event
-      let shift = payload.shift
-      let shiftDay = payload.shift.day
-      let dateObj = new Date(payload.shift.day);
-      let month = dateObj.getUTCMonth() + 1;
-      let day = dateObj.getUTCDate();
-      let year = dateObj.getUTCFullYear();
-      let newdate = month + "/" + day + "/" + year;
-      let shiftStart = payload.shiftStart
-      let shiftEnd = payload.shiftEnd
-
-      payload.rows.forEach(row => {
-        let assignment = {
-          shiftId: shift.id,
-          userId: row.userId,
-          date: newdate,
-          day: shift.day,
-          eventId: shift.eventId,
-          email: row.email,
-          firstName: row.firstName,
-          lastName: row.lastName,
-          phone: row.phone,
-          name: shift.event,
-          fileId: row.employeeNumber || row.contractorNumber || '123',
-          position: shift.position.title,
-          start: shiftDay + " " + shift.startTime,
-          end: shiftDay + " " + shift.endTime,
-          startTime: shift.startTime,
-          endTime: shift.endTime,
-          eventInfo: event,
-          shiftStart: shiftStart,
-          shiftEnd: shiftEnd,
-          event: event.id,
-          eventName: event.title,
-          slug: event.slug,
-          status: "assigned"
-        }
-        // fb.userDaysCollection.doc(userId).update({
-        //   event: assignment.event,
-        //   slug: assignment.slug,
-        //   event: assignment.eventId,
-        //   fileId: assignment.fileId,
-        //   eventName: assignment.eventName,
-        //   status: "assigned",
-        //   shift: assignment.shiftId
-        // })
-        fb.userDaysCollection.where("userId", "==", assignment.userId).where("day", "==", assignment.day).get()
-        .then(function (querySnapshot) {
-            querySnapshot.forEach(function (doc) {
-              console.log(doc.data())
-              fb.userDaysCollection.doc(doc.id).update({
-              event: assignment.event,
-              slug: assignment.slug,
-              event: assignment.eventId,
-              fileId: assignment.fileId,
-              eventName: assignment.eventName,
-              status: "assigned",
-              shift: assignment.shiftId
-            })
-          })
-        })
-        fb.assignmentsCollection.add(assignment)
-        .then(
-          doc => {
-            fb.assignmentsCollection.doc(doc.id).update({
-              id: doc.id, 
-              created: fb.firestore.FieldValue.serverTimestamp()
-            })
+    getAllPayroll({ commit }) {
+      fb.assignmentsCollection.where("paystatus", "!=", "paid")
+      .onSnapshot(querySnapshot => {
+        let assignmentsArray = []
+        querySnapshot.forEach(doc => {
+          let docDate = new Date(doc.data().date)
+          let Feb = new Date("2/1/2022")
+          if (docDate > Feb) {
+            assignmentsArray.push(doc.data())
           }
-        )
-        // fb.eventStaffCollection.add(assignment)
-
+        })
+        commit('setAllPayroll', assignmentsArray)
       })
     },
+    clearAllPayroll({ commit }) {
+      commit('setAllPayroll', [])
+    },
+    
 
 
     /*PLACEMENTS*/
@@ -2097,6 +2053,7 @@ const store = new Vuex.Store({
           store.dispatch('getEventUsers', doc.data().id)
           store.dispatch('getEventDrops', doc.data().id)
           store.dispatch("getEventShiftsState", doc.data().id)
+          store.dispatch("getVenueFromId", doc.data().venueId)
         })
       })
     },
@@ -2234,10 +2191,93 @@ const store = new Vuex.Store({
     },
     addPlacement({ commit }, payload) {
       console.log(payload)
-      fb.userDaysCollection.doc(payload.id).update({status: "placed", shift: payload.placement.shiftId})
+      fb.userDaysCollection.doc(payload.id).update({status: "placed", shift: payload.placement.shiftId, start: ''})
+    },
+    lockTheShifts({ commit }, payload) {
+      console.log(payload)
+      let event = payload.event
+      let shift = payload.shift
+      let shiftDay = payload.shift.day
+      let dateObj = new Date(payload.shift.day);
+      let month = dateObj.getUTCMonth() + 1;
+      let day = dateObj.getUTCDate();
+      let year = dateObj.getUTCFullYear();
+      let newdate = month + "/" + day + "/" + year;
+
+      payload.rows.forEach(row => {
+
+        // let shiftStartTime = formatAMPM(row.start)
+        // let shiftEndTime = formatAMPM(row.end)
+
+        console.log(row)
+        let assignment = {
+          shiftId: shift.id,
+          userId: row.userId,
+          date: newdate,
+          day: shift.day,
+          eventId: shift.eventId,
+          email: row.email,
+          firstName: row.firstName,
+          lastName: row.lastName,
+          phone: row.phone,
+          name: shift.event,
+          fileId: row.ssn || '123',
+          position: row.job.title,
+          start: shiftDay + " " + shift.startTime,
+          end: shiftDay + " " + shift.endTime,
+          startTime: row.start,
+          endTime: row.end,
+          eventInfo: event,
+          shiftStart: row.start,
+          shiftEnd: row.end,
+          event: event.id,
+          eventName: event.title,
+          slug: event.slug,
+          status: "assigned",
+          shiftName: row.shiftName
+        }
+        // fb.userDaysCollection.doc(userId).update({
+        //   event: assignment.event,
+        //   slug: assignment.slug,
+        //   event: assignment.eventId,
+        //   fileId: assignment.fileId,
+        //   eventName: assignment.eventName,
+        //   status: "assigned",
+        //   shift: assignment.shiftId
+        // })
+        fb.userDaysCollection.where("userId", "==", assignment.userId).where("day", "==", assignment.day).get()
+        .then(function (querySnapshot) {
+            querySnapshot.forEach(function (doc) {
+              console.log(doc.data())
+              fb.userDaysCollection.doc(doc.id).update({
+              event: assignment.event,
+              slug: assignment.slug,
+              event: assignment.eventId,
+              fileId: assignment.fileId,
+              eventName: assignment.eventName,
+              status: "assigned",
+              shift: assignment.shiftId,
+              shiftName: assignment.shiftName
+            })
+          })
+        })
+        fb.assignmentsCollection.add(assignment)
+        .then(
+          doc => {
+            fb.assignmentsCollection.doc(doc.id).update({
+              id: doc.id, 
+              created: fb.firestore.FieldValue.serverTimestamp()
+            })
+          }
+        )
+        // fb.eventStaffCollection.add(assignment)
+
+      })
     },
     lockAShift({ commit }, payload) {
+      console.log(payload)
       let event = payload.event
+      let row = payload.row
       let shift = payload.shift
       let shiftDay = payload.shift.day
       let dateObj = new Date(payload.shift.day);
@@ -2247,10 +2287,20 @@ const store = new Vuex.Store({
       let newdate = month + "/" + day + "/" + year;
       let shiftStart = payload.shiftStart
       let shiftEnd = payload.shiftEnd
+      let userId = payload.row.userId
+      let positioned
+
+      if (payload.row.job && payload.row.job.label) {
+        positioned = payload.row.job.label
+      }
+
+      if (!payload.row.job || !payload.row.job.label) {
+        positioned = payload.shift.position.title
+      }
 
       let assignment = {
         shiftId: shift.id,
-        userId: payload.row.userId,
+        userId: userId,
         date: newdate,
         day: shift.day,
         eventId: shift.eventId,
@@ -2259,12 +2309,12 @@ const store = new Vuex.Store({
         lastName: payload.row.lastName,
         phone: payload.row.phone,
         name:  shift.event,
-        fileId: payload.row.employeeNumber || payload.row.contractorNumber || '123',
-        position: shift.position.title,
-        start: shiftDay + " " + shift.startTime,
-        end: shiftDay + " " + shift.endTime,
-        startTime: shift.startTime,
-        endTime: shift.endTime,
+        fileId: payload.row.ssn || '123',
+        position: positioned,
+        start: shiftDay + " " + shiftStart,
+        end: shiftDay + " " + shiftEnd,
+        startTime: shiftStart,
+        endTime: shiftEnd,
         eventInfo: event,
         shiftStart: shiftStart,
         shiftEnd: shiftEnd,
@@ -2287,12 +2337,13 @@ const store = new Vuex.Store({
       //   event: assignment.event,
       //   slug: assignment.slug,
       //   event: assignment.eventId,
-      //   fileId: assignment.fileId,
+      //   // fileId: assignment.fileId,
       //   eventName: assignment.eventName,
       //   status: "assigned",
-      //   shift: assignment.shiftId
+      //   shift: assignment.shiftId,
+      //   shiftName: assignment.shiftId
       // })
-      fb.userDaysCollection.where("userId", "==", assignment.userId).where("day", "==", assignment.day).get()
+      fb.userDaysCollection.where("userId", "==", assignment.userId).where("day", "==", assignment.day[0]).get()
       .then(function (querySnapshot) {
           querySnapshot.forEach(function (doc) {
             fb.userDaysCollection.doc(doc.id).update({
@@ -2302,37 +2353,39 @@ const store = new Vuex.Store({
             fileId: assignment.fileId,
             eventName: assignment.eventName,
             status: "assigned",
-            shift: assignment.shiftId
+            shift: assignment.shiftId,
+            shiftName: payload.shift.name
           })
         })
       })
     },
-    lockShift({ commit }, payload) {
-      fb.userDaysCollection.where("userId", "==", payload.userId).where("day", "==", payload.day).get()
-      .then(function (querySnapshot) {
-          querySnapshot.forEach(function (doc) {
-            fb.userDaysCollection.doc(doc.id).update({
-            event: payload.event,
-            slug: payload.slug,
-            event: payload.eventId,
-            fileId: payload.fileId,
-            eventName: payload.eventName,
-            status: "assigned",
-            shift: payload.shiftId
-          })
-        })
-      })
-      // fb.assignmentsCollection.add(payload)
-      // .then(
-      //   doc => {
-      //     fb.assignmentsCollection.doc(doc.id).update({
-      //       id: doc.id, 
-      //       created: fb.firestore.FieldValue.serverTimestamp()
-      //     })
-      //   }
-      // )
-      // fb.eventStaffCollection.add(payload)
-    },
+    // lockShift({ commit }, payload) {
+    //   fb.userDaysCollection.where("userId", "==", payload.userId).where("day", "==", payload.day).get()
+    //   .then(function (querySnapshot) {
+    //       querySnapshot.forEach(function (doc) {
+    //         fb.userDaysCollection.doc(doc.id).update({
+    //         event: payload.event,
+    //         slug: payload.slug,
+    //         event: payload.eventId,
+    //         fileId: payload.fileId,
+    //         eventName: payload.eventName,
+    //         status: "assigned",
+    //         shift: payload.shiftId,
+    //         shiftName: payload.shift.name
+    //       })
+    //     })
+    //   })
+    //   fb.assignmentsCollection.add(payload)
+    //   .then(
+    //     doc => {
+    //       fb.assignmentsCollection.doc(doc.id).update({
+    //         id: doc.id, 
+    //         created: fb.firestore.FieldValue.serverTimestamp()
+    //       })
+    //     }
+    //   )
+    //   fb.eventStaffCollection.add(payload)
+    // },
     getUsersPerDay({ commit }) {
       fb.userDaysCollection.onSnapshot(querySnapshot => {
         let userDaysArray = []
@@ -2960,6 +3013,13 @@ const store = new Vuex.Store({
         state.venueEventsSearchResults = []
       }
     },
+    setCancelledEvents(state, val) {
+      if (val) {
+        state.cancelledEvents = val
+      } else {
+        state.cancelledEvents = []
+      }
+    },
     setTaggedEvents(state, val) {
       if (val) {
         state.taggedEvents = val
@@ -2972,6 +3032,13 @@ const store = new Vuex.Store({
         state.eventAssignments = val
       } else {
         state.eventAssignments = []
+      }
+    },
+    setAllPayroll(state, val) {
+      if (val) {
+        state.allPayroll = val
+      } else {
+        state.allPayroll = []
       }
     },
   },

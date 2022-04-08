@@ -16,10 +16,10 @@
           
           <input type="text" placeholder="search" v-model.trim="searchText" style="background: white; padding: 0 1rem; min-height: 38px; min-width: 120px;" class="mr-3" />
           <div style="margin:auto;" v-if="showSearch">
-            <button class="btn btn__small btn__primary mr-5" @click="clearSearch()">clear</button>
+            <button class="btn btn__primary mr-5" @click="clearSearch()">clear</button>
           </div>
           <div style="margin:auto;" v-if="searchText.length > 1 && !showSearch">
-            <button class="btn btn__small btn__accent mr-5" @click="updateSearch()">submit</button>
+            <button class="btn btn__accent mr-5" @click="updateSearch()">submit</button>
           </div>
 
           <v-select
@@ -30,6 +30,9 @@
             @input="setSelectedVenue"
             >
           </v-select>
+          <button class="btn btn__primary ml-3" @click="showCancelled = true" v-if="showCancelled == false">Show Cancelled</button>
+
+          <button class="btn btn__primary ml-3" @click="showCancelled = false" v-if="showCancelled == true">Show Active</button>
 
 
           <router-link :to="{name: 'addevent'}" class="hidden-small color--text">
@@ -38,22 +41,12 @@
         </span>
       </div>
 
- <!-- (!venueEventsSearchResults || venueEventsSearchResults.length == 0) && !results && (!taggedEvents || taggedEvents.length == 0) && !showVenues && (infiniteEvents && infiniteEvents.length > 0) -->
-
-      
-
 
       <div class="dashboard__container--bodys eventCardContainer">
         <Loader v-if="performingRequest" />
         <Loader v-if="(!infiniteEvents || infiniteEvents.length < 1)" />
 
-        <!-- <div v-for="event in results" :key="event.id" class="eventCard" v-if="!taggedEvents || taggedEvents.length == 0 && !showVenues" @click="onRowClick(event)">
-          <img :data-src="(event.photoUrl || event.venue.photoUrl)" alt="">
-          <h3>{{event.title}}</h3>
-          <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}</span>
-            </div>
-        </div> -->
-
+        <!--VENUE RESULTS-->
         <div v-for="event in venueEventsSearchResults" :key="event.id" class="eventCard" v-if="venueEventsSearchResults.length > 0 && !results && taggedEvents.length == 0 && showVenues">
           <span class="flex align-center">
             <h3 v-bind:class="{ strike: event.status == 'cancelled' }">{{event.title}}</h3>
@@ -63,8 +56,14 @@
             <button v-if="!event.published" class="btn btn__icon ml-5" @click="publish(event)">
               <i class="fas fa-eye-slash" style="color:#d9534f;"></i>
             </button>
-            <button v-if="(!event.status || event.status != 'cancelled')" class="btn btn__icon ml-5" @click="cancel(event)">
+            <button v-if="((!event.status || event.status != 'cancelled') && !event.showCancel)" class="btn btn__icon ml-5" @click="showCancel(event)">
               <i class="fas fa-times" style="color:#d9534f;"></i>
+            </button>
+            <button v-if="event.showCancel" class="btn btn__small btn__primary ml-3" @click="cancelCancel(event)">
+              don't cancel event
+            </button>
+            <button v-if="event.showCancel" class="btn btn__small btn__danger ml-3" @click="cancel(event)">
+              cancel event
             </button>
             <button v-if="event.status == 'cancelled'" class="btn btn__small btn__success ml-3" @click="activate(event)">
               activate
@@ -104,6 +103,65 @@
           </div>
         </div>
 
+
+        <!--CANCELLED RESULTS-->
+        <div v-for="event in cancelledEvents" :key="event.id" class="eventCard" v-if="showCancelled">
+          <span class="flex align-center">
+            <h3 v-bind:class="{ strike: event.status == 'cancelled' }">{{event.title}}</h3>
+            <button v-if="event.published" class="btn btn__icon ml-5" @click="unpublish(event)">
+              <i class="fas fa-eye" style="color:#5cb85c;"></i>
+            </button>
+            <button v-if="!event.published" class="btn btn__icon ml-5" @click="publish(event)">
+              <i class="fas fa-eye-slash" style="color:#d9534f;"></i>
+            </button>
+            <button v-if="((!event.status || event.status != 'cancelled') && !event.showCancel)" class="btn btn__icon ml-5" @click="showCancel(event)">
+              <i class="fas fa-times" style="color:#d9534f;"></i>
+            </button>
+            <button v-if="event.showCancel" class="btn btn__small btn__primary ml-3" @click="cancelCancel(event)">
+              don't cancel event
+            </button>
+            <button v-if="event.showCancel" class="btn btn__small btn__danger ml-3" @click="cancel(event)">
+              cancel event
+            </button>
+            <button v-if="event.status == 'cancelled'" class="btn btn__small btn__success ml-3" @click="activate(event)">
+              activate
+            </button>
+          </span>
+          <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}</span>
+          </div>
+          <div class="flex mt-2">
+            <div class="flex">
+              <router-link :to="`/events/` + event.id">
+                <button class="btn btn__small btn__outlined mr-3">Edit</button>
+              </router-link>
+              <router-link :to="`/events/` + event.id + `/timesheets`">
+                <button class="btn btn__small btn__outlined mr-3" >Timesheets</button>
+              </router-link>
+              <router-link :to="`/events/` + event.id + `/shifts`">
+                <button class="btn btn__small btn__outlined mr-3" >Shifts</button>
+              </router-link>
+              <router-link :to="`/eventplacements/` + event.id">
+                <button class="btn btn__small btn__outlined mr-3" >Placements</button>
+              </router-link>
+            </div>
+            <div class="flex">
+              <!-- <button class="btn btn__small btn__flat" style="color:blue !important;" v-for="tag in event.tags" :key="tag.id">
+                {{tag.title}}
+              </button> -->
+              <v-select
+                  label="title" 
+                  :options="tags"
+                  multiple
+                  v-model="event.tags"
+                  @input="setTag(event)"
+                  style="min-width: 160px;"
+                  >
+                </v-select>
+            </div>
+          </div>
+        </div>
+
+        <!--SEARCH RESULTS-->
         <div v-for="event in filteredEvents" :key="event.id" class="eventCard" v-if="showSearch">
           <span class="flex align-center">
             <h3 v-bind:class="{ strike: event.status == 'cancelled' }">{{event.title}}</h3>
@@ -113,8 +171,14 @@
             <button v-if="!event.published" class="btn btn__icon ml-5" @click="publish(event)">
               <i class="fas fa-eye-slash" style="color:#d9534f;"></i>
             </button>
-            <button v-if="(!event.status || event.status != 'cancelled')" class="btn btn__icon ml-5" @click="cancel(event)">
+            <button v-if="((!event.status || event.status != 'cancelled') && !event.showCancel)" class="btn btn__icon ml-5" @click="showCancel(event)">
               <i class="fas fa-times" style="color:#d9534f;"></i>
+            </button>
+            <button v-if="event.showCancel" class="btn btn__small btn__primary ml-3" @click="cancelCancel(event)">
+              don't cancel event
+            </button>
+            <button v-if="event.showCancel" class="btn btn__small btn__danger ml-3" @click="cancel(event)">
+              cancel event
             </button>
             <button v-if="event.status == 'cancelled'" class="btn btn__small btn__success ml-3" @click="activate(event)">
               activate
@@ -163,7 +227,8 @@
 
 
 <!-- v-if="(!venueEventsSearchResults || venueEventsSearchResults.length == 0) && !results && (!taggedEvents || taggedEvents.length == 0) && !showVenues && !showPrevNext" -->
-
+        
+        <!--INITIAL LOAD-->
         <div v-for="event in infiniteEvents" :key="event.id" class="eventCard" v-if="showInfinite">
           <!-- <img :data-src="(event.photoUrl || event.venue.photoUrl)" alt=""> -->
           <span class="flex align-center">
@@ -174,8 +239,14 @@
             <button v-if="!event.published" class="btn btn__icon ml-5" @click="publish(event)">
               <i class="fas fa-eye-slash" style="color:#d9534f;"></i>
             </button>
-            <button v-if="(!event.status || event.status != 'cancelled')" class="btn btn__icon ml-5" @click="cancel(event)">
+            <button v-if="((!event.status || event.status != 'cancelled') && !event.showCancel)" class="btn btn__icon ml-5" @click="showCancel(event)">
               <i class="fas fa-times" style="color:#d9534f;"></i>
+            </button>
+            <button v-if="event.showCancel" class="btn btn__small btn__primary ml-3" @click="cancelCancel(event)">
+              don't cancel event
+            </button>
+            <button v-if="event.showCancel" class="btn btn__small btn__danger ml-3" @click="cancel(event)">
+              cancel event
             </button>
             <button v-if="event.status == 'cancelled'" class="btn btn__small btn__success ml-3" @click="activate(event)">
               activate
@@ -215,6 +286,7 @@
           </div>
         </div>
 
+        <!--PREV AND NEXT-->
         <div v-for="event in visibleEvents" :key="event.id" class="eventCard" v-if="(!venueEventsSearchResults || venueEventsSearchResults.length == 0) && !results && (!taggedEvents || taggedEvents.length == 0) && !showVenues && showPrevNext">
           <!-- <img :data-src="(event.photoUrl || event.venue.photoUrl)" alt=""> -->
           <span class="flex align-center">
@@ -225,8 +297,14 @@
             <button v-if="!event.published" class="btn btn__icon ml-5" @click="publish(event)">
               <i class="fas fa-eye-slash" style="color:#d9534f;"></i>
             </button>
-            <button v-if="(!event.status || event.status != 'cancelled')" class="btn btn__icon ml-5" @click="cancel(event)">
+            <button v-if="((!event.status || event.status != 'cancelled') && !event.showCancel)" class="btn btn__icon ml-5" @click="showCancel(event)">
               <i class="fas fa-times" style="color:#d9534f;"></i>
+            </button>
+            <button v-if="event.showCancel" class="btn btn__small btn__primary ml-3" @click="cancelCancel(event)">
+              don't cancel event
+            </button>
+            <button v-if="event.showCancel" class="btn btn__small btn__danger ml-3" @click="cancel(event)">
+              cancel event
             </button>
             <button v-if="event.status == 'cancelled'" class="btn btn__small btn__success ml-3" @click="activate(event)">
               activate
@@ -305,10 +383,11 @@ export default {
     searchText: '',
     results: null,
     showInfinite: true,
-    showSearch: false,
-    activeTag: '',
     showPrevNext: false,
     showVenues: false,
+    showSearch: false,
+    showCancelled: false,
+    activeTag: '',
     visibleEvents: [],
     performingRequest: false,
   }),
@@ -317,7 +396,6 @@ export default {
   // },
   created () {
     this.$store.dispatch("getInfiniteEvents")
-    this.$store.dispatch("getTagsState")
     // window.addEventListener("scroll", this.handleScroll, false);
     
   },
@@ -326,14 +404,16 @@ export default {
     this.$store.dispatch("getVenues")
   },
   computed: {
-    ...mapState(['infiniteEvents', 'prevInfiniteEvents', 'nextInfiniteEvents', 'lastVisibleEventSnapShot', 'firstVisibleEventSnapShot', 'allEvents', 'taggedEvents', 'venues', 'venueEventsSearchResults', 'tags']),
+    ...mapState(['infiniteEvents', 'cancelledEvents', 'prevInfiniteEvents', 'nextInfiniteEvents', 'lastVisibleEventSnapShot', 'firstVisibleEventSnapShot', 'allEvents', 'taggedEvents', 'venues', 'venueEventsSearchResults', 'tags']),
     // ...mapState(['events2021', 'events2022']),
     filteredEvents() {
-      return this.allEvents.filter(
-        (x => x.title.toLowerCase().includes(this.searchText.toLowerCase())) || 
-        (x => x.venueInfo.title.toLowerCase().includes(this.searchText.toLowerCase())) || 
-        (x => x.venueInfo.address.city.toLowerCase().includes(this.searchText.toLowerCase()))
-      )
+      if (this.searchText && this.searchText.length > 3) {
+        return this.allEvents.filter(
+          (x => x.title.toLowerCase().includes(this.searchText.toLowerCase())) || 
+          (x => x.venueInfo.title.toLowerCase().includes(this.searchText.toLowerCase())) || 
+          (x => x.venueInfo.address.city.toLowerCase().includes(this.searchText.toLowerCase()))
+        )
+      }
     }
   },
   components: {
@@ -354,22 +434,66 @@ export default {
     //   }, 1000)
     // },
     unpublish(event) {
+      this.performingRequest = true
       event.published = false
-      fb.eventsCollection.doc(event.id).update(event)
+      fb.eventsCollection.doc(event.id).update({
+        published: false
+      })
+      setTimeout(() => {
+        this.performingRequest = false
+      }, 1000)
     },
     publish(event) {
+      this.performingRequest = true
       event.published = true
-      fb.eventsCollection.doc(event.id).update(event)
+      fb.eventsCollection.doc(event.id).update({
+        published: true
+      })
+      setTimeout(() => {
+        this.performingRequest = false
+      }, 1000)
+    },
+    showCancel(event) {
+      this.performingRequest = true
+      event.showCancel = true
+      fb.eventsCollection.doc(event.id).update({
+        showCancel: true
+      })
+      setTimeout(() => {
+        this.performingRequest = false
+      }, 1000)
+    },
+    cancelCancel(event) {
+      this.performingRequest = true
+      event.showCancel = false
+      fb.eventsCollection.doc(event.id).update({
+        showCancel: false
+      })
+      setTimeout(() => {
+        this.performingRequest = false
+      }, 1000)
     },
     cancel(event) {
+      this.performingRequest = true
       event.status = 'cancelled'
       event.published = false
-      fb.eventsCollection.doc(event.id).update(event)
+      fb.eventsCollection.doc(event.id).update({
+        status: 'cancelled'
+      })
+      setTimeout(() => {
+        this.performingRequest = false
+      }, 1000)
     },
     activate(event) {
+      this.performingRequest = true
       event.status = 'active'
       event.published = true
-      fb.eventsCollection.doc(event.id).update(event)
+      fb.eventsCollection.doc(event.id).update({
+        status: 'active'
+      })
+      setTimeout(() => {
+        this.performingRequest = false
+      }, 1000)
     },
     updateEvent(event) {
       this.$store.dispatch('updateEvent', event)
@@ -382,6 +506,8 @@ export default {
       this.$store.dispatch("getPrevInfiniteEvents")
       this.performingRequest = true
       this.showPrevNext = true
+      this.searchText = ''
+      this.showCancelled = false
       this.showInfinite = false
       this.visibleEvents.push(...this.prevInfiniteEvents);
       setTimeout(() => {
@@ -392,7 +518,9 @@ export default {
       this.visibleEvents = []
       this.$store.dispatch("getNextInfiniteEvents")
       this.performingRequest = true
+      this.searchText = ''
       this.showInfinite = false
+      this.showCancelled = false
       this.showPrevNext = true
       this.visibleEvents.push(...this.nextInfiniteEvents);
       setTimeout(() => {
@@ -403,6 +531,7 @@ export default {
       this.showPrevNext = false
       this.showVenues = true
       this.showInfinite = false
+      this.showCancelled = false
       this.showSearch = false
       this.performingRequest = true
       this.activeTag = ''
@@ -461,6 +590,7 @@ export default {
       this.showInfinite = false
       this.searchText = ''
       this.showVenues = false
+      this.showCancelled = false
       this.showSearch = false
       this.activeTag = tag
       this.$store.dispatch("getTaggedEvents", tag)
@@ -471,12 +601,31 @@ export default {
     clearSearch() {
       this.performingRequest = true
       this.showInfinite = true
+      this.showCancelled = false
       this.searchText = ''
       this.showSearch = false
       this.visibleEvents.push(...this.infiniteEvents);
       setTimeout(() => {
         this.performingRequest = false
       }, 1000)
+    },
+    showCancelledEvents() {
+      this.performingRequest = true
+      this.activeTag = ''
+      this.searchText = ''
+      this.showVenues = false
+      this.showCancelled = true
+      this.showInfinite = false
+      this.showPrevNext = false
+      this.showSearch = false
+      this.$store.dispatch("clearTaggedEvents")
+      // if (this.searchText.length >= 1) {
+      //   this.results = this.filteredEvents
+      // }
+      
+      setTimeout(() => {
+        this.performingRequest = false
+      }, 5000)
     },
     updateSearch() {
       this.performingRequest = true

@@ -192,6 +192,14 @@ const router = new VueRouter({
       },
     },
     {
+      path: '/accounting/payroll',
+      name: 'allPayroll',
+      component: () => import('../views/Accounting/AllPayroll.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
       path: '/addevent',
       name: 'addevent',
       component: () => import('../views/Events/AddEvent.vue'),

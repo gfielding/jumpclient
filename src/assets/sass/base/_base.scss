@@ -99,3 +99,16 @@ hr {
   display:flex;
   justify-content:flex-end;
 }
+
+.success {
+  color:$success;
+}
+.warning {
+  color:$warning;
+}
+.blueHue {
+  color:$blueHue;
+}
+.danger {
+  color:$danger;
+}
