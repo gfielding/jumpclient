@@ -485,20 +485,53 @@ f<template>
                       </span>
 
                       <span v-if="props.column.field == 'start'">
-                        <input type="time" v-model.trim="props.row.start" id="start" @change="updateAssignment(props.row)" />
+                        <span v-if="props.row.status == 'assigned'">
+                          <span v-if="props.row.start">
+                            {{props.row.start | moment("hh:mm A")}}
+                          </span>
+                          
+                         
+                        </span>
+                        <span v-if="props.row.status != 'assigned'">
+                          <input type="time" v-model.trim="props.row.start" id="start" @change="updateAssignment(props.row)" />
+                          <button  v-if="props.row.start" class="icon" v-tooltip="'remove'" @click="deleteStartTime(props.row)">
+                          <i class="fas fa-times ml-2 mr-2"></i>
+                        </button>
+                        </span>
                       </span>
+
                       <span v-if="props.column.field == 'end'">
-                        <input type="time" v-model.trim="props.row.end" id="end" @change="updateAssignment(props.row)" />
+                        <span v-if="props.row.status == 'assigned'">
+                          <span v-if="props.row.end">
+                            {{props.row.end | moment("hh:mm A")}}
+                          </span>
+                          
+                         
+                        </span>
+                        <span v-if="props.row.status != 'assigned'">
+                          <input type="time" v-model.trim="props.row.end" id="end" @change="updateAssignment(props.row)" />
+                          <button  v-if="props.row.end" class="icon" v-tooltip="'remove'" @click="deleteEndTime(props.row)">
+                          <i class="fas fa-times ml-2 mr-2"></i>
+                        </button>
+                        </span>
+                        
                       </span>
 
                       <span v-if="props.column.field == 'assigned'">
-                        <v-select
-                          label="label" 
-                         :options="event.venue.job || venueInfo.job"
-                          v-model="props.row.job"
-                          @input="updateAssignment(props.row)"
-                          >
-                        </v-select>
+                        <span v-if="props.row.status == 'assigned'">
+                          <span v-if="props.row.job && props.row.job.label">{{props.row.job.label}}</span>
+                          <span v-if="props.row.job && !props.row.job.label">{{props.row.job && props.row.job.title}}</span>
+                        </span>
+                        <span v-if="props.row.status != 'assigned'">
+                          <v-select
+                            label="title" 
+                            :options="event.venue.job || venueInfo.job"
+                            v-model="props.row.job"
+                            @input="updateAssignment(props.row)"
+                            >
+                          </v-select>
+                        </span>
+                        
                       </span>
 
 
@@ -538,7 +571,7 @@ f<template>
                         </button>
                       </span>
 
-                        <button v-if="props.row.dayStatus == 'hired' && props.row.status != 'assigned' && props.row.status != 'spinning' && (props.row.start || shift.start) && (props.row.end || shift.end) && (props.row.job || shift.job)" class="icon" v-tooltip="'lock shift'" @click="lockShift(props, shift)" style="display:inline;">
+                        <button v-if="props.row.dayStatus == 'hired' && props.row.status != 'assigned' && props.row.status != 'spinning' && (props.row.start || shift.start) && (props.row.end || shift.end || shift.end)" class="icon" v-tooltip="'lock shift'" @click="lockShift(props, shift)" style="display:inline;">
                           <i class="fas fa-lock-open-alt ml-2 mr-2"></i>
                         </button>
                       
@@ -660,7 +693,7 @@ f<template>
   </div>
 </template>
 
-<style scoped>
+<style scoped type="text/css">
   .darkLink {
     color:#606266;
   }
@@ -1059,22 +1092,22 @@ export default {
 
       fb.usersCollection.doc(item.objectID).get()
       .then(doc => {
-        let onboarded = doc.data().onboarded
-        let address = doc.data().address
-        let blacklist = doc.data().blacklist
-        let certs = doc.data().certs
-        let groups = doc.data().groups
-        let phoneVerified = doc.data().phoneVerified
-        let photoUrl = doc.data().photoUrl
-        let points = doc.data().points
-        let rating = doc.data().rating
-        let shirtsize = doc.data().shirtsize
-        let skills = doc.data().skills
-        let vaccination = doc.data().vaccination
-        let firstName = doc.data().firstName
-        let lastName = doc.data().lastName
-        let phone = doc.data().phone
-        let ssn = doc.data().ssn
+        let onboarded = doc.data().onboarded || null
+        let address = doc.data().address || null
+        let blacklist = doc.data().blacklist || null
+        let certs = doc.data().certs || null
+        let groups = doc.data().groups || null
+        let phoneVerified = doc.data().phoneVerified || null
+        let photoUrl = doc.data().photoUrl || null
+        let points = doc.data().points || null
+        let rating = doc.data().rating || null
+        let shirtsize = doc.data().shirtsize || null
+        let skills = doc.data().skills || null
+        let vaccination = doc.data().vaccination || null
+        let firstName = doc.data().firstName || null
+        let lastName = doc.data().lastName || null
+        let phone = doc.data().phone || null
+        let ssn = doc.data().ssn || null
         fb.userDaysCollection.add({
           onboarded: onboarded,
           address: address,
@@ -1442,22 +1475,6 @@ export default {
         })
       })
       props.row.confirmed = true
-      fb.userDaysCollection.where("confirmed", "==", true).get()
-      .then(function(querySnapshot) {
-        querySnapshot.forEach(doc => {
-        console.log(doc.data())
-          fb.assignmentsCollection.where("shiftId", "==", doc.data().shift).where("userId", "==", doc.data().userId).get()
-          .then(function(querySnapshot) {
-            querySnapshot.forEach(doc => {
-              console.log(doc.data().id)
-              fb.assignmentsCollection.doc(doc.data().id).update({
-                confirmed: true
-              })
-            })
-          })
-        })
-      })
-
     },
     unConfirmPlacement(props) {
       fb.userDaysCollection.doc(props.row.id).update({confirmed: false})
@@ -1492,10 +1509,21 @@ export default {
       //   })
       // })
     },
+    deleteStartTime(row) {
+      row.start = ''
+      fb.userDaysCollection.doc(row.id).update({start: ''})
+    },
+    deleteEndTime(row) {
+      row.end = ''
+      fb.userDaysCollection.doc(row.id).update({end: ''})
+    },
     lockShift(props, shift) {
       console.log(props)
       console.log(shift)
       props.row.status = "spinning"
+
+      let shiftStarting
+      let shiftEnding
 
       let event = this.event
       let shiftDay = this.activeDay
@@ -1504,15 +1532,43 @@ export default {
       let day = dateObj.getUTCDate();
       let year = dateObj.getUTCFullYear();
       let newdate = month + "/" + day + "/" + year;
-      // let shiftStart = this.formatAMPM(shift.startTime)
-      // let shiftEnd = this.formatAMPM(shift.endTime)
+
+      // if (shift.start) {
+      //   shiftStarting = this.formatAMPM(shift.start)
+      // }
+      // if (!shift.start) {
+      //   shiftStarting = null
+      // }
+      // console.log(shiftStarting)
+      // if (shift.end) {
+      //   shiftEnding = this.formatAMPM(shift.end)
+      // }
+      // if (!shift.end) {
+      //   shiftEnding = null
+      // }
+      // console.log(shiftEnding)
+
+      if (props.row.start) {
+        shiftStarting = this.formatAMPM(props.row.start)
+      }
+      if (!props.row.start && shift.start) {
+        shiftStarting = this.formatAMPM(shift.start)
+      }
+
+      if (props.row.end) {
+        shiftEnding = this.formatAMPM(props.row.end)
+      }
+      if (!props.row.end && shift.end) {
+        shiftEnding = this.formatAMPM(shift.end)
+      }
+
 
       this.$store.dispatch("lockAShift", {
         event: event,
         row: props.row,
         shift: shift,
-        shiftStart: this.formatAMPM(props.row.start) || this.formatAMPM(props.shift.start),
-        shiftEnd:this.formatAMPM(props.row.end) || this.formatAMPM(props.shift.end)
+        shiftStart: shiftStarting,
+        shiftEnd: shiftEnding
       })
 
       

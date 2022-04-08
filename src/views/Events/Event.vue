@@ -15,6 +15,7 @@
           </button>
         </div>
         <div class="flex align-center">
+          <button class="btn btn__outlined mr-3" @click="venueSync()">Sync Venue Details</button>
           <router-link :to="{name: 'eventtimesheets'}">
           <button class="btn btn__outlined mr-3" @click="sheets()">Timesheets</button>
           </router-link>
@@ -147,7 +148,11 @@
           </div>
 
           <div class="dashboard__container--body--col" v-if="event.venue">
-            <h3>Jobs to Staff</h3>
+            <div class="flex justify-space-between align-center">
+              <h3>Jobs to Staff</h3>
+              
+            </div>
+            
             <div class="mb-3">
               <label for="pickDate">Choose Jobs:</label>
               <v-select
@@ -497,6 +502,17 @@ export default {
     },
   },
   methods: {
+    venueSync() {
+      let venueId = this.eventInfo.venueId
+      fb.venuesCollection.doc(venueId).get()
+      .then(doc => {
+        console.log(doc.data().job)
+        this.$store.dispatch('updateEventJobs', {
+          eventId: this.eventInfo.id,
+          venue: doc.data()
+        })
+      })
+    },
     previewImage(event) {
       this.uploadValue=0;
       this.imageData=event.target.files[0]

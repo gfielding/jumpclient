@@ -117,7 +117,7 @@ const store = new Vuex.Store({
         })
 
       // fetch user profile and set in state
-      if (user && user.email && user.email.endsWith('mvpeventstaffing.com') && (user.email != 'd.brown@mvpeventstaffing.com' || user.email != 'jlax@mvpeventstaffing.com' || user.email != 'selina@mvpeventstaffing.com')) {
+      if (user && user.email && user.emailVerified && user.email.endsWith('mvpeventstaffing.com') && (user.email != 'd.brown@mvpeventstaffing.com' || user.email != 'jlax@mvpeventstaffing.com' || user.email != 'selina@mvpeventstaffing.com')) {
         dispatch('fetchUserProfile', user)
       } else {
         store.dispatch('logout')
@@ -1493,6 +1493,12 @@ const store = new Vuex.Store({
     updateEvent({ commit }, payload) {
       fb.eventsCollection.doc(payload.id).update(payload)
     },
+    updateEventJobs({ commit }, payload) {
+      console.log(payload)
+      fb.eventsCollection.doc(payload.eventId).update({
+          venue: payload.venue
+      })
+    },
     updateEventStaff({ commit }, payload) {
       console.log(payload)
       fb.userDaysCollection.where("event", "==", payload.id).onSnapshot(querySnapshot => {
@@ -2185,7 +2191,7 @@ const store = new Vuex.Store({
     },
     addPlacement({ commit }, payload) {
       console.log(payload)
-      fb.userDaysCollection.doc(payload.id).update({status: "placed", shift: payload.placement.shiftId})
+      fb.userDaysCollection.doc(payload.id).update({status: "placed", shift: payload.placement.shiftId, start: ''})
     },
     lockTheShifts({ commit }, payload) {
       console.log(payload)
@@ -2282,6 +2288,15 @@ const store = new Vuex.Store({
       let shiftStart = payload.shiftStart
       let shiftEnd = payload.shiftEnd
       let userId = payload.row.userId
+      let positioned
+
+      if (payload.row.job && payload.row.job.label) {
+        positioned = payload.row.job.label
+      }
+
+      if (!payload.row.job || !payload.row.job.label) {
+        positioned = payload.shift.position.title
+      }
 
       let assignment = {
         shiftId: shift.id,
@@ -2295,7 +2310,7 @@ const store = new Vuex.Store({
         phone: payload.row.phone,
         name:  shift.event,
         fileId: payload.row.ssn || '123',
-        position: (row.job.label || row.job.title) || shift.position.title,
+        position: positioned,
         start: shiftDay + " " + shiftStart,
         end: shiftDay + " " + shiftEnd,
         startTime: shiftStart,
@@ -2328,7 +2343,7 @@ const store = new Vuex.Store({
       //   shift: assignment.shiftId,
       //   shiftName: assignment.shiftId
       // })
-      fb.userDaysCollection.where("userId", "==", assignment.userId).where("day", "==", assignment.day).get()
+      fb.userDaysCollection.where("userId", "==", assignment.userId).where("day", "==", assignment.day[0]).get()
       .then(function (querySnapshot) {
           querySnapshot.forEach(function (doc) {
             fb.userDaysCollection.doc(doc.id).update({
