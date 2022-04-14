@@ -4,8 +4,12 @@
       <div class="dashboard__container--header">
         <h1>Dashboard</h1>
       </div>
-      <div class="dashboard__container--body" v-if="userProfile">
-        
+      <div class="dashboard__container--body pt-3" v-if="userProfile">
+        <!-- <div class="dashboard__container--body--col">
+          <Recap />
+        </div> -->
+        <!-- <button @click="updateSocials()">Update Socials</button> -->
+        <!-- <button @click="updateAllEvents()">Update All Events</button> -->
 
 
         <!-- <div class="dashboard__container--body--col">
@@ -37,7 +41,8 @@
 <script>
 import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
-import firebase from 'firebase/app';
+import Recap from '@/components/Recap.vue'
+const fb = require('../firebaseConfig.js')
 
 export default {
   name: 'dashboard',
@@ -49,26 +54,34 @@ export default {
   },
   components: {
     Loader,
+    Recap
   },
   methods: {
-    // addUser() {
-    //   var createUser = firebase.functions().httpsCallable('createUser');
-    //   createUser({ 
-    //     email: this.newUser.email,
-    //     password: this.newUser.password,
-    //     displayName: this.newUser.displayName
-    //   })
-    //   .then((result) => {
-    //     console.log(result)
-    //   })
-    // }
-    // addUser() {
-    //   var addUser = firebase.functions().httpsCallable('createUser');
-    //   createUser({ data: newUser })
-    //   .then(function (result) {
-    //       console.log(result.data)
-    //   });
-    // }
+    updateSocials() {
+      console.log('updating')
+      fb.usersCollection.where("ssn", "!=", null).orderBy("ssn").limit(10000)
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          // console.log(doc.id, " => ", doc.data());
+          let social = doc.data().ssn
+          fb.assignmentsCollection.where("userId", "==", doc.id)
+          .get()
+          .then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+              console.log(doc.id, " => ", doc.data());
+              fb.assignmentsCollection.doc(doc.id).update({
+                fileId: social || ''
+              })
+            })
+          })
+        });
+      })
+    },
+    updateAllEvents() {
+      console.log('updating')
+      this.$store.dispatch("updateAllEvents")
+    }
   },
   // created () {
   //   if (!this.userProfile) {

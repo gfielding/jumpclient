@@ -269,9 +269,9 @@ f<template>
             <div class="flex align-center justify-space-between mb-1">
               <span>
                 <h3 v-if="shift.name">{{shift.name}} | <span v-if="activeDay">{{activeDay | moment("dddd, MMM Do") }}</span></h3>
-                <div class="caption" v-if="shift.job">Default Job: {{shift.job.label || shift.job.title}}</div>
+                <div class="caption" v-if="shift.position">Default position: {{shift.position.label || shift.position.title}}</div>
                 
-                <div class="caption" v-if="shift.start"> Default Shift Times: {{ [ shift.start, "HH:mm" ] | moment("hh:mm A") }}<span v-if="shift.end"> - {{ [ shift.end, "HH:mm" ] | moment("hh:mm A") }}</span></div>
+                <div class="caption" v-if="shift.startTime"> Default Shift Times: {{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}<span v-if="shift.endTime"> - {{ [ shift.endTime, "HH:mm" ] | moment("hh:mm A") }}</span></div>
 
               </span>
               <div>
@@ -344,60 +344,7 @@ f<template>
                 <i class="far fa-search ml-2 mr-2" @click="showModal(props.row)"></i>
                 <UserModal v-if="modalValue == props.row" @close="closeModal" :staff="modalValue" />
               </span>
-                      <!-- <span v-if="props.column.field == 'extras'">
-                        <span v-if="(props.row)">
-                          <span v-for="u in filteredInfo(props.row)" style="display:flex; justify-content: space-evenly;">
-
-                            <span v-if="u.blacklist && u.blacklist.length >=1">
-                              <v-popover>
-                                <i class="fas fa-exclamation-triangle ml-2 mr-2" style="color:red;"></i>
-                                <template slot="popover">
-                                <span v-for="z in u.blacklist">{{z.title}}</span>
-                              </template>
-                              </v-popover>
-                            </span>
-
-                            <span v-if="u && u.skills && u.skills.length > 0" style="display:inline;">
-                            <v-popover>
-                                <i class="fad fa-briefcase ml-2 mr-2"></i>
-                                <template slot="popover">
-                                <span v-for="z in u.skills">{{z.title}} / </span>
-                              </template>
-                              </v-popover>
-                            </span>
-
-                            <span v-if="u && u.fullyVaccinated && u.fullyVaccinated == `yes`" style="display:inline;">
-                              <i class="fas fa-syringe ml-2 mr-2" style="color: green;"></i>
-                            </span>
-
-
-                          </span>
-                        </span>
-                      </span> -->
-  <!--                   </span> -->
-                      <!-- <span v-else-if="props.column.field == 'jobs'">
-                        <span v-if="(props.row)">
-                          <span v-for="u in filteredInfo(props.row)">
-                            <span v-if="u && u.skills && u.skills.length > 0" style="display:inline;">
-                              <v-popover>
-                                <i class="fad fa-briefcase"></i>
-                                <template slot="popover">
-                                <span v-for="z in u.skills">{{z.title}} / </span>
-                              </template>
-                              </v-popover>
-                            </span>
-                          </span>
-                        </span>
-                      </span>
-                      <span v-else-if="props.column.field == 'vaccinated'">
-                        <span v-if="(props.row)">
-                          <span v-for="u in filteredInfo(props.row)">
-                            <span v-if="u && u.vaccinated">
-                              <i class="fas fa-syringe" style="color: green;"></i>
-                            </span>
-                          </span>
-                        </span>
-                      </span> -->
+ 
 
                       <span v-if="props.column.field == 'photoUrl'">
                         <span v-if="props.row.photoUrl">
@@ -492,7 +439,7 @@ f<template>
                           
                          
                         </span>
-                        <span v-if="props.row.status != 'assigned'">
+                        <span v-if="props.row.status != 'assigned'" style="display: flex;">
                           <input type="time" v-model.trim="props.row.start" id="start" @change="updateAssignment(props.row)" />
                           <button  v-if="props.row.start" class="icon" v-tooltip="'remove'" @click="deleteStartTime(props.row)">
                           <i class="fas fa-times ml-2 mr-2"></i>
@@ -508,7 +455,7 @@ f<template>
                           
                          
                         </span>
-                        <span v-if="props.row.status != 'assigned'">
+                        <span v-if="props.row.status != 'assigned'" style="display: flex;">
                           <input type="time" v-model.trim="props.row.end" id="end" @change="updateAssignment(props.row)" />
                           <button  v-if="props.row.end" class="icon" v-tooltip="'remove'" @click="deleteEndTime(props.row)">
                           <i class="fas fa-times ml-2 mr-2"></i>
@@ -571,7 +518,7 @@ f<template>
                         </button>
                       </span>
 
-                        <button v-if="props.row.dayStatus == 'hired' && props.row.status != 'assigned' && props.row.status != 'spinning' && (props.row.start || shift.start) && (props.row.end || shift.end || shift.end)" class="icon" v-tooltip="'lock shift'" @click="lockShift(props, shift)" style="display:inline;">
+                        <button v-if="props.row.dayStatus == 'hired' && props.row.status != 'assigned' && props.row.status != 'spinning' && (props.row.start || shift.startTime) && (props.row.end || shift.endTime)" class="icon" v-tooltip="'lock shift'" @click="lockShift(props, shift)" style="display:inline;">
                           <i class="fas fa-lock-open-alt ml-2 mr-2"></i>
                         </button>
                       
@@ -991,7 +938,9 @@ export default {
     },
 
     activeDay() {
-      return this.newActiveDay ? this.newActiveDay : this.eventInfo.days[0]
+      if (this.eventInfo.days) {
+        return this.newActiveDay ? this.newActiveDay : this.eventInfo.days[0]
+      }
     },
 
     filteredUsers () {
@@ -1304,7 +1253,12 @@ export default {
         let start = this.orderedPlacedUsers2(shift.id)[key].start
         let end = this.orderedPlacedUsers2(shift.id)[key].end
 
-        let job = (this.orderedPlacedUsers2(shift.id)[key].job.label || shift.position.title)
+        let job
+        if (this.orderedPlacedUsers2(shift.id)[key].job && this.orderedPlacedUsers2(shift.id)[key].job.label) {
+          job = this.orderedPlacedUsers2(shift.id)[key].job.label
+        } else {
+          job = (shift.position.title || null)
+        }
 
         fb.usersCollection.doc(uid).get()
         .then(doc => {
@@ -1551,15 +1505,15 @@ export default {
       if (props.row.start) {
         shiftStarting = this.formatAMPM(props.row.start)
       }
-      if (!props.row.start && shift.start) {
-        shiftStarting = this.formatAMPM(shift.start)
+      if (!props.row.start && shift.startTime) {
+        shiftStarting = this.formatAMPM(shift.startTime)
       }
 
       if (props.row.end) {
         shiftEnding = this.formatAMPM(props.row.end)
       }
-      if (!props.row.end && shift.end) {
-        shiftEnding = this.formatAMPM(shift.end)
+      if (!props.row.end && shift.endTime) {
+        shiftEnding = this.formatAMPM(shift.endTime)
       }
 
 

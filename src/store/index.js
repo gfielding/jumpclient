@@ -105,7 +105,8 @@ const store = new Vuex.Store({
     venueEventsSearchResults: [],
     eventAssignments: [],
     cancelledEvents: [],
-    allPayroll: []
+    allPayroll: [],
+    myRecaps: []
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -192,6 +193,36 @@ const store = new Vuex.Store({
           store.dispatch('logout')
         }
       })
+    },
+    // getMyRecaps({ commit, state }) {
+    //   fb.eventsCollection.where("event.venue.mgrs", "array-contains", "Greg Fielding").onSnapshot(querySnapshot => {
+    //     let eventsArray = []
+    //     querySnapshot.forEach(doc => {
+    //       console.log(doc.data())
+    //     })
+    //     commit('setMyRecaps',eventsArray)
+    //   })
+    // },
+    getMyRecaps({ commit, state }) {
+      var eventsRef = fb.eventsCollection
+      let documents = eventsRef.limit(1).get()
+        .then(snapshot => {
+          snapshot.forEach(doc => {
+            console.log("Parent Document ID: ", doc.id);
+
+            let subCollectionDocs = eventsRef.doc(doc.id/{venue}).collection("mgrs").get()
+              .then(snapshot => {
+                snapshot.forEach(doc => {
+                  console.log("Sub Document ID: ", doc.id);
+                })
+              }).catch(err => {
+                console.log("Error getting sub-collection documents", err);
+              })
+          });
+        }).catch(err => {
+        console.log("Error getting documents", err);
+      })
+      
     },
     updateUserProfile({ commit }, payload) {
       fb.usersCollection.doc(payload.id).update(payload)
@@ -1498,7 +1529,33 @@ const store = new Vuex.Store({
       fb.eventsCollection.doc(payload.id).update(payload)
     },
     updateEvent({ commit }, payload) {
+      // let geo = new fb.firestore.GeoPoint(payload.venue.center.lat, payload.venue.center.lng)
+      // payload.event_location = geo
       fb.eventsCollection.doc(payload.id).update(payload)
+    },
+    updateAllEvents({ commit }) {
+      fb.eventsCollection.orderBy('id', 'asc').get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          let geo
+          if (doc.data().venue && doc.data().venue.center && doc.data().venue.center) {
+            geo = new fb.firestore.GeoPoint(doc.data().venue.center.lat, doc.data().venue.center.lng)
+          }
+          if (!doc.data().venue || !doc.data().venue.center.lat || !doc.data().venue.center.lng) {
+            geo = null
+          }
+          if (doc.data().venue && doc.data().venue.address) {
+            console.log(doc.id)
+            fb.eventsCollection.doc(doc.id).update({
+              event_city: doc.data().venue.address.city || null,
+              event_location: geo,
+              event_state: doc.data().venue.address.state || null,
+              event_venue_title: doc.data().title || null,
+              event_zip: doc.data().venue.address.zip || null
+            })
+          }
+          
+        })
+      })
     },
     updateEventJobs({ commit }, payload) {
       console.log(payload)
@@ -2445,6 +2502,11 @@ const store = new Vuex.Store({
       console.log(payload)
       fb.assignmentsCollection.doc(payload.id).update(payload)
     },
+
+    updateTimesheetRates({ commit }, payload) {
+      fb.assignmentsCollection.doc(payload.id).update(payload)
+    },
+
     updateTimesheetPay({ commit }, payload) {
       console.log(payload)
       fb.assignmentsCollection.doc(payload.id).update({
@@ -3047,6 +3109,13 @@ const store = new Vuex.Store({
       } else {
         state.allPayroll = []
      }
+    },
+    setMyRecaps(state, val) {
+      if (val) {
+        state.myRecaps = val
+      } else {
+        state.myRecaps = []
+      }
     },
   },
 })
