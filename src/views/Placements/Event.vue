@@ -269,9 +269,9 @@ f<template>
             <div class="flex align-center justify-space-between mb-1">
               <span>
                 <h3 v-if="shift.name">{{shift.name}} | <span v-if="activeDay">{{activeDay | moment("dddd, MMM Do") }}</span></h3>
-                <div class="caption" v-if="shift.job">Default Job: {{shift.job.label || shift.job.title}}</div>
+                <div class="caption" v-if="shift.position">Default position: {{shift.position.label || shift.position.title}}</div>
                 
-                <div class="caption" v-if="shift.start"> Default Shift Times: {{ [ shift.start, "HH:mm" ] | moment("hh:mm A") }}<span v-if="shift.end"> - {{ [ shift.end, "HH:mm" ] | moment("hh:mm A") }}</span></div>
+                <div class="caption" v-if="shift.startTime"> Default Shift Times: {{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}<span v-if="shift.endTime"> - {{ [ shift.endTime, "HH:mm" ] | moment("hh:mm A") }}</span></div>
 
               </span>
               <div>
@@ -439,7 +439,7 @@ f<template>
                           
                          
                         </span>
-                        <span v-if="props.row.status != 'assigned'">
+                        <span v-if="props.row.status != 'assigned'" style="display: flex;">
                           <input type="time" v-model.trim="props.row.start" id="start" @change="updateAssignment(props.row)" />
                           <button  v-if="props.row.start" class="icon" v-tooltip="'remove'" @click="deleteStartTime(props.row)">
                           <i class="fas fa-times ml-2 mr-2"></i>
@@ -455,7 +455,7 @@ f<template>
                           
                          
                         </span>
-                        <span v-if="props.row.status != 'assigned'">
+                        <span v-if="props.row.status != 'assigned'" style="display: flex;">
                           <input type="time" v-model.trim="props.row.end" id="end" @change="updateAssignment(props.row)" />
                           <button  v-if="props.row.end" class="icon" v-tooltip="'remove'" @click="deleteEndTime(props.row)">
                           <i class="fas fa-times ml-2 mr-2"></i>
@@ -518,7 +518,7 @@ f<template>
                         </button>
                       </span>
 
-                        <button v-if="props.row.dayStatus == 'hired' && props.row.status != 'assigned' && props.row.status != 'spinning' && (props.row.start || shift.start) && (props.row.end || shift.end || shift.end)" class="icon" v-tooltip="'lock shift'" @click="lockShift(props, shift)" style="display:inline;">
+                        <button v-if="props.row.dayStatus == 'hired' && props.row.status != 'assigned' && props.row.status != 'spinning' && (props.row.start || shift.startTime) && (props.row.end || shift.endTime)" class="icon" v-tooltip="'lock shift'" @click="lockShift(props, shift)" style="display:inline;">
                           <i class="fas fa-lock-open-alt ml-2 mr-2"></i>
                         </button>
                       
@@ -1505,15 +1505,15 @@ export default {
       if (props.row.start) {
         shiftStarting = this.formatAMPM(props.row.start)
       }
-      if (!props.row.start && shift.start) {
-        shiftStarting = this.formatAMPM(shift.start)
+      if (!props.row.start && shift.startTime) {
+        shiftStarting = this.formatAMPM(shift.startTime)
       }
 
       if (props.row.end) {
         shiftEnding = this.formatAMPM(props.row.end)
       }
-      if (!props.row.end && shift.end) {
-        shiftEnding = this.formatAMPM(shift.end)
+      if (!props.row.end && shift.endTime) {
+        shiftEnding = this.formatAMPM(shift.endTime)
       }
 
 

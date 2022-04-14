@@ -226,21 +226,22 @@
 			        </div>
 			        <div class="flex mb-3">
 	  						<div v-if="event.venue && event.venue.job && event.venue.job.length > 0">
-			            <label for="job">Set Default Job for Shift:</label>
-			            <select v-model="eventShift.job" id="job">
+			            <label for="job">Default Job for Shift:</label>
+			            <input readonly v-model="eventShift.position.label || eventShift.position.title" />
+			            <!-- <select v-model="eventShift.job" id="job">
 			              <option v-for="(job, index) in event.venue.job" :key="index" v-bind:value="job">
 			              	<span v-if="job.label">{{job.label}}</span>
 			              	<span v-if="!job.label">{{job.title}}</span>
 			              </option>
-			            </select>
+			            </select> -->
 			          </div>
 	  						<div class="pl-3">
 		            <label for="start">Default Start Time:</label>
-			            <input type="time" v-model.trim="eventShift.start" id="start" />
+			            <input type="time" v-model.trim="eventShift.startTime" id="start" />
 			          </div>
 			          <div class="pl-3">
 			            <label for="end">Default End Time:</label>
-			            <input type="time" v-model.trim="eventShift.end" id="end" />
+			            <input type="time" v-model.trim="eventShift.endTime" id="end" />
 			          </div>
 
 	  					</div>
