@@ -88,10 +88,10 @@
           >
             <template slot="table-row" slot-scope="props">
               <span v-if="props.column.field == 'regRate'">
-                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onSheetEditableRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'dayRate'">
-                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onSheetEditabledayRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'firstName'">
                 <input type="text" v-model.trim="props.row.firstName" id="firstName" readonly />
@@ -226,10 +226,10 @@
           
             <template slot="table-row" slot-scope="props">
               <span v-if="props.column.field == 'regRate'">
-                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onSheetEditableRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'dayRate'">
-                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onSheetEditableRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'firstName'">
                 <input type="text" v-model.trim="props.row.firstName" id="firstName" readonly />
@@ -263,19 +263,19 @@
               </span>
 
               <span v-else-if="props.column.field == 'regHours'">
-                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onSheetEditableRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'otHours'">
-                <input type="number" v-model.trim="props.row.otHours" id="otHours" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.otHours" id="otHours" @change="onSheetEditableRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'ot2Hours'">
-                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @change="onSheetEditableRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'mbp'">
-                <input type="number" v-model.trim="props.row.mbp" id="mbp" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.mbp" id="mbp" @change="onSheetEditableRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'tips'">
-                <input type="number" v-model.trim="props.row.tips" id="tips" @change="onSheetEditable(props.row)" :readonly="props.row.locked"  />
+                <input type="number" v-model.trim="props.row.tips" id="tips" @change="onSheetEditableRate(props.row)" :readonly="props.row.locked"  />
               </span>
               <span v-else-if="props.column.field == 'state'">
                 <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
@@ -803,7 +803,16 @@ export default {
     onSheetEditable(row)  {
       row = row
       row.editable = true
-      this.$store.dispatch('updateTimesheet', row)
+      this.$store.dispatch('updateTimesheet', {
+        id: row.id,
+        regRate: row.regRate,
+        dayRate: row.dayRate || null,
+        regHours: row.regHours || null,
+        otHours: row.otHours || null,
+        ot2Hours: row.ot2Hours || null,
+        mbp: row.mbp || null,
+        tips: row.tips || null,
+      })
     },
     onSheetEdit(row) {
       row = row
@@ -822,6 +831,24 @@ export default {
         status: row.status
       })
     },
+    onSheetEditableRate(row) {
+      this.$store.dispatch('updateTimesheetRates', {
+        id: row.id,
+        regRate: row.regRate,
+        dayRate: row.dayRate || null,
+        regHours: row.regHours || null,
+        otHours: row.otHours || null,
+        ot2Hours: row.ot2Hours || null,
+        mbp: row.mbp || null,
+        tips: row.tips || null,
+      })
+    },
+    // onSheetEditabledayRate(row) {
+    //   this.$store.dispatch('updateTimesheetRates', {
+    //     id: row.id,
+    //     dayRate: row.dayRate
+    //   })
+    // },
     opr(item) {
       fb.assignmentsCollection.doc(item.id).update({ opr: true })
       fb.oprCollection.add(item)

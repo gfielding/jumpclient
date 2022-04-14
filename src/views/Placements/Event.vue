@@ -344,60 +344,7 @@ f<template>
                 <i class="far fa-search ml-2 mr-2" @click="showModal(props.row)"></i>
                 <UserModal v-if="modalValue == props.row" @close="closeModal" :staff="modalValue" />
               </span>
-                      <!-- <span v-if="props.column.field == 'extras'">
-                        <span v-if="(props.row)">
-                          <span v-for="u in filteredInfo(props.row)" style="display:flex; justify-content: space-evenly;">
-
-                            <span v-if="u.blacklist && u.blacklist.length >=1">
-                              <v-popover>
-                                <i class="fas fa-exclamation-triangle ml-2 mr-2" style="color:red;"></i>
-                                <template slot="popover">
-                                <span v-for="z in u.blacklist">{{z.title}}</span>
-                              </template>
-                              </v-popover>
-                            </span>
-
-                            <span v-if="u && u.skills && u.skills.length > 0" style="display:inline;">
-                            <v-popover>
-                                <i class="fad fa-briefcase ml-2 mr-2"></i>
-                                <template slot="popover">
-                                <span v-for="z in u.skills">{{z.title}} / </span>
-                              </template>
-                              </v-popover>
-                            </span>
-
-                            <span v-if="u && u.fullyVaccinated && u.fullyVaccinated == `yes`" style="display:inline;">
-                              <i class="fas fa-syringe ml-2 mr-2" style="color: green;"></i>
-                            </span>
-
-
-                          </span>
-                        </span>
-                      </span> -->
-  <!--                   </span> -->
-                      <!-- <span v-else-if="props.column.field == 'jobs'">
-                        <span v-if="(props.row)">
-                          <span v-for="u in filteredInfo(props.row)">
-                            <span v-if="u && u.skills && u.skills.length > 0" style="display:inline;">
-                              <v-popover>
-                                <i class="fad fa-briefcase"></i>
-                                <template slot="popover">
-                                <span v-for="z in u.skills">{{z.title}} / </span>
-                              </template>
-                              </v-popover>
-                            </span>
-                          </span>
-                        </span>
-                      </span>
-                      <span v-else-if="props.column.field == 'vaccinated'">
-                        <span v-if="(props.row)">
-                          <span v-for="u in filteredInfo(props.row)">
-                            <span v-if="u && u.vaccinated">
-                              <i class="fas fa-syringe" style="color: green;"></i>
-                            </span>
-                          </span>
-                        </span>
-                      </span> -->
+ 
 
                       <span v-if="props.column.field == 'photoUrl'">
                         <span v-if="props.row.photoUrl">
@@ -991,7 +938,9 @@ export default {
     },
 
     activeDay() {
-      return this.newActiveDay ? this.newActiveDay : this.eventInfo.days[0]
+      if (this.eventInfo.days) {
+        return this.newActiveDay ? this.newActiveDay : this.eventInfo.days[0]
+      }
     },
 
     filteredUsers () {
@@ -1304,7 +1253,12 @@ export default {
         let start = this.orderedPlacedUsers2(shift.id)[key].start
         let end = this.orderedPlacedUsers2(shift.id)[key].end
 
-        let job = (this.orderedPlacedUsers2(shift.id)[key].job.label || shift.position.title)
+        let job
+        if (this.orderedPlacedUsers2(shift.id)[key].job && this.orderedPlacedUsers2(shift.id)[key].job.label) {
+          job = this.orderedPlacedUsers2(shift.id)[key].job.label
+        } else {
+          job = (shift.position.title || null)
+        }
 
         fb.usersCollection.doc(uid).get()
         .then(doc => {

@@ -117,10 +117,10 @@
             <button v-if="((!event.status || event.status != 'cancelled') && !event.showCancel)" class="btn btn__icon ml-5" @click="showCancel(event)">
               <i class="fas fa-times" style="color:#d9534f;"></i>
             </button>
-            <button v-if="event.showCancel" class="btn btn__small btn__primary ml-3" @click="cancelCancel(event)">
+            <button v-if="event.showCancel && event.status != 'cancelled'" class="btn btn__small btn__primary ml-3" @click="cancelCancel(event)">
               don't cancel event
             </button>
-            <button v-if="event.showCancel" class="btn btn__small btn__danger ml-3" @click="cancel(event)">
+            <button v-if="event.showCancel && event.status != 'cancelled'" class="btn btn__small btn__danger ml-3" @click="cancel(event)">
               cancel event
             </button>
             <button v-if="event.status == 'cancelled'" class="btn btn__small btn__success ml-3" @click="activate(event)">
