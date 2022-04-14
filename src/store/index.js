@@ -1456,12 +1456,19 @@ const store = new Vuex.Store({
       fb.eventsCollection.add(payload)
       .then(
         doc => {
+          let geo = new fb.firestore.GeoPoint(payload.venue.center.lat, payload.venue.center.lng)
+          payload.event_location = geo
           fb.eventsCollection.doc(doc.id).update({
             id: doc.id,
             created: fb.firestore.FieldValue.serverTimestamp(),
             venueId: payload.venue.id,
             jobs: payload.jobs || [],
-            days: payload.days || []
+            days: payload.days || [],
+            event_city: payload.venue.address.city,
+            event_location: payload,
+            event_state: payload.venue.address.state,
+            event_venue_title: payload.title,
+            event_zip: payload.venue.address.zip
           })
         }
       )
@@ -3039,7 +3046,7 @@ const store = new Vuex.Store({
         state.allPayroll = val
       } else {
         state.allPayroll = []
-      }
+     }
     },
   },
 })
