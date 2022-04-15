@@ -3,7 +3,7 @@
     <div class="dashboard__container">
       <div class="dashboard__container--header">
         <div class="flex align-center">
-          <h1>{{eventInfo.title}} Event Shifts</h1>
+          <h1 v-if="eventInfo && eventInfo.title">{{eventInfo.title}} Event Shifts</h1>
           <button class="btn btn__large btn__danger ml-5" v-if="event && event.cancelled">
             Cancelled
           </button>

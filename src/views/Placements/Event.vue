@@ -68,10 +68,10 @@ f<template>
             >
             <template slot="table-row" slot-scope="props">
 
-              <span v-if="props.column.field == 'preview'">
+              <!-- <span v-if="props.column.field == 'preview'">
                 <i class="far fa-search ml-2 mr-2" @click="showModal(props.row)"></i>
                 <UserModal v-if="modalValue == props.row" @close="closeModal" :staff="modalValue" />
-              </span>
+              </span> -->
               <span v-if="props.column.field == 'photoUrl'">
                 <span v-if="props.row.photoUrl">
                   <img :src="(props.row.photoUrl || `https://firebasestorage.googleapis.com/v0/b/mvpes-25aef.appspot.com/o/avatar%20copy.png?alt=media&token=966c07c4-125a-490f-81be-4e2d26bf33fa`)" alt="" style="width: 3.5rem; height:3.5rem; border-radius: 50%; padding: 0.25rem;">
@@ -89,74 +89,100 @@ f<template>
               </span>
 
               <span v-if="props.column.field == 'moreInfo'" class="flex">
-                <span v-if="props.row.onboarded && props.row.onboarded == true">
-                  <v-popover>
-                  <i class="fa-solid fa-square-check ml-2 mr-2 success"></i>
-                  <template slot="popover">
-                      <span>Fully Onboarded</span>
-                    </template>
-                  </v-popover>
-                </span>
-                <span v-if="!props.row.onboarded || props.row.onboarded != true">
-                  <v-popover>
-                    <i class="fa-solid fa-square-check ml-2 mr-2" style="opacity: 50%;"></i>
-                    <template slot="popover">
-                      <span>Not Onboarded</span>
-                    </template>
-                  </v-popover>
-                </span>
-                <span v-if="props.row.skills && props.row.skills.length == 0">
-                  <i class="fad fa-briefcase ml-2 mr-2" style="opacity:50%;"></i>
-                </span>
-                <span v-if="props.row.skills && props.row.skills.length > 0">
-                  <v-popover>
-                    <i class="fad fa-briefcase ml-2 mr-2 success"></i>
-                    <template slot="popover">
-                      <span v-for="z in props.row.skills">{{z.title}} / </span>
-                    </template>
-                  </v-popover>
-                </span>
-                <span v-if="props.row.blacklist && props.row.blacklist.length == 0">
-                  <i class="fas fa-exclamation-triangle ml-2 mr-2" style="opacity:50%;"></i>
-                </span>
-                <span v-if="props.row.blacklist && props.row.blacklist.length > 0">
-                  <v-popover>
-                    <i class="fas fa-exclamation-triangle ml-2 mr-2 danger"></i>
-                    <template slot="popover">
-                      <span v-for="z in props.row.blacklist">{{z.title}} / </span>
-                    </template>
-                  </v-popover>
-                </span>
-                <span v-if="props.row.groups && props.row.groups.length == 0">
-                  <i class="fa-solid fa-user-group ml-2 mr-2" style="opacity:50%;"></i>
-                </span>
-                <span v-if="props.row.groups && props.row.groups.length > 0">
-                  <v-popover>
-                    <i class="fa-solid fa-user-group ml-2 mr-2 blueHue"></i>
-                    <template slot="popover">
-                      <span v-for="z in props.row.groups">{{z}} / </span>
-                    </template>
-                  </v-popover>
-                </span>
-                <span v-if="props.row.vaccination && props.row.vaccination === `Yes`">
-                  <v-popover>
-                  <i class="fa-solid fa-virus-covid ml-2 mr-2 success"></i>
-                  <template slot="popover">
-                      <span>Vaccinated</span>
-                    </template>
-                  </v-popover>
-                </span>
-                <span v-if="props.row.vaccination && props.row.vaccination === `No`">
-                  <v-popover>
-                    <i class="fa-solid fa-virus-covid ml-2 mr-2 danger"></i>
-                    <template slot="popover">
-                      <span>Not Vaccinated</span>
-                    </template>
-                  </v-popover>
-                </span>
-              </span>
 
-              <span v-if="props.column.field == 'phone'">
+                        <span v-if="props.row.onboarded && props.row.onboarded == true">
+                          <v-popover>
+                          <i class="fa-solid fa-square-check ml-2 mr-2 success"></i>
+                          <template slot="popover">
+                              <span>Fully Onboarded</span>
+                            </template>
+                          </v-popover>
+                        </span>
+
+                        <span v-if="!props.row.onboarded || props.row.onboarded != true">
+                          <v-popover>
+                            <i class="fa-solid fa-square-check ml-2 mr-2" style="opacity: 50%;"></i>
+                            <template slot="popover">
+                              <span>Not Onboarded</span>
+                            </template>
+                          </v-popover>
+                        </span>
+
+                        <span v-if="!props.row.skills || props.row.skills.length == 0">
+                          <i class="fad fa-briefcase ml-2 mr-2" style="opacity:50%;"></i>
+                        </span>
+                        <span v-if="props.row.skills && props.row.skills.length > 0">
+                          <v-popover>
+                            <i class="fad fa-briefcase ml-2 mr-2 success"></i>
+                            <template slot="popover">
+                              <span v-for="z in props.row.skills">{{z.title}} / </span>
+                            </template>
+                          </v-popover>
+                        </span>
+
+                        <span v-if="!props.row.blacklist || props.row.blacklist.length == 0">
+                          <i class="fas fa-exclamation-triangle ml-2 mr-2" style="opacity:50%;"></i>
+                        </span>
+                        <span v-if="props.row.blacklist && props.row.blacklist.length > 0">
+                          <v-popover>
+                            <i class="fas fa-exclamation-triangle ml-2 mr-2 danger"></i>
+                            <template slot="popover">
+                              <span v-for="z in props.row.blacklist">{{z.title}} / </span>
+                            </template>
+                          </v-popover>
+                        </span>
+
+                        <span v-if="!props.row.groups || props.row.groups.length == 0">
+                          <i class="fa-solid fa-user-group ml-2 mr-2" style="opacity:50%;"></i>
+                        </span>
+                        <span v-if="props.row.groups && props.row.groups.length > 0">
+                          <v-popover>
+                            <i class="fa-solid fa-user-group ml-2 mr-2 blueHue"></i>
+                            <template slot="popover">
+                              <span v-for="z in props.row.groups">{{z}} / </span>
+                            </template>
+                          </v-popover>
+                        </span>
+
+                        <span v-if="!props.row.certs || props.row.certs.length == 0">
+                          <i class="fa-solid fa-certificate ml-2 mr-2" style="opacity:50%;"></i>
+                        </span>
+                        <span v-if="props.row.certs && props.row.certs.length > 0">
+                          <v-popover>
+                            <i class="fa-solid fa-certificate ml-2 mr-2 orangeHue"></i>
+                            <template slot="popover">
+                              <span v-for="z in props.row.certs">{{z.type}} / </span>
+                            </template>
+                          </v-popover>
+                        </span>
+
+                        <span v-if="props.row.fullyVaccinated && props.row.fullyVaccinated === `yes`">
+                          <v-popover>
+                          <i class="fa-solid fa-virus-covid ml-2 mr-2 success"></i>
+                          <template slot="popover">
+                              <span>Vaccinated</span>
+                            </template>
+                          </v-popover>
+                        </span>
+                        <span v-if="!props.row.fullyVaccinated">
+                          <v-popover>
+                            <i class="fa-solid fa-virus-covid ml-2 mr-2" style="opacity:50%;"></i>
+                            <template slot="popover">
+                              <span>Not Vaccinated</span>
+                            </template>
+                          </v-popover>
+                        </span>
+                        <span v-if="props.row.fullyVaccinated && props.row.fullyVaccinated === `no`">
+                          <v-popover>
+                            <i class="fa-solid fa-virus-covid ml-2 mr-2 danger"></i>
+                            <template slot="popover">
+                              <span>Not Vaccinated</span>
+                            </template>
+                          </v-popover>
+                        </span>
+                      </span>
+
+                      <span v-if="props.column.field == 'phone'">
                         <span v-if="props.row.phone">
                           <a :href="'sms:' + props.row.phone" class="darkLink">{{props.row.phone}}</a>
                         </span>
@@ -340,10 +366,10 @@ f<template>
                       <button class="btn btn__small btn__flat" @click="lockAll(shift)">Lock All <i class="fas fa-lock-alt"></i></button>
                     </div>
                     <template slot="table-row" slot-scope="props">
-                      <span v-if="props.column.field == 'preview'">
+                      <!-- <span v-if="props.column.field == 'preview'">
                 <i class="far fa-search ml-2 mr-2" @click="showModal(props.row)"></i>
                 <UserModal v-if="modalValue == props.row" @close="closeModal" :staff="modalValue" />
-              </span>
+              </span> -->
  
 
                       <span v-if="props.column.field == 'photoUrl'">
@@ -353,72 +379,98 @@ f<template>
                       </span>
 
                       <span v-if="props.column.field == 'moreInfo'" class="flex">
-                <span v-if="props.row.onboarded && props.row.onboarded == true">
-                  <v-popover>
-                  <i class="fa-solid fa-square-check ml-2 mr-2 success"></i>
-                  <template slot="popover">
-                      <span>Fully Onboarded</span>
-                    </template>
-                  </v-popover>
-                </span>
-                <span v-if="!props.row.onboarded || props.row.onboarded != true">
-                  <v-popover>
-                    <i class="fa-solid fa-square-check ml-2 mr-2" style="opacity: 50%;"></i>
-                    <template slot="popover">
-                      <span>Not Onboarded</span>
-                    </template>
-                  </v-popover>
-                </span>
-                <span v-if="props.row.skills && props.row.skills.length == 0">
-                  <i class="fad fa-briefcase ml-2 mr-2" style="opacity:50%;"></i>
-                </span>
-                <span v-if="props.row.skills && props.row.skills.length > 0">
-                  <v-popover>
-                    <i class="fad fa-briefcase ml-2 mr-2 success"></i>
-                    <template slot="popover">
-                      <span v-for="z in props.row.skills">{{z.title}} / </span>
-                    </template>
-                  </v-popover>
-                </span>
-                <span v-if="props.row.blacklist && props.row.blacklist.length == 0">
-                  <i class="fas fa-exclamation-triangle ml-2 mr-2" style="opacity:50%;"></i>
-                </span>
-                <span v-if="props.row.blacklist && props.row.blacklist.length > 0">
-                  <v-popover>
-                    <i class="fas fa-exclamation-triangle ml-2 mr-2 danger"></i>
-                    <template slot="popover">
-                      <span v-for="z in props.row.blacklist">{{z.title}} / </span>
-                    </template>
-                  </v-popover>
-                </span>
-                <span v-if="props.row.groups && props.row.groups.length == 0">
-                  <i class="fa-solid fa-user-group ml-2 mr-2" style="opacity:50%;"></i>
-                </span>
-                <span v-if="props.row.groups && props.row.groups.length > 0">
-                  <v-popover>
-                    <i class="fa-solid fa-user-group ml-2 mr-2 blueHue"></i>
-                    <template slot="popover">
-                      <span v-for="z in props.row.groups">{{z}} / </span>
-                    </template>
-                  </v-popover>
-                </span>
-                <span v-if="props.row.vaccination && props.row.vaccination === `Yes`">
-                  <v-popover>
-                  <i class="fa-solid fa-virus-covid ml-2 mr-2 success"></i>
-                  <template slot="popover">
-                      <span>Vaccinated</span>
-                    </template>
-                  </v-popover>
-                </span>
-                <span v-if="props.row.vaccination && props.row.vaccination === `No`">
-                  <v-popover>
-                    <i class="fa-solid fa-virus-covid ml-2 mr-2 danger"></i>
-                    <template slot="popover">
-                      <span>Not Vaccinated</span>
-                    </template>
-                  </v-popover>
-                </span>
-              </span>
+
+                        <span v-if="props.row.onboarded && props.row.onboarded == true">
+                          <v-popover>
+                          <i class="fa-solid fa-square-check ml-2 mr-2 success"></i>
+                          <template slot="popover">
+                              <span>Fully Onboarded</span>
+                            </template>
+                          </v-popover>
+                        </span>
+
+                        <span v-if="!props.row.onboarded || props.row.onboarded != true">
+                          <v-popover>
+                            <i class="fa-solid fa-square-check ml-2 mr-2" style="opacity: 50%;"></i>
+                            <template slot="popover">
+                              <span>Not Onboarded</span>
+                            </template>
+                          </v-popover>
+                        </span>
+
+                        <span v-if="!props.row.skills || props.row.skills.length == 0">
+                          <i class="fad fa-briefcase ml-2 mr-2" style="opacity:50%;"></i>
+                        </span>
+                        <span v-if="props.row.skills && props.row.skills.length > 0">
+                          <v-popover>
+                            <i class="fad fa-briefcase ml-2 mr-2 success"></i>
+                            <template slot="popover">
+                              <span v-for="z in props.row.skills">{{z.title}} / </span>
+                            </template>
+                          </v-popover>
+                        </span>
+
+                        <span v-if="!props.row.blacklist || props.row.blacklist.length == 0">
+                          <i class="fas fa-exclamation-triangle ml-2 mr-2" style="opacity:50%;"></i>
+                        </span>
+                        <span v-if="props.row.blacklist && props.row.blacklist.length > 0">
+                          <v-popover>
+                            <i class="fas fa-exclamation-triangle ml-2 mr-2 danger"></i>
+                            <template slot="popover">
+                              <span v-for="z in props.row.blacklist">{{z.title}} / </span>
+                            </template>
+                          </v-popover>
+                        </span>
+
+                        <span v-if="!props.row.groups || props.row.groups.length == 0">
+                          <i class="fa-solid fa-user-group ml-2 mr-2" style="opacity:50%;"></i>
+                        </span>
+                        <span v-if="props.row.groups && props.row.groups.length > 0">
+                          <v-popover>
+                            <i class="fa-solid fa-user-group ml-2 mr-2 blueHue"></i>
+                            <template slot="popover">
+                              <span v-for="z in props.row.groups">{{z}} / </span>
+                            </template>
+                          </v-popover>
+                        </span>
+
+                        <span v-if="!props.row.certs || props.row.certs.length == 0">
+                          <i class="fa-solid fa-certificate ml-2 mr-2" style="opacity:50%;"></i>
+                        </span>
+                        <span v-if="props.row.certs && props.row.certs.length > 0">
+                          <v-popover>
+                            <i class="fa-solid fa-certificate ml-2 mr-2 orangeHue"></i>
+                            <template slot="popover">
+                              <span v-for="z in props.row.certs">{{z.type}} / </span>
+                            </template>
+                          </v-popover>
+                        </span>
+
+                        <span v-if="props.row.fullyVaccinated && props.row.fullyVaccinated === `yes`">
+                          <v-popover>
+                          <i class="fa-solid fa-virus-covid ml-2 mr-2 success"></i>
+                          <template slot="popover">
+                              <span>Vaccinated</span>
+                            </template>
+                          </v-popover>
+                        </span>
+                        <span v-if="!props.row.fullyVaccinated">
+                          <v-popover>
+                            <i class="fa-solid fa-virus-covid ml-2 mr-2" style="opacity:50%;"></i>
+                            <template slot="popover">
+                              <span>Not Vaccinated</span>
+                            </template>
+                          </v-popover>
+                        </span>
+                        <span v-if="props.row.fullyVaccinated && props.row.fullyVaccinated === `no`">
+                          <v-popover>
+                            <i class="fa-solid fa-virus-covid ml-2 mr-2 danger"></i>
+                            <template slot="popover">
+                              <span>Not Vaccinated</span>
+                            </template>
+                          </v-popover>
+                        </span>
+                      </span>
 
                          
                       <span v-if="props.column.field == 'created'">
@@ -673,15 +725,17 @@ export default {
         'f03dc899fbdd294d6797791724cdb402',
       ),
       columns: [
-        {
-          label: '',
-          field: 'preview',
-          sortable: false,
-        },
+        // {
+        //   label: '',
+        //   field: 'preview',
+        //   sortable: false,
+        // },
         {
           label: '',
           field: 'photoUrl',
           sortable: false,
+          width:'42px',
+          tdClass: 'text-center',
         },
         {
           label: 'Name',
@@ -1410,7 +1464,6 @@ export default {
         // shiftStart: this.formatAMPM(shift.startTime) ,
         // shiftEnd:this.formatAMPM(shift.endTime)
       })
-      // this.$refs[shift.id][0].selectedRows = []
       
     },
 

@@ -11,6 +11,8 @@
         <!-- <button @click="updateSocials()">Update Socials</button> -->
         <!-- <button @click="updateAllEvents()">Update All Events</button> -->
 
+       <!--  <button @click="updateAllApplications()">Update All Applications</button> -->
+
 
         <!-- <div class="dashboard__container--body--col">
           <ProfileImage :userProfile="userProfile" />
@@ -81,6 +83,10 @@ export default {
     updateAllEvents() {
       console.log('updating')
       this.$store.dispatch("updateAllEvents")
+    },
+    updateAllApplications() {
+      console.log('updating')
+      this.$store.dispatch("updateAllApplications")
     }
   },
   // created () {

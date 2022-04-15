@@ -339,6 +339,87 @@ const store = new Vuex.Store({
     },
 
 
+    /*dash buttons*/
+    updateAllApplications({ commit }) {
+      let timestamp = new Date('2022-03-13 00:00:00');
+      let timestamp2 = new Date('2022-03-15 00:00:00');
+      fb.userDaysCollection.where("created", ">", timestamp).where("created", "<=", timestamp2)
+      .get()
+      .then((querySnapshot) => {
+        let onboarded
+        let address
+        let blacklist
+        let certs
+        let groups
+        let phoneVerified
+        let photoUrl
+        let points
+        let rating
+        let shirtsize
+        let skills
+        let fullyVaccinated
+        let firstName
+        let lastName
+        let phone
+        let ssn
+        querySnapshot.forEach((doc) => {
+          console.log(doc.id)
+          let userDayId = doc.id
+          fb.usersCollection.doc(doc.data().userId)
+          .get()
+          .then(doc => {
+            // console.log(doc.data())
+            let newUpdates = {
+              onboarded: doc.data().onboarded,
+              address: doc.data().address,
+              blacklist: doc.data().blacklist,
+              certs: doc.data().certs,
+              groups: doc.data().groups,
+              phoneVerified: doc.data().phoneVerified,
+              photoUrl: doc.data().photoUrl,
+              points: doc.data().points,
+              rating: doc.data().rating,
+              shirtsize: doc.data().shirtsize,
+              skills: doc.data().skills,
+              fullyVaccinated: doc.data().fullyVaccinated,
+              firstName: doc.data().firstName,
+              lastName: doc.data().lastName,
+              phone: doc.data().phone,
+              ssn: doc.data().ssn,
+            }
+            console.log(newUpdates)
+            store.dispatch('updateUserDayDetails', {
+              newUpdates: newUpdates,
+              userDayId: userDayId
+            })
+          })
+        })
+      })
+    },
+    updateUserDayDetails({ commit }, payload) {
+      console.log(payload.userDayId)
+      fb.userDaysCollection.doc(payload.userDayId).update({
+        onboarded: payload.newUpdates.onboarded || null,
+        address: payload.newUpdates.address || null,
+        blacklist: payload.newUpdates.blacklist || null,
+        certs: payload.newUpdates.certs || null,
+        groups: payload.newUpdates.groups || null,
+        phoneVerified: payload.newUpdates.phoneVerified || null,
+        photoUrl: payload.newUpdates.photoUrl || null,
+        points: payload.newUpdates.points || null,
+        rating: payload.newUpdates.rating || null,
+        shirtsize: payload.newUpdates.shirtsize || null,
+        skills: payload.newUpdates.skills || null,
+        fullyVaccinated: payload.newUpdates.fullyVaccinated || null,
+        firstName: payload.newUpdates.firstName || null,
+        lastName: payload.newUpdates.lastName || null,
+        phone: payload.newUpdates.phone || null,
+        ssn: payload.newUpdates.ssn || null,
+      })
+    },
+
+
+
     /*User Messages*/
     sendUserMessage({ commit }, payload) {
       console.log(payload)
