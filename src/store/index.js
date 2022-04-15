@@ -106,7 +106,8 @@ const store = new Vuex.Store({
     eventAssignments: [],
     cancelledEvents: [],
     allPayroll: [],
-    myRecaps: []
+    myRecaps: [],
+    checkInMaster: null
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -1916,6 +1917,17 @@ const store = new Vuex.Store({
     },
 
 
+    /*CODE*/
+    getCode({ commit }) {
+      console.log('getting code')
+      fb.checkInMasterCollection.doc('q6fwrK6k4RxLSw3NQN6y')
+      .onSnapshot((doc) => {
+        let checkInMaster = doc.data().checkInMaster
+        commit('setCheckInMaster', checkInMaster)
+      })
+    },
+
+
 
     /*SHIFTS*/
     addEventShift({ commit }, payload) {
@@ -2204,6 +2216,13 @@ const store = new Vuex.Store({
     },
     getEventUsers({ commit }, payload) {
       fb.userDaysCollection.where("preferredEvent", "==", payload).orderBy('created', 'asc')
+      // .get()
+      //   .then(snapshot => {
+      //     let eventUsersArray = []
+      //     snapshot.forEach(doc => {
+      //       let user = doc.data()
+      //       eventUsersArray.push(user)
+      //     })
       .onSnapshot(querySnapshot => {
         let eventUsersArray = []
         querySnapshot.forEach(doc => {
@@ -3197,6 +3216,9 @@ const store = new Vuex.Store({
       } else {
         state.myRecaps = []
       }
+    },
+    setCheckInMaster(state, val) {
+      state.checkInMaster = val
     },
   },
 })

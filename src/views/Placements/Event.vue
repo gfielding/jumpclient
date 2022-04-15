@@ -607,14 +607,29 @@ f<template>
                       </button>
                     </span>
                     <span v-else-if="props.column.field == 'delete'">
-                      <button v-if="props.row.status == 'placed'" class="icon" v-tooltip="'remove'" @click="removePlacement(props.row)">
-                        <i class="fas fa-times ml-2 mr-2"></i>
+
+                      <button class="icon mr-2 ml-2" v-if="!props.row.showTrash || props.row.status != 'assigned'" v-tooltip="'delete instance'" @click="showTrash(props)">
+                        <i class="fas fa-times"></i>
                       </button>
+
+                      <button class="icon mr-2 ml-2" v-if="props.row.showTrash" v-tooltip="'cancel'" @click="hideTrash(props)">
+                        <i class="fas fa-times"></i>
+                      </button>
+
+                      <button class="icon mr-2 ml-2" v-if="props.row.showTrash" v-tooltip="'delete instance'" @click="removePlacement(props.row)">
+                        <i class="fas fa-trash"></i>
+                      </button>
+                    </span>
+
+                  <!--   <span v-else-if="props.column.field == 'delete'">
+                      <button v-if="props.row.status == 'placed' || " class="icon" v-tooltip="'remove'" @click="removePlacement(props.row)">
+                        <i class="fas fa-times ml-2 mr-2"></i>
+                      </button> -->
 
                       <!-- <button v-if="props.row.status == 'assigned'" class="icon" v-tooltip="'remove'" @click="removeAssignment(props, shift)">
                         <i class="fas fa-times ml-2 mr-2"></i>
                       </button> -->
-                    </span>
+                    <!-- </span> -->
                       <span v-else-if="props.column.field == 'requestedJob.title'">
                         <span v-if="props.row.requestedJob && props.row.requestedJob.title">
                            {{props.row.requestedJob.title}}
@@ -875,11 +890,11 @@ export default {
         // },
       ],
       columns2: [
-        {
-          label: '',
-          field: 'preview',
-          sortable: false,
-        },
+        // {
+        //   label: '',
+        //   field: 'preview',
+        //   sortable: false,
+        // },
         {
           label: '',
           field: 'photoUrl',
@@ -977,7 +992,7 @@ export default {
     // if (!this.users || this.users.length < 1) {
     //   this.$store.dispatch("getUsers")
     // }
-    this.$store.dispatch("getUserAvailabilityState", this.$route.params.id)
+    // this.$store.dispatch("getUserAvailabilityState", this.$route.params.id)
     // if (this.eventInfo && this.eventInfo.days && this.eventInfo.days[0]) {
     //   this.setInitialDay(this.eventInfo.days[0])
     // } else {
@@ -1154,10 +1169,10 @@ export default {
       })
       setTimeout(() => {
         this.performingRequest = false;
-        document
-        .querySelectorAll('.ais-SearchBox-input')
-        .forEach((e) => (e.value = ''))
-        document.querySelectorAll('.ais-Hits-item').forEach((e) => e.remove())
+        // document
+        // .querySelectorAll('.ais-SearchBox-input')
+        // .forEach((e) => (e.value = ''))
+        // document.querySelectorAll('.ais-Hits-item').forEach((e) => e.remove())
       }, 250)
     },
     exportUnplaced() {
@@ -1228,6 +1243,13 @@ export default {
       ];
       const exportItems = [];
       for (var key in this.filteredPlacedUsers) {
+        let job
+        if (this.filteredPlacedUsers[key].job && this.filteredPlacedUsers[key].job.label) {
+          job = this.filteredPlacedUsers[key].job.label
+        }
+        if (!this.filteredPlacedUsers[key].job) {
+          job = this.filteredPlacedUsers[key].shiftName
+        }
         let firstName = this.filteredPlacedUsers[key].firstName
         let lastName = this.filteredPlacedUsers[key].lastName
         let phone = this.filteredPlacedUsers[key].phone
@@ -1237,7 +1259,7 @@ export default {
         let shiftName = this.filteredPlacedUsers[key].shiftName
         let start = this.filteredPlacedUsers[key].start
         let end = this.filteredPlacedUsers[key].end
-        let job = (this.filteredPlacedUsers[key].job.label || shift.position.title)
+        job
         let confirmed = this.filteredPlacedUsers[key].confirmed
         let uid = this.filteredPlacedUsers[key].userId
         fb.usersCollection.doc(uid).get()
@@ -1282,12 +1304,12 @@ export default {
       console.log(shift)
       const exportHeaders = [
         "Day",
+        "First Name",
+        "Last Name",
         "Event",
         "Position",
         "Start",
         "End",
-        "First Name",
-        "Last Name",
         "Phone",
         "Email",
         "Points",
@@ -1304,8 +1326,22 @@ export default {
 
         let confirmed = this.orderedPlacedUsers2(shift.id)[key].confirmed
 
-        let start = this.orderedPlacedUsers2(shift.id)[key].start
-        let end = this.orderedPlacedUsers2(shift.id)[key].end
+        let start
+        if (this.orderedPlacedUsers2(shift.id)[key].start) {
+          start = this.orderedPlacedUsers2(shift.id)[key].start
+        }
+        if (!this.orderedPlacedUsers2(shift.id)[key].start && shift.startTime) {
+          start = shift.startTime
+        }
+        let end
+        if (this.orderedPlacedUsers2(shift.id)[key].end) {
+          end = this.orderedPlacedUsers2(shift.id)[key].end
+        }
+        if (!this.orderedPlacedUsers2(shift.id)[key].end && shift.endTime) {
+          end = shift.endTime
+        }
+        // let start = this.orderedPlacedUsers2(shift.id)[key].start
+        // let end = this.orderedPlacedUsers2(shift.id)[key].end
 
         let job
         if (this.orderedPlacedUsers2(shift.id)[key].job && this.orderedPlacedUsers2(shift.id)[key].job.label) {
@@ -1319,12 +1355,12 @@ export default {
           console.log(doc.data())
           exportItems.push([
             day,
+            doc.data().firstName,
+            doc.data().lastName,
             shift.event,
             job,
             start,
             end,
-            doc.data().firstName,
-            doc.data().lastName,
             doc.data().phone,
             doc.data().email,
             doc.data().points,
@@ -1380,6 +1416,7 @@ export default {
       })
     },
     removePlacement(row) {
+      row.showTrash = false
       this.$store.dispatch('removeUserPlacement', row)
     },
     expand(shift) {
@@ -1577,8 +1614,9 @@ export default {
         shiftStart: shiftStarting,
         shiftEnd: shiftEnding
       })
-
-      
+      setTimeout(() => {
+        props.row.status = "assigned"
+      }, 500)
       // console.log(assignment)
       // this.$store.dispatch("lockShift", assignment)
     },
