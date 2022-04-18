@@ -9,7 +9,14 @@
             Cancelled
           </button>
         </div>
-        <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
+        <div class="flex justify-flex-end flex-wrap">
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="checkIn()">Check-In</button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="shifts()">Shifts</button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="editEvent()">Edit</button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="placements()">Placements</button>
+          <button class="btn btn__outlined btn__small mb-3" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
+        </div>
+        
       </div>
       <div class="dashboard__container--body" v-if="eventInfo">
         <div class="eventdays mb-3">
@@ -24,10 +31,11 @@
       <div class="dashboard__container--body"  v-if="!activeDay">
         <div class="text-right mb-3" style="width:100%;">
               
-          <button class="btn mr-3" v-bind:class="{ 'btn__dark': isVisible, 'btn__outlined': !isVisible }" @click="showVisible()">Visible</button>
-          <button class="btn mr-3" v-bind:class="{ 'btn__dark': isPaid, 'btn__outlined': !isPaid }" @click="showPaid()">Paid</button>
-          <button class="btn mr-3" v-bind:class="{ 'btn__dark': isHidden, 'btn__outlined': !isHidden }" @click="showHidden()">Hidden</button>
-          <button class="btn btn__outlined mr-3" @click.prevent="exportReportEmp2()">Export Payroll-Peoplease<i class="fas fa-external-link ml-3"></i></button>
+          <button class="btn btn__small mr-3" v-bind:class="{ 'btn__dark': isVisible, 'btn__outlined': !isVisible }" @click="showVisible()">Visible</button>
+          <button class="btn btn__small mr-3" v-bind:class="{ 'btn__dark': isPaid, 'btn__outlined': !isPaid }" @click="showPaid()">Paid</button>
+          <button class="btn btn__small mr-3" v-bind:class="{ 'btn__dark': isHidden, 'btn__outlined': !isHidden }" @click="showHidden()">Hidden</button>
+          <button class="btn btn__small btn__outlined mr-3 mb-3" @click.prevent="exportRegister">Payroll Register<i class="fas fa-external-link ml-3"></i></button>
+          <button class="btn btn__small btn__outlined mr-3" @click.prevent="exportReportEmp2()">Export Payroll-Peoplease<i class="fas fa-external-link ml-3"></i></button>
         </div>
         <vue-good-table
             v-if="isVisible"
@@ -838,6 +846,41 @@ export default {
       console.log(url)
       router.push(url)
     },
+    exportRegister() {
+      this.performingRequest = true
+      const exportHeaders = [
+        "First Name",
+        "Last Name",
+        "Hourly Rate",
+        "Reg Hours",
+        "Overtime",
+        "2x Overtime",
+        "Break Penalty",
+        "CC Tips"
+      ];
+      const exportItems = [];
+      for (var key in this.eventAssignments) {
+        if (!this.eventAssignments[key].hidden) {
+          exportItems.push([
+            this.eventAssignments[key].firstName,
+            this.eventAssignments[key].lastName,
+            this.eventAssignments[key].regRate,
+            this.eventAssignments[key].regHours,
+            this.eventAssignments[key].otHours,
+            this.eventAssignments[key].ot2Hours,
+            this.eventAssignments[key].mbp,
+            this.eventAssignments[key].tips
+          ]);
+        }
+      }
+      this.$gapi.getGapiClient().then(gapi => {
+        const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+        exportService.export();
+      });
+      setTimeout(() => {
+        this.performingRequest = false
+      }, 2000)
+    },
     exportReportEmp2(item) {
       this.performingRequest = true
       const exportHeaders = [
@@ -1003,6 +1046,22 @@ export default {
         // this.$store.dispatch("getShiftFromId", this.$route.params.id)
         this.performingRequest = false
       }, 2000)
+    },
+    placements() {
+      let url = `/eventplacements/` + this.event.id
+      router.push(url)
+    },
+    editEvent() {
+      let url = `/events/` + this.$route.params.id
+      router.push(url)
+    },
+    shifts() {
+      let url = `/events/` + this.$route.params.id + `/shifts`
+      router.push(url)
+    },
+    checkIn() {
+      let url = `/events/` + this.$route.params.id + `/checkin`
+      router.push(url)
     },
   },
   beforeDestroy () {

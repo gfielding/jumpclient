@@ -3,14 +3,17 @@
     <div class="dashboard__container">
       <div class="dashboard__container--header">
         <div class="flex align-center">
-          <h1>{{eventInfo.title}} Event Shifts</h1>
+          <h1 v-if="eventInfo && eventInfo.title">{{eventInfo.title}} Event Shifts</h1>
           <button class="btn btn__large btn__danger ml-5" v-if="event && event.cancelled">
             Cancelled
           </button>
         </div>
-        <span>
-        <button class="btn btn__outlined mr-3" @click="placements()">Event placements</button>
-        <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
+        <span class="flex justify-flex-end flex-wrap">
+        	<button class="btn btn__outlined btn__small mr-3 mb-3" @click="editEvent()">Edit</button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="checkIn()">Check-In</button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="sheets()">Timesheets</button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="placements()">Placements</button>
+        <button class="btn btn__outlined btn__small mb-3" @click="goBack"><i class="fas fa-arrow-left"></i></button>
         </span>
       </div>
 
@@ -391,6 +394,18 @@ export default {
       let url = `/eventplacements/` + this.$route.params.id
       router.push(url)
     },
+    sheets() {
+      let url = `/events/` + this.$route.params.id + `/timesheets`
+      router.push(url)
+    },
+    editEvent() {
+      let url = `/events/` + this.$route.params.id
+      router.push(url)
+    },
+    checkIn() {
+      let url = `/events/` + this.$route.params.id + `/checkin`
+      router.push(url)
+    },
   },
   beforeDestroy () {
   	this.performingRequest = null
@@ -401,6 +416,7 @@ export default {
     this.$store.dispatch("clearEventState")
     this.$store.dispatch("clearEventShifts")
   	this.$store.dispatch('clearErrors')
+  	console.log(this)
   }
 }
 </script>

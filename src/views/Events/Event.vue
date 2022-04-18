@@ -15,13 +15,14 @@
           </button>
         </div>
         <div class="flex align-center">
-          <button class="btn btn__outlined mr-3" @click="venueSync()">Sync Venue Details</button>
-          <router-link :to="{name: 'eventtimesheets'}">
-          <button class="btn btn__outlined mr-3" @click="sheets()">Timesheets</button>
-          </router-link>
-          <button class="btn btn__outlined mr-3" @click="shifts()">Event Shifts</button>
-          <button class="btn btn__outlined mr-3" @click="placements()">Event placements</button>
-          <button class="btn btn__flat" @click="goBack()"><i class="fas fa-arrow-left fa-2x"></i></button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="venueSync()">Sync Venue Details</button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="checkIn()">Check-In</button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="shifts()">Shifts</button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="sheets()">Timesheets</button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="placements()">Placements</button>
+
+
+          <button class="btn btn__outlined btn__small mb-3" @click="goBack()"><i class="fas fa-arrow-leftf"></i></button>
         </div>
       </div>
       <form ref="form" @submit.prevent>
@@ -319,7 +320,7 @@
             </div>
           </div>
         </div>
-        <hr>
+        <!-- <hr>
         <div class="dashboard__container--body">
           <div class="dashboard__container--body--col">
             <h2>Last Message</h2>
@@ -346,7 +347,7 @@
               </transition>
             </button>
           </div>
-        </div>
+        </div> -->
         <div class="dashboard__container--body">
           
           
@@ -600,6 +601,10 @@ export default {
       let url = `/eventplacements/` + this.$route.params.id
       router.push(url)
     },
+    checkIn() {
+      let url = `/events/` + this.$route.params.id + `/checkin`
+      router.push(url)
+    },
     deleteEvent() {
       let event = this.eventInfo
       this.$store.dispatch('deleteEvent', event.id)
@@ -706,6 +711,7 @@ export default {
   	this.$store.dispatch('clearErrors')
     this.$store.dispatch('clearTagsState')
     this.$store.dispatch('clearEventState')
+    console.log(this)
   }
 }
 </script>

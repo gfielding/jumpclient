@@ -30,13 +30,13 @@
             @input="setSelectedVenue"
             >
           </v-select>
-          <button class="btn btn__primary ml-3" @click="showCancelled = true" v-if="showCancelled == false">Show Cancelled</button>
+          <button v-tooltip="'show cancelled events'" style="padding:1rem;" class="btn btn__flat ml-3" @click="showCancelled = true" v-if="showCancelled == false"><i class="fa-solid fa-align-slash fa-2x"></i></button>
 
-          <button class="btn btn__primary ml-3" @click="showCancelled = false" v-if="showCancelled == true">Show Active</button>
+          <button v-tooltip="'show active events'" style="padding:1rem;" class="btn btn__flat ml-3" @click="showCancelled = false" v-if="showCancelled == true"><i class="fa-solid fa-align-justify fa-2x"></i></button>
 
 
           <router-link :to="{name: 'addevent'}" class="hidden-small color--text">
-            <button class="btn btn__flat ml-3"><i class="fas fa-plus fa-2x"></i></button>
+            <button v-tooltip="'add event'" style="padding:1rem;" class="btn btn__flat ml-0"><i class="fas fa-plus fa-2x"></i></button>
           </router-link>
         </span>
       </div>
@@ -72,19 +72,23 @@
           <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}</span>
           </div>
           <div class="flex mt-2">
-            <div class="flex">
+            <div class="flex flex-wrap">
               <router-link :to="`/events/` + event.id">
-                <button class="btn btn__small btn__outlined mr-3">Edit</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3">Edit</button>
               </router-link>
               <router-link :to="`/events/` + event.id + `/timesheets`">
-                <button class="btn btn__small btn__outlined mr-3" >Timesheets</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Timesheets</button>
               </router-link>
               <router-link :to="`/events/` + event.id + `/shifts`">
-                <button class="btn btn__small btn__outlined mr-3" >Shifts</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Shifts</button>
               </router-link>
               <router-link :to="`/eventplacements/` + event.id">
-                <button class="btn btn__small btn__outlined mr-3" >Placements</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Placements</button>
               </router-link>
+              <router-link :to="`/events/` + event.id + `/checkin`">
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Check-In</button>
+              </router-link>
+
             </div>
             <div class="flex">
               <!-- <button class="btn btn__small btn__flat" style="color:blue !important;" v-for="tag in event.tags" :key="tag.id">
@@ -130,18 +134,21 @@
           <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}</span>
           </div>
           <div class="flex mt-2">
-            <div class="flex">
+            <div class="flex flex-wrap">
               <router-link :to="`/events/` + event.id">
-                <button class="btn btn__small btn__outlined mr-3">Edit</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3">Edit</button>
               </router-link>
               <router-link :to="`/events/` + event.id + `/timesheets`">
-                <button class="btn btn__small btn__outlined mr-3" >Timesheets</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Timesheets</button>
               </router-link>
               <router-link :to="`/events/` + event.id + `/shifts`">
-                <button class="btn btn__small btn__outlined mr-3" >Shifts</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Shifts</button>
               </router-link>
               <router-link :to="`/eventplacements/` + event.id">
-                <button class="btn btn__small btn__outlined mr-3" >Placements</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Placements</button>
+              </router-link>
+              <router-link :to="`/events/` + event.id + `/checkin`">
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Check-In</button>
               </router-link>
             </div>
             <div class="flex">
@@ -187,18 +194,21 @@
           <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}</span>
           </div>
           <div class="flex mt-2">
-            <div class="flex">
+            <div class="flex flex-wrap">
               <router-link :to="`/events/` + event.id">
-                <button class="btn btn__small btn__outlined mr-3">Edit</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3">Edit</button>
               </router-link>
               <router-link :to="`/events/` + event.id + `/timesheets`">
-                <button class="btn btn__small btn__outlined mr-3" >Timesheets</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Timesheets</button>
               </router-link>
               <router-link :to="`/events/` + event.id + `/shifts`">
-                <button class="btn btn__small btn__outlined mr-3" >Shifts</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Shifts</button>
               </router-link>
               <router-link :to="`/eventplacements/` + event.id">
-                <button class="btn btn__small btn__outlined mr-3" >Placements</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Placements</button>
+              </router-link>
+              <router-link :to="`/events/` + event.id + `/checkin`">
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Check-In</button>
               </router-link>
             </div>
             <div class="flex">
@@ -255,18 +265,21 @@
           <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}</span>
             </div>
           <div class="flex mt-2">
-            <div class="flex">
+            <div class="flex flex-wrap">
               <router-link :to="`/events/` + event.id">
-                <button class="btn btn__small btn__outlined mr-3">Edit</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3">Edit</button>
               </router-link>
               <router-link :to="`/events/` + event.id + `/timesheets`">
-                <button class="btn btn__small btn__outlined mr-3" >Timesheets</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Timesheets</button>
               </router-link>
               <router-link :to="`/events/` + event.id + `/shifts`">
-                <button class="btn btn__small btn__outlined mr-3" >Shifts</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Shifts</button>
               </router-link>
               <router-link :to="`/eventplacements/` + event.id">
-                <button class="btn btn__small btn__outlined mr-3" >Placements</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Placements</button>
+              </router-link>
+              <router-link :to="`/events/` + event.id + `/checkin`">
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Check-In</button>
               </router-link>
             </div>
             <div class="flex">
@@ -313,18 +326,21 @@
           <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}</span>
           </div>
           <div class="flex mt-2">
-            <div class="flex">
+            <div class="flex flex-wrap">
               <router-link :to="`/events/` + event.id">
-                <button class="btn btn__small btn__outlined mr-3">Edit</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3">Edit</button>
               </router-link>
               <router-link :to="`/events/` + event.id + `/timesheets`">
-                <button class="btn btn__small btn__outlined mr-3" >Timesheets</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Timesheets</button>
               </router-link>
               <router-link :to="`/events/` + event.id + `/shifts`">
-                <button class="btn btn__small btn__outlined mr-3" >Shifts</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Shifts</button>
               </router-link>
               <router-link :to="`/eventplacements/` + event.id">
-                <button class="btn btn__small btn__outlined mr-3" >Placements</button>
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Placements</button>
+              </router-link>
+              <router-link :to="`/events/` + event.id + `/checkin`">
+                <button class="btn btn__small btn__outlined mr-3 mb-3" >Check-In</button>
               </router-link>
             </div>
             <div class="flex">
@@ -668,7 +684,7 @@ export default {
     //   }, 2000)
     // },
   },
-  beforeDestroy () {
+  destroyed () {
     this.performingRequest = false
     this.searchText = false
     this.results = null

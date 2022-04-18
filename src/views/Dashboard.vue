@@ -6,10 +6,13 @@
       </div>
       <div class="dashboard__container--body pt-3" v-if="userProfile">
         <!-- <div class="dashboard__container--body--col">
-          <Recap />
+          <h3>Check-In/Check-Out</h3>
+          {{checkInMaster}}
         </div> -->
         <!-- <button @click="updateSocials()">Update Socials</button> -->
         <!-- <button @click="updateAllEvents()">Update All Events</button> -->
+
+       <!--  <button @click="updateAllApplications()">Update All Applications</button> -->
 
 
         <!-- <div class="dashboard__container--body--col">
@@ -49,8 +52,11 @@ export default {
   data: () => ({
     newUser: {}
   }),
+  created () {
+    this.$store.dispatch("getCode")
+  },
   computed: {
-    ...mapState(['userProfile']),
+    ...mapState(['userProfile', 'checkInMaster']),
   },
   components: {
     Loader,
@@ -81,6 +87,10 @@ export default {
     updateAllEvents() {
       console.log('updating')
       this.$store.dispatch("updateAllEvents")
+    },
+    updateAllApplications() {
+      console.log('updating')
+      this.$store.dispatch("updateAllApplications")
     }
   },
   // created () {
