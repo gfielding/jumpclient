@@ -1,37 +1,32 @@
 <template>
-	<div class="dashboard">
+  <div class="dashboard">
     <div class="dashboard__container">
       <div class="dashboard__container--header mb-3" v-if="event">
-        <div class="mb-3">
+        <div>
           <div class="flex align-center">
-          <h1 v-if="event">{{event.title}} Staff Placements</h1>
-          <button class="btn btn__large btn__danger ml-5" v-if="event && event.cancelled">
-            Cancelled
-          </button>
+          <h1 v-if="event">{{event.title}} Check-In-Out</h1>
         </div>
           <!-- <h2 v-if="event &&event.title">Staff Placements for {{event.title}}</h2> -->
           <span v-if="event && event.venue && event.venue.title">
           <p>{{event.venue.title}}<span v-if="event.venue && event.venue.address"> | {{event.venue.address.city}}, {{event.venue.address.state}}</span> | {{event.startDate | moment("ddd, MMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("ddd, MMM Do YYYY") }}</span></p>
         </span> 
         </div>
-        <span class="flex flex-wrap justify-flex-end">
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="exportAll()">export all</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="exportPlaced()">export placed</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="checkIn()">Check-In</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="shifts()">Shifts</button>
+        <span class="flex justify-flex-end flex-wrap">
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="editEvent()">Edit</button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="shifts()">Shifts</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="sheets()">Timesheets</button>
-          <button class="btn btn__outlined btn__small mb-3" @click="goBack"><i class="fas fa-arrow-left"></i></button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="placements()">Placements</button>
+          <!-- <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button> -->
         </span>
       </div>
       <div class="dashboard__container--body mb-3" v-if="event && event.days && event.days.length > 1">
         <div>
-          <button v-for="(day, index) in event.days" :key="index" class="btn btn__small mr-3 mb-3" v-bind:class="{ 'btn__dark': activeDay == day, 'btn__outlined': activeDay != day }" @click="setActiveDay(day)">{{day}}</button>
+          <button v-for="(day, index) in event.days" :key="index" class="btn mr-3" v-bind:class="{ 'btn__dark': activeDay == day, 'btn__outlined': activeDay != day }" @click="setActiveDay(day)">{{day}}</button>
         </div>
       </div>
       
       <div class="dashboard__container--body">
-        <div class="dashboard__container--body--col" style="width:100%;">
+        <div class="dashboard__container--body--col hidden-small" style="width:100%;">
           <Loader v-if="!eventUsers || eventUsers.length < 1" />
           <div class="flex justify-space-between align-center">
             <ais-instant-search :search-client="searchClient" index-name="a_users" >
@@ -53,16 +48,10 @@
                 </template>
               </ais-state-results>
             </ais-instant-search>
-
-            <button class="btn btn__outlined mb-2 mt-3" @click="exportUnplaced()">export unplaced</button>
           </div>
           <vue-good-table
               :columns="columns"
               :rows="filteredUsers"
-              :search-options="{
-                enabled: true,
-                placeholder: 'Search this table',
-              }"
               :pagination-options="{
                 enabled: true,
                 mode: 'records',
@@ -73,7 +62,7 @@
 
               <!-- <span v-if="props.column.field == 'preview'">
                 <i class="far fa-search ml-2 mr-2" @click="showModal(props.row)"></i>
-                <UserModal v-if="modalValue == props.row" @close="closeModal" :staff="modalValue" />
+                <CheckInModal v-if="modalValue == props.row" @close="closeModal" :staff="modalValue" />
               </span> -->
               <span v-if="props.column.field == 'photoUrl'">
                 <span v-if="props.row.photoUrl">
@@ -252,15 +241,16 @@
               </span>
 
               <span v-else-if="props.column.field == 'fullName'">
-                <router-link :to="'/users/' + props.row.userId" class="darkLink">
+                {{props.row.fullName}}
+                <!-- <router-link :to="'/users/' + props.row.userId" class="darkLink">
                   {{props.row.fullName}}
-                </router-link>
-                <div class="flex justify-flex-start mt-1">
+                </router-link> -->
+                <!-- <div class="flex justify-flex-start mt-1">
                   <star-rating :read-only="true" :star-size="12" v-if="props.row && props.row.rating" v-model="props.row.rating" class="caption"></star-rating>
                   <span v-if="props.row && props.row.points" class="caption flex align-center ml-2">
                     | {{props.row.points}} Points
                   </span>
-                </div>
+                </div> -->
               </span>
 
               <span v-else-if="props.column.field == 'day'">
@@ -305,7 +295,7 @@
               </span>
               <div>
                 
-                <button class="btn btn__outlined mb-2 mr-5" @click="exportStaff(shift)">export</button>
+<!--                 <button class="btn btn__outlined mb-2 mr-5" @click="exportStaff(shift)">export</button> -->
                 <button class="btn btn__icon" @click="expand(shift)" v-if="shift.collapse"><i class="fas fa-chevron-up"></i></button>
                 <button class="btn btn__icon" @click="collapse(shift)" v-if="!shift.collapse"><i class="fas fa-chevron-down"></i></button>
               </div>
@@ -321,7 +311,7 @@
 
                   <button class="btn btn__flat chip mt-1">{{orderedPlacedUsers(shift).length}} / {{shift.staff}}</button>
 
-                  <button class="btn btn__flat chip mt-1 ml-2" style="color:green; border-color:green;">{{confirmedPlacedUsers(shift).length}}</button>
+                  <button class="btn btn__flat chip mt-1 ml-2" style="color:green; border-color:green;">{{checkedInUsers(shift).length}}</button>
                 </div>
                 <div>
                   <span class="caption" v-if="shift.details">Details from Client: {{shift.details}}</span>
@@ -340,7 +330,7 @@
                   </button>
                 </div> -->
               </div>
-
+<!-- 
                 <div class="pt-3" v-if="orderedUsers.length >= 1" style="width:50%; min-width: 30rem;">
                   <v-select
                     label="fullName" 
@@ -353,26 +343,23 @@
                       <span>{{ fullName }}<span v-if="requestedJob"> | {{requestedJob.title}}</span></span>
                     </template>
                   </v-select>
-                </div>
+                </div> -->
                 <div class="pt-3">
                   <vue-good-table
                     :columns="columns2"
                     :id="shift.id"
                     :ref="shift.id"
                     :rows="orderedPlacedUsers(shift)"
-                     :select-options="{
-                      enabled: true,
-                      selectOnCheckboxOnly: true,
-                    }"
                     >
-                    <div slot="selected-row-actions">
+                    <!-- <div slot="selected-row-actions">
                       <button class="btn btn__small btn__flat" @click="lockAll(shift)">Lock All <i class="fas fa-lock-alt"></i></button>
-                    </div>
+                    </div> -->
                     <template slot="table-row" slot-scope="props">
-                      <!-- <span v-if="props.column.field == 'preview'">
-                <i class="far fa-search ml-2 mr-2" @click="showModal(props.row)"></i>
-                <UserModal v-if="modalValue == props.row" @close="closeModal" :staff="modalValue" />
-              </span> -->
+                      <span v-if="props.column.field == 'preview'">
+                        <button class="btn btn__accent btn__small ma-2" @click="showModal(props.row)">Check-In-Out</button>
+                      
+                        <CheckInModal v-if="modalValue == props.row" @checkUserIn="checkin(props.row)" @checkUserOut="checkout(props.row)" @close="closeModal" :row="props.row" />
+                      </span>
  
 
                       <span v-if="props.column.field == 'photoUrl'">
@@ -520,11 +507,11 @@
                       </span>
 
                       <span v-if="props.column.field == 'assigned'">
-                        <span v-if="props.row.status == 'assigned'">
+                       <!--  <span v-if="props.row.status == 'assigned'">
                           <span v-if="props.row.job && props.row.job.label">{{props.row.job.label}}</span>
                           <span v-if="props.row.job && !props.row.job.label">{{props.row.job && props.row.job.title}}</span>
                         </span>
-                        <span v-if="props.row.status != 'assigned'">
+                        <span v-if="props.row.status != 'assigned'"> -->
                           <v-select
                             label="title" 
                             :options="event.venue.job || venueInfo.job"
@@ -532,7 +519,7 @@
                             @input="updateAssignment(props.row)"
                             >
                           </v-select>
-                        </span>
+                        <!-- </span> -->
                         
                       </span>
 
@@ -599,10 +586,22 @@
                       </button>
                     </span>
 
+                    <span v-else-if="props.column.field == 'checkin'">
+                      <span v-if="!props.row.editCheckIn && props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp)}}</span>
+                      <input type="time" v-if="props.row.editCheckIn" v-model="newTime" @change="updateCheckIn(props.row)">
+                      <button v-if="!props.row.editCheckIn && props.row.checkInTimeStamp" @click="showCheckInEdit(props.row)">Edit</button>
+                      <button v-if="props.row.editCheckIn" @click="hideCheckInEdit(props.row)">Cancel</button>
+                    
+                    </span>
+
+                    <span v-else-if="props.column.field == 'checkout'">
+<!--                       <button class="btn btn__primary btn__small" @click="checkout(props.row)">Check Out</button> -->
+<!-- <input type="time" :value="props.row.checkOutTimeStamp" @change="checkout(props.row)"/> -->
+                      <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
+                    </span>
+
                     <span v-else-if="props.column.field == 'fullName'">
-                      <router-link :to="'/users/' + props.row.userId">
-                        {{props.row.fullName}}
-                      </router-link>
+                      {{props.row.fullName}}
                     </span>
                     <span v-else-if="props.column.field == 'notes'">
                       <button class="icon" v-if="props.row.note" v-tooltip="props.row.note">
@@ -611,7 +610,7 @@
                     </span>
                     <span v-else-if="props.column.field == 'delete'">
 
-                      <button class="icon mr-2 ml-2" v-if="!props.row.showTrash && props.row.status != 'assigned'" v-tooltip="'delete instance'" @click="showTrash(props)">
+                      <button class="icon mr-2 ml-2" v-if="!props.row.showTrash || props.row.status != 'assigned'" v-tooltip="'delete instance'" @click="showTrash(props)">
                         <i class="fas fa-times"></i>
                       </button>
 
@@ -649,7 +648,7 @@
           </div>
         </div>
 
-        <div class="dashboard__container--body--col" style="width:100%;">
+        <div class="dashboard__container--body--col hidden-small" style="width:100%;">
           <h3>Drops</h3>
           <vue-good-table
               :columns="columnsD"
@@ -727,7 +726,7 @@ import router from '@/router'
 import StarRating from 'vue-star-rating'
 import algoliasearch from 'algoliasearch/lite';
 import ExportService from "@/services/ExportService"
-import UserModal from "@/components/UserModal.vue";
+import CheckInModal from "@/components/CheckInModal.vue";
 const fb = require('../../firebaseConfig.js')
 
 export default {
@@ -737,6 +736,7 @@ export default {
       performingRequest: false,
       performingRequest7: false,
       newActiveDay: '',
+      newTime: '',
       modalValue: null,
       searchClient: algoliasearch(
         '0T1SIY6Y1V',
@@ -766,18 +766,24 @@ export default {
           sortable: false,
         },
         {
+          label: '',
+          field: 'notes',
+          sortable: false,
+          tdClass: 'text-center',
+        },
+        {
           label: 'Phone',
           field: 'phone',
           sortable: false,
           width:'120px',
         },
 
-        {
-          label: 'Signed Up',
-          field: 'created',
-          sortable: false,
-          width:'120px',
-        },
+        // {
+        //   label: 'Signed Up',
+        //   field: 'created',
+        //   sortable: false,
+        //   width:'120px',
+        // },
         // {
         //   label: 'Start Time',
         //   field: 'start',
@@ -826,25 +832,15 @@ export default {
         //   tdClass: 'text-center',
         //   sortable: false,
         // },
-        {
-          label: '',
-          field: 'notes',
-          sortable: false,
-          tdClass: 'text-center',
-        },
-        {
-          label: '',
-          field: 'reservations',
-          tdClass: 'text-center',
-          sortable: false,
-        },
         
-        {
-          label: '',
-          field: 'delete',
-          tdClass: 'text-center',
-          sortable: false,
-        },
+        // {
+        //   label: '',
+        //   field: 'reservations',
+        //   tdClass: 'text-center',
+        //   sortable: false,
+        // },
+        
+        
       ],
       columnsD: [
         {
@@ -891,47 +887,59 @@ export default {
         //   tdClass: 'text-center',
         //   sortable: false,
         // },
+
       ],
       columns2: [
-        // {
-        //   label: '',
-        //   field: 'preview',
-        //   sortable: false,
-        // },
+        {
+          label: '',
+          field: 'preview',
+          sortable: false,
+        },
         {
           label: '',
           field: 'photoUrl',
           sortable: false,
+          tdClass: 'hidden-small',
+          thClass: 'hidden-small',
         },
         {
           label: 'Name',
           field: 'fullName',
+          sortable: false,
         },
+        // {
+        //   label: 'Phone',
+        //   field: 'phone',
+        //   sortable: false,
+        // },
+        
         {
-          label: '',
-          field: 'moreInfo',
+          label: 'Requested Job',
+          field: 'requestedJob.title',
+          tdClass: 'hidden-small',
+          thClass: 'hidden-small',
           sortable: false,
         },
         {
-          label: 'Phone',
-          field: 'phone',
+          label: 'Change Job',
+          field: 'assigned',
+          // tdClass: 'hidden-small',
+          // thClass: 'hidden-small',
           sortable: false,
         },
         {
           label: 'Start Time',
           field: 'start',
+          tdClass: 'hidden-small',
+          thClass: 'hidden-small',
+          sortable: false,
         },
         {
           label: 'End Time',
           field: 'end',
-        },
-        {
-          label: 'Requested Job',
-          field: 'requestedJob.title',
-        },
-        {
-          label: 'Assigned Job',
-          field: 'assigned',
+          tdClass: 'hidden-small',
+          thClass: 'hidden-small',
+          sortable: false,
         },
         // {
         //   label: '',
@@ -952,33 +960,39 @@ export default {
         //   tdClass: 'text-center',
         // },
         {
-          label: '',
-          field: 'reservations',
-          tdClass: 'text-center',
-          tdClass: 'text-center',
+          label: 'Check-In',
+          field: 'checkin',
           sortable: false,
-          width: '60px',
+          width: '90px',
+          sortable: false,
         },
         {
-          label: '',
-          field: 'confirmed',
-          tdClass: 'text-center',
+          label: 'Check-Out',
+          field: 'checkout',
+          sortable: false,
+          width: '90px',
           sortable: false,
         },
-        
-        {
-          label: '',
-          field: 'delete',
-          tdClass: 'text-center',
-          sortable: false,
-        },
+        // {
+        //   label: '',
+        //   field: 'reservations',
+        //   tdClass: 'text-center',
+        //   tdClass: 'text-center',
+        //   sortable: false,
+        //   width: '60px',
+        // },
+        // {
+        //   label: '',
+        //   field: 'confirmed',
+        //   tdClass: 'text-center',
+        //   sortable: false,
+        // },
       ]
     }
   },
   components: {
     Loader,
-    UserModal,
-    StarRating,
+    CheckInModal,
   },
   created () {
     this.$store.dispatch("getEventPlacementFromId", this.$route.params.id)
@@ -1010,7 +1024,7 @@ export default {
     },
 
     activeDay() {
-      if (this.eventInfo.days) {
+      if (this.eventInfo && this.eventInfo.days) {
         return this.newActiveDay ? this.newActiveDay : this.eventInfo.days[0]
       }
     },
@@ -1034,6 +1048,27 @@ export default {
     },
   },
   methods: {
+    showCheckInEdit(row) {
+      row.editCheckIn = true
+      this.$store.dispatch('updateAssignment', row)
+    },
+    hideCheckInEdit(row) {
+      row.editCheckIn = false
+      this.$store.dispatch('updateAssignment', row)
+    },
+    updateCheckIn(row) {
+      row.editCheckIn = false
+      this.$store.dispatch('checkinAssignment', row) 
+    },
+    updateCheckOut(row) {
+      this.$store.dispatch('checkoutAssignment', row) 
+    },
+    checkin(row) {
+      this.$store.dispatch('checkinAssignment', row)
+    },
+    checkout(row) {
+      this.$store.dispatch('checkoutAssignment', row)
+    },
     updateAssignment(row) {
       this.$store.dispatch('updateAssignment', row)
     },
@@ -1483,6 +1518,18 @@ export default {
         return user.shift == shift.id && user.confirmed
       });
     },
+    checkedInUsers(shift) {
+      function compare(a, b) {
+        if (a.firstName < b.firstName)
+          return -1;
+        if (a.firstName > b.firstName)
+          return 1;
+        return 0;
+      }
+      return this.filteredPlacedUsers.sort(compare).filter(user => {
+        return user.shift == shift.id && user.checkInTimeStamp
+      });
+    },
     lockAll(shift) {
       let event = this.event
       // this.$refs[shift.id][0].selectedRows[0].status = "haha"
@@ -1690,10 +1737,13 @@ export default {
     formatDate(q) {
       if(q) {
         const postedDate = new Date(q.seconds) * 1000;
-        return moment(postedDate).format('MMM Do YYYY')
+        return moment(postedDate).format('hh:mm:ss A')
       } else {
         return null
       }
+    },
+    goBack() {
+      router.go(-1)
     },
     placements() {
       let url = `/eventplacements/` + this.event.id
@@ -1711,16 +1761,12 @@ export default {
       let url = `/events/` + this.$route.params.id + `/shifts`
       router.push(url)
     },
-    checkIn() {
-      let url = `/events/` + this.$route.params.id + `/checkin`
-      router.push(url)
-    },
-    goBack() {
-      router.go(-1)
-    },
   },
-  destroyed () {
+
+
+  beforeDestroy () {
     this.$store.dispatch("clearEventUsers")
+    this.$store.dispatch("clearUsersState")
     this.$store.dispatch("clearEventState")
     this.$store.dispatch('clearVenueState')
     this.$store.dispatch("clearEventShiftsState")

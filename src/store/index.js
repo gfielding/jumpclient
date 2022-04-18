@@ -107,6 +107,7 @@ const store = new Vuex.Store({
     cancelledEvents: [],
     allPayroll: [],
     myRecaps: [],
+    staticEventUsers: [],
     checkInMaster: null
   },
   actions: {
@@ -149,7 +150,7 @@ const store = new Vuex.Store({
       dispatch('fetchUserProfile', user)
     },
     async fetchUserProfile({ commit }, user) {
-
+      console.log('fetchUserProfile')
       // fetch user profile
       const userProfile = await fb.usersCollection.doc(user.uid).get()
 
@@ -186,6 +187,7 @@ const store = new Vuex.Store({
       router.push('/')
     },
     getUserProfile({ commit, state }) {
+      console.log('getUserProfile')
       fb.usersCollection.doc(state.currentUser.uid)
       .onSnapshot(function (doc) {
         if (doc.exists) {
@@ -205,6 +207,7 @@ const store = new Vuex.Store({
     //   })
     // },
     getMyRecaps({ commit, state }) {
+      console.log('getMyRecaps')
       var eventsRef = fb.eventsCollection
       let documents = eventsRef.limit(1).get()
         .then(snapshot => {
@@ -244,6 +247,7 @@ const store = new Vuex.Store({
       )
     },
     updateUser({ commit }, payload) {
+      console.log('updateUser')
       console.log(payload)
       let user = payload
       fb.usersCollection.doc(payload.id).update(payload)
@@ -312,7 +316,8 @@ const store = new Vuex.Store({
 
     getUsersByState({ commit }, payload) {
       console.log(payload)
-      fb.usersCollection.where("address.state", "==", payload).orderBy('created', 'desc').onSnapshot(querySnapshot => {
+      fb.usersCollection.where("address.state", "==", payload).orderBy('created', 'desc')
+      .onSnapshot(querySnapshot => {
         let usersArray = []
         querySnapshot.forEach(doc => {
           let user = doc.data()
@@ -450,6 +455,7 @@ const store = new Vuex.Store({
 
     /*REFERRALS*/
     getReferrals({ commit }, payload) {
+      console.log('getReferrals')
       fb.referralsCollection.orderBy('created', 'desc').onSnapshot(querySnapshot => {
         let referralsArray = []
 
@@ -512,6 +518,7 @@ const store = new Vuex.Store({
     
     /*Groups*/
     getFollowersGroups({ commit }) {
+      console.log('getFollowersGroups')
       fb.venueFollowersCollection.orderBy('venueName', 'asc').onSnapshot(querySnapshot => {
         let groupsArray = []
         querySnapshot.forEach(doc => {
@@ -535,6 +542,7 @@ const store = new Vuex.Store({
       store.dispatch('getFollowersGroupMessages', payload)
     },
     getFollowersGroupUsers({ commit }, payload) {
+      console.log('getFollowersGroupUsers')
       fb.venueFollowersCollection.where("venue", "==", payload).onSnapshot(querySnapshot => {
         let followersArray = []
         querySnapshot.forEach(doc => {
@@ -622,6 +630,7 @@ const store = new Vuex.Store({
       })
     },
     getGroups({ commit }) {
+      console.log('getGroups')
       fb.groupsCollection.orderBy('title', 'asc').onSnapshot(querySnapshot => {
         let groupsArray = []
         querySnapshot.forEach(doc => {
@@ -856,9 +865,15 @@ const store = new Vuex.Store({
       })
     },
     getVenues({ commit }) {
-      fb.venuesCollection.orderBy('address.state', 'asc').orderBy('address.city', 'asc').onSnapshot(querySnapshot => {
+      console.log('getVenues')
+      fb.venuesCollection.orderBy('address.state', 'asc').orderBy('address.city', 'asc')
+      .get().then((querySnapshot) => {
         let venuesArray = []
-        querySnapshot.forEach(doc => {
+        querySnapshot.forEach((doc) => {
+
+      // .onSnapshot(querySnapshot => {
+      //   let venuesArray = []
+      //   querySnapshot.forEach(doc => {
           let venue = doc.data()
           venue.id = doc.id
           venuesArray.push(venue)
@@ -867,7 +882,7 @@ const store = new Vuex.Store({
       })
     },
     getVenueFromId({ commit }, payload) {
-      console.log(payload)
+      console.log('getVenueFromId')
       fb.venuesCollection.doc(payload).get()
       .then(
         doc => {
@@ -891,10 +906,27 @@ const store = new Vuex.Store({
       //   })
       // })
     },
+    getVenueFromIdPlacements({ commit }, payload) {
+      console.log('getVenueFromIdPlacements')
+      fb.venuesCollection.doc(payload).get()
+      .then(
+        doc => {
+          commit("setVenueInfo", doc.data())
+          // store.dispatch('getVenueEvents', payload)
+          // store.dispatch('getVenueFollowers', payload)
+        }
+      )
+    },
     getVenueFollowers({ commit }, payload) {
-      fb.venueFollowersCollection.where("venue", "==", payload).onSnapshot(querySnapshot => {
+      console.log('getVenueFollowers')
+      fb.venueFollowersCollection.where("venue", "==", payload)
+      .get().then((querySnapshot) => {
         let followersArray = []
-        querySnapshot.forEach(doc => {
+        querySnapshot.forEach((doc) => {
+
+      // .onSnapshot(querySnapshot => {
+      //   let followersArray = []
+      //   querySnapshot.forEach(doc => {
           let follower = doc.data()
           follower.id = doc.id
           followersArray.push(follower)
@@ -906,6 +938,7 @@ const store = new Vuex.Store({
       })
     },
     getVenueEvents({ commit }, payload) {
+      console.log('getVenueEvents')
       fb.eventsCollection.where("venueId", "==", payload).orderBy('startDate', 'desc').onSnapshot(querySnapshot => {
         console.log(payload)
         let eventsArray = []
@@ -939,9 +972,15 @@ const store = new Vuex.Store({
 
     /*USERS*/
     getUsers({ commit }) {
-      fb.usersCollection.onSnapshot(querySnapshot => {
-        let usersArray = []
-        querySnapshot.forEach(doc => {
+      console.log('getUsers')
+      fb.usersCollection
+      .get().then((querySnapshot) => {
+         let usersArray = []
+        querySnapshot.forEach((doc) => {
+
+      // .onSnapshot(querySnapshot => {
+      //   let usersArray = []
+      //   querySnapshot.forEach(doc => {
           let user = doc.data()
           usersArray.push(user)
         })
@@ -949,7 +988,7 @@ const store = new Vuex.Store({
       })
     },
     getUserFromId({ commit }, payload) {
-      console.log("getting")
+      console.log("getUserFromId")
       fb.usersCollection.doc(payload).get()
       .then(
         doc => {
@@ -983,7 +1022,7 @@ const store = new Vuex.Store({
       )
     },
     getAccountingNotes({ commit }, payload) {
-      console.log(payload)
+      console.log("getAccountingNotes")
       fb.accountingNotesCollection.where("event.id", "==", payload).orderBy('created', 'desc').onSnapshot(querySnapshot => {
         let accountingNotesArray = []
 
@@ -1027,7 +1066,7 @@ const store = new Vuex.Store({
       )
     },
     getContactNotes({ commit }, payload) {
-      console.log("getting notes")
+      console.log("getting contact notes")
       fb.contactNotesCollection.where("userId", "==", payload).orderBy('created', 'desc').onSnapshot(querySnapshot => {
         let userNotesArray = []
 
@@ -1105,7 +1144,7 @@ const store = new Vuex.Store({
       )
     },
     getUserReviews({ commit }, payload) {
-      console.log("getting review")
+      console.log("getting user reviews")
       fb.reviewsCollection.where("userId", "==", payload).orderBy('created', 'desc').onSnapshot(querySnapshot => {
         let reviewsArray = []
 
@@ -1153,7 +1192,13 @@ const store = new Vuex.Store({
       })
     },
     getUserEvents({ commit }, payload) {
-      fb.userDaysCollection.where("userId", "==", payload).orderBy('created', 'desc').onSnapshot(querySnapshot => {
+      console.log('getUserEvents')
+      fb.userDaysCollection.where("userId", "==", payload).orderBy('created', 'desc')
+      // .get().then((querySnapshot) => {
+      //    let eventsArray = []
+      //   querySnapshot.forEach((doc) => {
+
+      .onSnapshot(querySnapshot => {
         let eventsArray = []
         querySnapshot.forEach(doc => {
           let event = doc.data()
@@ -1176,6 +1221,7 @@ const store = new Vuex.Store({
       })
     },
     getUserAssignments({ commit }, payload) {
+      console.log('getUserAssignments')
       fb.assignmentsCollection.where("userId", "==", payload).onSnapshot(querySnapshot => {
         let assignmentsArray = []
         querySnapshot.forEach(doc => {
@@ -1200,9 +1246,16 @@ const store = new Vuex.Store({
 
     /*TAGS*/
     getTagsState({ commit }, payload) {
-      fb.tagsCollection.onSnapshot(querySnapshot => {
-        let tagsArray = []
-        querySnapshot.forEach(doc => {
+      console.log('getTagsState')
+      fb.tagsCollection
+      .get()
+        .then(snapshot => {
+          let tagsArray = []
+          snapshot.forEach(doc => {
+
+      // .onSnapshot(querySnapshot => {
+      //   let tagsArray = []
+      //   querySnapshot.forEach(doc => {
           let tag = doc.data()
           tagsArray.push(tag)
         })
@@ -1312,11 +1365,21 @@ const store = new Vuex.Store({
       })
     },
     getJobFromId({ commit }, payload) {
-      fb.jobsCollection.where("id", "==", payload).onSnapshot(querySnapshot => {
-        querySnapshot.forEach(function (doc) {
-          commit("setJobInfo", doc.data())
-        })
+      fb.jobsCollection.doc(payload)
+      .get().then(doc => {
+        commit("setJobInfo", doc.data())
       })
+
+      // .onSnapshot(querySnapshot => {
+      //   querySnapshot.forEach(function (doc) {
+      //     commit("setJobInfo", doc.data())
+      //   })
+      // })
+      // fb.jobsCollection.where("id", "==", payload).onSnapshot(querySnapshot => {
+      //   querySnapshot.forEach(function (doc) {
+      //     commit("setJobInfo", doc.data())
+      //   })
+      // })
     },
     deleteJob({ commit }, payload) {
       fb.jobsCollection.doc(payload).delete()
@@ -1588,9 +1651,14 @@ const store = new Vuex.Store({
       store.dispatch('alertFollowers', payload)
     },
     alertFollowers({ commit }, payload) {
-      console.log(payload)
-      fb.venueFollowersCollection.where("venue", "==", payload.venue.id).onSnapshot(querySnapshot => {
-        querySnapshot.forEach(doc => {
+      console.log('alertFollowers')
+      fb.venueFollowersCollection.where("venue", "==", payload.venue.id)
+      .get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+
+
+      // .onSnapshot(querySnapshot => {
+      //   querySnapshot.forEach(doc => {
           let message = {
             phone: doc.data().phone,
             name: doc.data().name,
@@ -1647,8 +1715,12 @@ const store = new Vuex.Store({
     },
     updateEventStaff({ commit }, payload) {
       console.log(payload)
-      fb.userDaysCollection.where("event", "==", payload.id).onSnapshot(querySnapshot => {
-        querySnapshot.forEach(doc => {
+      fb.userDaysCollection.where("event", "==", payload.id)
+      .get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+
+      // .onSnapshot(querySnapshot => {
+      //   querySnapshot.forEach(doc => {
           let message = {
             phone: doc.data().phone || null,
             name: doc.data().fullName,
@@ -1702,6 +1774,7 @@ const store = new Vuex.Store({
       fb.eventsCollection.doc(payload).delete()
     },
     getEventsByYear({ commit }, payload) {
+      console.log('getEventsByYear')
       console.log(payload)
       fb.eventsCollection.orderBy('startDate', 'asc').get().then((querySnapshot) => {
         let eventsArray = []
@@ -1750,6 +1823,7 @@ const store = new Vuex.Store({
       commit('setEventsByMonth', [])
     },
     get2022Events({ commit }) {
+      console.log('get2022Events')
       fb.eventsCollection.orderBy('startDate', 'asc').get().then((querySnapshot) => {
         let events2022Array = []
         querySnapshot.forEach((doc) => {
@@ -1777,6 +1851,7 @@ const store = new Vuex.Store({
       })
     },
     getEventFromId({ commit }, payload) {
+      console.log('getEventFromId')
       fb.eventsCollection.doc(payload).get()
       .then(
         doc => {
@@ -1799,7 +1874,7 @@ const store = new Vuex.Store({
     //   })
     // },
     getInfiniteEvents({ commit }) {
-      console.log('getting initial')
+      console.log('getInfiniteEvents')
       fb.eventsCollection.orderBy('startDate', 'asc').get().then((querySnapshot) => {
         var lastVisibleEventSnapShot = {};
         var firstVisibleEventSnapShot = {};
@@ -1854,10 +1929,10 @@ const store = new Vuex.Store({
       commit('setFirstVisibleEventSnapShot', items.at(+1))
       commit('setPrevInfiniteEvents', items)
     },
-    getSearchEvents({ commit }, payload) {
-      console.log('getting search')
-      fb.eventsCollection.where("published", "==", true).orderBy('startDate', 'asc').where("title")
-    },
+    // getSearchEvents({ commit }, payload) {
+    //   console.log('getting search')
+    //   fb.eventsCollection.where("published", "==", true).orderBy('startDate', 'asc').where("title")
+    // },
     getTaggedEvents({ commit }, payload) {
       console.log('getting tagged')
       fb.eventsCollection.where("published", "==", true).where("tags", "array-contains", payload).orderBy('startDate', 'asc')
@@ -1870,11 +1945,20 @@ const store = new Vuex.Store({
       })
     },
     getVenueEventsSearchResults({ commit }, payload) {
-      fb.eventsCollection.where("venueId", "==", payload).orderBy('startDate', 'asc').onSnapshot(querySnapshot => {
+      console.log('getVenueEventsSearchResults')
+      fb.eventsCollection.where("venueId", "==", payload).orderBy('startDate', 'asc')
+      .get().then((querySnapshot) => {
         let yesterday = new Date()
         yesterday.setDate(yesterday.getDate() - 1);
         let venueEventsArray = []
-        querySnapshot.forEach((doc) => {
+        querySnapshot.forEach(doc => {
+
+
+      // .onSnapshot(querySnapshot => {
+      //   let yesterday = new Date()
+      //   yesterday.setDate(yesterday.getDate() - 1);
+      //   let venueEventsArray = []
+      //   querySnapshot.forEach((doc) => {
           let startComp = new Date(doc.data().startDate)
           let endComp = new Date(doc.data().endDate)
           let event = doc.data()
@@ -1886,6 +1970,7 @@ const store = new Vuex.Store({
         commit('setVenueEventsSearchResults', venueEventsArray)
       })
     },
+
     clearVenueEventsSearchResults({ commit }) {
       commit('setVenueEventsSearchResults', [])
     },
@@ -1994,6 +2079,18 @@ const store = new Vuex.Store({
           assignmentsArray.push(assignment)
         })
         commit('setEventAssignments', assignmentsArray)
+      })
+    },
+    checkoutAssignment({ commit }, payload) {
+      console.log(payload)
+      fb.userDaysCollection.doc(payload.id).update({
+        checkOutTimeStamp: fb.firestore.FieldValue.serverTimestamp(payload.checkOutTimeStamp)
+      })
+    },
+    checkinAssignment({ commit }, payload) {
+      console.log(payload)
+      fb.userDaysCollection.doc(payload.id).update({
+        checkInTimeStamp: fb.firestore.FieldValue.serverTimestamp(payload.checkInTimeStamp)
       })
     },
     updateAssignment({ commit }, payload) {
@@ -2123,21 +2220,21 @@ const store = new Vuex.Store({
             })
           }
         )
-        fb.eventStaffCollection.add(assignment)
-        fb.userDaysCollection.where("userId", "==", assignment.userId).where("day", "==", assignment.day).get()
-        .then(function (querySnapshot) {
-            querySnapshot.forEach(function (doc) {
-              fb.userDaysCollection.doc(doc.id).update({
-              event: assignment.event,
-              slug: assignment.slug,
-              event: assignment.eventId,
-              fileId: assignment.fileId,
-              eventName: assignment.eventName,
-              status: "assigned",
-              shift: assignment.shiftId
-            })
-          })
-        })
+        // fb.eventStaffCollection.add(assignment)
+        // fb.userDaysCollection.where("userId", "==", assignment.userId).where("day", "==", assignment.day).get()
+        // .then(function (querySnapshot) {
+        //     querySnapshot.forEach(function (doc) {
+        //       fb.userDaysCollection.doc(doc.id).update({
+        //       event: assignment.event,
+        //       slug: assignment.slug,
+        //       event: assignment.eventId,
+        //       fileId: assignment.fileId,
+        //       eventName: assignment.eventName,
+        //       status: "assigned",
+        //       shift: assignment.shiftId
+        //     })
+        //   })
+        // })
       })
     },
     addEventTimesheetNote({ commit }, payload) {
@@ -2201,20 +2298,61 @@ const store = new Vuex.Store({
       })
 
     },
-    getEventPlacementFromId({ commit }, payload) {
-      console.log(payload)
-      fb.eventsCollection.where("id", "==", payload)
-      .onSnapshot(querySnapshot => {
-        querySnapshot.forEach(doc => {
+    clearEventCheckin({ commit }) {
+      commit('setStaticEventUsers', [])
+    },
+    getEventCheckin({ commit }, payload) {
+      fb.eventsCollection.doc(payload)
+        .get()
+        .then(doc => {
+      // fb.eventsCollection.where("id", "==", payload)
+      // .onSnapshot(querySnapshot => {
+      //   querySnapshot.forEach(doc => {
           commit("setEventInfo", doc.data())
           store.dispatch('getEventUsers', doc.data().id)
           store.dispatch('getEventDrops', doc.data().id)
           store.dispatch("getEventShiftsState", doc.data().id)
-          store.dispatch("getVenueFromId", doc.data().venueId)
-        })
+          store.dispatch("getVenueFromIdPlacements", doc.data().venueId)
+        // })
+      })
+    },
+    getStaticEventUsers({ commit }, payload) {
+      fb.userDaysCollection.where("preferredEvent", "==", payload).orderBy('created', 'asc')
+      .get()
+        .then(snapshot => {
+          let eventUsersArray = []
+          snapshot.forEach(doc => {
+            let user = doc.data()
+            eventUsersArray.push(user)
+          })
+      // .onSnapshot(querySnapshot => {
+      //   let eventUsersArray = []
+      //   querySnapshot.forEach(doc => {
+      //     let user = doc.data()
+      //     eventUsersArray.push(user)
+      //   })
+        commit('setStaticEventUsers', eventUsersArray)
+      })
+    },
+    getEventPlacementFromId({ commit }, payload) {
+      console.log(payload)
+      fb.eventsCollection.doc(payload)
+        .get()
+        .then(doc => {
+      //     let eventUsersArray = []
+      //     snapshot.forEach(doc => {
+      // fb.eventsCollection.where("id", "==", payload)
+      // .onSnapshot(querySnapshot => {
+      //   querySnapshot.forEach(doc => {
+          commit("setEventInfo", doc.data())
+          store.dispatch('getEventUsers', doc.data().id)
+          store.dispatch('getEventDrops', doc.data().id)
+          store.dispatch("getEventShiftsState", doc.data().id)
+          store.dispatch("getVenueFromIdPlacements", doc.data().venueId)
       })
     },
     getEventUsers({ commit }, payload) {
+      console.log('getEventUsers')
       fb.userDaysCollection.where("preferredEvent", "==", payload).orderBy('created', 'asc')
       // .get()
       //   .then(snapshot => {
@@ -2233,6 +2371,7 @@ const store = new Vuex.Store({
       })
     },
     getEventDrops({ commit }, payload) {
+      console.log('getEventDrops')
       fb.dropsCollection.where("preferredEvent", "==", payload).orderBy('created', 'asc')
       .onSnapshot(querySnapshot => {
         let eventUsersArray = []
@@ -2244,19 +2383,30 @@ const store = new Vuex.Store({
       })
     },
     getDayShiftsState({ commit }, payload) {
+      console.log('getDayShiftsState(')
       fb.shiftsCollection.where("day", "==", payload).orderBy('startTime', 'asc')
-      .onSnapshot(querySnapshot => {
-        let dayShiftsArray = []
-        querySnapshot.forEach(doc => {
-          let dayShift = doc.data()
-          dayShift.id = doc.id
-          dayShiftsArray.push(dayShift)
-        })
-        commit('setDayShifts', dayShiftsArray)
-        store.dispatch('getUserAvailabilityState', payload)
+        .get()
+        .then(snapshot => {
+          let dayShiftsArray = []
+          snapshot.forEach(doc => {
+            let dayShift = doc.data()
+            dayShiftsArray.push(dayShift)
+          })
+          commit('setDayShifts', dayShiftsArray)
+          store.dispatch('getUserAvailabilityState', payload)
+
+      // .onSnapshot(querySnapshot => {
+      //   let dayShiftsArray = []
+      //   querySnapshot.forEach(doc => {
+      //     let dayShift = doc.data()
+      //     dayShift.id = doc.id
+      //     dayShiftsArray.push(dayShift)
+      //   })
+        
       })
     },
     getEventsByDay({ commit }, payload) {
+      console.log('getEventsByDay')
       fb.eventsCollection.where("days", "array-contains", payload).orderBy('title', 'asc').onSnapshot(querySnapshot => {
         let dayEventsArray = []
         querySnapshot.forEach(doc => {
@@ -2268,6 +2418,7 @@ const store = new Vuex.Store({
       })
     },
     getEventShiftsState({ commit }, payload) {
+      console.log('getEventShiftsState')
       fb.shiftsCollection.where("eventId", "==", payload).orderBy('day', 'asc').orderBy('startTime', 'asc')
      .onSnapshot(querySnapshot => {
         let eventShiftsArray = []
@@ -2281,7 +2432,7 @@ const store = new Vuex.Store({
       })
     },
     getUserAvailabilityState({ commit }, payload) {
-      console.log(payload)
+      console.log('getUserAvailabilityState')
       fb.userDaysCollection.where("day", "==", payload)
       // .get()
       // .then((querySnapshot) => {
@@ -2314,6 +2465,7 @@ const store = new Vuex.Store({
     //   })
     // },
     getDayEventsState({ commit }, payload) {
+      console.log('getDayEventsState')
       fb.eventsCollection.where("days", "array-contains", payload).orderBy('startDate', 'desc').onSnapshot(querySnapshot => {
         let dayEventsArray = []
         querySnapshot.forEach(doc => {
@@ -2409,22 +2561,22 @@ const store = new Vuex.Store({
         //   status: "assigned",
         //   shift: assignment.shiftId
         // })
-        fb.userDaysCollection.where("userId", "==", assignment.userId).where("day", "==", assignment.day).get()
-        .then(function (querySnapshot) {
-            querySnapshot.forEach(function (doc) {
-              console.log(doc.data())
-              fb.userDaysCollection.doc(doc.id).update({
-              event: assignment.event,
-              slug: assignment.slug,
-              event: assignment.eventId,
-              fileId: assignment.fileId,
-              eventName: assignment.eventName,
-              status: "assigned",
-              shift: assignment.shiftId,
-              shiftName: assignment.shiftName
-            })
-          })
-        })
+        // fb.userDaysCollection.where("userId", "==", assignment.userId).where("day", "==", assignment.day).get()
+        // .then(function (querySnapshot) {
+        //     querySnapshot.forEach(function (doc) {
+        //       console.log(doc.data())
+        //       fb.userDaysCollection.doc(doc.id).update({
+        //       event: assignment.event,
+        //       slug: assignment.slug,
+        //       event: assignment.eventId,
+        //       fileId: assignment.fileId,
+        //       eventName: assignment.eventName,
+        //       status: "assigned",
+        //       shift: assignment.shiftId,
+        //       shiftName: assignment.shiftName
+        //     })
+        //   })
+        // })
         fb.assignmentsCollection.add(assignment)
         .then(
           doc => {
@@ -2452,7 +2604,31 @@ const store = new Vuex.Store({
       let shiftStart = payload.shiftStart
       let shiftEnd = payload.shiftEnd
       let userId = payload.row.userId
+      let ssn
       let positioned
+      let rate
+      let tipped
+
+      if (payload.row.ssn) {
+        ssn = payload.row.ssn
+      }
+      if (!payload.row.ssn) {
+        ssn = ''
+      }
+
+      if (payload.row.job && payload.row.job.rate) {
+        rate = payload.row.job.rate
+      }
+      if (!payload.row.job || !payload.row.job.rate) {
+        rate = ''
+      }
+
+      if (payload.row.job && payload.row.job.tipped) {
+        tipped = payload.row.job.tipped
+      }
+      if (!payload.row.job || !payload.row.job.tipped) {
+        tipped = false
+      }
 
       if (payload.row.job && payload.row.job.label) {
         positioned = payload.row.job.label
@@ -2461,6 +2637,8 @@ const store = new Vuex.Store({
       if (!payload.row.job || !payload.row.job.label) {
         positioned = payload.shift.position.title
       }
+
+
 
       let assignment = {
         shiftId: shift.id,
@@ -2473,8 +2651,10 @@ const store = new Vuex.Store({
         lastName: payload.row.lastName,
         phone: payload.row.phone,
         name:  shift.event,
-        fileId: payload.row.ssn || '123',
+        fileId: ssn,
         position: positioned,
+        regRate: rate,
+        tipped: tipped,
         start: shiftDay + " " + shiftStart,
         end: shiftDay + " " + shiftEnd,
         startTime: shiftStart,
@@ -2485,6 +2665,7 @@ const store = new Vuex.Store({
         event: event.id,
         eventName: event.title,
         slug: event.slug,
+        shiftName: payload.shift.name
       }
       console.log(assignment)
       fb.assignmentsCollection.add(assignment)
@@ -2497,60 +2678,26 @@ const store = new Vuex.Store({
           })
         }
       )
-      // fb.userDaysCollection.doc(userId).update({
-      //   event: assignment.event,
-      //   slug: assignment.slug,
-      //   event: assignment.eventId,
-      //   // fileId: assignment.fileId,
-      //   eventName: assignment.eventName,
-      //   status: "assigned",
-      //   shift: assignment.shiftId,
-      //   shiftName: assignment.shiftId
+
+      // fb.userDaysCollection.where("userId", "==", assignment.userId).where("day", "==", assignment.day[0]).get()
+      // .then(function (querySnapshot) {
+      //     querySnapshot.forEach(function (doc) {
+      //       fb.userDaysCollection.doc(doc.id).update({
+      //       event: assignment.event,
+      //       slug: assignment.slug,
+      //       event: assignment.eventId,
+      //       fileId: assignment.fileId,
+      //       eventName: assignment.eventName,
+      //       status: "assigned",
+      //       shift: assignment.shiftId,
+      //       shiftName: payload.shift.name
+      //     })
+      //   })
       // })
-      fb.userDaysCollection.where("userId", "==", assignment.userId).where("day", "==", assignment.day[0]).get()
-      .then(function (querySnapshot) {
-          querySnapshot.forEach(function (doc) {
-            fb.userDaysCollection.doc(doc.id).update({
-            event: assignment.event,
-            slug: assignment.slug,
-            event: assignment.eventId,
-            fileId: assignment.fileId,
-            eventName: assignment.eventName,
-            status: "assigned",
-            shift: assignment.shiftId,
-            shiftName: payload.shift.name
-          })
-        })
-      })
     },
-    // lockShift({ commit }, payload) {
-    //   fb.userDaysCollection.where("userId", "==", payload.userId).where("day", "==", payload.day).get()
-    //   .then(function (querySnapshot) {
-    //       querySnapshot.forEach(function (doc) {
-    //         fb.userDaysCollection.doc(doc.id).update({
-    //         event: payload.event,
-    //         slug: payload.slug,
-    //         event: payload.eventId,
-    //         fileId: payload.fileId,
-    //         eventName: payload.eventName,
-    //         status: "assigned",
-    //         shift: payload.shiftId,
-    //         shiftName: payload.shift.name
-    //       })
-    //     })
-    //   })
-    //   fb.assignmentsCollection.add(payload)
-    //   .then(
-    //     doc => {
-    //       fb.assignmentsCollection.doc(doc.id).update({
-    //         id: doc.id, 
-    //         created: fb.firestore.FieldValue.serverTimestamp()
-    //       })
-    //     }
-    //   )
-    //   fb.eventStaffCollection.add(payload)
-    // },
+    
     getUsersPerDay({ commit }) {
+      console.log('getUsersPerDay')
       fb.userDaysCollection.onSnapshot(querySnapshot => {
         let userDaysArray = []
         querySnapshot.forEach(doc => {
@@ -2575,7 +2722,6 @@ const store = new Vuex.Store({
     clearEventUsers({ commit }) {
       commit('setEventUsers', null)
       commit('setEventDrops', null)
-      commit('setEventInfo', null)
     },
     clearEventShiftsState({ commit }) {
       commit('setEventShifts', null)
@@ -2929,6 +3075,13 @@ const store = new Vuex.Store({
         state.eventUsers = val
       } else {
         state.eventUsers = []
+      }
+    },
+    setStaticEventUsers(state, val) {
+      if (val) {
+        state.staticEventUsers = val
+      } else {
+        state.staticEventUsers = []
       }
     },
     setEventDrops(state, val) {

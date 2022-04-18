@@ -232,6 +232,14 @@ const router = new VueRouter({
       },
     },
     {
+      path: '/events/:id/checkin',
+      name: 'eventcheckin',
+      component: () => import('../views/Events/EventCheckin.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
       path: '/events/:id/timesheets',
       name: 'eventtimesheets',
       component: () => import('../views/Shifts/EventShifts.vue'),
@@ -532,14 +540,14 @@ const router = new VueRouter({
 
 
     
-    {
-      path: '/eventplacements',
-      name: 'eventplacements',
-      component: () => import('../views/Placements/ByEvent.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
+    // {
+    //   path: '/eventplacements',
+    //   name: 'eventplacements',
+    //   component: () => import('../views/Placements/ByEvent.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    // },
     {
       path: '/eventplacements/:id',
       name: 'eventplacement',

@@ -29,7 +29,7 @@
         <div class="dashboard__container--body--col">
           <ProfileStatus :user="user" />
         </div>
-        <div class="dashboard__container--body--col">
+        <div class="dashboard__container--body--col" v-if="currentUser && (currentUser.email == 'greg@mvpeventstaffing.com' || 'katy@mvpeventstaffing.com' || 'tai@mvpeventstaffing.com')">
           <ProfileSSN :userProfile="user" />
         </div>
         <div class="dashboard__container--body--col">
@@ -152,7 +152,7 @@ import router from '@/router'
 export default {
   name: 'user',
   computed: {
-    ...mapState(['userInfo', 'reviews', 'userNotes', 'userProfile', 'userEvents', 'userVerifications', 'userAssignments', 'groups', 'userMessages']),
+    ...mapState(['currentUser', 'userInfo', 'reviews', 'userNotes', 'userProfile', 'userEvents', 'userVerifications', 'userAssignments', 'groups', 'userMessages']),
     user() {
       return this.userInfo
     }

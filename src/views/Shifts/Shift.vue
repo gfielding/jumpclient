@@ -6,6 +6,10 @@
           <h1>Timesheet</h1>
         </div>
         <div class="flex align-center">
+          <button class="btn btn__outlined mr-3" @click="checkIn()">Check-In</button>
+          <button class="btn btn__outlined mr-3" @click="shifts()">Shifts</button>
+          <button class="btn btn__outlined mr-3" @click="editEvent()">Edit</button>
+          <button class="btn btn__outlined mr-3" @click="placements()">Placements</button>
           <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
         </div>
       </div>
@@ -1292,6 +1296,22 @@ export default {
         // this.$store.dispatch("getShiftFromId", this.$route.params.id)
         this.performingRequest = false
       }, 2000)
+    },
+    placements() {
+      let url = `/eventplacements/` + this.event.id
+      router.push(url)
+    },
+    editEvent() {
+      let url = `/events/` + this.$route.params.id
+      router.push(url)
+    },
+    shifts() {
+      let url = `/events/` + this.$route.params.id + `/shifts`
+      router.push(url)
+    },
+    checkIn() {
+      let url = `/events/` + this.$route.params.id + `/checkin`
+      router.push(url)
     },
   },
     

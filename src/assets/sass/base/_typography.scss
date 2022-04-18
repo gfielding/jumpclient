@@ -111,7 +111,7 @@ h1 {
   line-height:1.3;
   // letter-spacing:0.05rem;
   @include respond(tv) { 
-    font-size: 2.4vw !important;
+    font-size: 2vw !important;
   }
   @include respond(desktop) { 
     font-size: 3.3rem !important;
