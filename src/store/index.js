@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 // import * as fb from '../firebaseConfig'
 const fb = require('../firebaseConfig.js')
 import router from '../router/index'
+import * as moment from 'moment'
 import firebase from 'firebase/app';
 
 Vue.use(Vuex)
@@ -108,7 +109,7 @@ const store = new Vuex.Store({
     allPayroll: [],
     myRecaps: [],
     staticEventUsers: [],
-    checkInMaster: null
+    checkInMaster: null,
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -2084,14 +2085,67 @@ const store = new Vuex.Store({
     checkoutAssignment({ commit }, payload) {
       console.log(payload)
       fb.userDaysCollection.doc(payload.id).update({
-        checkOutTimeStamp: fb.firestore.FieldValue.serverTimestamp(payload.checkOutTimeStamp)
+        checkOutTimeStamp: fb.firestore.FieldValue.serverTimestamp(payload.newTime)
       })
     },
     checkinAssignment({ commit }, payload) {
       console.log(payload)
       fb.userDaysCollection.doc(payload.id).update({
-        checkInTimeStamp: fb.firestore.FieldValue.serverTimestamp(payload.checkInTimeStamp)
+        checkInTimeStamp: fb.firestore.FieldValue.serverTimestamp(payload.newTime)
       })
+    },
+
+    formatDate(q) {
+      if(q) {
+        const postedDate = new Date(q.seconds) * 1000;
+        return moment(postedDate).format('hh:mm:ss A')
+      } else {
+        return null
+      }
+    },
+
+
+    checkinTimeAssignment({ commit }, payload) {
+      console.log(payload.id)
+      let postedDate = new Date(payload.checkInTimeStamp.seconds);
+      console.log(postedDate)
+      let split = payload.newTime.split(/:|,/)
+      console.log(split)
+
+      postedDate.setHours(split[0], split[1])
+      // let newVar = moment(postedDate).format('hh:mm:ss A')
+      console.log(postedDate)
+      // console.log(newVar)
+
+
+
+
+      let newSeconds = postedDate.getTime()
+
+      console.log(newSeconds)
+      // var myTimestamp = firebase.firestore.Timestamp.fromDate(newVar);
+      // console.log(myTimestamp)
+
+      // function toTimestamp(strDate){
+      //  var datum = Date.parse(strDate);
+      //  return datum/1000;
+      // }
+
+      // const time = payload.newTime.toDate().toLocaleTimeString()
+      // console.log(time)
+
+      // const t = firebase.firestore.Timestamp.fromDate(t);
+
+      // futureDate.setDate(payload.newTime.getDate());
+      // console.log(futureDate)
+      fb.userDaysCollection.doc(payload.id).update({
+        checkInTimeStamp: {
+          seconds: newSeconds
+        }
+      })
+    },
+    newCheckIn({ commit }, payload) {
+      console.log(payload)
     },
     updateAssignment({ commit }, payload) {
       console.log(payload)
@@ -2590,6 +2644,28 @@ const store = new Vuex.Store({
 
       })
     },
+    // getEventCheckinList({ commit }, payload) {
+    //   console.log('getUserAvailabilityState')
+    //   fb.userDaysCollection.where("day", "==", TODAY).where()
+    //   .get().then((querySnapshot) => {
+    //     let dayUsersArray = []
+    //     querySnapshot.forEach((doc) => {
+    //       let dayUser = doc.data()
+    //       dayUsersArray.push(dayUser)
+    //     })
+    //     commit('setDayUsers', dayUsersArray)
+    //   })
+    // },
+    findShiftUser({ commit }, payload) {
+      fb.userDaysCollection.where("userId", "==", payload.userId).where("shift", "==", payload.shift)
+      .get()
+      .then(doc => {
+        commit("setCheckinUser", doc.data())
+      })
+    },
+    clearShiftUser({ commit }) {
+      commit("setCheckinUser", null)
+    },
     lockAShift({ commit }, payload) {
       console.log(payload)
       let event = payload.event
@@ -2840,6 +2916,9 @@ const store = new Vuex.Store({
         state.seriesDays = []
       }
     },
+    setCheckinUser(state, val) {
+      state.checkinUser = val
+    },
     setSeriesInfo(state, val) {
       state.seriesInfo = val
     },
@@ -2899,6 +2978,9 @@ const store = new Vuex.Store({
         state.eventDays = []
       }
     },
+    // setCheckinInfo(state, val) {
+    //   state.checkinInfo = val
+    // },
     setEventInfo(state, val) {
       state.eventInfo = val
     },

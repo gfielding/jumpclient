@@ -16,7 +16,7 @@
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="shifts()">Shifts</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="sheets()">Timesheets</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="placements()">Placements</button>
-          <!-- <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button> -->
+          <button class="btn btn__outlined btn__small mb-3" @click="goBack"><i class="fas fa-arrow-left"></i></button>
         </span>
       </div>
       <div class="dashboard__container--body mb-3" v-if="event && event.days && event.days.length > 1">
@@ -587,17 +587,30 @@
                     </span>
 
                     <span v-else-if="props.column.field == 'checkin'">
-                      <span v-if="!props.row.editCheckIn && props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp)}}</span>
-                      <input type="time" v-if="props.row.editCheckIn" v-model="newTime" @change="updateCheckIn(props.row)">
+                      {{formatDate(props.row.checkInTimeStamp)}}
+                     <!--  <span v-if="!props.row.editCheckIn && props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp)}}</span>
+                      <span v-if="!props.row.editCheckIn && props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp2)}}</span> -->
+
+                        <button class="btn btn__outlined btn__small ma-2" @click="showEdit(props.row)">Edit</button>
+                      
+                        <EditTimeModal v-if="modalEditValue == props.row" @updateTime="updateInTime(props.row)" @close="closeEditModal" :row="props.row" />
+    
+
+
+                      <!-- <input type="time" v-if="props.row.editCheckIn" v-model="newTime" @change="updateCheckIn(props.row)">
                       <button v-if="!props.row.editCheckIn && props.row.checkInTimeStamp" @click="showCheckInEdit(props.row)">Edit</button>
                       <button v-if="props.row.editCheckIn" @click="hideCheckInEdit(props.row)">Cancel</button>
-                    
+                     -->
                     </span>
 
+
                     <span v-else-if="props.column.field == 'checkout'">
-<!--                       <button class="btn btn__primary btn__small" @click="checkout(props.row)">Check Out</button> -->
-<!-- <input type="time" :value="props.row.checkOutTimeStamp" @change="checkout(props.row)"/> -->
-                      <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
+                      <span v-if="!props.row.editCheckOut && props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
+
+                      <input type="time" v-if="props.row.editCheckOut" v-model="newTime" @change="updateCheckOut(props.row)">
+                      <button v-if="!props.row.editCheckOut && props.row.checkOutTimeStamp" @click="showCheckOutEdit(props.row)">Edit</button>
+                      <button v-if="props.row.editCheckOut" @click="hideCheckOutEdit(props.row)">Cancel</button>
+                    
                     </span>
 
                     <span v-else-if="props.column.field == 'fullName'">
@@ -648,61 +661,6 @@
           </div>
         </div>
 
-        <div class="dashboard__container--body--col hidden-small" style="width:100%;">
-          <h3>Drops</h3>
-          <vue-good-table
-              :columns="columnsD"
-              :rows="eventDrops"
-              :search-options="{
-                enabled: true,
-                placeholder: 'Search this table',
-              }"
-              :pagination-options="{
-                enabled: true,
-                mode: 'records',
-                perPage: 20,
-              }"
-            >
-            <template slot="table-row" slot-scope="props">
-              <span v-if="props.column.field == 'dropped'">
-                <span v-if="props.row.created">{{formatDate(props.row.created)}}</span>
-              </span>
-              <span v-else-if="props.column.field == 'notes'">
-                <button class="icon" v-if="props.row.note" v-tooltip="props.row.note">
-                  <i class="far fa-sticky-note"></i>
-                </button>
-              </span>
-              <span v-else-if="props.column.field == 'email'">
-                <a :href="`mailto:` + props.row.email" target="_blank">
-                  {{props.row.email}}
-                </a>
-              </span>
-             
-              
-            
-              <span v-else-if="props.column.field == 'day'">
-                <span v-if="(props.row.day)">
-                  {{props.row.day}}
-                </span>
-              </span>
-              
-              <span v-else-if="props.column.field == 'fullName'">
-                <router-link :to="'/users/' + props.row.userId">
-                  {{props.row.fullName}}
-                </router-link>
-              </span>
-             
-              <span v-else-if="props.column.field == 'phone'">
-                <span v-if="props.row.phone">
-                  <a :href="'sms:' + props.row.phone">{{props.row.phone}}</a>
-                </span>
-              </span>
-              <span v-else>
-                <!-- {{props.formattedRow[props.column.field]}} -->
-              </span>
-            </template>
-          </vue-good-table>
-        </div>
 
       </div>
     </div>
@@ -727,6 +685,7 @@ import StarRating from 'vue-star-rating'
 import algoliasearch from 'algoliasearch/lite';
 import ExportService from "@/services/ExportService"
 import CheckInModal from "@/components/CheckInModal.vue";
+import EditTimeModal from "@/components/EditTimeModal.vue";
 const fb = require('../../firebaseConfig.js')
 
 export default {
@@ -738,6 +697,7 @@ export default {
       newActiveDay: '',
       newTime: '',
       modalValue: null,
+      modalEditValue: null,
       searchClient: algoliasearch(
         '0T1SIY6Y1V',
         'f03dc899fbdd294d6797791724cdb402',
@@ -841,53 +801,6 @@ export default {
         // },
         
         
-      ],
-      columnsD: [
-        {
-          label: 'Name',
-          field: 'fullName',
-        },
-        {
-          label: 'Phone',
-          field: 'phone',
-        },
-        {
-          label: 'Email',
-          field: 'email',
-        },
-        {
-          label: 'Day to Work',
-          field: 'day',
-        },
-        {
-          label: 'Dropped',
-          field: 'dropped',
-          sortable: false,
-        },
-        // {
-        //   label: 'Requested Job',
-        //   field: 'requestedJob.title',
-        // },
-        {
-          label: 'Notes',
-          field: 'notes',
-          sortable: false,
-          tdClass: 'text-center',
-        },
-        // {
-        //   label: '',
-        //   field: 'reservations',
-        //   tdClass: 'text-center',
-        //   sortable: false,
-        // },
-        
-        // {
-        //   label: '',
-        //   field: 'delete',
-        //   tdClass: 'text-center',
-        //   sortable: false,
-        // },
-
       ],
       columns2: [
         {
@@ -993,6 +906,7 @@ export default {
   components: {
     Loader,
     CheckInModal,
+    EditTimeModal
   },
   created () {
     this.$store.dispatch("getEventPlacementFromId", this.$route.params.id)
@@ -1060,6 +974,18 @@ export default {
       row.editCheckIn = false
       this.$store.dispatch('checkinAssignment', row) 
     },
+
+
+    updateInTime(row) {
+      this.$store.dispatch('checkinTimeAssignment', row) 
+    },
+    updateOutTime(row) {
+      row.checkOutTimeStamp = row.newTime
+      this.$store.dispatch('checkoutAssignment', row) 
+    },
+
+
+    
     updateCheckOut(row) {
       this.$store.dispatch('checkoutAssignment', row) 
     },
@@ -1084,6 +1010,12 @@ export default {
     
     showModal(user) {
       this.modalValue = user;
+    },
+    showEdit(user) {
+      this.modalEditValue = user;
+    },
+    closeEditModal() {
+      this.modalEditValue = null;
     },
     closeModal() {
       this.modalValue = null;

@@ -1235,14 +1235,12 @@ export default {
         "Day",
         "Event",
         "Shift Name",
-        "Position",
-        "Start",
-        "End",
-        "Confirmed",
-        "Points",
-        "DOB",
-        "Shirt Size",
-        "Code",
+        // "Position",
+        // "Confirmed",
+        // "Points",
+        // "DOB",
+        // "Shirt Size",
+        // "Code",
       ];
       const exportItems = [];
       for (var key in this.filteredPlacedUsers) {
@@ -1260,13 +1258,12 @@ export default {
         let day = this.filteredPlacedUsers[key].day
         let eventName = this.filteredPlacedUsers[key].eventName
         let shiftName = this.filteredPlacedUsers[key].shiftName
-        let start = this.filteredPlacedUsers[key].start
-        let end = this.filteredPlacedUsers[key].end
         job
         let confirmed = this.filteredPlacedUsers[key].confirmed
         let uid = this.filteredPlacedUsers[key].userId
         fb.usersCollection.doc(uid).get()
         .then(doc => {
+          console.log(doc.data())
           exportItems.push([
             firstName,
             lastName,
@@ -1275,10 +1272,8 @@ export default {
             day,
             eventName,
             shiftName,
-            job,
-            start,
-            end,
-            confirmed,
+            // job,
+            // confirmed,
             // this.filteredPlacedUsers[key].firstName,
             // this.filteredPlacedUsers[key].lastName,
             // this.filteredPlacedUsers[key].phone,
@@ -1290,10 +1285,10 @@ export default {
             // this.filteredPlacedUsers[key].start,
             // this.filteredPlacedUsers[key].end,
             // this.filteredPlacedUsers[key].confirmed,
-            doc.data().points,
-            doc.data().dob,
-            doc.data().shirtsize,
-            `=REGEXEXTRACT(C2,"....$")`
+            // doc.data().points,
+            // doc.data().dob,
+            // doc.data().shirtsize,
+            // `=REGEXEXTRACT(C2,"....$")`
           ])
         })
         this.$gapi.getGapiClient().then(gapi => {
