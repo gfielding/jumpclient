@@ -587,31 +587,30 @@
                     </span>
 
                     <span v-else-if="props.column.field == 'checkin'">
-                      {{formatDate(props.row.checkInTimeStamp)}}
-                     <!--  <span v-if="!props.row.editCheckIn && props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp)}}</span>
-                      <span v-if="!props.row.editCheckIn && props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp2)}}</span> -->
-
-                        <button class="btn btn__outlined btn__small ma-2" @click="showEdit(props.row)">Edit</button>
+                      <span>{{formatDate(props.row.checkInTimeStamp)}}</span>
+                   
+                        <button class="btn btn__outlined btn__small ma-2" @click="showEditIn(props.row)">Edit</button>
                       
-                        <EditTimeModal v-if="modalEditValue == props.row" @updateTime="updateInTime(props.row)" @close="closeEditModal" :row="props.row" />
-    
+                        <EditTimeModal v-if="modalEditInValue == props.row" @updateTime="updateInTime(props.row)" @close="closeEditModal" :row="props.row" />
+                    </span>
 
-
-                      <!-- <input type="time" v-if="props.row.editCheckIn" v-model="newTime" @change="updateCheckIn(props.row)">
-                      <button v-if="!props.row.editCheckIn && props.row.checkInTimeStamp" @click="showCheckInEdit(props.row)">Edit</button>
-                      <button v-if="props.row.editCheckIn" @click="hideCheckInEdit(props.row)">Cancel</button>
-                     -->
+                    <span v-else-if="props.column.field == 'checkout'">
+                      <span>{{formatDate(props.row.checkOutTimeStamp)}}</span>
+                   
+                        <button class="btn btn__outlined btn__small ma-2" @click="showEditOut(props.row)">Edit</button>
+                      
+                        <EditTimeModal v-if="modalEditOutValue == props.row" @updateTime="updateOutTime(props.row)" @close="closeEditModal" :row="props.row" />
                     </span>
 
 
-                    <span v-else-if="props.column.field == 'checkout'">
+                    <!-- <span v-else-if="props.column.field == 'checkout'">
                       <span v-if="!props.row.editCheckOut && props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
 
                       <input type="time" v-if="props.row.editCheckOut" v-model="newTime" @change="updateCheckOut(props.row)">
                       <button v-if="!props.row.editCheckOut && props.row.checkOutTimeStamp" @click="showCheckOutEdit(props.row)">Edit</button>
                       <button v-if="props.row.editCheckOut" @click="hideCheckOutEdit(props.row)">Cancel</button>
                     
-                    </span>
+                    </span> -->
 
                     <span v-else-if="props.column.field == 'fullName'">
                       {{props.row.fullName}}
@@ -697,7 +696,8 @@ export default {
       newActiveDay: '',
       newTime: '',
       modalValue: null,
-      modalEditValue: null,
+      modalEditInValue: null,
+      modalEditOutValue: null,
       searchClient: algoliasearch(
         '0T1SIY6Y1V',
         'f03dc899fbdd294d6797791724cdb402',
@@ -970,25 +970,24 @@ export default {
       row.editCheckIn = false
       this.$store.dispatch('updateAssignment', row)
     },
-    updateCheckIn(row) {
-      row.editCheckIn = false
-      this.$store.dispatch('checkinAssignment', row) 
-    },
+    // updateCheckIn(row) {
+    //   row.editCheckIn = false
+    //   this.$store.dispatch('checkinAssignment', row) 
+    // },
 
 
     updateInTime(row) {
       this.$store.dispatch('checkinTimeAssignment', row) 
     },
     updateOutTime(row) {
-      row.checkOutTimeStamp = row.newTime
-      this.$store.dispatch('checkoutAssignment', row) 
+      this.$store.dispatch('checkoutTimeAssignment', row) 
     },
 
 
     
-    updateCheckOut(row) {
-      this.$store.dispatch('checkoutAssignment', row) 
-    },
+    // updateCheckOut(row) {
+    //   this.$store.dispatch('checkoutAssignment', row) 
+    // },
     checkin(row) {
       this.$store.dispatch('checkinAssignment', row)
     },
@@ -1011,14 +1010,19 @@ export default {
     showModal(user) {
       this.modalValue = user;
     },
-    showEdit(user) {
-      this.modalEditValue = user;
+    showEditIn(user) {
+      this.modalEditInValue = user;
+    },
+    showEditOut(user) {
+      this.modalEditOutValue = user;
     },
     closeEditModal() {
-      this.modalEditValue = null;
+      this.modalEditInValue = null;
+      this.modalEditOutValue = null;
     },
     closeModal() {
-      this.modalValue = null;
+      this.modalEditInValue = null;
+      this.modalEditOutValue = null;
     },
     beforeOpen(event) {
       console.log('Event:', event)

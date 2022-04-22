@@ -2094,50 +2094,37 @@ const store = new Vuex.Store({
         checkInTimeStamp: fb.firestore.FieldValue.serverTimestamp(payload.newTime)
       })
     },
+    checkoutTimeAssignment({ commit }, payload) {
+      var date = new Date(payload.checkOutTimeStamp.seconds*1000);
+      let postedDate = new Date(payload.checkOutTimeStamp.seconds*1000);
+      let split = payload.newTime.split(/:|,/)
+      postedDate.setHours(split[0], split[1])
+      let newSeconds = (postedDate.getTime()/1000)
 
-    formatDate(q) {
-      if(q) {
-        const postedDate = new Date(q.seconds) * 1000;
-        return moment(postedDate).format('hh:mm:ss A')
-      } else {
-        return null
-      }
+      console.log(newSeconds)
+      fb.userDaysCollection.doc(payload.id).update({
+        checkOutTimeStamp: {
+          seconds: newSeconds
+        }
+      })
     },
-
 
     checkinTimeAssignment({ commit }, payload) {
       console.log(payload.id)
-      let postedDate = new Date(payload.checkInTimeStamp.seconds);
+      console.log(payload.checkInTimeStamp.seconds*1000)
+      var date = new Date(payload.checkInTimeStamp.seconds*1000);
+      console.log(date.getTime())
+      console.log(date)
+      let postedDate = new Date(payload.checkInTimeStamp.seconds*1000);
       console.log(postedDate)
       let split = payload.newTime.split(/:|,/)
       console.log(split)
-
       postedDate.setHours(split[0], split[1])
-      // let newVar = moment(postedDate).format('hh:mm:ss A')
       console.log(postedDate)
-      // console.log(newVar)
 
-
-
-
-      let newSeconds = postedDate.getTime()
+      let newSeconds = (postedDate.getTime()/1000)
 
       console.log(newSeconds)
-      // var myTimestamp = firebase.firestore.Timestamp.fromDate(newVar);
-      // console.log(myTimestamp)
-
-      // function toTimestamp(strDate){
-      //  var datum = Date.parse(strDate);
-      //  return datum/1000;
-      // }
-
-      // const time = payload.newTime.toDate().toLocaleTimeString()
-      // console.log(time)
-
-      // const t = firebase.firestore.Timestamp.fromDate(t);
-
-      // futureDate.setDate(payload.newTime.getDate());
-      // console.log(futureDate)
       fb.userDaysCollection.doc(payload.id).update({
         checkInTimeStamp: {
           seconds: newSeconds
