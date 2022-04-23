@@ -30,8 +30,6 @@
       	<div class="dashboard__container--body mt-3" v-if="eventInfo">
       		<div class="dashboard__container--body--col">
 
-            <vue-qrcode :value="`https://mvpeventstaffing.com/events/` + event.slug" />
-
     				<div class="mb-3">
     					<label for="eventName">Event Name:</label>
     					<input type="text" v-model.trim="event.title" id="eventName" required />
