@@ -37,7 +37,7 @@
         </span>
         <span v-if="props.column.field == 'title'">
           <span>{{props.row.title}} 
-            <router-link :to="`/accounting/events/` + props.row.id">
+            <router-link :to="`/accounting/events/` + props.row.id" target="_blank">
               <i class="fas fa-external-link ml-3"></i>
             </router-link>
           </span>

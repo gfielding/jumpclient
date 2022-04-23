@@ -7,13 +7,19 @@
         <h1>{{venue.title}}</h1>
         </div>
         <span class="flex align-center">
+          <router-link :to="`/venues/` + venueInfo.id + `/qr`">
+            <button class="btn btn__outlined mr-3">Get QR Code</button>
+          </router-link>
           <button class="btn btn__outlined" @click="exportFollowers()">Followers: <span class="caption" v-if="venueFollowers">{{venueFollowers.length}}</span></button>
           <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
         </span>
       </div>
       <form ref="form" @submit.prevent>
       	<div class="dashboard__container--body" v-if="venue">
+
+
       		<div class="dashboard__container--body--col">
+
     				<!-- <div class="mb-3">
     					<label>
 				        <gmap-autocomplete

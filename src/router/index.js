@@ -47,8 +47,16 @@ const router = new VueRouter({
     },
     {
       path: '/venues/:id',
-      name: 'venue',
+      name: 'venueQR',
       component: () => import('../views/Venues/Venue.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/venues/:id/qr',
+      name: 'venue',
+      component: () => import('../views/Venues/qrCode.vue'),
       meta: {
         requiresAuth: true
       },
