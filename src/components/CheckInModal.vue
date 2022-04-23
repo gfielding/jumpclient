@@ -121,10 +121,18 @@ export default {
     },
     close() {
       this.$emit("close");
-    }
+    },
+    formatDate(q) {
+      if(q) {
+        const postedDate = new Date(q.seconds) * 1000;
+        return moment(postedDate).format('hh:mm:ss A')
+      } else {
+        return null
+      }
   },
   // beforeDestroy() {
   //   this.$store.dispatch('clearUserState')
   // }
-};
+  }
+}
 </script>
