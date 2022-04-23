@@ -587,17 +587,17 @@
                     </span>
 
                     <span v-else-if="props.column.field == 'checkin'">
-                      <span>{{formatDate(props.row.checkInTimeStamp)}}</span>
+                      <span v-if="props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp)}}</span>
                    
-                        <button class="btn btn__outlined btn__small ma-2" @click="showEditIn(props.row)">Edit</button>
+                        <button v-if="props.row.checkInTimeStamp" class="btn btn__outlined btn__small ma-2" @click="showEditIn(props.row)">Edit</button>
                       
                         <EditTimeModal v-if="modalEditInValue == props.row" @updateTime="updateInTime(props.row)" @close="closeEditModal" :row="props.row" />
                     </span>
 
                     <span v-else-if="props.column.field == 'checkout'">
-                      <span>{{formatDate(props.row.checkOutTimeStamp)}}</span>
+                      <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
                    
-                        <button class="btn btn__outlined btn__small ma-2" @click="showEditOut(props.row)">Edit</button>
+                        <button v-if="props.row.checkOutTimeStamp" class="btn btn__outlined btn__small ma-2" @click="showEditOut(props.row)">Edit</button>
                       
                         <EditTimeModal v-if="modalEditOutValue == props.row" @updateTime="updateOutTime(props.row)" @close="closeEditModal" :row="props.row" />
                     </span>

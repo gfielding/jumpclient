@@ -19,14 +19,33 @@ import VueClipboard from 'vue-clipboard2'
 import 'vue-good-table/dist/vue-good-table.css'
 import InstantSearch from 'vue-instantsearch';
 import VueCryptojs from 'vue-cryptojs'
+import VueHtmlToPaper from 'vue-html-to-paper';
+import VueQr from 'vue-qr'
 import 'instantsearch.css/themes/satellite-min.css';
 import './assets/sass/main.scss'
 const fb = require('./firebaseConfig.js')
 
+const options = {
+  name: '_blank',
+  specs: [
+    'fullscreen=yes',
+    'titlebar=yes',
+    'scrollbars=yes'
+  ],
+  styles: [
+    'https://firebasestorage.googleapis.com/v0/b/mvpes-25aef.appspot.com/o/PrintCss%2Fprint.css?alt=media&token=1a9b8c56-cef9-4842-ade6-1b44c9856497'
+  ],
+  timeout: 1000, // default timeout before the print window appears
+  autoClose: true, // if false, the window will not close after printing
+  windowTitle: "MVP Event Staffin Checkin-Checkout", // override the window title
+}
+
+Vue.use(VueHtmlToPaper, options);
 Vue.component('v-select', vSelect)
 Vue.use(VueGoodTablePlugin)
 Vue.use(InstantSearch)
 Vue.use(Croppa)
+Vue.use(VueQr)
 Vue.use(VueMask)
 Vue.use(VueCryptojs)
 Vue.use(StarRating)

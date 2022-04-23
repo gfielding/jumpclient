@@ -1777,7 +1777,7 @@ const store = new Vuex.Store({
     getEventsByYear({ commit }, payload) {
       console.log('getEventsByYear')
       console.log(payload)
-      fb.eventsCollection.orderBy('startDate', 'asc').get().then((querySnapshot) => {
+      fb.eventsCollection.where("published", "==", true).orderBy('startDate', 'asc').get().then((querySnapshot) => {
         let eventsArray = []
         querySnapshot.forEach((doc) => {
           let event = doc.data()
