@@ -42,7 +42,7 @@
       </div>
 
 
-      <div class="dashboard__container--bodys eventCardContainer">
+      <div class="dashboard__container--body eventCardContainer">
         <Loader v-if="performingRequest" />
         <Loader v-if="(!infiniteEvents || infiniteEvents.length < 1)" />
 

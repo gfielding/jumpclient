@@ -16,7 +16,7 @@
      <!--  <keep-alive  max="3" :include="['eventsHome', 'eventsByMonth']">
         
       </keep-alive> -->
-      <keep-alive  max="4" :include="['events']">
+      <keep-alive  max="4" :include="['events', 'venues']">
         <router-view :key="$route.fullPath"></router-view> 
       </keep-alive>
      <!--  <router-view :key="$route.fullPath"></router-view>  -->

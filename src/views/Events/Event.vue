@@ -22,7 +22,7 @@
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="placements()">Placements</button>
 
 
-          <button class="btn btn__outlined btn__small mb-3" @click="goBack()"><i class="fas fa-arrow-leftf"></i></button>
+          <button class="btn btn__outlined btn__small mb-3" @click="goBack()"><i class="fas fa-arrow-left"></i></button>
         </div>
       </div>
       <form ref="form" @submit.prevent>
