@@ -23,6 +23,7 @@ const store = new Vuex.Store({
     emailVerified: '',
     errorMessage: '',
     venues: [],
+    hiddenVenues: [],
     venueInfo: {},
     venueEvents: [],
     venueFollowers: [],
@@ -867,19 +868,20 @@ const store = new Vuex.Store({
     },
     getVenues({ commit }) {
       console.log('getVenues')
-      fb.venuesCollection.orderBy('address.state', 'asc').orderBy('address.city', 'asc')
+      fb.venuesCollection.orderBy('title', 'asc')
       .get().then((querySnapshot) => {
         let venuesArray = []
+        let venuesHiddenArray = []
         querySnapshot.forEach((doc) => {
-
-      // .onSnapshot(querySnapshot => {
-      //   let venuesArray = []
-      //   querySnapshot.forEach(doc => {
           let venue = doc.data()
-          venue.id = doc.id
-          venuesArray.push(venue)
+          if (doc.data().visible) {
+            venuesArray.push(venue)
+          } else {
+            venuesHiddenArray.push(venue)
+          }
         })
         commit('setVenues', venuesArray)
+        commit('setHiddenVenues', venuesHiddenArray)
       })
     },
     getVenueFromId({ commit }, payload) {
@@ -965,6 +967,7 @@ const store = new Vuex.Store({
     },
     clearVenuesState({ commit }) {
       commit('setVenues', [])
+      commit('setHiddenVenues', [])
     },
 
 
@@ -2683,7 +2686,7 @@ const store = new Vuex.Store({
         rate = payload.row.job.rate
       }
       if (!payload.row.job || !payload.row.job.rate) {
-        rate = ''
+        rate = payload.shift.position.rate
       }
 
       if (payload.row.job && payload.row.job.tipped) {
@@ -2693,11 +2696,11 @@ const store = new Vuex.Store({
         tipped = false
       }
 
-      if (payload.row.job && payload.row.job.label) {
-        positioned = payload.row.job.label
+      if (payload.row.job && payload.row.job.title) {
+        positioned = payload.row.job.title
       }
 
-      if (!payload.row.job || !payload.row.job.label) {
+      if (!payload.row.job || !payload.row.job.title) {
         positioned = payload.shift.position.title
       }
 
@@ -2870,6 +2873,13 @@ const store = new Vuex.Store({
         state.venues = val
       } else {
         state.venues = []
+      }
+    },
+    setHiddenVenues(state, val) {
+      if (val) {
+        state.hiddenVenues = val
+      } else {
+        state.hiddenVenues = []
       }
     },
     setVenueInfo(state, val) {

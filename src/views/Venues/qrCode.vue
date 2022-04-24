@@ -3,11 +3,12 @@
 		<div id="printMe" class="pa-5">
 			<h1>MVP Check-In / Check-Out</h1>
 			<h2 v-if="venueInfo">{{venueInfo.title}}</h2>
-			<vue-qr :text="`https://mvpeventstaffing.com/venues/` + venueInfo.id" :size="300" style="margin:auto;"></vue-qr>
+			<vue-qr :text="`https://mvpeventstaffing.com/checkinout/` + venueInfo.id" :size="300" style="margin:auto;"></vue-qr>
 			<p>Scan this QR code and open the link to sign in and out of your shift</p>
 		</div>
 		<div>
-			<button class="btn btn__primary" @click="print()">Print</button>
+			<button class="btn ma-2 btn__primary" @click="print()">Print</button>
+			<button class="btn ma-2 btn__outlined" @click="goBack">Go Back</button>
 		</div>
 	</div>
 </template>
@@ -42,6 +43,7 @@
 </style>
 <script>
 import { mapState } from 'vuex'
+import router from '@/router'
 import Loader from '@/components/Loader.vue'
 
 export default {
@@ -62,6 +64,10 @@ export default {
       // Pass the element id here
       await this.$htmlToPaper('printMe');
     }
-  }
+  },
+  goBack() {
+    this.$store.dispatch('clearVenueState')
+    router.go(-1)
+  },
 }
 </script>
