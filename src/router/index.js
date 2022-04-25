@@ -165,23 +165,31 @@ const router = new VueRouter({
  
 
 
+    // {
+    //   path: '/accounting/events', redirect: '/accounting/events/year/2022',
+    //   name: 'accountingEvents',
+    //   component: () => import('../views/Accounting/Events.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    //   children: [
+    //     {
+    //       path: '/accounting/events/year/:id',
+    //       name: 'accountingEventsTable',
+    //       component: () => import('../views/Accounting/EventsTable.vue'),
+    //       meta: {
+    //         requiresAuth: true
+    //       },
+    //     },
+    //   ]
+    // },
     {
-      path: '/accounting/events', redirect: '/accounting/events/year/2022',
+      path: '/accounting/events/',
       name: 'accountingEvents',
       component: () => import('../views/Accounting/Events.vue'),
       meta: {
         requiresAuth: true
       },
-      children: [
-        {
-          path: '/accounting/events/year/:id',
-          name: 'accountingEventsTable',
-          component: () => import('../views/Accounting/EventsTable.vue'),
-          meta: {
-            requiresAuth: true
-          },
-        },
-      ]
     },
     {
       path: '/accounting/events/:id',

@@ -111,6 +111,9 @@ const store = new Vuex.Store({
     myRecaps: [],
     staticEventUsers: [],
     checkInMaster: null,
+    eventsCancelled: [],
+    completeEvents: [],
+    partialEvents: []
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -2449,6 +2452,83 @@ const store = new Vuex.Store({
         
       })
     },
+    getInfiniteEvents({ commit }) {
+      console.log('getInfiniteEvents')
+      fb.eventsCollection.orderBy('startDate', 'asc').get().then((querySnapshot) => {
+        var lastVisibleEventSnapShot = {};
+        var firstVisibleEventSnapShot = {};
+        let yesterday = new Date()
+        yesterday.setDate(yesterday.getDate() - 1);
+        let currentEventsArray = []
+        let cancelledEventsArray = []
+        let allEventsArray = []
+        querySnapshot.forEach(doc => {
+          let startComp = new Date(doc.data().startDate)
+          let endComp = new Date(doc.data().endDate)
+          let event = doc.data()
+          if ((endComp >= yesterday || startComp >= yesterday) && (event.status != 'cancelled')) {
+            currentEventsArray.push(event)
+          }
+          if (event.status != 'cancelled') {
+            allEventsArray.push(event)
+          }
+          if (event.status == 'cancelled') {
+            cancelledEventsArray.push(event)
+          }
+        })
+        let twelve = currentEventsArray.slice(0, 12);
+        // firstVisibleEventSnapShot = currentEventsArray.slice(0, 1);
+        // lastVisibleEventSnapShot = currentEventsArray.slice(11, 12);
+        firstVisibleEventSnapShot = twelve[twelve.length - 12];
+        lastVisibleEventSnapShot = twelve[twelve.length - 1];
+        commit('setLastVisibleEventSnapShot', lastVisibleEventSnapShot)
+        commit('setFirstVisibleEventSnapShot', firstVisibleEventSnapShot)
+        commit('setAllEvents', allEventsArray)
+        commit('setCancelledEvents', cancelledEventsArray)
+        commit('setInfiniteEvents', twelve)
+      })
+    },
+
+
+    getEvents({ commit }, payload) {
+      console.log('getEvents')
+      fb.eventsCollection.where("published", "==", true).orderBy('startDate', 'asc')
+      .onSnapshot(querySnapshot => {
+        let eventsArray = []
+        let completeEventsArray = []
+        let partialEventsArray = []
+        let cancelledEventsArray = []
+        querySnapshot.forEach(doc => {
+          
+          let event = doc.data()
+          // if (event.status != 'cancelled') {
+          //   eventsArray.push(event)
+          // }
+          if (event.status != 'cancelled' && event.invoiceStatus == 'complete' && event.startDate.includes("2022")) {
+            completeEventsArray.push(event)
+          }
+          if (event.status != 'cancelled' && event.invoiceStatus == 'partial' && event.startDate.includes("2022")) {
+            partialEventsArray.push(event)
+          }
+          if (event.status != 'cancelled' && !event.invoiceStatus && event.startDate.includes("2022")) {
+            eventsArray.push(event)
+          }
+          if (event.status == 'cancelled' && event.startDate.includes("2022")) {
+            cancelledEventsArray.push(event)
+          }
+        })
+        commit('setEvents', eventsArray.slice(0, 96))
+        commit('setPartialEvents', partialEventsArray)
+        commit('setCompleteEvents', completeEventsArray)
+        commit('setEventsCancelled', cancelledEventsArray)
+      })
+    },
+    clearEvents({ commit }) {
+      commit('setEvents', [])
+      commit('setPartialEvents', [])
+      commit('setCompleteEvents', [])
+      commit('setEventsCancelled', [])
+    },
     getEventsByDay({ commit }, payload) {
       console.log('getEventsByDay')
       fb.eventsCollection.where("days", "array-contains", payload).orderBy('title', 'asc').onSnapshot(querySnapshot => {
@@ -2671,39 +2751,37 @@ const store = new Vuex.Store({
       let shiftEnd = payload.shiftEnd
       let userId = payload.row.userId
       let ssn
-      let positioned
       let rate
       let tipped
+      let positioned
 
-      if (payload.row.ssn) {
-        ssn = payload.row.ssn
-      }
-      if (!payload.row.ssn) {
+      if (row.ssn) {
+        ssn = row.ssn
+      } else {
         ssn = ''
       }
 
-      if (payload.row.job && payload.row.job.rate) {
-        rate = payload.row.job.rate
-      }
-      if (!payload.row.job || !payload.row.job.rate) {
-        rate = payload.shift.position.rate
+      if (row.job && row.job.rate) {
+        rate = row.job.rate
+      } else if ((!row.job || !row.job.rate) && (shift.position && shift.position.rate)) {
+        rate = shift.position.rate
+      } else {
+        rate = "0"
       }
 
-      if (payload.row.job && payload.row.job.tipped) {
-        tipped = payload.row.job.tipped
-      }
-      if (!payload.row.job || !payload.row.job.tipped) {
+      if (row.job && row.job.tipped) {
+        tipped = row.job.tipped
+      } else {
         tipped = false
       }
 
-      if (payload.row.job && payload.row.job.title) {
-        positioned = payload.row.job.title
+      if (row.job && row.job.title) {
+        positioned = row.job.title
+      } else if (!row.job || !row.job.title) {
+        positioned = shift.position.title
+      } else {
+        positioned = {}
       }
-
-      if (!payload.row.job || !payload.row.job.title) {
-        positioned = payload.shift.position.title
-      }
-
 
 
       let assignment = {
@@ -3451,6 +3529,27 @@ const store = new Vuex.Store({
     },
     setCheckInMaster(state, val) {
       state.checkInMaster = val
+    },
+    setEventsCancelled(state, val) {
+      if (val) {
+        state.eventsCancelled = val
+      } else {
+        state.eventsCancelled = []
+      }
+    },
+    setPartialEvents(state, val) {
+      if (val) {
+        state.partialEvents = val
+      } else {
+        state.partialEvents = []
+      }
+    },
+    setCompleteEvents(state, val) {
+      if (val) {
+        state.completeEvents = val
+      } else {
+        state.completeEvents = []
+      }
     },
   },
 })
