@@ -420,7 +420,7 @@ export default {
     this.$store.dispatch("getVenues")
   },
   computed: {
-    ...mapState(['infiniteEvents', 'cancelledEvents', 'prevInfiniteEvents', 'nextInfiniteEvents', 'lastVisibleEventSnapShot', 'firstVisibleEventSnapShot', 'allEvents', 'taggedEvents', 'venues', 'venueEventsSearchResults', 'tags']),
+    ...mapState(['infiniteEvents', 'cancelledEvents', 'prevInfiniteEvents', 'nextInfiniteEvents', 'lastVisibleEventSnapShot', 'firstVisibleEventSnapShot', 'allEvents', 'venues', 'venueEventsSearchResults', 'tags']),
     // ...mapState(['events2021', 'events2022']),
     filteredEvents() {
       if (this.searchText && this.searchText.length > 3) {
@@ -572,31 +572,6 @@ export default {
       }
       
     },
-    // onRowClick(item) {
-    //   let url = `/events/` + item.slug
-    //   console.log(url)
-    //   router.push(url)
-    // },
-    // loadMore() {
-    //   this.performingRequest = true
-    //   this.$store.dispatch("getNextInfiniteEvents")
-    //   // this.visibleEvents = this.infiniteEvents.concat(this.nextInfiniteEvents)
-    //   // this.visibleEvents.push(this.nextInfiniteEvents)
-    //   this.visibleEvents.push(...this.nextInfiniteEvents);
-    //   this.performingRequest = false
-    // },
-    // handleScroll(event) {
-    //   let bottomOfWindow = document.documentElement.scrollTop + window.innerHeight === document.documentElement.offsetHeight;
-    //   if (bottomOfWindow) {
-    //     // let next = this.visibleEvents[this.visibleEvents.length - 1]
-    //     this.performingRequest = true
-    //     this.$store.dispatch("getNextInfiniteEvents")
-    //     // this.visibleEvents = this.infiniteEvents.concat(this.nextInfiniteEvents)
-    //     // this.visibleEvents.push(this.nextInfiniteEvents)
-    //     this.visibleEvents.push(...this.nextInfiniteEvents);
-    //     this.performingRequest = false
-    //   }
-    // },
     clearTags() {
       this.activeTag = ''
       this.$store.dispatch("clearTaggedEvents")

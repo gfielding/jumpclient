@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <Loader v-if="performingRequest" />
+    <Loader v-if="performingRequest || (!eventAssignments || eventAssignments.length < 1)" />
     <div class="dashboard__container" v-if="eventInfo && eventInfo.id">
       <div class="dashboard__container--header">
         <div class="flex align-center">
@@ -34,7 +34,7 @@
           <button class="btn btn__small mr-3" v-bind:class="{ 'btn__dark': isVisible, 'btn__outlined': !isVisible }" @click="showVisible()">Visible</button>
           <button class="btn btn__small mr-3" v-bind:class="{ 'btn__dark': isPaid, 'btn__outlined': !isPaid }" @click="showPaid()">Paid</button>
           <button class="btn btn__small mr-3" v-bind:class="{ 'btn__dark': isHidden, 'btn__outlined': !isHidden }" @click="showHidden()">Hidden</button>
-          <button class="btn btn__small btn__outlined mr-3 mb-3" @click.prevent="exportRegister">Payroll Register<i class="fas fa-external-link ml-3"></i></button>
+          <button class="btn btn__small btn__outlined mr-3 mb-3" @click.prevent="exportRegister()">Payroll Register<i class="fas fa-external-link ml-3"></i></button>
           <button class="btn btn__small btn__outlined mr-3" @click.prevent="exportReportEmp2()">Export Payroll-Peoplease<i class="fas fa-external-link ml-3"></i></button>
         </div>
         <vue-good-table
@@ -50,10 +50,10 @@
           >
             <template slot="table-row" slot-scope="props">
               <span v-if="props.column.field == 'regRate'">
-                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onEditRegRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'dayRate'">
-                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onEditDayRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'firstName'">
                 <input type="text" v-model.trim="props.row.firstName" id="firstName" readonly />
@@ -79,6 +79,9 @@
               <span v-else-if="props.column.field == 'checkOutTimeStamp'">
                 <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
               </span>
+              <span v-else-if="props.column.field == 'date'">
+                <span v-if="props.row.date">{{props.row.date}}</span>
+              </span>
 
               <span v-else-if="props.column.field == 'position'">
                 <span v-if="props.row.position">{{props.row.position}}</span>
@@ -89,19 +92,19 @@
               </span>
 
               <span v-else-if="props.column.field == 'regHours'">
-                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onEditRegHours(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'otHours'">
-                <input type="number" v-model.trim="props.row.otHours" id="otHours" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.otHours" id="otHours" @change="onEditotHours(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'ot2Hours'">
-                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @change="onEditot2Hours(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'mbp'">
-                <input type="number" v-model.trim="props.row.mbp" id="mbp" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.mbp" id="mbp" @change="onEditMBP(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'tips'">
-                <input type="number" v-model.trim="props.row.tips" id="tips" @change="onSheetEditable(props.row)" :readonly="props.row.locked"  />
+                <input type="number" v-model.trim="props.row.tips" id="tips" @change="onEditTips(props.row)" :readonly="props.row.locked"  />
               </span>
               <span v-else-if="props.column.field == 'state'">
                 <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
@@ -140,15 +143,6 @@
                 <span v-if="props.row.fileId">HAS SSN</span>
               </span>
 
-
-              <span v-if="props.column.field == 'onpay'">
-                <button class="btn btn__icon" @click="opr(props.row)" v-if="!props.row.opr">
-                  <i class="fad fa-money-bill-wave ml-3 mr-3"></i>
-                </button>
-                <button class="btn btn__icon" @click="removeopr(props.row)" v-if="props.row.opr">
-                  <i class="fad fa-money-bill-wave ml-3 mr-3" style="color:#f0ad4e;"></i>
-                </button>
-              </span>
 
               <span v-else-if="props.column.field == 'delete'">
                 <button :disabled="props.row.locked" class="btn btn__primary btn__small ml-2 mr-2" @click="removeEntry(props.row)">
@@ -221,6 +215,9 @@
 
               <span v-else-if="props.column.field == 'checkOutTimeStamp'">
                 <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
+              </span>
+              <span v-else-if="props.column.field == 'date'">
+                <span v-if="props.row.date">{{props.row.date}}</span>
               </span>
 
               <span v-else-if="props.column.field == 'position'">
@@ -365,6 +362,10 @@
 
               <span v-else-if="props.column.field == 'checkOutTimeStamp'">
                 <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
+              </span>
+
+              <span v-else-if="props.column.field == 'date'">
+                <span v-if="props.row.date">{{props.row.date}}</span>
               </span>
 
               <span v-else-if="props.column.field == 'position'">
@@ -535,6 +536,10 @@ export default {
         sortable: false,
       },
       {
+        label: 'Date',
+        field: 'date',
+      },
+      {
         label: 'Confirmed',
         field: 'confirmed',
         sortable: false,
@@ -592,36 +597,36 @@ export default {
       {
         label: 'Hours',
         field: 'regHours',
-        width: '64px',
+        width: '88px',
         sortable: false,
       },
       {
         label: 'OT',
         field: 'otHours',
-        width: '64px',
+        width: '88px',
         sortable: false,
       },
       {
         label: '2OT',
         field: 'ot2Hours',
-        width: '64px',
+        width: '88px',
         sortable: false,
       },
       {
         label: 'Penalty',
         field: 'mbp',
-        width: '64px',
+        width: '88px',
         sortable: false,
       },
       {
         label: 'Tips',
         field: 'tips',
-        width: '64px',
+        width: '88px',
       },
       {
         label: 'Bonus',
         field: 'dayRate',
-        width: '64px',
+        width: '88px',
         sortable: false,
       },
       {
@@ -805,10 +810,57 @@ export default {
         hidden:false
       })
     },
-    onSheetEditable(row)  {
-      row = row
+    onEditRegRate(row) {
       row.editable = true
-      this.$store.dispatch('updateTimesheet', row)
+      fb.assignmentsCollection.doc(row.id).update({
+        regRate: row.regRate
+      })
+      row.editable = false
+    },
+    onEditRegHours(row) {
+      row.editable = true
+      fb.assignmentsCollection.doc(row.id).update({
+        regHours: row.regHours
+      })
+      row.editable = false
+    },
+    onEditotHours(row) {
+      row.editable = true
+      fb.assignmentsCollection.doc(row.id).update({
+        otHours: row.otHours
+      })
+      row.editable = false
+    },
+    onEditot2Hours(row) {
+      row.editable = true
+      fb.assignmentsCollection.doc(row.id).update({
+        ot2Hours: row.ot2Hours
+      })
+      row.editable = false
+    },
+    onEditDayRate(row) {
+      row.editable = true
+      fb.assignmentsCollection.doc(row.id).update({
+        dayRate: row.dayRate
+      })
+      row.editable = false
+    },
+    onEditMBP(row) {
+      row.editable = true
+      fb.assignmentsCollection.doc(row.id).update({
+        mbp: row.mbp
+      })
+      row.editable = false
+    },
+    onEditTips(row) {
+      row.editable = true
+      fb.assignmentsCollection.doc(row.id).update({
+        tips: row.tips
+      })
+      row.editable = false
+    },
+    onSheetEditable(row)  {
+      row.editable = true
     },
     onSheetEdit(row) {
       row = row
@@ -849,9 +901,13 @@ export default {
     exportRegister() {
       this.performingRequest = true
       const exportHeaders = [
+        "Date",
         "First Name",
         "Last Name",
+        "Position",
         "Hourly Rate",
+        "Clock-In",
+        "Clock-Out",
         "Reg Hours",
         "Overtime",
         "2x Overtime",
@@ -861,10 +917,18 @@ export default {
       const exportItems = [];
       for (var key in this.eventAssignments) {
         if (!this.eventAssignments[key].hidden) {
+
+          let inTime = this.formatDate(this.eventAssignments[key].checkInTimeStamp)
+          let outTime = this.formatDate(this.eventAssignments[key].checkOutTimeStamp)
+
           exportItems.push([
+            this.eventAssignments[key].date,
             this.eventAssignments[key].firstName,
             this.eventAssignments[key].lastName,
+            this.eventAssignments[key].position,
             this.eventAssignments[key].regRate,
+            inTime,
+            outTime,
             this.eventAssignments[key].regHours,
             this.eventAssignments[key].otHours,
             this.eventAssignments[key].ot2Hours,
@@ -1048,7 +1112,7 @@ export default {
       }, 2000)
     },
     placements() {
-      let url = `/eventplacements/` + this.event.id
+      let url = `/eventplacements/` + this.$route.params.id
       router.push(url)
     },
     editEvent() {

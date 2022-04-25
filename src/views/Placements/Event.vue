@@ -1010,7 +1010,7 @@ export default {
     },
 
     activeDay() {
-      if (this.eventInfo.days) {
+      if (this.eventInfo && this.eventInfo.days && this.eventInfo.days.length > 0) {
         return this.newActiveDay ? this.newActiveDay : this.eventInfo.days[0]
       }
     },
@@ -1538,7 +1538,7 @@ export default {
       fb.userDaysCollection.doc(props.row.id).update({status: "placed"})
       setTimeout(() => {
         props.row.status = "placed"
-      }, 2000)
+      }, 5000)
       fb.assignmentsCollection.where("shiftId", "==", shift.id).where("userId", "==", props.row.userId).get().then(function(querySnapshot) {
         querySnapshot.forEach(doc => {
           console.log(doc.id)
@@ -1614,7 +1614,7 @@ export default {
       })
       setTimeout(() => {
         props.row.status = "assigned"
-      }, 1000)
+      }, 5000)
       // console.log(assignment)
       // this.$store.dispatch("lockShift", assignment)
     },

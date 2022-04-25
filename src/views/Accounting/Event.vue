@@ -2,11 +2,11 @@
 	<div class="dashboard">
     <div class="dashboard__container">
     	<Loader v-if="!eventInfo" />
-      <div class="dashboard__container--header" v-if="event">
+      <div class="dashboard__container--header" v-if="eventInfo">
         <div class="flex align-center justify-space-between align-center" style="width:100%;">
-          <h1>{{event.title}}</h1>
+          <h1>{{eventInfo.title}}</h1>
           <span style="display: flex; align-items:center;">
-          	<button class="btn btn__large btn__success mr-3" @click="requestInvoice()" v-if="!event.invoiceRequested">
+          	<button class="btn btn__large btn__success mr-3" @click="requestInvoice()" v-if="!eventInfo.invoiceRequested">
   						Request New Invoice
   						<transition name="fade">
 			          <span class="ml-2" v-if="performingRequest4">
@@ -14,7 +14,7 @@
 			          </span>
 			        </transition>
   					</button>
-  					<button class="btn btn__large btn__danger mr-3" v-if="event.invoiceRequested">Invoice Requested</button>
+  					<button class="btn btn__large btn__danger mr-3" v-if="eventInfo.invoiceRequested">Invoice Requested</button>
   					<button class="btn btn__large btn__dark mr-3" @click="cancelRequest()">Cancel Request</button>
   					 <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
           </span>
@@ -322,7 +322,9 @@ export default {
   },
   created () {
     this.$store.dispatch("getEventFromId", this.$route.params.id);
-    this.$store.dispatch("getAccountingNotes", this.$route.params.id);
+  },
+  mounted() {
+  	this.$store.dispatch("getAccountingNotes", this.$route.params.id);
   },
   computed: {
     ...mapState(['eventInfo', 'eventShifts', 'accountingNotes']),
@@ -447,6 +449,9 @@ export default {
   	}
 	},
 	beforeDestroy () {
+		this.$store.dispatch('clearEventState')
+		this.$store.dispatch('clearAccountingNotes')
+		this.$store.dispatch("clearEventShifts")
 		this.uploadValue = null
 		this.showBar = null
 		this.timesheetsUrl = null
@@ -479,9 +484,6 @@ export default {
   	delete this.columns
   	delete this.columns2
   	delete this.columns3
-		this.$store.dispatch('clearEventState')
-		this.$store.dispatch('clearAccountingNotes')
-		this.$store.dispatch("clearEventShifts")
 	}
 }
 </script>
