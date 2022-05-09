@@ -70,6 +70,30 @@ const router = new VueRouter({
       },
     },
     {
+      path: '/markets',
+      name: 'markets',
+      component: () => import('../views/Leads/Markets.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/leads',
+      name: 'marketingLeads',
+      component: () => import('../views/Leads/Leads.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/leads/add',
+      name: 'enterNewLead',
+      component: () => import('../views/Leads/AddLead.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
       path: '/groups',
       name: 'groups',
       component: () => import('../views/Groups/Groups.vue'),

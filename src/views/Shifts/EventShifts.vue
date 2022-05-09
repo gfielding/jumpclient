@@ -822,6 +822,7 @@ export default {
       fb.assignmentsCollection.doc(row.id).update({
         regHours: row.regHours
       })
+      console.log(row)
       row.editable = false
     },
     onEditotHours(row) {

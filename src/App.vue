@@ -62,11 +62,13 @@ export default {
   // beforeMount(){
   //   this.cred()
   // },
-  // async mounted() {
-  //   if (!this.userProfile) {
-  //     this.$store.dispatch("getUserProfile");
-  //   }
-  // },
+  mounted() {
+    if (!this.userProfile) {
+      this.$store.dispatch("getUserProfile");
+    }
+    this.$store.dispatch("getInfiniteEvents")
+    this.$store.dispatch("getVenues")
+  },
   computed: {
     ...mapState(['currentUser', 'errorMessage', 'userProfile']),
     showNav() {

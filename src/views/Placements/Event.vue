@@ -328,17 +328,19 @@
                 </div>
 
 
-                <div>
-                <!-- <textarea :id="shift" cols="30" rows="2" v-model="shift.newMessage"></textarea>
-                <div class="flex justify-flex-end">
-                  <button class="btn btn__outlined mb-3 mt-3" @click="messageShift(shift)" :disabled="!shift.newMessage">send message
-                    <transition name="fade">
-                      <span class="ml-2" v-if="performingRequest7">
-                      <i class="fa fa-spinner fa-spin"></i>
-                      </span>
-                    </transition>
-                  </button>
-                </div> -->
+                <div class="mt-2">
+                <textarea :id="shift" cols="30" rows="1" placeholder="send a text to shift" v-model="shift.newMessage"></textarea>
+                <transition name="fade">
+                  <div class="flex justify-flex-end" v-if="shift.newMessage">
+                    <button class="btn btn__small btn__success mb-3 mt-3" @click="messageShift(shift)" :disabled="!shift.newMessage">send message
+                      <transition name="fade">
+                        <span class="ml-2" v-if="performingRequest7">
+                        <i class="fa fa-spinner fa-spin"></i>
+                        </span>
+                      </transition>
+                    </button>
+                  </div>
+                </transition>
               </div>
 
                 <div class="pt-3" v-if="orderedUsers.length >= 1" style="width:50%; min-width: 30rem;">
@@ -360,10 +362,7 @@
                     :id="shift.id"
                     :ref="shift.id"
                     :rows="orderedPlacedUsers(shift)"
-                     :select-options="{
-                      enabled: true,
-                      selectOnCheckboxOnly: true,
-                    }"
+                    
                     >
                     <div slot="selected-row-actions">
                       <button class="btn btn__small btn__flat" @click="lockAll(shift)">Lock All <i class="fas fa-lock-alt"></i></button>
@@ -590,10 +589,21 @@
                       
                     </span>
 
-                    <span v-else-if="props.column.field == 'confirmed'">
-                      <button v-if="!props.row.confirmed" class="icon" v-tooltip="'confirm'" @click="confirmPlacement(props)">
-                        <i class="fas fa-check ml-2 mr-2" style="opacity: 0.3;"></i>
+                    <span v-else-if="props.column.field == 'confirmed'" style="display: flex;">
+                      <button v-if="!props.row.confirmed && props.row.status == 'assigned'" class="icon" v-tooltip="'confirm'" @click="confirmPlacement(props)">
+                        <i class="fas fa-check ml-2 mr-2" style="opacity: 0.4;"></i>
                       </button>
+
+                      <button v-if="!props.row.confirmed && props.row.status == 'assigned' && (props.row.updatedRequested && Object.keys(props.row.updatedRequested).length)" class="icon" v-tooltip="'already sent again'">
+                        <i class="fa-solid fa-paper-plane ml-2 mr-2" style="opacity: 0.4;"></i>
+                      </button>
+
+
+
+                      <button v-if="!props.row.confirmed && props.row.status == 'assigned' && !props.row.updatedRequested" class="icon" v-tooltip="'resend confirmation text'" @click="requestConfirmation(props)">
+                        <i class="fa-solid fa-paper-plane ml-2 mr-2 blueHue"></i>
+                      </button>
+
                       <button v-if="props.row.confirmed" class="icon" v-tooltip="'unconfirm'" @click="unConfirmPlacement(props)">
                         <i class="fas fa-check ml-2 mr-2" style="color:green"></i>
                       </button>
@@ -611,7 +621,7 @@
                     </span>
                     <span v-else-if="props.column.field == 'delete'">
 
-                      <button class="icon mr-2 ml-2" v-if="!props.row.showTrash && props.row.status != 'assigned'" v-tooltip="'delete instance'" @click="showTrash(props)">
+                      <button class="icon mr-2 ml-2" v-if="!props.row.showTrash && (props.row.status != 'assigned' || !props.row.dayStatus)" v-tooltip="'delete instance'" @click="showTrash(props)">
                         <i class="fas fa-times"></i>
                       </button>
 
@@ -724,6 +734,7 @@ import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import * as moment from 'moment'
 import router from '@/router'
+import firebase from 'firebase/app';
 import StarRating from 'vue-star-rating'
 import algoliasearch from 'algoliasearch/lite';
 import ExportService from "@/services/ExportService"
@@ -906,6 +917,7 @@ export default {
         {
           label: 'Name',
           field: 'fullName',
+          width: '120px',
         },
         {
           label: '',
@@ -916,22 +928,27 @@ export default {
           label: 'Phone',
           field: 'phone',
           sortable: false,
+          width: '112px',
         },
         {
-          label: 'Start Time',
+          label: 'Overwrite Start',
           field: 'start',
+          width: '120px'
         },
         {
-          label: 'End Time',
+          label: 'Overwrite End',
           field: 'end',
+          width: '120px'
         },
         {
           label: 'Requested Job',
           field: 'requestedJob.title',
+          width: '144px',
         },
         {
-          label: 'Assigned Job',
+          label: 'Overwrite Job',
           field: 'assigned',
+          width: '144px',
         },
         // {
         //   label: '',
@@ -957,13 +974,14 @@ export default {
           tdClass: 'text-center',
           tdClass: 'text-center',
           sortable: false,
-          width: '60px',
+          width: '50px',
         },
         {
           label: '',
           field: 'confirmed',
           tdClass: 'text-center',
           sortable: false,
+          width: '50px',
         },
         
         {
@@ -1535,7 +1553,11 @@ export default {
     },
     unlock(props, shift) {
       props.row.status = "spinning"
-      fb.userDaysCollection.doc(props.row.id).update({status: "placed"})
+      fb.userDaysCollection.doc(props.row.id).update({
+        status: "placed",
+        confirmed: false,
+        updatedRequested: firebase.firestore.FieldValue.delete()
+      })
       setTimeout(() => {
         props.row.status = "placed"
       }, 5000)
@@ -1609,14 +1631,27 @@ export default {
         event: event,
         row: props.row,
         shift: shift,
-        shiftStart: shiftStarting,
-        shiftEnd: shiftEnding
+        shiftStart: shiftStarting || null,
+        shiftEnd: shiftEnding || null
       })
       setTimeout(() => {
         props.row.status = "assigned"
       }, 5000)
       // console.log(assignment)
       // this.$store.dispatch("lockShift", assignment)
+    },
+    requestConfirmation(props) {
+      fb.userDaysCollection.doc(props.row.id).update({
+        updatedRequested: fb.firestore.FieldValue.serverTimestamp()
+      })
+      fb.assignmentsCollection.where("shiftId", "==", props.row.shift).where("userId", "==", props.row.userId).get()
+      .then(function(querySnapshot) {
+        querySnapshot.forEach(doc => {
+          fb.assignmentsCollection.doc(doc.data().id).update({
+            updatedRequested: fb.firestore.FieldValue.serverTimestamp()
+          })
+        })
+      })
     },
     assignShift(shift) {
       let userId = shift.selectedStaff.userId

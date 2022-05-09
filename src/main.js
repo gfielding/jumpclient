@@ -21,6 +21,8 @@ import InstantSearch from 'vue-instantsearch';
 import VueCryptojs from 'vue-cryptojs'
 import VueHtmlToPaper from 'vue-html-to-paper';
 import VueQr from 'vue-qr'
+import VueMoment from 'vue-moment'
+import moment from 'moment-timezone'
 import 'instantsearch.css/themes/satellite-min.css';
 import './assets/sass/main.scss'
 const fb = require('./firebaseConfig.js')
@@ -52,7 +54,10 @@ Vue.use(StarRating)
 Vue.use(VTooltip)
 Vue.use(VueClipboard)
 Vue.use(vClickOutside)
-Vue.use(require('vue-moment'))
+// Vue.use(require('vue-moment'))
+Vue.use(VueMoment, {
+    moment,
+})
 Vue.use(VueGoogleMaps, {
   load: {
     // key: 'AIzaSyBvT8-4gdOJ8CRHv2mD_MAohqD8vo0To10',

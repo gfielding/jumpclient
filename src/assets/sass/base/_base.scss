@@ -67,22 +67,22 @@ hr {
 
 .hidden-small {
   @include respond(tablet-port) {
-    display:none;
+    display:none !important;
   }
 }
 
 .hidden-large {
   @include respond(tablet-land) {
-    display:none;
+    display:none !important;
   }
   @include respond(desktop) {
-    display:none;
+    display:none !important;
   }
   @include respond(tv) {
-    display:none;
+    display:none !important;
   }
   @include respond(tablet-port) {
-    display:block;
+    display:block !important;
   }
 }
 

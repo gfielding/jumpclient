@@ -44,6 +44,27 @@
               Venues <i class="fas fa-chevron-right"></i>
             </router-link>
           </div>
+          <div class="nav__menu--item dropdown">
+            <span>Marketing Leads</span>
+            <div class="dropdown-content">
+              <div class="mb-3">
+                <router-link :to="{name: 'marketingLeads'}">
+                  Leads <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+             <div class="mb-3">
+                <router-link :to="{name: 'markets'}">
+                  Markets <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+              <div class="mb-3">
+                <router-link :to="{name: 'enterNewLead'}">
+                  Add New Lead <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+            </div>
+          </div>
+         
           
           
         
