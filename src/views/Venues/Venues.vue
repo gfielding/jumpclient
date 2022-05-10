@@ -125,7 +125,7 @@ export default {
     ]
   }),
   computed: {
-    ...mapState(['venues', 'hiddenVenues']),
+    ...mapState(['currentUser', 'venues', 'hiddenVenues']),
     filteredVenues() {
       if (this.searchText && this.searchText.length > 2) {
         return this.venues.filter(
@@ -147,6 +147,11 @@ export default {
       router.push(url)
     },
     exportAll() {
+      let logFields = {
+          user: this.currentUser.email,
+          export: 'All (Venues) Export',
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "ID",
         "Title",

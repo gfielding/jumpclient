@@ -18,7 +18,7 @@
                 <router-link :to="`users/` + item.objectID">
                   <button class="btn btn__icon btn__flat mr-4"><i class="fad fa-external-link"></i></button>
                 </router-link>
-                <h4 style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</h4 style="display: inline;">
+                <h4 style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</h4>
               </div>
             </template>
           </ais-hits>
@@ -277,7 +277,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['userProfile', 'stateUsers', 'cityUsers', 'groups']),
+    ...mapState(['currentUser', 'userProfile', 'stateUsers', 'cityUsers', 'groups']),
   },
   components: {
     Loader,
@@ -313,6 +313,12 @@ export default {
       this.$store.dispatch("getUsersByCity", value)
     },
     exportCity() {
+      let logFields = {
+          user: this.currentUser.email,
+          export: 'City (Users) Export',
+           city: this.value
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "First Name",
         "Last Name",
@@ -340,6 +346,12 @@ export default {
       });
     },
     exportState() {
+      let logFields = {
+          user: this.currentUser.email,
+          export: 'State (Users) Export',
+          state: this.value
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "First Name",
         "Last Name",

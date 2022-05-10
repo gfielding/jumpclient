@@ -12,7 +12,7 @@
                         <i class="fas fa-plus" style="color:blue;" v-if="!performingRequest"></i>
                         <i class="fa fa-spinner fa-spin" style="color:blue;" v-if="performingRequest"></i>
                       </button>
-                      <p style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</p style="display: inline;">
+                      <p style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</p>
                     </div>
                   </template>
                 </ais-hits>
@@ -261,6 +261,12 @@ export default {
       }, 1000)
     },
     exportGroup() {
+      let logFields = {
+          user: this.currentUser.email,
+          export: 'Group Export',
+          group: this.group.id
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "First Name",
         "Last Name",

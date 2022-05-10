@@ -194,6 +194,12 @@ export default {
       }, 1000)
     },
     exportGroup() {
+          let logFields = {
+          user: this.currentUser.email,
+          export: 'Followers Group Export',
+          group: this.followersGroup.id
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "First Name",
         "Email",

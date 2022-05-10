@@ -336,7 +336,7 @@ export default {
   //   this.decryptRow()
   // },
   computed: {
-    ...mapState(['allPayroll']),
+    ...mapState(['currentUser', 'allPayroll']),
     // visibleAssignments() {
     //   return this.allPayroll.filter(item => {
     //     return ((!item.hidden || item.hidden != true) && (!item.paystatus || item.paystatus != 'paid'))
@@ -528,6 +528,11 @@ export default {
       
     },
     exportReportEmp2() {
+      let logFields = {
+          user: this.currentUser.email,
+          export: 'Payroll Export',
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "first_name",
         "last_name",
