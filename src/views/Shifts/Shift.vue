@@ -910,8 +910,7 @@ export default {
           export: 'Details (Shift) Export',
           shift: this.shift.id
       }
-      console.log (logFields)
-      //this.$store.dispatch('sendExportLog', logFields)
+      this.$store.dispatch('sendExportLog', logFields)
       this.performingRequest = true
       const exportHeaders = [
         "First Name",

@@ -42,7 +42,6 @@ const venuesCollection = db.collection('venues')
 const applicationsCollection = db.collection('applications')
 const venueFollowersCollection = db.collection('venueFollowers')
 const eventStaffCollection = db.collection('eventStaff')
-const exportsCollection = db.collection('exports')
 const eventDaysCollection = db.collection('eventDays')
 const userDaysCollection = db.collection('userDays')
 const noticesCollection = db.collection('notices')
@@ -102,7 +101,6 @@ export {
   venueFollowersCollection,
   eventDaysCollection,
   eventStaffCollection,
-  exportsCollection,
   userDaysCollection,
   noticesCollection,
   assignmentsCollection,
