@@ -34,7 +34,7 @@
             <template v-slot:item="{ item }">
               <div>
                 <button @click="addUser(item)" class="btn btn__icon btn__flat mr-4"><i class="fas fa-plus" style="color:blue;"></i></button>
-                <p style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</p style="display: inline;">
+                <p style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</p>
               </div>
             </template>
           </ais-hits>
@@ -499,6 +499,12 @@ export default {
   		this.$store.dispatch("updateEvent", event)
   	},
     exportHomeless(orderedAvailableUsers) {
+        let logFields = {
+          user: this.currentUser.email,
+          export: 'Homeless (Day) Export',
+          Day: this.day.id
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "First Name",
         "Last Name",
@@ -520,6 +526,12 @@ export default {
       });
     },
   	exportAll() {
+        let logFields = {
+          user: this.currentUser.email,
+          export: 'All (Day) Export',
+          Day: this.day.id
+      }
+      this.$store.dispatch('sendExportLog', logFields)
   		const exportHeaders = [
   			"First Name",
 				"Last Name",
@@ -542,6 +554,12 @@ export default {
       });
   	},
   	exportStaff(shift) {
+        let logFields = {
+          user: this.currentUser.email,
+          export: 'Staff (Day) Export',
+          Day: this.day.id
+      }
+      this.$store.dispatch('sendExportLog', logFields)
   		console.log(shift)
 			const exportHeaders = [
 				"Day",
@@ -577,6 +595,12 @@ export default {
       });
   	},
   	exportReport() {
+      let logFields = {
+          user: this.currentUser.email,
+          export: 'Report (Day) Export',
+          Day: this.day.id
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       this.performingRequest = true
       const exportHeaders = [
         "Co Code",

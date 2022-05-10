@@ -144,7 +144,7 @@ export default {
     ]
   }),
   computed: {
-    ...mapState(['opr']),
+    ...mapState(['currentUser', 'opr']),
   },
   components: {
     Loader,
@@ -177,6 +177,11 @@ export default {
       }, 1000)
     },
     exportAll() {
+      let logFields = {
+          user: this.currentUser.email,
+          export: 'OPR Export',
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "Added",
         "Last Name",

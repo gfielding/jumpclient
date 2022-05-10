@@ -1003,7 +1003,7 @@ export default {
     // this.setInitialDay()
   },
   computed: {
-    ...mapState(['venueInfo', 'eventUsers', 'eventShifts', 'eventInfo', 'eventDrops', 'userProfile']),
+    ...mapState(['currentUser', 'venueInfo', 'eventUsers', 'eventShifts', 'eventInfo', 'eventDrops', 'userProfile']),
     event() {
       return this.eventInfo
     },
@@ -1178,6 +1178,12 @@ export default {
       }, 250)
     },
     exportUnplaced() {
+      let logFields = {
+          user: this.currentUser.email,
+          export: 'Unplaced (Event) Export',
+          eventId: this.event.id,
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "First Name",
         "Last Name",
@@ -1214,6 +1220,12 @@ export default {
       })
     },
     exportAll() {
+      let logFields = {
+          user: this.currentUser.email,
+          export: 'All (Event) Export',
+          eventId: this.event.id,
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "First Name",
         "Last Name",
@@ -1238,6 +1250,12 @@ export default {
       });
     },
     exportPlaced() {
+      let logFields = {
+          user: this.currentUser.email,
+          export: 'Placed (Event) Export',
+          eventId: this.event.id,
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "First Name",
         "Last Name",
@@ -1310,6 +1328,12 @@ export default {
       }
     },
     exportStaff(shift) {
+      let logFields = {
+          user: this.currentUser.email,
+          export: 'Staff (Event) Export',
+          eventId: this.event.id,
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       console.log(shift)
       const exportHeaders = [
         "Day",

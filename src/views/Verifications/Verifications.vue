@@ -138,6 +138,11 @@ export default {
       })
     },
     exportAll() {
+      let logFields = {
+          user: this.currentUser.email,
+          export: 'Verifications Export',
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "Added",
         "Last Name",
