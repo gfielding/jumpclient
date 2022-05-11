@@ -113,7 +113,13 @@ const store = new Vuex.Store({
     checkInMaster: null,
     eventsCancelled: [],
     completeEvents: [],
-    partialEvents: []
+    partialEvents: [],
+    eventsSearchResults: [],
+    markets: [],
+    marketingLeads: [],
+    archivedLeads: [],
+    marketLeads: [],
+    eventAssignmentsByDay: []
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -125,8 +131,12 @@ const store = new Vuex.Store({
         })
 
       // fetch user profile and set in state
-      if (user && user.email && user.emailVerified && user.email.endsWith('mvpeventstaffing.com') && (user.email != 'd.brown@mvpeventstaffing.com' || user.email != 'jlax@mvpeventstaffing.com' || user.email != 'selina@mvpeventstaffing.com')) {
+      if ((user && user.email && user.emailVerified && user.email.endsWith('mvpeventstaffing.com') && (user.email != 'd.brown@mvpeventstaffing.com' || user.email != 'jlax@mvpeventstaffing.com' || user.email != 'kaela@mvpeventstaffing.com' || user.email != 'selina@mvpeventstaffing.com')) || user.email.endsWith('tcicapital.com')) {
         dispatch('fetchUserProfile', user)
+        //change route to dashboard
+        if (router.currentRoute.path === '/login') {
+          router.push('/dashboard')
+        }
       } else {
         store.dispatch('logout')
       }
@@ -817,6 +827,7 @@ const store = new Vuex.Store({
 
     /*VENUES*/
     addVenue({ commit }, payload) {
+      console.log(payload)
       fb.venuesCollection.add(payload)
       .then(
         doc => {
@@ -1262,6 +1273,96 @@ const store = new Vuex.Store({
     clearUsersState({ commit }) {
       commit('setUsers', [])
     },
+    /*MARKETS*/
+    addLead({ commit }, payload) {
+      fb.marketingLeadsCollection.add(payload)
+      .then(
+        doc => {
+          fb.marketingLeadsCollection.doc(doc.id).update({
+            id: doc.id,
+            created: fb.firestore.FieldValue.serverTimestamp(),
+          })
+        }
+      )
+    },
+    getMarketetingLeads({ commit }, payload) {
+      console.log('getMarketetingLeads')
+      fb.marketingLeadsCollection.orderBy('created', 'desc')
+      .onSnapshot(querySnapshot => {
+        let leadsArray = []
+        let archiveArray = []
+        querySnapshot.forEach(function (doc) {
+          let lead = doc.data()
+          if (doc.data().hidden) {
+            archiveArray.push(lead)
+          } else {
+            leadsArray.push(lead)
+          }
+
+        })
+        commit('setMarketingLeads', leadsArray)
+        commit('setArchivedLeads', archiveArray)
+      })
+      store.dispatch('getMyLeads')
+    },
+    clearMarketingLeads({ commit }) {
+      commit('setMarketingLeads', [])
+      commit('setArchivedLeads', [])
+      commit('setMyLeads', [])
+    },
+    getMyLeads({ commit, state }) {
+      fb.marketsCollection
+      .onSnapshot(querySnapshot => {
+        let leadsArray = []
+        querySnapshot.forEach(function (doc) {
+          let mgrs = doc.data().mgrs
+          if (mgrs && mgrs.length > 0 && (mgrs.some(e => e.userId === state.currentUser.uid))) {
+            console.log(doc.id)
+          
+          fb.marketingLeadsCollection.where("marketId", "==", doc.id).orderBy('created', 'desc')
+          .onSnapshot(querySnapshot => {
+            
+            querySnapshot.forEach(function (doc) {
+              let lead = doc.data()
+              if (doc.data().hidden) {
+              } else {
+                leadsArray.push(lead)
+              }
+            })
+            
+          })
+        }
+
+        }) 
+        commit('setMyLeads', leadsArray)
+      })
+    },
+    addMarket({ commit }, payload) {
+      fb.marketsCollection.add(payload)
+      .then(
+        doc => {
+          fb.marketsCollection.doc(doc.id).update({
+            id: doc.id,
+            created: fb.firestore.FieldValue.serverTimestamp(),
+          })
+        }
+      )
+    },
+    getMarketsState({ commit }, payload) {
+      console.log('getMarketsState')
+      fb.marketsCollection.orderBy('city', 'asc')
+      .onSnapshot(querySnapshot => {
+        let marketsArray = []
+        querySnapshot.forEach(function (doc) {
+          let market = doc.data()
+          marketsArray.push(market)
+        })
+        commit('setMarkets', marketsArray)
+      })
+    },
+    clearMarketsState({ commit }) {
+      commit('setMarkets', [])
+    },
 
     /*TAGS*/
     getTagsState({ commit }, payload) {
@@ -1293,7 +1394,7 @@ const store = new Vuex.Store({
         }
       )
     },
-    geTagFromId({ commit }, payload) {
+    getTagFromId({ commit }, payload) {
       fb.tagsCollection.where("id", "==", payload).onSnapshot(querySnapshot => {
         querySnapshot.forEach(function (doc) {
           commit("setTagInfo", doc.data())
@@ -1318,7 +1419,7 @@ const store = new Vuex.Store({
 
     /*MGRS*/
     getMgrsState({ commit }, payload) {
-      fb.mgrsCollection.onSnapshot(querySnapshot => {
+      fb.mgrsCollection.orderBy('name', 'asc').onSnapshot(querySnapshot => {
         let mgrsArray = []
         querySnapshot.forEach(doc => {
           let mgr = doc.data()
@@ -1652,7 +1753,6 @@ const store = new Vuex.Store({
       .then(
         doc => {
           let geo = new fb.firestore.GeoPoint(payload.venue.center.lat, payload.venue.center.lng)
-          payload.event_location = geo
           fb.eventsCollection.doc(doc.id).update({
             id: doc.id,
             created: fb.firestore.FieldValue.serverTimestamp(),
@@ -1660,10 +1760,11 @@ const store = new Vuex.Store({
             jobs: payload.jobs || [],
             days: payload.days || [],
             event_city: payload.venue.address.city,
-            event_location: payload,
+            event_location: geo,
             event_state: payload.venue.address.state,
-            event_venue_title: payload.title,
-            event_zip: payload.venue.address.zip
+            venue_title: payload.venue.title,
+            event_zip: payload.venue.address.zip,
+            endDate: payload.endDate || payload.startDate
           })
         }
       )
@@ -1674,23 +1775,21 @@ const store = new Vuex.Store({
       fb.venueFollowersCollection.where("venue", "==", payload.venue.id)
       .get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
-
-
-      // .onSnapshot(querySnapshot => {
-      //   querySnapshot.forEach(doc => {
-          let message = {
-            phone: doc.data().phone,
-            name: doc.data().name,
-            venueName: doc.data().venueName,
-            venueId: doc.data().venue,
-            user: doc.data().user,
-            event: payload.title,
-            start: payload.startDate,
-            created: fb.firestore.FieldValue.serverTimestamp(),
-            slug: payload.slug
+          if (doc.data().phone) {
+            let message = {
+              phone: doc.data().phone,
+              name: doc.data().name,
+              venueName: doc.data().venueName,
+              venueId: doc.data().venue,
+              user: doc.data().user,
+              event: payload.title,
+              start: payload.startDate,
+              created: fb.firestore.FieldValue.serverTimestamp(),
+              slug: payload.slug
+            }
+            console.log(message)
+            fb.smsCollection.add(message)
           }
-          console.log(message)
-          fb.smsCollection.add(message)
         })
       })
     },
@@ -1894,38 +1993,38 @@ const store = new Vuex.Store({
     // },
     getInfiniteEvents({ commit }) {
       console.log('getInfiniteEvents')
-      fb.eventsCollection.orderBy('startDate', 'asc').get().then((querySnapshot) => {
+      fb.eventsCollection.orderBy('startDate', 'asc')
+       .onSnapshot(querySnapshot => {
+
         var lastVisibleEventSnapShot = {};
         var firstVisibleEventSnapShot = {};
         let yesterday = new Date()
         yesterday.setDate(yesterday.getDate() - 1);
         let currentEventsArray = []
         let cancelledEventsArray = []
-        let allEventsArray = []
         querySnapshot.forEach(doc => {
           let startComp = new Date(doc.data().startDate)
           let endComp = new Date(doc.data().endDate)
           let event = doc.data()
-          if ((endComp >= yesterday || startComp >= yesterday) && (event.status != 'cancelled')) {
+          if ((startComp >= yesterday) && (event.status != 'cancelled')) {
             currentEventsArray.push(event)
-          }
-          if (event.status != 'cancelled') {
-            allEventsArray.push(event)
-          }
-          if (event.status == 'cancelled') {
+          } else if (event.status == 'cancelled') {
             cancelledEventsArray.push(event)
+          } else {
+
           }
         })
         let twelve = currentEventsArray.slice(0, 12);
-        // firstVisibleEventSnapShot = currentEventsArray.slice(0, 1);
-        // lastVisibleEventSnapShot = currentEventsArray.slice(11, 12);
         firstVisibleEventSnapShot = twelve[twelve.length - 12];
         lastVisibleEventSnapShot = twelve[twelve.length - 1];
+        commit('setInfiniteEvents', twelve)
+        // firstVisibleEventSnapShot = currentEventsArray.slice(0, 1);
+        // lastVisibleEventSnapShot = currentEventsArray.slice(11, 12);
+        
         commit('setLastVisibleEventSnapShot', lastVisibleEventSnapShot)
         commit('setFirstVisibleEventSnapShot', firstVisibleEventSnapShot)
-        commit('setAllEvents', allEventsArray)
+        // commit('setAllEvents', allEventsArray)
         commit('setCancelledEvents', cancelledEventsArray)
-        commit('setInfiniteEvents', twelve)
       })
     },
     getNextInfiniteEvents({ commit, state }) {
@@ -1963,11 +2062,34 @@ const store = new Vuex.Store({
         commit('setTaggedEvents', taggedEventsArray)
       })
     },
+    searchEvents({ commit }, payload) {
+      console.log(payload)
+      fb.eventsCollection.orderBy('startDate', 'asc')
+      .onSnapshot(querySnapshot => {
+       let results = []
+        querySnapshot.forEach(doc => {
+          let event = doc.data()
+          if (
+            event.title && event.title.toLowerCase().includes(payload.toLowerCase()) || 
+            event.venue_title && event.venue_title.toLowerCase().includes(payload.toLowerCase())
+          ) {
+          results.push(event)
+          }
+        })
+        console.log(results.length)
+        commit('setEventsSearchResults', results)
+      })
+    },
+    clearSearchEvents({ commit }) {
+      commit('setEventsSearchResults', [])
+    },
+
+
     getVenueEventsSearchResults({ commit }, payload) {
       console.log('getVenueEventsSearchResults')
       fb.eventsCollection.where("venueId", "==", payload).orderBy('startDate', 'asc')
-      .get().then((querySnapshot) => {
-        let yesterday = new Date()
+      .onSnapshot(querySnapshot => {
+       let yesterday = new Date()
         yesterday.setDate(yesterday.getDate() - 1);
         let venueEventsArray = []
         querySnapshot.forEach(doc => {
@@ -2090,6 +2212,16 @@ const store = new Vuex.Store({
     clearEventShifts({ commit }) {
       commit('setEventShifts', [])
     },
+    getEventAssignmentsByDay({ commit }, payload) {
+      fb.assignmentsCollection.where("eventId", "==", payload.eventId).where("day", "==", payload.day).onSnapshot(querySnapshot => {
+        let assignmentsArray = []
+        querySnapshot.forEach(doc => {
+          let assignment = doc.data()
+          assignmentsArray.push(assignment)
+        })
+        commit('setEventAssignmentsByDay', assignmentsArray)
+      })
+    },
     getEventAssignments({ commit }, payload) {
       fb.assignmentsCollection.where("eventId", "==", payload).onSnapshot(querySnapshot => {
         let assignmentsArray = []
@@ -2152,12 +2284,26 @@ const store = new Vuex.Store({
     newCheckIn({ commit }, payload) {
       console.log(payload)
     },
+    deleteInStamp({ commit }, payload) {
+      fb.userDaysCollection.doc(payload.id).update({
+        checkInTimeStamp: firebase.firestore.FieldValue.delete()
+      })
+    },
+    deleteOutStamp({ commit }, payload) {
+      fb.userDaysCollection.doc(payload.id).update({
+        checkOutTimeStamp: firebase.firestore.FieldValue.delete()
+      })
+    },
     updateAssignment({ commit }, payload) {
       console.log(payload)
       fb.userDaysCollection.doc(payload.id).update(payload)
     },
+    clearEventAssignmentsByDay({ commit }) {
+      commit('setEventAssignmentsByDay', [])
+    },
     clearEventAssignments({ commit }) {
       commit('setEventAssignments', [])
+      commit('setEventAssignmentsByDay', [])
     },
     getDayShifts({ commit }, payload) {
       console.log(payload)
@@ -2762,6 +2908,7 @@ const store = new Vuex.Store({
       let shiftStart = payload.shiftStart
       let shiftEnd = payload.shiftEnd
       let userId = payload.row.userId
+      let name = payload.shift.name
       let ssn
       let rate
       let tipped
@@ -2784,7 +2931,7 @@ const store = new Vuex.Store({
       if (row.job && row.job.tipped) {
         tipped = row.job.tipped
       } else {
-        tipped = false
+        tipped = "false"
       }
 
       if (row.job && row.job.title) {
@@ -2800,7 +2947,7 @@ const store = new Vuex.Store({
         shiftId: shift.id,
         userId: userId,
         date: newdate,
-        day: shift.day,
+        day: shift.day[0],
         eventId: shift.eventId,
         email: payload.row.email,
         firstName: payload.row.firstName,
@@ -2821,7 +2968,7 @@ const store = new Vuex.Store({
         event: event.id,
         eventName: event.title,
         slug: event.slug,
-        shiftName: payload.shift.name
+        shiftName: name
       }
       console.log(assignment)
       fb.assignmentsCollection.add(assignment)
@@ -3460,6 +3607,13 @@ const store = new Vuex.Store({
         state.eventsByVenue = []
       }
     },
+    setMarkets(state, val) {
+      if (val) {
+        state.markets = val
+      } else {
+        state.markets = []
+      }
+    },
     setTagInfo(state, val) {
       state.tagInfo = val
     },
@@ -3504,6 +3658,13 @@ const store = new Vuex.Store({
         state.venueEventsSearchResults = []
       }
     },
+    setEventsSearchResults(state, val) {
+      if (val) {
+        state.eventsSearchResults = val
+      } else {
+        state.eventsSearchResults = []
+      }
+    },
     setCancelledEvents(state, val) {
       if (val) {
         state.cancelledEvents = val
@@ -3523,6 +3684,13 @@ const store = new Vuex.Store({
         state.eventAssignments = val
       } else {
         state.eventAssignments = []
+      }
+    },
+    setEventAssignmentsByDay(state, val) {
+      if (val) {
+        state.eventAssignmentsByDay = val
+      } else {
+        state.eventAssignmentsByDay = []
       }
     },
     setAllPayroll(state, val) {
@@ -3561,6 +3729,27 @@ const store = new Vuex.Store({
         state.completeEvents = val
       } else {
         state.completeEvents = []
+      }
+    },
+    setMarketingLeads(state, val) {
+      if (val) {
+        state.marketingLeads = val
+      } else {
+        state.marketingLeads = []
+      }
+    },
+    setArchivedLeads(state, val) {
+      if (val) {
+        state.archivedLeads = val
+      } else {
+        state.archivedLeads = []
+      }
+    },
+    setMyLeads(state, val) {
+      if (val) {
+        state.marketLeads = val
+      } else {
+        state.marketLeads = []
       }
     },
   },

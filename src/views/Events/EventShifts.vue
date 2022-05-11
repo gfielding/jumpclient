@@ -84,7 +84,7 @@
 			              </option>
 			            </select>
 	  						</div>
-	  						<div class="pl-3">
+	  						<div class="pl-3" v-if="event && event.days">
 	  							<label for="day">Select day:</label>
 	  							<v-select
 			              label="title" 

@@ -88,7 +88,7 @@ export default {
   },
   computed: {
     valid() {
-      if ((this.loginForm.email.length > 6) && (this.loginForm.password.length > 6)) {
+      if ((this.loginForm.email.length > 6) && (this.loginForm.password.length > 5)) {
         return true
       }
       else {
@@ -96,7 +96,7 @@ export default {
       }
     },
     valid2() {
-      if ((this.signupForm.email.length > 6) && (this.signupForm.password.length > 6) && (this.signupForm.firstname.length > 0) && (this.signupForm.firstname.length > 0)) {
+      if ((this.signupForm.email.length > 6) && (this.signupForm.password.length > 5) && (this.signupForm.firstname.length > 0) && (this.signupForm.firstname.length > 0)) {
         return true
       }
       else {

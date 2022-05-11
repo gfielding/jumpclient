@@ -191,8 +191,8 @@ export default {
       this.$store.dispatch("getVenues")
     }
   },
-  beforeDestroy () {
-    this.$store.dispatch('clearVenuesState')
-  }
+  // beforeDestroy () {
+  //   this.$store.dispatch('clearVenuesState')
+  // }
 }
 </script>

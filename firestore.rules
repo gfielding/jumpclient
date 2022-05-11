@@ -4,5 +4,17 @@ service cloud.firestore {
       allow read;
       allow write: if request.auth.uid != null
     }
+    match /leads/{leadId} {
+      allow write;
+      allow read: if request.auth.uid != null
+    }
+    match /userDays/{dayId} {
+      allow write;
+      allow read;
+    }
+    match /assignments/{assignmentId} {
+      allow read;
+      allow write;
+    }
   }
 }

@@ -588,8 +588,11 @@
 
                     <span v-else-if="props.column.field == 'checkin'">
                       <span v-if="props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp)}}</span>
-                   
-                        <button v-if="props.row.checkInTimeStamp" class="btn btn__outlined btn__small ma-2" @click="showEditIn(props.row)">Edit</button>
+                        <div class="flex align-center justify-space-between">
+                          <button v-if="props.row.checkInTimeStamp" class="btn btn__icon ma-3" @click="showEditIn(props.row)"><i class="fa-solid fa-pen-to-square"></i></button>
+
+                          <button v-if="props.row.checkInTimeStamp" class="btn  btn__icon ma-3" @click="deleteInStamp(props.row)"><i class="fa-solid fa-xmark" style="color:red;"></i></button>
+                        </div>
                       
                         <EditTimeModal v-if="modalEditInValue == props.row" @updateTime="updateInTime(props.row)" @close="closeEditModal" :row="props.row" />
                     </span>
@@ -597,7 +600,13 @@
                     <span v-else-if="props.column.field == 'checkout'">
                       <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
                    
-                        <button v-if="props.row.checkOutTimeStamp" class="btn btn__outlined btn__small ma-2" @click="showEditOut(props.row)">Edit</button>
+                       <!--  <button v-if="props.row.checkOutTimeStamp" class="btn btn__small ma-2" @click="showEditOut(props.row)">Edit</button> -->
+
+                        <div class="flex align-center justify-space-between">
+                          <button v-if="props.row.checkOutTimeStamp" class="btn btn__icon ma-3" @click="showEditOut(props.row)"><i class="fa-solid fa-pen-to-square"></i></button>
+
+                          <button v-if="props.row.checkOutTimeStamp" class="btn  btn__icon ma-3" @click="deleteOutStamp(props.row)"><i class="fa-solid fa-xmark" style="color:red;"></i></button>
+                        </div>
                       
                         <EditTimeModal v-if="modalEditOutValue == props.row" @updateTime="updateOutTime(props.row)" @close="closeEditModal" :row="props.row" />
                     </span>
@@ -962,6 +971,12 @@ export default {
     },
   },
   methods: {
+    deleteInStamp(row) {
+      this.$store.dispatch('deleteInStamp', row)
+    },
+    deleteOutStamp(row) {
+      this.$store.dispatch('deleteOutStamp', row)
+    },
     showCheckInEdit(row) {
       row.editCheckIn = true
       this.$store.dispatch('updateAssignment', row)

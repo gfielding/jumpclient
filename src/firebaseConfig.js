@@ -81,6 +81,9 @@ const accessNotesCollection = db.collection('accessNotes')
 const checkInMasterCollection = db.collection('checkInMaster')
 const verificationsCollection = db.collection('verifications')
 const tagsCollection = db.collection('tags')
+const marketsCollection = db.collection('markets')
+const marketingLeadsCollection = db.collection('marketingLeads')
+
 
 export {
   db,
@@ -140,5 +143,7 @@ export {
   checkInMasterCollection,
   eventTimesheetNotesCollection,
   verificationsCollection,
-  tagsCollection
+  tagsCollection,
+  marketsCollection,
+  marketingLeadsCollection
 }
