@@ -285,7 +285,7 @@ export default {
     ]
   }),
 	computed: {
-    ...mapState(['dayShifts', 'eventInfo', 'shiftAssignments', 'userProfile', 'eventTimesheetNotes']),
+    ...mapState(['currentUser', 'dayShifts', 'eventInfo', 'shiftAssignments', 'userProfile', 'eventTimesheetNotes']),
     day() {
     	return this.$route.params.day
     }
@@ -329,6 +329,12 @@ export default {
       router.go(-1)
     },
     exportRegister() {
+      let logFields = {
+          user: this.currentUser.email,
+          export: 'Register (Day Shifts) Export',
+          shiftAssignment: this.shiftAssignments.id
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       this.performingRequest = true
       const exportHeaders = [
         "First Name",
@@ -364,6 +370,12 @@ export default {
       }, 2000)
     },
     exportReportCont() {
+      let logFields = {
+          user: this.currentUser.email,
+          export: 'Report Cont- (Day Shifts) Export',
+          shiftAssignment: this.shiftAssignments.id
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       this.performingRequest = true
       const exportHeaders = [
         "type",
@@ -439,6 +451,12 @@ export default {
       }, 2000)
     },
     exportReportEmp() {
+      let logFields = {
+          user: this.currentUser.email,
+          export: 'Report Emp- (Day Shifts) Export',
+          shiftAssignment: this.shiftAssignments.id
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       this.performingRequest = true
       const exportHeaders = [
         "type",

@@ -41,7 +41,7 @@
                           <i class="fas fa-plus" style="color:blue;" v-if="!performingRequest"></i>
                           <i class="fa fa-spinner fa-spin" style="color:blue;" v-if="performingRequest"></i>
                         </button>
-                        <p style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</p style="display: inline;">
+                        <p style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</p>
                       </div>
                     </template>
                   </ais-hits>
@@ -941,7 +941,7 @@ export default {
     // this.setInitialDay()
   },
   computed: {
-    ...mapState(['venueInfo', 'eventUsers', 'eventShifts', 'eventInfo', 'eventDrops', 'userProfile']),
+    ...mapState(['currentUser', 'venueInfo', 'eventUsers', 'eventShifts', 'eventInfo', 'eventDrops', 'userProfile']),
     event() {
       return this.eventInfo
     },
@@ -1165,6 +1165,12 @@ export default {
       }, 250)
     },
     exportUnplaced() {
+        let logFields = {
+          user: this.currentUser.email,
+          export: 'Event Check In - Unplaced  Export',
+          eventId: this.eventInfo
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "First Name",
         "Last Name",
@@ -1189,6 +1195,12 @@ export default {
       });
     },
     exportAll() {
+           let logFields = {
+          user: this.currentUser.email,
+          export: 'Event Check In - All - Export',
+          eventId: this.eventInfo
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "First Name",
         "Last Name",
@@ -1213,6 +1225,12 @@ export default {
       });
     },
     exportPlaced() {
+           let logFields = {
+          user: this.currentUser.email,
+          export: 'Event Check In - Placed Export',
+          eventId: this.eventInfo
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "First Name",
         "Last Name",
@@ -1290,6 +1308,12 @@ export default {
       }
     },
     exportStaff(shift) {
+          let logFields = {
+          user: this.currentUser.email,
+          export: 'Event Check In - Staff Export',
+          exportId: this.eventInfo
+      }
+      this.$store.dispatch('sendExportLog', logFields)
       console.log(shift)
       const exportHeaders = [
         "Day",

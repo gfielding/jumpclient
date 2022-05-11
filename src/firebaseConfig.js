@@ -66,6 +66,7 @@ const payHelpCollection = db.collection('payHelp')
 const groupsCollection = db.collection('groups')
 const reviewsCollection = db.collection('reviews')
 const userMessagesCollection = db.collection('userMessages')
+const exportLogCollection = db.collection('exportLog')
 const shiftUpdatesCollection = db.collection('shiftUpdates')
 const groupUpdatesCollection = db.collection('groupUpdates')
 const dropsCollection = db.collection('drops')
@@ -116,6 +117,7 @@ export {
   emailsCollection,
   userNotesCollection,
   userMessagesCollection,
+  exportLogCollection,
   placementsCollection,
   faqsCollection,
   seriesCollection,

@@ -16,10 +16,7 @@
       </div>
       <form ref="form" @submit.prevent>
       	<div class="dashboard__container--body" v-if="venue">
-
-
       		<div class="dashboard__container--body--col">
-
     				<!-- <div class="mb-3">
     					<label>
 				        <gmap-autocomplete
@@ -150,7 +147,7 @@
                       <template v-slot:item="{ item }">
                         <div>
                           <button class="btn btn__icon btn__flat mr-2 mb-2" @click="addUser(item)"><i class="fad fa-plus"></i></button>
-                          <h4 style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</h4 style="display: inline;">
+                          <h4 style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</h4>
                         </div>
                       </template>
                     </ais-hits>
@@ -371,7 +368,7 @@ export default {
     ]
   }),
    computed: {
-    ...mapState(['venueInfo', 'clients', 'jobs', 'mgrs', 'venueFollowers']),
+    ...mapState(['currentUser', 'venueInfo', 'clients', 'jobs', 'mgrs', 'venueFollowers']),
     // ...mapState(['venueInfo', 'venueEvents', 'clients', 'jobs', 'mgrs', 'venueFollowers']),
     venue() {
       return this.venueInfo
@@ -558,6 +555,13 @@ export default {
       }
     },
     exportFollowers() {
+      let logFields = {
+          user: this.currentUser.email,
+          export: 'Followers (Venues) Export',
+          venue: this.venue.id
+      }
+      this.$store.dispatch('sendExportLog', logFields)
+      
       const exportHeaders = [
         "First Name",
         "Email",
