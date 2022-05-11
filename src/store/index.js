@@ -118,7 +118,8 @@ const store = new Vuex.Store({
     markets: [],
     marketingLeads: [],
     archivedLeads: [],
-    marketLeads: []
+    marketLeads: [],
+    eventAssignmentsByDay: []
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -2199,6 +2200,16 @@ const store = new Vuex.Store({
     clearEventShifts({ commit }) {
       commit('setEventShifts', [])
     },
+    getEventAssignmentsByDay({ commit }, payload) {
+      fb.assignmentsCollection.where("eventId", "==", payload.eventId).where("day", "==", payload.day).onSnapshot(querySnapshot => {
+        let assignmentsArray = []
+        querySnapshot.forEach(doc => {
+          let assignment = doc.data()
+          assignmentsArray.push(assignment)
+        })
+        commit('setEventAssignmentsByDay', assignmentsArray)
+      })
+    },
     getEventAssignments({ commit }, payload) {
       fb.assignmentsCollection.where("eventId", "==", payload).onSnapshot(querySnapshot => {
         let assignmentsArray = []
@@ -2275,8 +2286,12 @@ const store = new Vuex.Store({
       console.log(payload)
       fb.userDaysCollection.doc(payload.id).update(payload)
     },
+    clearEventAssignmentsByDay({ commit }) {
+      commit('setEventAssignmentsByDay', [])
+    },
     clearEventAssignments({ commit }) {
       commit('setEventAssignments', [])
+      commit('setEventAssignmentsByDay', [])
     },
     getDayShifts({ commit }, payload) {
       console.log(payload)
@@ -3657,6 +3672,13 @@ const store = new Vuex.Store({
         state.eventAssignments = val
       } else {
         state.eventAssignments = []
+      }
+    },
+    setEventAssignmentsByDay(state, val) {
+      if (val) {
+        state.eventAssignmentsByDay = val
+      } else {
+        state.eventAssignmentsByDay = []
       }
     },
     setAllPayroll(state, val) {

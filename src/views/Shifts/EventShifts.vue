@@ -463,6 +463,146 @@
           </vue-good-table>
       </div>
       <div class="dashboard__container--body"  v-if="activeDay">
+        <div class="text-right mb-3" style="width:100%;">
+              
+<!--           <button class="btn btn__small mr-3" v-bind:class="{ 'btn__dark': isVisible, 'btn__outlined': !isVisible }" @click="showVisibleByDay()">Visible</button>
+          <button class="btn btn__small mr-3" v-bind:class="{ 'btn__dark': isPaid, 'btn__outlined': !isPaid }" @click="showPaidByDay()">Paid</button>
+          <button class="btn btn__small mr-3" v-bind:class="{ 'btn__dark': isHidden, 'btn__outlined': !isHidden }" @click="showHiddenByDay()">Hidden</button> -->
+          <button class="btn btn__small btn__outlined mr-3 mb-3" @click.prevent="exportRegisterByDay()">Payroll Register<i class="fas fa-external-link ml-3"></i></button>
+          <button class="btn btn__small btn__outlined mr-3" @click.prevent="exportReportEmp2ByDay()">Export Payroll-Peoplease<i class="fas fa-external-link ml-3"></i></button>
+        </div>
+        <vue-good-table
+            :columns="columns2"
+            :rows="eventAssignmentsByDay"
+            :pagination-options="{
+              enabled: true,
+              mode: 'records',
+              perPage: 50,
+            }"
+           
+          >
+            <template slot="table-row" slot-scope="props">
+              <span v-if="props.column.field == 'regRate'">
+                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onEditRegRate(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'dayRate'">
+                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onEditDayRate(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'firstName'">
+                <input type="text" v-model.trim="props.row.firstName" id="firstName" readonly />
+              </span>
+              <span v-else-if="props.column.field == 'lastName'">
+                <input type="text" v-model.trim="props.row.lastName" id="lastName" readonly />
+              </span>
+
+              <span v-else-if="props.column.field == 'note'">
+                <button v-show="!props.row.note" class="btn btn__flat btn__icon" @click="showNote(props.row)" v-tooltip="'Leave a note'"><i class="far fa-sticky-note ml-3 mr-3" style="opacity:0.5;"></i></button>
+                <button v-show="props.row.note" class="btn btn__flat btn__icon" @click="showNote(props.row)" v-tooltip="'Leave a note'"><i class="far fa-sticky-note ml-3 mr-3" style="color:blue"></i></button>
+                <transition name="modal">
+                  <div v-if="activeItem == props.row">
+                    <TimesheetNote :item="props.row" @close="closeNote(props.row)" />
+                  </div>
+                </transition>
+              </span>
+
+              <span v-else-if="props.column.field == 'checkInTimeStamp'">
+                <span v-if="props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp)}}</span>
+              </span>
+
+              <span v-else-if="props.column.field == 'checkOutTimeStamp'">
+                <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
+              </span>
+              <span v-else-if="props.column.field == 'date'">
+                <span v-if="props.row.date">{{props.row.date}}</span>
+              </span>
+
+              <span v-else-if="props.column.field == 'position'">
+                <span v-if="props.row.position">{{props.row.position}}</span>
+              </span>
+
+              <span v-else-if="props.column.field == 'confirmed'">
+                <span v-if="props.row.confirmed">{{props.row.confirmed}}</span>
+              </span>
+
+              <span v-else-if="props.column.field == 'regHours'">
+                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onEditRegHours(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'otHours'">
+                <input type="number" v-model.trim="props.row.otHours" id="otHours" @change="onEditotHours(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'ot2Hours'">
+                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @change="onEditot2Hours(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'mbp'">
+                <input type="number" v-model.trim="props.row.mbp" id="mbp" @change="onEditMBP(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'tips'">
+                <input type="number" v-model.trim="props.row.tips" id="tips" @change="onEditTips(props.row)" :readonly="props.row.locked"  />
+              </span>
+              <span v-else-if="props.column.field == 'state'">
+                <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+              </span>
+              <span v-else-if="props.column.field == 'status'">
+                <v-select
+                  label="status" 
+                  :options="statuses"
+                  v-model="props.row.status"
+                  @input="onUpdateStatus(props.row)"
+                  :disabled="props.row.locked"
+                  :clearable=false
+                  >
+                </v-select>
+              </span>
+              <span v-else-if="props.column.field == 'paystatus'">
+                <v-select
+                  label="status" 
+                  :options="paystatuses"
+                  v-model="props.row.paystatus"
+                  @input="onUpdatePay(props.row)"
+                  :disabled="props.row.locked"
+                  :clearable=true
+                  >
+                </v-select>
+              </span>
+              <span v-else-if="props.column.field == 'locked'">
+                <button class="btn btn__icon" @click="lock(props.row)" v-if="!props.row.locked">
+                  <i class="fas fa-lock-open-alt ml-3 mr-3"></i>
+                </button>
+                <button class="btn btn__icon" @click="unlock(props.row)" v-if="props.row.locked">
+                  <i class="fas fa-lock-alt ml-3 mr-3" style="color:#5cb85c;"></i>
+                </button>
+              </span>
+              <span v-if="props.column.field == 'fileId'">
+                <span v-if="props.row.fileId">HAS SSN</span>
+              </span>
+
+
+              <span v-else-if="props.column.field == 'delete'">
+                <button :disabled="props.row.locked" class="btn btn__primary btn__small ml-2 mr-2" @click="removeEntry(props.row)">
+                  hide
+                </button>
+              </span>
+
+
+              
+              <span v-else-if="props.column.field == 'link'">
+                <router-link :to="`/users/` + props.row.userId" target="_blank">
+                  <i class="fas fa-external-link ml-3 mr-3"></i>
+                </router-link>
+              </span>
+              <span v-else-if="props.column.field == 'save'">
+                <button :disabled="(props.row.locked || !props.row.editable)" class="btn btn__primary btn__small ml-2 mr-2" @click="onSheetEdit(props.row)">
+                  Save
+                </button>
+              </span>
+               <span v-else>
+                <!-- {{props.formattedRow[props.column.field]}} -->
+              </span>
+            </template>
+          </vue-good-table>
+          
+      </div>
+      <!-- <div class="dashboard__container--body"  v-if="activeDay">
         <Loader v-if="!eventShifts || eventShifts.length == 0" />
         <vue-good-table
           :columns="columns"
@@ -490,7 +630,7 @@
             </span>
           </template>
         </vue-good-table>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -670,12 +810,7 @@ export default {
   //   this.decryptRow()
   // },
   computed: {
-    ...mapState(['eventShifts', 'eventInfo', 'eventAssignments']),
-    filteredEventShifts() {
-      return this.eventShifts.filter(item => {
-        return (item.day = this.activeDay)
-      })
-    },
+    ...mapState(['eventShifts', 'eventInfo', 'eventAssignments', 'eventAssignmentsByDay']),
     visibleAssignments() {
       return this.eventAssignments.filter(item => {
         return ((!item.hidden || item.hidden != true) && (!item.paystatus || item.paystatus != 'paid'))
@@ -691,12 +826,32 @@ export default {
         return (item.paystatus == 'paid')
       })
     },
+    visibleAssignmentsByDay() {
+      return this.eventAssignmentsByDay.filter(item => {
+        return ((!item.hidden || item.hidden != true) && (!item.paystatus || item.paystatus != 'paid'))
+      })
+    },
+    hiddenAssignmentsByDay() {
+      return this.eventAssignmentsByDay.filter(item => {
+        return (item.hidden)
+      })
+    },
+    paidAssignmentsByDay() {
+      return this.eventAssignmentsByDay.filter(item => {
+        return (item.paystatus == 'paid')
+      })
+    },
   },
   components: {
     Loader,
     TimesheetNote
   },
   methods: {
+    // filteredEventShifts(activeDay) {
+    //   return this.visibleAssignments.filter(item => {
+    //     return (item.day = activeDay)
+    //   })
+    // },
     decryptedText() {
       if (this.userProfile.ssn) {
       return (this.$CryptoJS.AES.decrypt(this.userProfile.ssn, this.encryptionKey).toString(this.CryptoJS.enc.Utf8) || this.$CryptoJS.AES.encrypt(this.ssn, this.encryptionKey).toString())
@@ -889,16 +1044,69 @@ export default {
     // },
     showEventShfts(day) {
       this.performingRequest = true
+      this.$store.dispatch("clearEventAssignmentsByDay")
       this.activeDay = day
+      this.$store.dispatch("getEventAssignmentsByDay", {
+        day: day,
+        eventId: this.$route.params.id
+      })
       setTimeout(() => {
         this.performingRequest = false
-      }, 2000)
+      }, 5000)
     },
     onRowClick(params) {
       let url = `/timesheets/` + params.row.id
       console.log(url)
       router.push(url)
     },
+    exportRegisterByDay() {
+      this.performingRequest = true
+      const exportHeaders = [
+        "Date",
+        "First Name",
+        "Last Name",
+        "Position",
+        "Hourly Rate",
+        "Clock-In",
+        "Clock-Out",
+        "Reg Hours",
+        "Overtime",
+        "2x Overtime",
+        "Break Penalty",
+        "CC Tips"
+      ];
+      const exportItems = [];
+      for (var key in this.eventAssignmentsByDay) {
+        if (!this.eventAssignmentsByDay[key].hidden) {
+
+          let inTime = this.formatDate(this.eventAssignmentsByDay[key].checkInTimeStamp)
+          let outTime = this.formatDate(this.eventAssignmentsByDay[key].checkOutTimeStamp)
+
+          exportItems.push([
+            this.eventAssignmentsByDay[key].date,
+            this.eventAssignmentsByDay[key].firstName,
+            this.eventAssignmentsByDay[key].lastName,
+            this.eventAssignmentsByDay[key].position,
+            this.eventAssignmentsByDay[key].regRate,
+            inTime,
+            outTime,
+            this.eventAssignmentsByDay[key].regHours,
+            this.eventAssignmentsByDay[key].otHours,
+            this.eventAssignmentsByDay[key].ot2Hours,
+            this.eventAssignmentsByDay[key].mbp,
+            this.eventAssignmentsByDay[key].tips
+          ]);
+        }
+      }
+      this.$gapi.getGapiClient().then(gapi => {
+        const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+        exportService.export();
+      });
+      setTimeout(() => {
+        this.performingRequest = false
+      }, 2000)
+    },
+
     exportRegister() {
       this.performingRequest = true
       const exportHeaders = [
@@ -943,6 +1151,172 @@ export default {
         exportService.export();
       });
       setTimeout(() => {
+        this.performingRequest = false
+      }, 2000)
+    },
+    exportReportEmp2ByDay(item) {
+      this.performingRequest = true
+      const exportHeaders = [
+        "first_name",
+        "last_name",
+        "type",
+        "id",
+        "ssn",
+        "hours",
+        "rate",
+        "treat_as_cash",
+        "day_worked",
+        "venue_id",
+        "wc_code"
+      ];
+      const exportItems = [];
+
+      
+
+      for (var key in this.eventAssignmentsByDay) {
+        let uid = this.eventAssignmentsByDay[key].userId
+        let regRate = this.eventAssignmentsByDay[key].regRate
+        let regHours = this.eventAssignmentsByDay[key].regHours
+        let otHours = this.eventAssignmentsByDay[key].otHours
+        let ot2Hours = this.eventAssignmentsByDay[key].ot2Hours
+        let mbp = this.eventAssignmentsByDay[key].mbp
+        let tips = this.eventAssignmentsByDay[key].tips
+        let event = this.eventAssignmentsByDay[key].name
+        let dayRate = this.eventAssignmentsByDay[key].dayRate
+        let venueId = this.eventAssignmentsByDay[key].eventInfo.venueId
+
+         fb.usersCollection.doc(uid).get()
+
+          .then(doc => {
+          
+          let wcCode
+
+          if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('AL'||'AK'||'AR'||'CO'||'CT'||'FL'||'GA'||'HI'||'ID'||'IL'||'IN'||'IA'||'KS'||'KY'||'MN'||'MO'||'MS'||'MT'||'NE'||'NV'||'NC'||'NH'||'NM'||'OK'||'OR'||'RI'||'SC'||'SD'||'TN'||'UT'||'VT'||'WI'||'WV')){
+            wcCode = '9082'
+          }
+          else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('AZ'||'LA'||'VA')){
+             wcCode = '9083'
+          }
+          else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('CA'||'TX')){
+            wcCode ='9079'
+          }
+          else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('DE'|| 'PA')){
+            wcCode ='9045'
+          }
+          else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('ME')){
+            wcCode ='9084'
+          }
+          else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('MD')){
+            wcCode ='9086'
+          }
+          else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('MI'||'NY')){
+            wcCode ='9058'
+          }
+          else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('MA')){
+            wcCode ='9085'
+          }
+          else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('ND'|| 'OH'|| 'WA'|| 'WY')){
+            wcCode ='9082OC'
+          }
+          else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('NJ')){
+            wcCode ='9078'
+          }
+
+          
+          var social
+          if (doc.data().ssn) {
+            social = (this.$CryptoJS.AES.decrypt(doc.data().ssn, this.encryptionKey).toString(this.CryptoJS.enc.Utf8))
+          }
+
+          exportItems.push([
+            doc.data().firstName || '',
+            doc.data().lastName || '',
+            "1",
+            "7",
+            social || '',
+            "1",
+            dayRate || '',
+            "1",
+            event || '',
+            venueId,
+            wcCode || ''
+          ]);
+          exportItems.push([
+            doc.data().firstName || '',
+            doc.data().lastName || '',
+            "1",
+            "1",
+            social || '',
+            regHours || '',
+            regRate || '',
+            "0",
+            event,
+            venueId,
+            wcCode || ''
+          ]);
+          exportItems.push([
+            doc.data().firstName || '',
+            doc.data().lastName || '',
+            "1",
+            "2",
+            social || '',
+            otHours || '',
+            regRate * 1.5 || '',
+            "0",
+            event,
+            venueId,
+            wcCode || ''
+          ]);
+          exportItems.push([
+            doc.data().firstName || '',
+            doc.data().lastName || '',
+            "1",
+            "22",
+            social || '',
+            ot2Hours || '',
+            regRate * 2 || '',
+            "0",
+            event,
+            venueId,
+            wcCode || ''
+          ]);
+          exportItems.push([
+            doc.data().firstName || '',
+            doc.data().lastName || '',
+            "1",
+            "125",
+            social || '',
+            "1",
+            tips || '',
+            "1",
+            event,
+            venueId,
+            wcCode || ''
+          ]);
+          exportItems.push([
+            doc.data().firstName || '',
+            doc.data().lastName || '',
+            "1",
+            "4",
+            social || '',
+            "0",
+            mbp || '',
+            "0",
+            event,
+            venueId,
+            wcCode || ''
+          ]);
+          this.$gapi.getGapiClient().then(gapi => {
+            const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+            exportService.export();
+          });
+        })
+
+      }
+      
+      // fb.shiftsCollection.doc(this.shift.id).update({ exportedEmp: fb.firestore.FieldValue.serverTimestamp() })
+      setTimeout(() => {
+        // this.$store.dispatch("getShiftFromId", this.$route.params.id)
         this.performingRequest = false
       }, 2000)
     },
