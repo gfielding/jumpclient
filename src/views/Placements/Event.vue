@@ -16,7 +16,13 @@
         </div>
         <span class="flex flex-wrap justify-flex-end">
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="exportAll()">export all</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="exportPlaced()">export placed</button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="exportP2()">export placed
+            <transition name="fade">
+                <span class="ml-2" v-if="spin">
+                <i class="fa fa-spinner fa-spin"></i>
+                </span>
+              </transition>
+          </button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="checkIn()">Check-In</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="shifts()">Shifts</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="editEvent()">Edit</button>
@@ -297,6 +303,7 @@
             <div class="flex align-center justify-space-between mb-1">
               <span>
                 <h3 v-if="shift.name">{{shift.name}} | <span v-if="activeDay">{{activeDay | moment("dddd, MMM Do") }}</span></h3>
+                <div class="caption" v-if="shift.id">{{shift.id}}</div>
                 <div class="caption" v-if="shift.position">Default position: {{shift.position.label || shift.position.title}}</div>
                 
                 <div class="caption" v-if="shift.startTime"> Default Shift Times: {{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}<span v-if="shift.endTime"> - {{ [ shift.endTime, "HH:mm" ] | moment("hh:mm A") }}</span></div>
@@ -593,15 +600,25 @@
                         <i class="fas fa-check ml-2 mr-2" style="opacity: 0.4;"></i>
                       </button>
 
-                      <button v-if="!props.row.confirmed && props.row.status == 'assigned' && (props.row.updatedRequested && Object.keys(props.row.updatedRequested).length)" class="icon" v-tooltip="'already sent again'">
+                      <!-- <button v-if="!props.row.confirmed && props.row.status == 'assigned' && (props.row.updatedRequested && Object.keys(props.row.updatedRequested).length)" class="icon" v-tooltip="'already sent again'">
                         <i class="fa-solid fa-paper-plane ml-2 mr-2" style="opacity: 0.4;"></i>
-                      </button>
+                      </button> -->
+
+                        <button v-if="(!props.row.confirmed && props.row.status == 'assigned') && !performingRequestRequest" class="icon" v-tooltip="'resend confirmation text'" @click="requestConfirmation(props)">
+                          <i class="fa-solid fa-paper-plane ml-2 mr-2 blueHue"></i>
+                        </button>
 
 
+                      <transition name="fade">
+                        <span class="ml-2" v-if="performingRequestRequest">
+                        <i class="fa fa-spinner fa-spin"></i>
+                        </span>
+                      </transition>
 
-                      <button v-if="!props.row.confirmed && props.row.status == 'assigned' && !props.row.updatedRequested" class="icon" v-tooltip="'resend confirmation text'" @click="requestConfirmation(props)">
+
+                      <!-- <button v-if="!props.row.confirmed && props.row.status == 'assigned' && !props.row.updatedRequested" class="icon" v-tooltip="'resend confirmation text'" @click="requestConfirmation(props)">
                         <i class="fa-solid fa-paper-plane ml-2 mr-2 blueHue"></i>
-                      </button>
+                      </button> -->
 
                       <button v-if="props.row.confirmed" class="icon" v-tooltip="'unconfirm'" @click="unConfirmPlacement(props)">
                         <i class="fas fa-check ml-2 mr-2" style="color:green"></i>
@@ -745,6 +762,8 @@ export default {
   data() {
     return {
       performingRequest: false,
+      performingRequestRequest: false,
+      spin: false,
       performingRequest7: false,
       newActiveDay: '',
       modalValue: null,
@@ -1044,6 +1063,12 @@ export default {
         return ((user.status == 'placed') || (user.status == 'assigned'))
       })
     },
+    filteredPlacedDayUsers () {
+      console.log(this.activeDay)
+      return this.eventUsers.filter(user => {
+        return ((user.status == 'placed') || (user.status == 'assigned'))
+      })
+    },
     activeShifts() {
       return this.eventShifts.filter(shift => {
         return (shift.day == this.activeDay || shift.day.includes(this.activeDay))
@@ -1267,6 +1292,50 @@ export default {
         exportService.export();
       });
     },
+    exportP2() {
+      this.spin = true
+      const exportHeaders = [
+        "First Name",
+        "Last Name",
+        "Phone",
+        "Email",
+        "Day",
+        "Shift ID",
+        ];
+      const exportItems = [];
+      console.log(this.filteredPlacedDayUsers)
+      for (var key in this.filteredPlacedDayUsers) {
+        let firstName = this.filteredPlacedDayUsers[key].firstName || null
+        let lastName = this.filteredPlacedDayUsers[key].lastName || null
+        let phone = this.filteredPlacedDayUsers[key].phone || null
+        let email = this.filteredPlacedDayUsers[key].email || null
+        let day = this.filteredPlacedDayUsers[key].day
+        let shift = this.filteredPlacedDayUsers[key].shift
+        let uid = this.filteredPlacedDayUsers[key].userId
+        exportItems.push([
+          firstName,
+          lastName,
+          phone,
+          email,
+          day,
+          shift,
+        ])
+
+        
+      }
+
+      setTimeout(() => {
+        this.$gapi.getGapiClient().then(gapi => {
+            const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+            exportService.export();
+          });
+        this.spin = false
+      }, 15000)
+
+      
+      
+      
+    },
     exportPlaced() {
       let logFields = {
           user: this.currentUser.email,
@@ -1291,13 +1360,15 @@ export default {
       ];
       const exportItems = [];
       for (var key in this.filteredPlacedUsers) {
-        let job
-        if (this.filteredPlacedUsers[key].job && this.filteredPlacedUsers[key].job.label) {
-          job = this.filteredPlacedUsers[key].job.label
-        }
-        if (!this.filteredPlacedUsers[key].job) {
-          job = this.filteredPlacedUsers[key].shiftName
-        }
+        // let job
+        // if (this.filteredPlacedUsers[key].job && this.filteredPlacedUsers[key].job.label) {
+        //   job = this.filteredPlacedUsers[key].job.label
+        // } else {
+        //   job = this.filteredPlacedUsers[key].shiftName || null
+        // }
+        // if (!this.filteredPlacedUsers[key].job) {
+          
+        // }
         let firstName = this.filteredPlacedUsers[key].firstName
         let lastName = this.filteredPlacedUsers[key].lastName
         let phone = this.filteredPlacedUsers[key].phone
@@ -1305,12 +1376,11 @@ export default {
         let day = this.filteredPlacedUsers[key].day
         let eventName = this.filteredPlacedUsers[key].eventName
         let shiftName = this.filteredPlacedUsers[key].shiftName
-        job
         let confirmed = this.filteredPlacedUsers[key].confirmed
         let uid = this.filteredPlacedUsers[key].userId
         fb.usersCollection.doc(uid).get()
         .then(doc => {
-          console.log(doc.data())
+          // console.log(doc.data())
           exportItems.push([
             firstName,
             lastName,
@@ -1341,8 +1411,7 @@ export default {
         this.$gapi.getGapiClient().then(gapi => {
           const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
           exportService.export();
-          
-        })
+        });
       }
     },
     exportStaff(shift) {
@@ -1403,7 +1472,9 @@ export default {
 
         fb.usersCollection.doc(uid).get()
         .then(doc => {
-          console.log(doc.data())
+          // console.log(doc.data())
+
+
           exportItems.push([
             day,
             doc.data().firstName,
@@ -1420,12 +1491,27 @@ export default {
             doc.data().shirtsize,
             `=REGEXEXTRACT(H2,"....$")`
           ])
-        
-        console.log(exportItems)
+
+
+
           this.$gapi.getGapiClient().then(gapi => {
             const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
             exportService.export();
-          });
+          })
+
+
+      
+        
+          // console.log(exportItems)
+          // let uniqueItems = [...new Set(exportItems)];
+          // console.log(uniqueItems);
+          // this.$gapi.getGapiClient().then(gapi => {
+          //   const exportService = new ExportService(exportHeaders, Object.values(uniqueItems), gapi);
+          //   exportService.export();
+          // })
+
+
+          
         })
       }
     },
@@ -1676,6 +1762,7 @@ export default {
       // this.$store.dispatch("lockShift", assignment)
     },
     requestConfirmation(props) {
+      this.performingRequestRequest = true
       fb.userDaysCollection.doc(props.row.id).update({
         updatedRequested: fb.firestore.FieldValue.serverTimestamp()
       })
@@ -1687,6 +1774,9 @@ export default {
           })
         })
       })
+      setTimeout(() => {
+        this.performingRequestRequest = false
+      }, 5000)
     },
     assignShift(shift) {
       let userId = shift.selectedStaff.userId
