@@ -34,7 +34,7 @@
           activate
         </button>
     	</span>
-      <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}<span v-if="event.venue && event.venue.mgrs && event.venue.mgrs.length > 0"> | <span v-for="mgr in event.venue.mgrs" class="mr-3">{{mgr.name}}</span></span></span>
+      <div class="caption">{{event.startDate | moment("dddd, MMMM Do YYYY") }}<span v-if="(event.endDate && (event.endDate != event.startDate))"> - {{event.endDate | moment("dddd, MMMM Do YYYY") }}</span><span v-if="event && event.venue && event.venue.title"> | {{event.venue.title}}</span><span v-if="event && event.venue && event.venue.address && event.venue.address.city"> | {{event.venue.address.city}}<span v-if="event.venue && event.venue.mgrs && event.venue.mgrs.length > 0"> | <span v-for="mgr in event.venue.mgrs" class="mr-3">{{mgr.name}}</span></span></span>
       </div>
       <div class="flex mt-2">
         <div class="flex flex-wrap">
