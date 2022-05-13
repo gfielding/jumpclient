@@ -601,15 +601,25 @@
                         <i class="fas fa-check ml-2 mr-2" style="opacity: 0.4;"></i>
                       </button>
 
-                      <button v-if="!props.row.confirmed && props.row.status == 'assigned' && (props.row.updatedRequested && Object.keys(props.row.updatedRequested).length)" class="icon" v-tooltip="'already sent again'">
+                      <!-- <button v-if="!props.row.confirmed && props.row.status == 'assigned' && (props.row.updatedRequested && Object.keys(props.row.updatedRequested).length)" class="icon" v-tooltip="'already sent again'">
                         <i class="fa-solid fa-paper-plane ml-2 mr-2" style="opacity: 0.4;"></i>
-                      </button>
+                      </button> -->
+
+                        <button v-if="(!props.row.confirmed && props.row.status == 'assigned') && !performingRequestRequest" class="icon" v-tooltip="'resend confirmation text'" @click="requestConfirmation(props)">
+                          <i class="fa-solid fa-paper-plane ml-2 mr-2 blueHue"></i>
+                        </button>
 
 
+                      <transition name="fade">
+                        <span class="ml-2" v-if="performingRequestRequest">
+                        <i class="fa fa-spinner fa-spin"></i>
+                        </span>
+                      </transition>
 
-                      <button v-if="!props.row.confirmed && props.row.status == 'assigned' && !props.row.updatedRequested" class="icon" v-tooltip="'resend confirmation text'" @click="requestConfirmation(props)">
+
+                      <!-- <button v-if="!props.row.confirmed && props.row.status == 'assigned' && !props.row.updatedRequested" class="icon" v-tooltip="'resend confirmation text'" @click="requestConfirmation(props)">
                         <i class="fa-solid fa-paper-plane ml-2 mr-2 blueHue"></i>
-                      </button>
+                      </button> -->
 
                       <button v-if="props.row.confirmed" class="icon" v-tooltip="'unconfirm'" @click="unConfirmPlacement(props)">
                         <i class="fas fa-check ml-2 mr-2" style="color:green"></i>
@@ -753,6 +763,7 @@ export default {
   data() {
     return {
       performingRequest: false,
+      performingRequestRequest: false,
       spin: false,
       performingRequest7: false,
       newActiveDay: '',
@@ -1716,6 +1727,7 @@ export default {
       // this.$store.dispatch("lockShift", assignment)
     },
     requestConfirmation(props) {
+      this.performingRequestRequest = true
       fb.userDaysCollection.doc(props.row.id).update({
         updatedRequested: fb.firestore.FieldValue.serverTimestamp()
       })
@@ -1727,6 +1739,9 @@ export default {
           })
         })
       })
+      setTimeout(() => {
+        this.performingRequestRequest = false
+      }, 5000)
     },
     assignShift(shift) {
       let userId = shift.selectedStaff.userId
