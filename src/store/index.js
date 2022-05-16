@@ -2383,7 +2383,7 @@ const store = new Vuex.Store({
         .then(function (doc) {
         let event = doc.data()
         let shift = payload.shift
-        let shiftDay = payload.shift.day
+        let shiftDay = payload.day
         let dateObj = new Date(payload.shift.day);
         let month = dateObj.getUTCMonth() + 1;
         let day = dateObj.getUTCDate();
@@ -2404,8 +2404,8 @@ const store = new Vuex.Store({
           name:  shift.event,
           fileId: payload.user.employeeNumber || payload.user.contractorNumber || '123',
           position: shift.position.title,
-          start: shiftDay + " " + shift.startTime,
-          end: shiftDay + " " + shift.endTime,
+          start: shift.day[0] + " " + shift.startTime,
+          end: shift.day[0] + " " + shift.endTime,
           startTime: shift.startTime,
           endTime: shift.endTime,
           eventInfo: event,
@@ -2795,7 +2795,7 @@ const store = new Vuex.Store({
       console.log(payload)
       let event = payload.event
       let shift = payload.shift
-      let shiftDay = payload.shift.day
+      let shiftDay = payload.day
       let dateObj = new Date(payload.shift.day);
       let month = dateObj.getUTCMonth() + 1;
       let day = dateObj.getUTCDate();
@@ -2899,8 +2899,8 @@ const store = new Vuex.Store({
       let event = payload.event
       let row = payload.row
       let shift = payload.shift
-      let shiftDay = payload.shift.day
-      let dateObj = new Date(payload.shift.day);
+      let shiftDay = payload.day
+      let dateObj = new Date(payload.day);
       let month = dateObj.getUTCMonth() + 1;
       let day = dateObj.getUTCDate();
       let year = dateObj.getUTCFullYear();
@@ -2909,6 +2909,7 @@ const store = new Vuex.Store({
       let shiftEnd = payload.shiftEnd
       let userId = payload.row.userId
       let name = payload.shift.name
+      let theDate = payload.row.dateFormat
       let ssn
       let rate
       let tipped
@@ -2946,8 +2947,8 @@ const store = new Vuex.Store({
       let assignment = {
         shiftId: shift.id,
         userId: userId,
-        date: newdate,
-        day: shift.day[0],
+        date: theDate,
+        day: payload.day,
         eventId: shift.eventId,
         email: payload.row.email,
         firstName: payload.row.firstName,
@@ -2958,8 +2959,8 @@ const store = new Vuex.Store({
         position: positioned,
         regRate: rate,
         tipped: tipped,
-        start: shiftDay + " " + shiftStart,
-        end: shiftDay + " " + shiftEnd,
+        start: shift.day[0] + " " + shiftStart,
+        end: shift.day[0] + " " + shiftEnd,
         startTime: shiftStart,
         endTime: shiftEnd,
         eventInfo: event,

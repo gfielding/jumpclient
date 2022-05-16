@@ -1,5 +1,6 @@
 <template>
 	<div class="dashboard">
+    <Loader v-if="performingRequest" />
     <div class="dashboard__container">
       <div class="dashboard__container--header mb-3" v-if="event">
         <div class="mb-3">
@@ -11,7 +12,14 @@
         </div>
           <!-- <h2 v-if="event &&event.title">Staff Placements for {{event.title}}</h2> -->
           <span v-if="event && event.venue && event.venue.title">
-          <p>{{event.venue.title}}<span v-if="event.venue && event.venue.address"> | {{event.venue.address.city}}, {{event.venue.address.state}}</span> | {{event.startDate | moment("ddd, MMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("ddd, MMM Do YYYY") }}</span></p>
+            <p>{{event.venue.title}}<span v-if="event.venue && event.venue.address"> | {{event.venue.address.city}}, {{event.venue.address.state}}</span>
+            <span v-if="event.startDate">
+             | {{event.startDate | moment("ddd, MMM Do YYYY") }}
+            </span>
+            <span v-if="event.endDate">
+               - {{event.endDate | moment("ddd, MMM Do YYYY") }}
+             </span>
+           </p>
         </span> 
         </div>
         <span class="flex flex-wrap justify-flex-end">
@@ -48,10 +56,11 @@
                     <template v-slot:item="{ item }">
                       <div>
                         <button @click="addUser(item)" class="btn btn__icon btn__flat mr-4">
+                          </span>
                           <i class="fas fa-plus" style="color:blue;" v-if="!performingRequest"></i>
                           <i class="fa fa-spinner fa-spin" style="color:blue;" v-if="performingRequest"></i>
                         </button>
-                        <p style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</p>
+                        <p style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</p style="display: inline;">
                       </div>
                     </template>
                   </ais-hits>
@@ -319,11 +328,7 @@
             <transition name="fade">
               <div v-if="shift.collapse == true">
                 <div class="mb-2">
-                  <!-- <h4 v-if="shift.name">{{shift.name}} <span v-if="shift.location">/ {{shift.location}}</span></h4> -->
-                  <!-- <p v-if="shift.position.title">{{shift.position.title}}, 
-                    <span v-if="shift.startTime" class="ml-2"> {{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}</span> - 
-                    <span v-if="shift.endTime">{{ [ shift.endTime, "HH:mm" ] | moment("hh:mm A") }}</span>
-                  </p> -->
+              
 
                   <button class="btn btn__flat chip mt-1">{{orderedPlacedUsers(shift).length}} / {{shift.staff}}</button>
 
@@ -542,23 +547,42 @@
                       </span>
 
 
-                      <span v-else-if="props.column.field == 'reservations'">
+                      <span v-else-if="props.column.field == 'reservations'" class="flex">
                       <span v-if="
                         (props.row.dayStatus != 'hired') &&
                         (props.row.dayStatus != 'assigned') &&
                         (props.row.dayStatus != 'not requested')
-                      " style="display:inline; margin-right: 1.5rem;">
+                      " style="display:inline;">
                         <button class="icon" @click="reserveUser(props.row)" v-tooltip="'reserve user'">
                           <i class="far fa-calendar ml-2 mr-2"></i>
                         </button>
                       </span>
+
+
                       <span v-if="
+                        (props.row.dayStatus == 'hired' && props.row.status == 'assigned')
+                      " style="display:inline;">
+                        <button class="icon mr-2 ml-2" v-tooltip="'unlock first to cancel reservation'">
+                          <i class="fas fa-calendar-check" style="color:green;"></i>
+                        </button>
+                      </span>
+
+                      <span v-if="
+                        (props.row.dayStatus == 'hired' && (!props.row.status || props.row.status != 'assigned'))
+                      " style="display:inline;">
+                        <button class="icon mr-2 ml-2" v-tooltip="'cancel reservation'" @click="unreserveUser(props.row)">
+                          <i class="fas fa-calendar-check" style="color:green;"></i>
+                        </button>
+                      </span>
+                      <!-- <span v-if="
                         (props.row.dayStatus == 'hired' || props.row.dayStatus == 'assigned')
                       " style="display:inline;">
                         <button class="icon" v-tooltip="'cancel reservation'" @click="unreserveUser(props.row)">
                           <i class="fas fa-calendar-check ml-2 mr-2" style="color:green;"></i>
                         </button>
-                      </span>
+                      </span> -->
+
+
 
                       <span v-if="
                         (props.row.dayStatus != 'hired') &&
@@ -570,6 +594,9 @@
                         </button>
                       </span>
 
+
+
+
                       <span v-if="
                         (props.row.dayStatus == 'not requested')
                       " style="display:inline;">
@@ -577,6 +604,17 @@
                           <i class="fas fa-calendar-times ml-2 mr-2" style="color:red;"></i>
                         </button>
                       </span>
+
+
+<!--                       if (row.job && row.job.title) {
+        positioned = row.job.title
+      } else if (!row.job || !row.job.title) {
+        positioned = shift.position.title
+      } else {
+        positioned = {}
+      } -->
+                      <span v-if="((shift.position && shift.position.title) || (props.row.job && props.row.job.title))">
+                       <!--  <span> -->
 
                         <button v-if="props.row.dayStatus == 'hired' && props.row.status != 'assigned' && props.row.status != 'spinning' && (props.row.start || shift.startTime) && (props.row.end || shift.endTime)" class="icon" v-tooltip="'lock shift'" @click="lockShift(props, shift)" style="display:inline;">
                           <i class="fas fa-lock-open-alt ml-2 mr-2"></i>
@@ -592,6 +630,7 @@
                         <button class="icon" v-if="props.row.dayStatus == 'hired' && props.row.status == 'assigned'" style="display:inline;" @click="unlock(props, shift)">
                           <i class="fas fa-lock-alt ml-2 mr-2"></i>
                         </button>
+                      </span>
                       
                     </span>
 
@@ -600,20 +639,20 @@
                         <i class="fas fa-check ml-2 mr-2" style="opacity: 0.4;"></i>
                       </button>
 
-                      <!-- <button v-if="!props.row.confirmed && props.row.status == 'assigned' && (props.row.updatedRequested && Object.keys(props.row.updatedRequested).length)" class="icon" v-tooltip="'already sent again'">
+                      <button v-if="!props.row.confirmed && props.row.status == 'assigned' && (props.row.updatedRequested || (props.row.updatedRequested && Object.keys(props.row.updatedRequested).length && props.row.dayStatus != 'not requested'))" class="icon" v-tooltip="'already sent again'">
                         <i class="fa-solid fa-paper-plane ml-2 mr-2" style="opacity: 0.4;"></i>
-                      </button> -->
+                      </button>
 
-                        <button v-if="(!props.row.confirmed && props.row.status == 'assigned') && !performingRequestRequest" class="icon" v-tooltip="'resend confirmation text'" @click="requestConfirmation(props)">
+                        <button v-if="(!props.row.confirmed && props.row.status == 'assigned' && !props.row.updatedRequested  && props.row.dayStatus != 'not requested')" class="icon" v-tooltip="'resend confirmation text'" @click="requestConfirmation(props)">
                           <i class="fa-solid fa-paper-plane ml-2 mr-2 blueHue"></i>
                         </button>
 
 
-                      <transition name="fade">
+                     <!--  <transition name="fade">
                         <span class="ml-2" v-if="performingRequestRequest">
                         <i class="fa fa-spinner fa-spin"></i>
                         </span>
-                      </transition>
+                      </transition> -->
 
 
                       <!-- <button v-if="!props.row.confirmed && props.row.status == 'assigned' && !props.row.updatedRequested" class="icon" v-tooltip="'resend confirmation text'" @click="requestConfirmation(props)">
@@ -635,9 +674,9 @@
                         <i class="far fa-sticky-note ml-2 mr-2"></i>
                       </button>
                     </span>
-                    <span v-else-if="props.column.field == 'delete'">
+                    <span v-else-if="props.column.field == 'delete'" class="flex">
 
-                      <button class="icon mr-2 ml-2" v-if="!props.row.showTrash && (props.row.status != 'assigned' || !props.row.dayStatus)" v-tooltip="'delete instance'" @click="showTrash(props)">
+                      <button class="icon mr-2 ml-2" v-if="!props.row.showTrash && (props.row.status != 'assigned' || (!props.row.dayStatus || props.row.dayStatus == 'not requested'))" v-tooltip="'delete instance'" @click="showTrash(props)">
                         <i class="fas fa-times"></i>
                       </button>
 
@@ -951,22 +990,22 @@ export default {
         {
           label: 'Overwrite Start',
           field: 'start',
-          width: '120px'
+          // width: '120px'
         },
         {
           label: 'Overwrite End',
           field: 'end',
-          width: '120px'
+          // width: '120px'
         },
         {
           label: 'Requested Job',
           field: 'requestedJob.title',
-          width: '144px',
+          // width: '144px',
         },
         {
           label: 'Overwrite Job',
           field: 'assigned',
-          width: '144px',
+          // width: '144px',
         },
         // {
         //   label: '',
@@ -1040,7 +1079,7 @@ export default {
     // this.setInitialDay()
   },
   computed: {
-    ...mapState(['currentUser', 'venueInfo', 'eventUsers', 'eventShifts', 'eventInfo', 'eventDrops', 'userProfile']),
+    ...mapState(['venueInfo', 'eventUsers', 'eventShifts', 'eventInfo', 'eventDrops', 'userProfile']),
     event() {
       return this.eventInfo
     },
@@ -1048,26 +1087,36 @@ export default {
     activeDay() {
       if (this.eventInfo && this.eventInfo.days && this.eventInfo.days.length > 0) {
         return this.newActiveDay ? this.newActiveDay : this.eventInfo.days[0]
+      } else if (this.eventInfo && this.eventInfo.days && this.eventInfo.days.length > 0) {
+        return this.eventInfo.days[0]
+      } else {
+
       }
     },
 
     filteredUsers () {
       return this.eventUsers.filter(user => {
         // return user.status == 'available'
-        return ((user.status != 'placed') && (user.status != 'assigned') && (user.day == this.activeDay))
+        if (this.activeDay) {
+          return ((user.status != 'placed') && (user.status != 'assigned') && (user.day == this.activeDay))
+        }
       })
     },
     
     filteredPlacedUsers () {
       return this.eventUsers.filter(user => {
-        return ((user.status == 'placed') || (user.status == 'assigned'))
+         if (this.activeDay) {
+          return (((user.status == 'placed') || (user.status == 'assigned')) && (user.day == this.activeDay))
+        }
       })
     },
     filteredPlacedDayUsers () {
       console.log(this.activeDay)
-      return this.eventUsers.filter(user => {
-        return ((user.status == 'placed') || (user.status == 'assigned'))
-      })
+      if (this.activeDay) {
+        return this.eventUsers.filter(user => {
+          return (((user.status == 'placed') || (user.status == 'assigned')) && (user.day == this.activeDay))
+        })
+      }
     },
     activeShifts() {
       return this.eventShifts.filter(shift => {
@@ -1196,6 +1245,7 @@ export default {
           dateFormat: newdate,
           start: this.activeDay,
           preferredEvent: this.event.id,
+          preferredEventName: this.event.title,
           status: "available",
           requestedJob: {},
           email: item.email,
@@ -1221,12 +1271,6 @@ export default {
       }, 250)
     },
     exportUnplaced() {
-      let logFields = {
-          user: this.currentUser.email,
-          export: 'Unplaced (Event) Export',
-          eventId: this.event.id,
-      }
-      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "First Name",
         "Last Name",
@@ -1249,26 +1293,8 @@ export default {
         const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
         exportService.export();
       });
-      fb.exportsCollection.add({
-        userId: this.userProfile.id,
-        eventId: this.event.id,
-        eventTitle: this.event.title,
-      }).then(
-        doc => {
-          fb.exportsCollection.doc(doc.id).update({
-          created: fb.firestore.FieldValue.serverTimestamp(),
-          id: doc.id, 
-          })
-          console.log('recorded')
-      })
     },
     exportAll() {
-      let logFields = {
-          user: this.currentUser.email,
-          export: 'All (Event) Export',
-          eventId: this.event.id,
-      }
-      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "First Name",
         "Last Name",
@@ -1337,12 +1363,6 @@ export default {
       
     },
     exportPlaced() {
-      let logFields = {
-          user: this.currentUser.email,
-          export: 'Placed (Event) Export',
-          eventId: this.event.id,
-      }
-      this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "First Name",
         "Last Name",
@@ -1415,12 +1435,6 @@ export default {
       }
     },
     exportStaff(shift) {
-      let logFields = {
-          user: this.currentUser.email,
-          export: 'Staff (Event) Export',
-          eventId: this.event.id,
-      }
-      this.$store.dispatch('sendExportLog', logFields)
       console.log(shift)
       const exportHeaders = [
         "Day",
@@ -1578,7 +1592,7 @@ export default {
         return 0;
       }
       return this.filteredPlacedUsers.sort(compare).filter(user => {
-        return user.shift == shift
+        return user.shift == shift && user.day == this.activeDay
       });
     },
     orderedPlacedUsers (shift) {
@@ -1590,7 +1604,7 @@ export default {
         return 0;
       }
       return this.filteredPlacedUsers.sort(compare).filter(user => {
-        return user.shift == shift.id && user.day == this.activeDay
+        return user.shift == shift.id
       });
     },
     orderedPlacedUsers3 (shift) {
@@ -1750,6 +1764,7 @@ export default {
 
       this.$store.dispatch("lockAShift", {
         event: event,
+        day: this.activeDay,
         row: props.row,
         shift: shift,
         shiftStart: shiftStarting || null,
@@ -1762,21 +1777,22 @@ export default {
       // this.$store.dispatch("lockShift", assignment)
     },
     requestConfirmation(props) {
-      this.performingRequestRequest = true
+      // this.performingRequest = true
+      props.row.updatedRequested = true
       fb.userDaysCollection.doc(props.row.id).update({
         updatedRequested: fb.firestore.FieldValue.serverTimestamp()
       })
-      fb.assignmentsCollection.where("shiftId", "==", props.row.shift).where("userId", "==", props.row.userId).get()
-      .then(function(querySnapshot) {
-        querySnapshot.forEach(doc => {
-          fb.assignmentsCollection.doc(doc.data().id).update({
-            updatedRequested: fb.firestore.FieldValue.serverTimestamp()
-          })
-        })
-      })
-      setTimeout(() => {
-        this.performingRequestRequest = false
-      }, 5000)
+      // fb.assignmentsCollection.where("day", "==", this.activeDay).where("shiftId", "==", props.row.shift).where("userId", "==", props.row.userId).get()
+      // .then(function(querySnapshot) {
+      //   querySnapshot.forEach(doc => {
+      //     fb.assignmentsCollection.doc(doc.data().id).update({
+      //       updatedRequested: fb.firestore.FieldValue.serverTimestamp()
+      //     })
+      //   })
+      // })
+      // setTimeout(() => {
+      //   this.performingRequest = false
+      // }, 1000)
     },
     assignShift(shift) {
       let userId = shift.selectedStaff.userId

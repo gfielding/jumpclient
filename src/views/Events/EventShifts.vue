@@ -228,9 +228,20 @@
 			          </div>
 			        </div>
 			        <div class="flex mb-3">
+
+			        	
+
+
 	  						<div v-if="event.venue && event.venue.job && event.venue.job.length > 0">
 			            <label for="job">Default Job for Shift:</label>
-			            <input readonly v-model="eventShift.position.label || eventShift.position.title" />
+			            <select v-model="eventShift.position" id="job">
+			              <option v-for="(job, index) in event.venue.job" :key="index" v-bind:value="job">
+			              	<span v-if="job.label">{{job.label}}</span>
+			              	<span v-if="!job.label">{{job.title}}</span>
+			              </option>
+			            </select>
+
+			           <!--  <input readonly v-model="eventShift.position.label || eventShift.position.title" /> -->
 			            <!-- <select v-model="eventShift.job" id="job">
 			              <option v-for="(job, index) in event.venue.job" :key="index" v-bind:value="job">
 			              	<span v-if="job.label">{{job.label}}</span>

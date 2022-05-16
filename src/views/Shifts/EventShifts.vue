@@ -810,7 +810,7 @@ export default {
   //   this.decryptRow()
   // },
   computed: {
-    ...mapState(['eventShifts', 'eventInfo', 'eventAssignments', 'eventAssignmentsByDay']),
+    ...mapState(['eventShifts', 'eventInfo', 'eventAssignments', 'eventAssignmentsByDay', 'currentUser']),
     visibleAssignments() {
       return this.eventAssignments.filter(item => {
         return ((!item.hidden || item.hidden != true) && (!item.paystatus || item.paystatus != 'paid'))

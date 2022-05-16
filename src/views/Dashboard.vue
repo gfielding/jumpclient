@@ -70,6 +70,10 @@
           <h3>Check-In/Check-Out</h3>
           {{checkInMaster}}
         </div> -->
+
+
+         <!-- <button @click="removeBadApps()">Bad Applications</button> -->
+
         <!-- <button @click="updateSocials()">Update Socials</button> -->
         <!-- <button @click="updateEvents()">Update All Events</button> -->
 
@@ -222,6 +226,9 @@ export default {
         exportService.export();
       });
     },
+    // removeBadApps() {
+    //   fb.assignmentsCollection.where()
+    // }
     // updateSocials() {
     //   console.log('updating')
     //   fb.usersCollection.where("ssn", "!=", null).orderBy("ssn").limit(10000)

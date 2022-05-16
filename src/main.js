@@ -54,7 +54,6 @@ Vue.use(StarRating)
 Vue.use(VTooltip)
 Vue.use(VueClipboard)
 Vue.use(vClickOutside)
-// Vue.use(require('vue-moment'))
 Vue.use(VueMoment, {
     moment,
 })
@@ -75,6 +74,16 @@ Vue.use(VueGapi, {
 
 Vue.config.productionTip = false
 Vue.config.devtools = true
+
+Vue.filter('moment', function (value, format) {
+  if (value === null || value === undefined || format === undefined) {
+    return ''
+  }
+  if (format === 'from') {
+    return moment(value).fromNow()
+  }
+  return moment(value).format(format)
+})
 
 
 Vue.filter('uppercase', function (value) {
