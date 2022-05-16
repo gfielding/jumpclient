@@ -2,200 +2,88 @@
 	<div class="dashboard">
     <div class="dashboard__container">
       <div class="dashboard__container--header">
-        <div class="flex align-center">
-          <h1>Edit Event</h1>
-          <button class="btn btn__large btn__success ml-5" v-if="event && event.published" :disabled="event.cancelled">
-            Published
-          </button>
-          <button class="btn btn__large btn__warning ml-5" v-if="event && !event.published" :disabled="event.status == 'cancelled'">
-            Draft
-          </button>
-          <button class="btn btn__large btn__danger ml-5" v-if="event && event.status == 'cancelled'">
-            Cancelled
-          </button>
+        <div class="flex align-center mb-5">
+          <h1>Event Info Email</h1>
         </div>
         <div class="flex align-center">
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="venueSync()">Sync Venue Details</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="email()">Info Email</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="checkIn()">Check-In</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="shifts()">Shifts</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="sheets()">Timesheets</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="placements()">Placements</button>
-
 
           <button class="btn btn__outlined btn__small mb-3" @click="goBack()"><i class="fas fa-arrow-left"></i></button>
         </div>
       </div>
-      <form ref="form" @submit.prevent>
-        <Loader v-if="!eventInfo || !eventInfo.id" />
+      <form ref="form" @submit.prevent style="margin:auto; max-width: 640px; background: white;">
+        <Loader v-if="!event || !event.id" />
+        <div v-if="event">
+          <img v-if="event.photoUrl || (event.venue && event.venue.photoUrl)" :src="(event.photoUrl || event.venue.photoUrl)" alt="" style="width:100%;">
+          <div class="pa-3">
+            <h1 v-if="event.title">Congratulations NAME! Your shift has been assigned to work as a JOB at {{event.title}} on DATE from START to END</h1>
+
+            <div>
+              <hr>
+              <label for="eventIntro">Add an Intro Paragraph:</label>
+              <textarea cols="30" rows="2" id="eventIntro" v-model="event.intro"></textarea>
+            </div>
+
+            <div v-if="!event.requiredVaccine">
+              <hr>
+              <h3>Covid-19 Vaccination is Required</h3>
+              <div>Please bring proof of vaccination with you or you will not be able to work.</div>
+            </div>
+            <div v-if="event && event.venue && event.venue.title">
+              <hr>
+              <h3>Location: {{event.venue.title}}</h3>
+              <div>{{event.venue.address.street_number}} {{event.venue.address.street}} <span v-if="event.venue.address.unit">#{{event.venue.address.unit}}</span><br />{{event.venue.address.city}}, {{event.venue.address.state}} {{event.venue.address.zip}}</div>
+            </div>
+            <div v-if="event && event.venue && event.venue.mgrs && event.venue.mgrs.length >= 1">
+              <hr>
+              <h3 v-if="event.venue.mgrs.length == 1">Your Manager</h3>
+              <h3 v-if="event.venue.mgrs.length > 1">Your Managers</h3>
+              <div v-for="(item, index) in event.venue.mgrs" :key="index" class="mb-3">
+                <h4>{{item.name}}</h4>
+                <p><span v-if="item.phone"><a :href="`tel:${item.phone}`">{{item.phone}}</a><br /></span>
+                <a :href="`mailto:${item.email}`">{{item.email}}</a></p>
+              </div>
+            </div>
+            <div v-if="event && event.venue && (event.venue.attire || venueInfo.attire)">
+              <hr>
+              <h3>What to Wear</h3>
+              <div v-if="event.venue.attire" v-html="event.venue.attire"></div>
+              <div v-if="!event.venue.attire && (venueInfo && venueInfo.attire)" v-html="venueInfo.attire"></div>
+            </div>
+
+            <div v-if="event && event.venue && (event.venue.checkin || venueInfo.checkin)">
+              <hr>
+              <h3>Check-In Instructions</h3>
+              <div v-if="event.venue.checkin" v-html="event.venue.checkin"></div>
+              <div v-if="!event.venue.checkin && (venueInfo && venueInfo.checkin)" v-html="venueInfo.checkin"></div>
+            </div>
+
+            <div v-if="event && event.venue && (event.venue.parking || venueInfo.parking)">
+              <hr>
+              <h3>Parking Details</h3>
+              <div v-if="event.venue.parking" v-html="event.venue.parking"></div>
+              <div v-if="!event.venue.parking && (venueInfo && venueInfo.parking)" v-html="venueInfo.parking"></div>
+            </div>
+
+            <div v-if="event && event.venue && (event.venue.creds || venueInfo.creds)">
+              <hr>
+              <h3>Credentials (wristbands)</h3>
+              <div v-if="event.venue.creds" v-html="event.venue.creds"></div>
+              <div v-if="!event.venue.creds && (venueInfo && venueInfo.creds)" v-html="venueInfo.creds"></div>
+            </div>
+
+
+            <div v-if="event && event.venue && (event.venue.camping || venueInfo.camping)">
+              <hr>
+              <h3>Camping Details</h3>
+              <div v-if="event.venue.camping" v-html="event.venue.camping"></div>
+              <div v-if="!event.venue.camping && (venueInfo && venueInfo.camping)" v-html="venueInfo.camping"></div>
+            </div>
+
+          </div>
+        </div>
+        
       	<div class="dashboard__container--body mt-3" v-if="eventInfo">
-      		<div class="dashboard__container--body--col">
 
-    				<div class="mb-3">
-    					<label for="eventName">Event Name:</label>
-    					<input type="text" v-model.trim="event.title" id="eventName" required />
-    				</div>
-
-            <div class="mb-3">
-              <label for="eventSlug">Event Slug:</label>
-              <input type="text" v-model.trim="event.slug" id="eventSlug" required />
-            </div>
-
-    				<div class="mb-3">
-    					<label for="eventPublished">Published:</label>
-    					<input type="checkbox" v-model.trim="event.published" id="eventPublished" class="ml-3" />
-    				</div>
-
-            <div class="mb-3" v-if="event && event.venue">
-              <label for="venueVisibility">Vaccination Required:</label>
-              <input v-if="!event.requiredVaccine" type="checkbox" v-model.trim="event.venue.requiredVaccine" id="venueVisibility" class="ml-3" />
-              <input v-if="event.requiredVaccine" type="checkbox" v-model.trim="event.requiredVaccine" id="venueVisibility" class="ml-3" />
-            </div>
-
-            <div class="mb-3" v-if="venues.length > 1">
-              <label for="venue">Venue: (updates on change)</label>
-              <v-select
-                class="mt-2"
-                label="title" 
-                :options="venues"
-                v-model="event.venue"
-                @input="updateVenue()"
-                >
-              </v-select>
-            </div>
-            <div class="mb-3" v-if="event.venue">
-              <label for="clients">Clients:</label>
-              <v-select
-                class="mt-2"
-                label="title"
-                multiple
-                :options="clients"
-                v-model="event.venue.client"
-                >
-              </v-select>
-            </div>
-
-            <div class="mb-3" v-if="event.venue && tags.length > 1">
-              <label for="tags">Tags:</label>
-              <v-select
-                class="mt-2"
-                label="title" 
-                :options="tags"
-                multiple
-                v-model="event.tags"
-                >
-              </v-select>
-            </div>
-            <div class="mb-3" v-if="event.venue && mgrs.length >= 1">
-            <label for="mgrs">Managers:</label>
-              <v-select
-                class="mt-2"
-                label="name" 
-                :options="mgrs"
-                multiple
-                v-model="event.venue.mgrs"
-                >
-              </v-select>
-            </div>
-          </div>
-          <div class="dashboard__container--body--col">
-            <div class="mb-3">
-              <label for="eventDescription">Description:</label>
-              <vue-editor id="eventDescription" v-model="event.description" required></vue-editor>
-            </div>
-          </div>
-          <div class="dashboard__container--body--col">
-
-            <div class="mb-3">
-              <label for="multiDay">Multiple Days:</label>
-              <input type="checkbox" v-model.trim="multiDay" id="multiDay" class="ml-3" />
-            </div>
-
-            <transition name="fadeStop">
-              <div class="mb-3" v-if="multiDay">
-                <label for="startDate">Start Date:</label>
-                <input type="date" v-model.trim="event.startDate"  id="startDate"  />
-              </div>
-            </transition>
-
-            <transition name="fadeStop">
-              <div class="mb-3" v-if="multiDay">
-                <label for="endDate">End Date:</label>
-                <input type="date" v-model.trim="event.endDate"  id="endDate"  />
-              </div>
-            </transition>
-
-            <transition name="fadeStop">
-              <div class="mb-3" v-if="!multiDay">
-                <label for="Date">Date:</label>
-                <input type="date" v-model.trim="event.startDate"  id="Date"  />
-              </div>
-            </transition>
-
-          </div>
-          <div class="dashboard__container--body--col">
-
-            <h3>Days to Staff</h3>
-            <transition name="fadeStop">
-              <div class="mt-2 flex" style="flex-wrap: wrap;" v-if="event.days && event.days.length >= 1">
-                <button class="chip mr-2 mb-2" v-for="(day, index) in event.days" :key="day" @click="deleteDay(index)">{{day}} <i class="far fa-times-circle ml-2"></i></button>
-              </div>
-            </transition> 
-            <transition name="fadeStop">
-              <div class="mb-3" v-if="event.startDate">
-                <label for="pickDate">Choose Date:</label>
-                <input type="date" v-model.trim="day" id="pickDate" @change="addDay()" />
-              </div>
-            </transition>
-          </div>
-
-          <div class="dashboard__container--body--col" v-if="event.venue">
-            <div class="flex justify-space-between align-center">
-              <h3>Jobs to Staff</h3>
-              
-            </div>
-            
-            <div class="mb-3">
-              <label for="pickDate">Choose Jobs:</label>
-              <v-select
-                class="mt-2"
-                label="title" 
-                :options="jobs"
-                v-model="event.venue.job"
-                multiple
-                >
-              </v-select>
-            </div>
-            <transition name="fadeStop">
-              <div class="mb-3" v-if="event.venue.job && event.venue.job.length >= 1">
-                <div v-for="job in event.venue.job" class="mb-3 flex justify-space-between">
-                  <input type="text" readonly v-model.trim="job.title" />
-                  <input class="ml-3" type="number" step=".01" placeholder="pay rate" v-model.trim="job.rate" />
-                  <input class="ml-3" type="text" placeholder="new label" v-model.trim="job.label" />
-                  <div class="ml-3">
-                    <label for="tipped">Tipped?</label>
-                    <input class="ml-3" type="checkbox" v-model="job.tipped" id="tipped" />
-                  </div>
-                  <!-- <button class="btn btn__accent btn__small ml-3">save</button> -->
-                </div>
-              </div>
-            </transition>
-          </div>
-
-          <!-- <div class="dashboard__container--body--col" v-if="event.venue">
-            <div class="mb-3" v-if="clients.length >= 1">
-              <h3>Client</h3>
-              <v-select
-                class="mt-2"
-                label="title"
-                multiple
-                :options="clients"
-                v-model="event.venue.client"
-                >
-              </v-select>
-            </div>
-          </div>
-           -->
           <div class="dashboard__container--body--col">
             <h3>Attach Files</h3>
 
@@ -239,36 +127,7 @@
             </div>
           </div>
 
-      		<div class="dashboard__container--body--col">
-            <h3 class="mb-3">Background Image</h3>
-            <div class="flex flex-column align-center">
-              <div class="event-wrapper" :style="{ backgroundImage: 'url(' + backgroundUrl + ')' }">
-                <croppa 
-                v-model="croppa"
-                :prevent-white-space="true"
-                :width="300"
-                :height="100"
-                accept=".jpeg,.png,.jpg,.svg"
-                :file-size-limit="2048000"
-                :quality="6"
-                :placeholder="'Upload Image'"
-                placeholder-color="white"
-                initial-size="cover"
-                :remove-button-size="32"
-                @file-size-exceed="onFileSizeExceed"
-                @file-type-mismatch="onFileTypeMismatch"
-              >
-              </croppa>
-              </div>
-              <p class="caption mt-3">jpg or png file. 2MB max</p>
-            </div>
-          </div>
-          <div class="dashboard__container--body--col" v-if="event.venue">
-            <h3>Attire</h3>
-            <div class="mb-3">
-              <vue-editor id="attire" v-model="event.venue.attire"></vue-editor>
-            </div>
-          </div>
+          
           <div class="dashboard__container--body--col" v-if="event.venue">
 
             <div class="mb-3">
@@ -276,14 +135,7 @@
               <vue-editor id="pay" v-model="event.venue.pay"></vue-editor>
             </div>
           </div>
-          <div class="dashboard__container--body--col" v-if="event.venue">
-
-            <div class="mb-3">
-              <h3>Check-In Instructions</h3>
-              <vue-editor id="checkin" v-model="event.venue.checkin"></vue-editor>
-            </div>
-
-          </div>
+          
 
           <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3">
@@ -432,7 +284,7 @@ import router from '@/router'
 const fb = require('../../firebaseConfig.js')
 
 export default {
-  name: 'event',
+  name: 'eventemail',
   data: () => ({
     croppa: {},
     day:'',
@@ -494,8 +346,11 @@ export default {
       this.$store.dispatch("getTagsState")
     }
   },
+  mounted() {
+    this.$store.dispatch("getVenueFromId", this.eventInfo.venueId);
+  },
   computed: {
-    ...mapState(['eventInfo', 'venues', 'clients', 'jobs', 'mgrs', 'tags']),
+    ...mapState(['eventInfo', 'venueInfo']),
     event() {
       return this.eventInfo
     },
@@ -600,10 +455,6 @@ export default {
     },
     placements() {
       let url = `/eventplacements/` + this.$route.params.id
-      router.push(url)
-    },
-    email() {
-      let url = `/events/` + this.$route.params.id + `/email`
       router.push(url)
     },
     checkIn() {

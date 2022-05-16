@@ -297,6 +297,7 @@ export default {
         "Last Name",
         "Email",
         "Phone",
+        "Market",
         "Source",
       ];
       const exportItems = [];
@@ -306,6 +307,7 @@ export default {
           this.marketLeads[key].last,
           this.marketLeads[key].email,
           this.marketLeads[key].phone,
+          this.marketLeads[key].market.city,
           this.marketLeads[key].source,
         ]);
       }
@@ -313,6 +315,7 @@ export default {
         const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
         exportService.export();
       });
+      this.performingRequest = false
     },
     showAll() {
       this.allLeads = true

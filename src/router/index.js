@@ -264,6 +264,14 @@ const router = new VueRouter({
       },
     },
     {
+      path: '/events/:id/email',
+      name: 'eventemail',
+      component: () => import('../views/Events/EventEmail.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
       path: '/events/:id/shifts',
       name: 'eventshifts',
       component: () => import('../views/Events/EventShifts.vue'),
