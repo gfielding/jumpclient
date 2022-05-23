@@ -3,17 +3,18 @@
     <div class="dashboard__container">
       <div class="dashboard__container--header">
         <div class="flex align-center mb-5">
-          <h1>Event Info Email</h1>
+          <h1>Preview Info Email</h1>
         </div>
         <div class="flex align-center">
 
           <button class="btn btn__outlined btn__small mb-3" @click="goBack()"><i class="fas fa-arrow-left"></i></button>
         </div>
       </div>
-      <form ref="form" @submit.prevent style="margin:auto; max-width: 640px; background: white;">
-        <Loader v-if="!event || !event.id" />
+      <Loader v-if="!event || !event.id" />
+      <form ref="form" v-if="event && event.id" @submit.prevent style="margin:auto; max-width: 640px; background: white;">
+        
         <div v-if="event">
-          <img v-if="event.photoUrl || (event.venue && event.venue.photoUrl)" :src="(event.photoUrl || event.venue.photoUrl)" alt="" style="width:100%;">
+          <img v-if="(event.photoUrl || (event.venue && event.venue.photoUrl) || venueInfo.photoUrl)" :src="(event.photoUrl || event.venue.photoUrl || venueInfo.photoUrl)" alt="" style="width:100%;">
           <div class="pa-3">
             <h1 v-if="event.title">Congratulations NAME! Your shift has been assigned to work as a JOB at {{event.title}} on DATE from START to END</h1>
 
@@ -21,9 +22,13 @@
               <hr>
               <label for="eventIntro">Add an Intro Paragraph:</label>
               <textarea cols="30" rows="2" id="eventIntro" v-model="event.intro"></textarea>
+
+              <transition name="fade">
+                <button v-if="event && event.intro && event.intro.length > 5" class="btn btn__small btn__success mt-3" @click="updateEvent()">Submit</button>
+              </transition>
             </div>
 
-            <div v-if="!event.requiredVaccine">
+            <div v-if="((event && event.requiredVaccine) || (venueInfo && venueInfo.requiredVaccine))">
               <hr>
               <h3>Covid-19 Vaccination is Required</h3>
               <div>Please bring proof of vaccination with you or you will not be able to work.</div>
@@ -43,28 +48,28 @@
                 <a :href="`mailto:${item.email}`">{{item.email}}</a></p>
               </div>
             </div>
-            <div v-if="event && event.venue && (event.venue.attire || venueInfo.attire)">
+            <div v-if="((event && event.venue && event.venue.attire) || (venueInfo && venueInfo.attire))">
               <hr>
               <h3>What to Wear</h3>
               <div v-if="event.venue.attire" v-html="event.venue.attire"></div>
               <div v-if="!event.venue.attire && (venueInfo && venueInfo.attire)" v-html="venueInfo.attire"></div>
             </div>
 
-            <div v-if="event && event.venue && (event.venue.checkin || venueInfo.checkin)">
+            <div v-if="((event && event.venue && event.venue.checkin) || (venueInfo && venueInfo.checkin))">
               <hr>
               <h3>Check-In Instructions</h3>
               <div v-if="event.venue.checkin" v-html="event.venue.checkin"></div>
               <div v-if="!event.venue.checkin && (venueInfo && venueInfo.checkin)" v-html="venueInfo.checkin"></div>
             </div>
 
-            <div v-if="event && event.venue && (event.venue.parking || venueInfo.parking)">
+            <div v-if="((event && event.venue && event.venue.parking) || (venueInfo && venueInfo.parking))">
               <hr>
               <h3>Parking Details</h3>
               <div v-if="event.venue.parking" v-html="event.venue.parking"></div>
               <div v-if="!event.venue.parking && (venueInfo && venueInfo.parking)" v-html="venueInfo.parking"></div>
             </div>
 
-            <div v-if="event && event.venue && (event.venue.creds || venueInfo.creds)">
+            <div v-if="((event && event.venue && event.venue.creds) || (venueInfo && venueInfo.creds))">
               <hr>
               <h3>Credentials (wristbands)</h3>
               <div v-if="event.venue.creds" v-html="event.venue.creds"></div>
@@ -72,205 +77,53 @@
             </div>
 
 
-            <div v-if="event && event.venue && (event.venue.camping || venueInfo.camping)">
+            <div v-if="((event && event.venue && event.venue.camping) || (venueInfo && venueInfo.camping))">
               <hr>
               <h3>Camping Details</h3>
               <div v-if="event.venue.camping" v-html="event.venue.camping"></div>
               <div v-if="!event.venue.camping && (venueInfo && venueInfo.camping)" v-html="venueInfo.camping"></div>
             </div>
 
-          </div>
-        </div>
-        
-      	<div class="dashboard__container--body mt-3" v-if="eventInfo">
+            <div v-if="((event && event.venue && event.venue.notes) || (venueInfo && venueInfo.notes))">
+              <hr>
+              <h3>Additional Notes</h3>
+              <div v-if="event.venue.notes" v-html="event.venue.notes"></div>
+              <div v-if="!event.venue.notes && (venueInfo && venueInfo.notes)" v-html="venueInfo.notes"></div>
+            </div>
 
-          <div class="dashboard__container--body--col">
-            <h3>Attach Files</h3>
 
-            <div class="mb-3">
-              <label for="fileTitle">Details:</label>
-              <input class="mb-2" placeholder="File Title" type="text" v-model.trim="fileTitle" id="fileTitle" />
-              <textarea placeholder="File Description" name="fileDescription" id="fileDescription" cols="30" rows="2" v-model="fileDescription"></textarea>
-
-              <input class="mt-3" type="file" ref="fileInputTip" accept="image/*,application/pdf,.doc" @change="previewImage">
-              <progress :value="uploadValue" max="100" v-if="showBar"></progress>
-              <div class="mb-3">
-                <button v-if="imageData != null" class="btn btn__primary mt-3" @click="onUploadFile">
-                  Upload
-                  <transition name="fade">
-                    <span class="ml-2" v-if="performingRequest3">
-                    <i class="fa fa-spinner fa-spin"></i>
-                    </span>
-                  </transition>
-                </button>
-              </div>
+            <div v-if="((event.files && event.files.length >= 1) || (venueInfo && venueInfo.files && venueInfo.files.length >= 1))">
+              <hr>
+              <h3>Attachments</h3>
               <div v-if="event.files && event.files.length >= 1">
-                <vue-good-table
-                  :columns="columns"
-                  :rows="event.files"
-                  >
-                  <template slot="table-row" slot-scope="props">
-                    <span v-if="props.column.field == 'url'">
-                      <a :href="props.row.url" target="_blank"><i class="fas fa-external-link"></i></a>
-                    </span>
-                    <span v-else-if="props.column.field == 'extras'">
-                      <button @click="deleteUploadedFile(props.row, props.index)">
-                        <i class="fas fa-trash"></i>
+                <div v-for="(item, index) in event.files" :key="index + `a`">
+                  <div class="flex justify-space-between align-center pt-3 mb-3" style="border-top:1px solid rgba(0,0,0,0.1);">
+                    <h5>{{item.title}}</h5>
+                    <a :href="item.url" target="_blank">
+                      <button class="btn btn__outlined btn__small">
+                        View Attachment<i class="fas fa-external-link ml-2"></i>
                       </button>
-                    </span>
-                    <span v-else>
-                      {{props.formattedRow[props.column.field]}}
-                    </span>
-                  </template>
-                </vue-good-table>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div v-if="venueInfo && venueInfo.files && venueInfo.files.length >= 1">
+                <div v-for="(item, index) in venueInfo.files" :key="index + `b`">
+                  <div class="flex justify-space-between align-center pt-3 mb-3" style="border-top:1px solid rgba(0,0,0,0.1);">
+                    <h5>{{item.title}}</h5>
+                    <a :href="item.url" target="_blank">
+                      <button class="btn btn__outlined btn__small">
+                        View Attachment<i class="fas fa-external-link ml-2"></i>
+                      </button>
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
 
-          
-          <div class="dashboard__container--body--col" v-if="event.venue">
-
-            <div class="mb-3">
-              <h3>Pay</h3>
-              <vue-editor id="pay" v-model="event.venue.pay"></vue-editor>
-            </div>
-          </div>
-          
-
-          <div class="dashboard__container--body--col" v-if="event.venue">
-            <div class="mb-3">
-              <h3>Parking Instructions</h3>
-              <vue-editor id="parking" v-model="event.venue.parking"></vue-editor>
-            </div>
-          </div>
-
-          <div class="dashboard__container--body--col" v-if="event.venue">
-            <div class="mb-3">
-              <h3>Camping Instructions</h3>
-              <vue-editor id="camping" v-model="event.venue.camping"></vue-editor>
-            </div>
-          </div>
-
-          <div class="dashboard__container--body--col" v-if="event.venue">
-            <div class="mb-3">
-              <h3>Credentials Instructions</h3>
-              <vue-editor id="creds" v-model="event.venue.creds"></vue-editor>
-            </div>
-          </div>
-
-          <div class="dashboard__container--body--col" v-if="event.venue">
-            <div class="mb-3">
-              <h3>COVID Requirements:</h3>
-              <vue-editor id="covid" v-model="event.venue.covid"></vue-editor>
-            </div>
-          </div>
-
-
-          <div class="dashboard__container--body--col" v-if="event.venue">
-            <div class="mb-3">
-              <h3>Additional Notes:</h3>
-              <vue-editor id="notes" v-model="event.venue.notes"></vue-editor>
-            </div>
           </div>
         </div>
-        <!-- <hr>
-        <div class="dashboard__container--body">
-          <div class="dashboard__container--body--col">
-            <h2>Last Message</h2>
-            <div class="mb-3 mt-1">
-            </div>
-            <div v-if="event.updateMessage">{{event.updateMessage}}</div>
-            <div class="mt-2">
-              <span v-if="event.updateStaffSent" class="caption">
-                Last Sent: {{event.updateStaffSent.toDate() | moment("MMMM Do YYYY, h:mm a") }}
-              </span>
-            </div>
-          </div>
-          <div class="dashboard__container--body--col">
-            <div class="mb-3">
-              <h3>Send Message to Update Staff:</h3>
-              <textarea name="updateMessage" id="updateMessage" cols="20" rows="4" v-model="event.updateMessage"></textarea>
-            </div>
-            <button class="btn btn__outlined btn__large" @click="updateStaff()">
-              Update Staff
-              <transition name="fade">
-                <span class="ml-2" v-if="performingRequest2">
-                <i class="fa fa-spinner fa-spin"></i>
-                </span>
-              </transition>
-            </button>
-          </div>
-        </div> -->
-        <div class="dashboard__container--body">
-          
-          
-          <!-- <div class="dashboard__container--body--col">
-            <div class="mb-3">
-              <div class="mb-3">
-                <label for="payDate">Pay Date:</label>
-                <input type="date" v-model.trim="event.payDate"  id="payDate"  />
-              </div>
-              <div class="mb-3">
-                <label for="payProcessed">Paid and Complete:</label>
-                <input type="checkbox" v-model.trim="event.paid" id="payProcessed" class="ml-3" />
-              </div>
-            </div>
-          </div> -->
-
-          <div class="dashboard__container--body--col" style="background: transparent;">
-            <div class="flex justify-space-between">
-              <!-- <button class="btn btn__outlined btn__large" @click="exportStaff()">
-              export Staff
-
-              </button> -->
-              <button class="btn btn__success btn__large" @click="updateEvent()" :disabled="event.status == 'cancelled'">
-              Update Event
-                <transition name="fade">
-                  <span class="ml-2" v-if="performingRequest">
-                  <i class="fa fa-spinner fa-spin"></i>
-                  </span>
-                </transition>
-              </button>
-
-              <button class="btn btn__danger btn__large" @click="showCancellation = true" v-if="!showCancellation">
-                Cancel Event
-                <transition name="fade">
-                  <span class="ml-2" v-if="performingRequest4">
-                  <i class="fa fa-spinner fa-spin"></i>
-                  </span>
-                </transition>
-              </button>
-
-              <button class="btn btn__primary btn__large" @click="showCancellation = false" v-if="showCancellation">
-                No Don't Cancel
-                <transition name="fade">
-                  <span class="ml-2" v-if="performingRequest4">
-                  <i class="fa fa-spinner fa-spin"></i>
-                  </span>
-                </transition>
-              </button>
-
-
-              <button class="btn btn__danger btn__large" @click="cancelEvent()" v-if="showCancellation">
-                Yes, Cancel Event
-                <transition name="fade">
-                  <span class="ml-2" v-if="performingRequest4">
-                  <i class="fa fa-spinner fa-spin"></i>
-                  </span>
-                </transition>
-              </button>
-              <button class="btn btn__success" @click="activateEvent()" v-if="event.status == 'cancelled'">
-                 Activate Event
-                <transition name="fade">
-                  <span class="ml-2" v-if="performingRequest4">
-                  <i class="fa fa-spinner fa-spin"></i>
-                  </span>
-                </transition>
-              </button>
-              <!-- <button class="btn btn__dark" @click="deleteEvent()">delete event</button> -->
-            </div>
-      		</div>
-      	</div>
+       
       </form>
     </div>
 	</div>
@@ -279,7 +132,6 @@
 <script>
 import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
-import { VueEditor } from "vue2-editor";
 import router from '@/router'
 const fb = require('../../firebaseConfig.js')
 
@@ -323,31 +175,13 @@ export default {
     ]
   }),
   components: {
-    VueEditor,
     Loader
   },
   created () {
-    this.$store.dispatch("getEventFromId", this.$route.params.id);
-  },
-  beforeMount() {
-    if (!this.venues || this.venues.length < 1) {
-      this.$store.dispatch("getVenues")
-    }
-    if (!this.clients || this.clients.length < 1) {
-      this.$store.dispatch("getClients")
-    }
-    if (!this.jobs || this.jobs.length < 1) {
-      this.$store.dispatch("getJobsState")
-    }
-    if (!this.mgrs || this.mgrs.length < 1) {
-      this.$store.dispatch("getMgrsState")
-    }
-     if (!this.tags || this.tags.length < 1) {
-      this.$store.dispatch("getTagsState")
-    }
+    this.$store.dispatch("getEventFromIdOnly", this.$route.params.id);
   },
   mounted() {
-    this.$store.dispatch("getVenueFromId", this.eventInfo.venueId);
+    this.$store.dispatch("getVenueFromIdWithoutEvents", this.eventInfo.venueId);
   },
   computed: {
     ...mapState(['eventInfo', 'venueInfo']),
@@ -359,181 +193,13 @@ export default {
     },
   },
   methods: {
-    venueSync() {
-      let venueId = this.eventInfo.venueId
-      fb.venuesCollection.doc(venueId).get()
-      .then(doc => {
-        console.log(doc.data().job)
-        this.$store.dispatch('updateEventJobs', {
-          eventId: this.eventInfo.id,
-          venue: doc.data()
-        })
-      })
-    },
-    previewImage(event) {
-      this.uploadValue=0;
-      this.imageData=event.target.files[0]
-    },
-    onUploadFile() {
-      this.showBar = true
+    updateEvent() {
       let event = this.event
-      let fileTitle = this.fileTitle
-      let fileDescription = this.fileDescription
-      let rand = (Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16)).toUpperCase()
-      let storageRef = fb.storageRef.child('docs/' + rand).put(this.imageData);
-      storageRef.on(`state_changed`, snapshot => {
-        this.uploadValue=(snapshot.bytesTransferred/snapshot.totalBytes)*100;
-      }, error => {console.log(error.message)},
-      () => {this.uploadValue=100;
-        storageRef.snapshot.ref.getDownloadURL().then((downloadURL) => {
-          console.log('File available at', downloadURL)
-            var docRef = fb.eventsCollection.doc(event.id)
-            docRef.update({
-              files: fb.firestore.FieldValue.arrayUnion({
-                title: fileTitle,
-                description: fileDescription,
-                url: downloadURL
-              })
-            });
-            event.files.push({
-              title: fileTitle,
-              description: fileDescription,
-              url: downloadURL
-            })
-        })
-        this.showBar = false
-      })
-      this.imageData = null
-      this.fileTitle = ''
-      this.fileDescription = ''
-      this.$refs.fileInputTip.value=null
-    },
-    onFileTypeMismatch(file) {
-      alert('Invalid file type. Please choose a jpeg or png file.')
-    },
-    onFileSizeExceed(file) {
-      alert('Please choose a file smaller than 2MB')
+      this.$store.dispatch('updateEvent', event)
     },
     goBack() {
       router.go(-1)
     },
-    addDay() {
-      let event = this.event
-      event.days.push(this.day)
-      this.day = ''
-      this.$store.dispatch('updateEvent', event)
-    },
-    addJob() {
-      let event = this.event
-      event.jobs.push(this.job)
-      this.job = ''
-      this.$store.dispatch('updateEvent', event)
-    },
-    deleteDay(index) {
-      let event = this.event
-      event.days.splice(index, 1)
-      this.$store.dispatch('updateEvent', event)
-    },
-    deleteJob(index) {
-      let event = this.event
-      event.jobs.splice(index, 1)
-      this.$store.dispatch('updateEvent', event)
-    },
-    deleteUploadedFile(u, index) {
-      console.log(u)
-      let event = this.event
-      event.files.splice(index, 1)
-      this.$store.dispatch('updateEvent', event)
-    },
-    sheets() {
-      let url = `/events/` + this.$route.params.id + `/timesheets`
-      router.push(url)
-    },
-    shifts() {
-      let url = `/events/` + this.$route.params.id + `/shifts`
-      router.push(url)
-    },
-    placements() {
-      let url = `/eventplacements/` + this.$route.params.id
-      router.push(url)
-    },
-    checkIn() {
-      let url = `/events/` + this.$route.params.id + `/checkin`
-      router.push(url)
-    },
-    deleteEvent() {
-      let event = this.eventInfo
-      this.$store.dispatch('deleteEvent', event.id)
-      let url = `/events`
-      router.push(url)
-    },
-    updateVenue() {
-      let event = this.event
-      event.venueId = this.event.venue.id
-      this.$store.dispatch('updateEventVenue', event)
-    },
-    updateStaff() {
-      let event = this.event
-      this.$store.dispatch('updateEventStaff', event)
-    },
-    cancelEvent() {
-      this.performingRequest4 = true
-      this.showCancellation = false
-      this.event.status = 'cancelled'
-      this.event.published = false
-      let event = this.event
-      this.$store.dispatch('updateEvent', event)
-      setTimeout(() => {
-        this.performingRequest4 = false
-      }, 500)
-    },
-    activateEvent() {
-      this.performingRequest4 = true
-      this.event.status = 'active'
-      this.event.published = true
-      let event = this.event
-      this.$store.dispatch('updateEvent', event)
-      setTimeout(() => {
-        this.performingRequest4 = false
-      }, 500)
-    },
-    updateEvent() {
-      this.performingRequest = true
-    	let event = this.event
-      let croppa = this.croppa
-      let store = this.$store
-      if (croppa.hasImage()) {
-        croppa.generateBlob(
-          blob => {
-            let croppaURL
-            let rand = (Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16)).toUpperCase()
-            let picRef = fb.storageRef.child('eventImages/' + rand)
-            picRef.put(blob).then((snap) => {
-              picRef.getDownloadURL().then(function(croppaURL) {
-                console.log('File available at', croppaURL)
-                event.photoUrl = croppaURL
-                store.dispatch('updateEvent', event)
-              })
-            })
-          }
-        )
-        setTimeout(() => {
-          this.performingRequest = false
-          croppa.remove()
-          // let url = `/events`
-          // router.push(url)
-        }, 5000)
-      } else {
-        console.log(event)
-        this.$store.dispatch('updateEvent', event)
-        setTimeout(() => {
-          croppa.remove()
-          this.performingRequest = false
-          // let url = `/events`
-          // router.push(url)
-        }, 2000)
-      }
-    }
   },
   beforeDestroy () {
     this.croppa = null
@@ -565,7 +231,6 @@ export default {
     delete this.showBar
     delete this.columns
   	this.$store.dispatch('clearErrors')
-    this.$store.dispatch('clearTagsState')
     this.$store.dispatch('clearEventState')
     console.log(this)
   }

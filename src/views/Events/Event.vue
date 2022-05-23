@@ -14,9 +14,9 @@
             Cancelled
           </button>
         </div>
-        <div class="flex align-center">
+        <div class="flex align-center flex-wrap ml-3 justify-flex-end">
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="venueSync()">Sync Venue Details</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="email()">Info Email</button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="email()">Preview Info Email</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="checkIn()">Check-In</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="shifts()">Shifts</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="sheets()">Timesheets</button>

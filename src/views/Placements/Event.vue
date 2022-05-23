@@ -31,6 +31,7 @@
                 </span>
               </transition>
           </button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="email()">Preview Info Email</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="checkIn()">Check-In</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="shifts()">Shifts</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="editEvent()">Edit</button>
@@ -45,7 +46,7 @@
       </div>
       
       <div class="dashboard__container--body">
-        <div class="dashboard__container--body--col" style="width:100%;">
+        <div class="dashboard__container--body--col" style="width: calc(100% - 3.2rem)">
           <Loader v-if="!eventUsers || eventUsers.length < 1" />
           <div class="flex justify-space-between align-center">
             <ais-instant-search :search-client="searchClient" index-name="a_users" >
@@ -68,7 +69,7 @@
               </ais-state-results>
             </ais-instant-search>
 
-            <button class="btn btn__outlined mb-2 mt-3" @click="exportUnplaced()">export unplaced</button>
+            <button class="btn btn__outlined btn__small mb-2 mt-3" @click="exportUnplaced()">export unplaced</button>
           </div>
           <vue-good-table
               :columns="columns"
@@ -319,8 +320,12 @@
 
               </span>
               <div>
-                
-                <button class="btn btn__outlined mb-2 mr-5" @click="exportStaff(shift)">export</button>
+
+              <button class="btn btn__outlined btn__small mb-2 mr-3" @click="showShiftModal(shift)">Preview Email</button>
+            
+              <InfoEmailTemplate v-if="modalValue == shift" @close="closeShiftModal" :eventInfo="eventInfo" :shift="shift" :venueInfo="venueInfo" />
+
+                <button class="btn btn__small btn__outlined mb-2 mr-5" @click="exportStaff(shift)">export</button>
                 <button class="btn btn__icon" @click="expand(shift)" v-if="shift.collapse"><i class="fas fa-chevron-up"></i></button>
                 <button class="btn btn__icon" @click="collapse(shift)" v-if="!shift.collapse"><i class="fas fa-chevron-down"></i></button>
               </div>
@@ -634,6 +639,17 @@
                       
                     </span>
 
+                    <span v-else-if="props.column.field == 'email'">
+                      <button v-if="(props.row.shiftEmailSent || (props.row.shiftEmailSent && Object.keys(props.row.shiftEmailSent).length))" class="icon" v-tooltip="'email sent'" @click="sendInfoEmail(props.row, shift)">
+                        <i class="fa-solid fa-envelope ml-2 mr-2" style="opacity: 0.4;"></i>
+                      </button>
+
+
+                      <button v-if="(!props.row.shiftEmailSent || (props.row.shiftEmailSent && Object.keys(!props.row.shiftEmailSent).length))" class="icon" v-tooltip="'send info email'" @click="sendInfoEmail(props.row, shift)">
+                        <i class="fa-solid fa-envelope ml-2 mr-2 blueHue"></i>
+                      </button>
+                    </span>
+
                     <span v-else-if="props.column.field == 'confirmed'" style="display: flex;">
                       <button v-if="!props.row.confirmed && props.row.status == 'assigned'" class="icon" v-tooltip="'confirm'" @click="confirmPlacement(props)">
                         <i class="fas fa-check ml-2 mr-2" style="opacity: 0.4;"></i>
@@ -794,6 +810,7 @@ import StarRating from 'vue-star-rating'
 import algoliasearch from 'algoliasearch/lite';
 import ExportService from "@/services/ExportService"
 import UserModal from "@/components/UserModal.vue";
+import InfoEmailTemplate from "@/components/InfoEmailTemplate.vue";
 const fb = require('../../firebaseConfig.js')
 
 export default {
@@ -1027,8 +1044,14 @@ export default {
         // },
         {
           label: '',
-          field: 'reservations',
+          field: 'email',
+          sortable: false,
           tdClass: 'text-center',
+          width: '25px',
+        },
+        {
+          label: '',
+          field: 'reservations',
           tdClass: 'text-center',
           sortable: false,
           width: '50px',
@@ -1054,6 +1077,7 @@ export default {
     Loader,
     UserModal,
     StarRating,
+    InfoEmailTemplate,
   },
   created () {
     this.$store.dispatch("getEventPlacementFromId", this.$route.params.id)
@@ -1125,6 +1149,30 @@ export default {
     },
   },
   methods: {
+    sendInfoEmail(props, shift) {
+      props.shiftEmailSent = ({
+        sent: true
+      })
+      this.$store.dispatch('sendShiftEmail', {
+        userDay: props,
+      })
+    },
+    showShiftModal(shift) {
+      this.modalValue = shift;
+    },
+    // showEditIn(user) {
+    //   this.modalEditInValue = user;
+    // },
+    // showEditOut(user) {
+    //   this.modalEditOutValue = user;
+    // },
+    // closeEditModal() {
+    //   this.modalEditInValue = null;
+    //   this.modalEditOutValue = null;
+    // },
+    closeShiftModal() {
+      this.modalValue = null;
+    },
     updateAssignment(row) {
       this.$store.dispatch('updateAssignment', row)
     },
@@ -1159,7 +1207,10 @@ export default {
     setActiveDay(day) {
       this.newActiveDay = day
     },
-
+    email() {
+      let url = `/events/` + this.$route.params.id + `/email`
+      router.push(url)
+    },
     messageShift(shift) {
       this.performingRequest7 = true
       let payload = {
@@ -1778,7 +1829,9 @@ export default {
     },
     requestConfirmation(props) {
       // this.performingRequest = true
-      props.row.updatedRequested = true
+      props.row.updatedRequested = ({
+        requested: true
+      })
       fb.userDaysCollection.doc(props.row.id).update({
         updatedRequested: fb.firestore.FieldValue.serverTimestamp()
       })

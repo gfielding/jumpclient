@@ -54,10 +54,15 @@ export default {
       this.$store.dispatch('clearErrors')
     }
   },
+
+
   methods: {
     close() {
       this.$store.dispatch('clearErrors')
-    }
+    },
+    logout() {
+      this.$store.dispatch('logout')
+    },
   },
   // beforeMount(){
   //   this.cred()
@@ -78,6 +83,14 @@ export default {
         return false
       }
     },
+    carlyCheck() {
+      if (this.currentUser && ((this.currentUser.email == 'carly@mvpeventstaffing.com') || (this.currentUser.email == 'crystal@mvpeventstaffing.com'))) {
+        this.logout()
+      } else {
+
+      }
+    }
+    
     
   },
 }
