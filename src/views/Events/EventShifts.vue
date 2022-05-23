@@ -131,6 +131,11 @@
 		            <label for="details">Shift-Specific Details From Client:</label>
 		            <textarea name="details" id="details" cols="30" rows="2" v-model.lazy="newShift.details" style="background: #efefef;"></textarea>
 		          </div>
+
+		          <div class="mb-3">
+		            <label for="info">Shift Into to Email Staff:</label>
+		            <textarea name="info" id="info" cols="30" rows="2" v-model.lazy="newShift.info" style="background: #efefef;"></textarea>
+		          </div>
 		          <!-- <div class="mb-3 pr-3 pl-3">
 		            <label for="location">Shift Location:</label>
 		            <input type="text" v-model.trim="newShift.location" id="location" />
@@ -259,9 +264,13 @@
 			          </div>
 
 	  					</div>
-			        <div>
+			        <div class="mb-3">
 		            <label for="details">Details from Client:</label>
 		            <textarea name="details" id="details" cols="30" rows="2" v-model.lazy="eventShift.details" style="background: #efefef;"></textarea>
+		          </div>
+		          <div>
+		            <label for="info">Shift Info for Emails:</label>
+		            <textarea name="info" id="info" cols="30" rows="2" v-model.lazy="eventShift.info" style="background: #efefef;"></textarea>
 		          </div>
 
 			          <!-- <div class="mb-3 pr-3 pl-3">

@@ -313,12 +313,12 @@ export default {
       this.$store.dispatch("getUsersByCity", value)
     },
     exportCity() {
-      let logFields = {
-          user: this.currentUser.email,
-          export: 'City (Users) Export',
-           city: this.value
-      }
-      this.$store.dispatch('sendExportLog', logFields)
+      // let logFields = {
+      //     user: this.currentUser.email,
+      //     export: 'City (Users) Export',
+      //      city: this.value
+      // }
+      // this.$store.dispatch('sendExportLog', logFields)
       const exportHeaders = [
         "First Name",
         "Last Name",
@@ -346,12 +346,13 @@ export default {
       });
     },
     exportState() {
-      let logFields = {
-          user: this.currentUser.email,
-          export: 'State (Users) Export',
-          state: this.value
-      }
-      this.$store.dispatch('sendExportLog', logFields)
+      // let logFields = {
+      //     user: this.currentUser.email,
+      //     export: 'State (Users) Export',
+      //     state: this.value
+      // }
+      // this.$store.dispatch('sendExportLog', logFields)
+      
       const exportHeaders = [
         "First Name",
         "Last Name",

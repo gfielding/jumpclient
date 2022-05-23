@@ -905,12 +905,12 @@ export default {
       router.go(-1)
     },
     exportDetails() {
-      let logFields = {
-          user: this.currentUser.email,
-          export: 'Details (Shift) Export',
-          shift: this.shift.id
-      }
-      this.$store.dispatch('sendExportLog', logFields)
+      // let logFields = {
+      //     user: this.currentUser.email,
+      //     export: 'Details (Shift) Export',
+      //     shift: this.shift.id
+      // }
+      // this.$store.dispatch('sendExportLog', logFields)
       this.performingRequest = true
       const exportHeaders = [
         "First Name",
@@ -938,12 +938,12 @@ export default {
       }, 2000)
     },
     exportRegister() {
-      let logFields = {
-          user: this.currentUser.email,
-          export: 'Register (Shift) Export',
-          shift: this.shift.id
-      }
-      this.$store.dispatch('sendExportLog', logFields)
+      // let logFields = {
+      //     user: this.currentUser.email,
+      //     export: 'Register (Shift) Export',
+      //     shift: this.shift.id
+      // }
+      // this.$store.dispatch('sendExportLog', logFields)
       this.performingRequest = true
       const exportHeaders = [
         "First Name",
@@ -1062,12 +1062,12 @@ export default {
       }, 2000)
     },
     exportReportEmp() {
-      let logFields = {
-          user: this.currentUser.email,
-          export: 'Report Emp- (Shift) Export',
-          shift: this.shift.id
-      }
-      this.$store.dispatch('sendExportLog', logFields)
+      // let logFields = {
+      //     user: this.currentUser.email,
+      //     export: 'Report Emp- (Shift) Export',
+      //     shift: this.shift.id
+      // }
+      // this.$store.dispatch('sendExportLog', logFields)
       this.performingRequest = true
       const exportHeaders = [
         "type",
@@ -1154,12 +1154,12 @@ export default {
       })
     },
     exportReportEmp2(item) {
-      let logFields = {
-          user: this.currentUser.email,
-          export: 'Report Emp 2- (Shift) Export',
-          shift: this.shift.id
-      }
-      this.$store.dispatch('sendExportLog', logFields)
+      // let logFields = {
+      //     user: this.currentUser.email,
+      //     export: 'Report Emp 2- (Shift) Export',
+      //     shift: this.shift.id
+      // }
+      // this.$store.dispatch('sendExportLog', logFields)
       this.performingRequest = true
       const exportHeaders = [
         "first_name",

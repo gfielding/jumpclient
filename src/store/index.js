@@ -131,7 +131,7 @@ const store = new Vuex.Store({
         })
 
       // fetch user profile and set in state
-      if ((user && user.email && user.emailVerified && user.email.endsWith('mvpeventstaffing.com') && (user.email != 'd.brown@mvpeventstaffing.com' || user.email != 'jlax@mvpeventstaffing.com' || user.email != 'kaela@mvpeventstaffing.com' || user.email != 'selina@mvpeventstaffing.com')) || user.email.endsWith('tcicapital.com')) {
+      if ((user && user.email && user.emailVerified && user.email.endsWith('mvpeventstaffing.com') && (user.email != 'd.brown@mvpeventstaffing.com' || user.email != 'crystal@mvpeventstaffing.com' || user.email != 'squire@mvpeventstaffing.com' || user.email != 'carly@mvpeventstaffing.com' || user.email != 'jlax@mvpeventstaffing.com' || user.email != 'kaela@mvpeventstaffing.com' || user.email != 'selina@mvpeventstaffing.com')) || user.email.endsWith('tcicapital.com')) {
         dispatch('fetchUserProfile', user)
         //change route to dashboard
         if (router.currentRoute.path === '/login') {
@@ -909,6 +909,15 @@ const store = new Vuex.Store({
         commit('setVenues', venuesArray)
         commit('setHiddenVenues', venuesHiddenArray)
       })
+    },
+    getVenueFromIdWithoutEvents({ commit }, payload) {
+      console.log('getVenueFromId')
+      fb.venuesCollection.doc(payload).get()
+      .then(
+        doc => {
+          commit("setVenueInfo", doc.data())
+        }
+      )
     },
     getVenueFromId({ commit }, payload) {
       console.log('getVenueFromId')
@@ -1968,6 +1977,15 @@ const store = new Vuex.Store({
         commit('set2021Events', events2021Array)
       })
     },
+    getEventFromIdOnly({ commit }, payload) {
+      console.log('getEventFromId')
+      fb.eventsCollection.doc(payload).get()
+      .then(
+        doc => {
+          commit("setEventInfo", doc.data())
+        }
+      )
+    },  
     getEventFromId({ commit }, payload) {
       console.log('getEventFromId')
       fb.eventsCollection.doc(payload).get()
@@ -2156,6 +2174,13 @@ const store = new Vuex.Store({
 
 
     /*SHIFTS*/
+    sendShiftEmail({ commit }, payload) {
+      console.log(payload)
+      fb.userDaysCollection.doc(payload.userDay.id).update({
+        shiftEmailSent: fb.firestore.FieldValue.serverTimestamp()
+      })
+    },
+
     addEventShift({ commit }, payload) {
       fb.shiftsCollection.add(payload)
       .then(

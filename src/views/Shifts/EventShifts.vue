@@ -1108,12 +1108,12 @@ export default {
     },
 
     exportRegister() {
-      let logFields = {
-          user: this.currentUser.email,
-          export: 'Register (Event Shifts) Export',
-          eventAssignment: this.eventAssignments.id
-      }
-      this.$store.dispatch('sendExportLog', logFields)
+      // let logFields = {
+      //     user: this.currentUser.email,
+      //     export: 'Register (Event Shifts) Export',
+      //     eventAssignment: this.eventAssignments.id
+      // }
+      // this.$store.dispatch('sendExportLog', logFields)
       this.performingRequest = true
       const exportHeaders = [
         "Date",
@@ -1327,12 +1327,12 @@ export default {
       }, 2000)
     },
     exportReportEmp2(item) {
-      let logFields = {
-          user: this.currentUser.email,
-          export: 'Report Emp 2 (Event Shifts) Export',
-          eventAssignment: this.eventAssignments.id
-      }
-      this.$store.dispatch('sendExportLog', logFields)
+      // let logFields = {
+      //     user: this.currentUser.email,
+      //     export: 'Report Emp 2 (Event Shifts) Export',
+      //     eventAssignment: this.eventAssignments.id
+      // }
+      // this.$store.dispatch('sendExportLog', logFields)
       this.performingRequest = true
       const exportHeaders = [
         "first_name",
