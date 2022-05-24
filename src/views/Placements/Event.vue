@@ -61,7 +61,7 @@
                           <i class="fas fa-plus" style="color:blue;" v-if="!performingRequest"></i>
                           <i class="fa fa-spinner fa-spin" style="color:blue;" v-if="performingRequest"></i>
                         </button>
-                        <p style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</p style="display: inline;">
+                        <p style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</p>
                       </div>
                     </template>
                   </ais-hits>
@@ -1103,7 +1103,7 @@ export default {
     // this.setInitialDay()
   },
   computed: {
-    ...mapState(['venueInfo', 'eventUsers', 'eventShifts', 'eventInfo', 'eventDrops', 'userProfile']),
+    ...mapState(['currentUser', 'venueInfo', 'eventUsers', 'eventShifts', 'eventInfo', 'eventDrops', 'userProfile']),
     event() {
       return this.eventInfo
     },
@@ -1865,6 +1865,14 @@ export default {
     reserveUser(user) {
       user.dayStatus = "hired"
       this.$store.dispatch('reserveUser', user)
+
+     let logFields = {
+          staffMember: this.currentUser.email,
+          export: 'Reserve User',
+          event: this.event.title,
+          user: user.id
+      }
+      this.$store.dispatch('sendPlacementsLog', logFields)
     },
     notRequestUser(user) {
       user.dayStatus = "not requested"
@@ -1873,6 +1881,15 @@ export default {
     unreserveUser(user) {
       user.dayStatus = null
       fb.userDaysCollection.doc(user.id).update({dayStatus: null})
+
+      let logFields = {
+          staffMember: this.currentUser.email,
+          export: 'Reserve User',
+          event: this.event.title,
+          user: user.id
+      }
+      console.log(this.currentUser.email, event, user)
+      this.$store.dispatch('sendPlacementsLog', logFields)
     },
     cancelNotRequestUser(user) {
       user.dayStatus = null

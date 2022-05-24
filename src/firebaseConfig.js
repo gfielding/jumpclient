@@ -55,7 +55,6 @@ const emailUpdatesCollection = db.collection('emailUpdates')
 const textsCollection = db.collection('texts')
 const emailsCollection = db.collection('emails')
 const userNotesCollection = db.collection('userNotes')
-const placementsCollection = db.collection('placements')
 const faqsCollection = db.collection('faqs')
 const oprCollection = db.collection('opr')
 const mgrsCollection = db.collection('mgrs')
@@ -67,6 +66,7 @@ const groupsCollection = db.collection('groups')
 const reviewsCollection = db.collection('reviews')
 const userMessagesCollection = db.collection('userMessages')
 const exportLogCollection = db.collection('exportLog')
+const placementsLogCollection = db.collection('placementsLog')
 const shiftUpdatesCollection = db.collection('shiftUpdates')
 const groupUpdatesCollection = db.collection('groupUpdates')
 const dropsCollection = db.collection('drops')
@@ -118,7 +118,7 @@ export {
   userNotesCollection,
   userMessagesCollection,
   exportLogCollection,
-  placementsCollection,
+  placementsLogCollection,
   faqsCollection,
   seriesCollection,
   seriesDaysCollection,
