@@ -94,6 +94,14 @@ const router = new VueRouter({
       },
     },
     {
+      path: '/shiftleads',
+      name: 'shiftLeads',
+      component: () => import('../views/ShiftLeads/ShiftLeads.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
       path: '/groups',
       name: 'groups',
       component: () => import('../views/Groups/Groups.vue'),

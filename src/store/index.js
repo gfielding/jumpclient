@@ -119,7 +119,8 @@ const store = new Vuex.Store({
     marketingLeads: [],
     archivedLeads: [],
     marketLeads: [],
-    eventAssignmentsByDay: []
+    eventAssignmentsByDay: [],
+    shiftLeads: []
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -1282,6 +1283,23 @@ const store = new Vuex.Store({
     clearUsersState({ commit }) {
       commit('setUsers', [])
     },
+    /*ShiftLeads*/
+
+    getShiftLeads({ commit }, payload) {
+      fb.leadApplicationsCollection.orderBy('created', 'desc')
+      .onSnapshot(querySnapshot => {
+        let leadsArray = []
+        querySnapshot.forEach(function (doc) {
+          let lead = doc.data()
+          leadsArray.push(lead)
+        })
+        commit('setShiftLeads', leadsArray)
+      })
+    },
+    clearShiftLeads({ commit }) {
+      commit('setShiftLeads', [])
+    },
+
     /*MARKETS*/
     addLead({ commit }, payload) {
       fb.marketingLeadsCollection.add(payload)
@@ -3776,6 +3794,13 @@ const store = new Vuex.Store({
         state.marketLeads = val
       } else {
         state.marketLeads = []
+      }
+    },
+    setShiftLeads(state, val) {
+      if (val) {
+        state.shiftLeads = val
+      } else {
+        state.shiftLeads = []
       }
     },
   },

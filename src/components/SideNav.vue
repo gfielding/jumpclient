@@ -64,6 +64,11 @@
               </div>
             </div>
           </div>
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'shiftLeads'}">
+              Shift Leads <i class="fas fa-chevron-right"></i>
+            </router-link>
+          </div>
          
           
           

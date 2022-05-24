@@ -83,6 +83,7 @@ const verificationsCollection = db.collection('verifications')
 const tagsCollection = db.collection('tags')
 const marketsCollection = db.collection('markets')
 const marketingLeadsCollection = db.collection('marketingLeads')
+const leadApplicationsCollection = db.collection('leadApplications')
 
 
 export {
@@ -145,5 +146,6 @@ export {
   verificationsCollection,
   tagsCollection,
   marketsCollection,
-  marketingLeadsCollection
+  marketingLeadsCollection,
+  leadApplicationsCollection
 }
