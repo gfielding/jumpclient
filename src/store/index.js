@@ -224,6 +224,18 @@ const store = new Vuex.Store({
         }
       )
     },
+    sendPlacementsLog({ commit }, payload) {
+      console.log(payload)
+      fb.placementsLogCollection.add(payload)
+      .then(
+        doc => {
+          fb.placementsLogCollection.doc(doc.id).update({
+            id: doc.id,
+            created: fb.firestore.FieldValue.serverTimestamp()
+          })
+        }
+      )
+    },
     // getMyRecaps({ commit, state }) {
     //   fb.eventsCollection.where("event.venue.mgrs", "array-contains", "Greg Fielding").onSnapshot(querySnapshot => {
     //     let eventsArray = []
