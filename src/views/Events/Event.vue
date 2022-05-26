@@ -495,7 +495,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['eventInfo', 'venues', 'clients', 'jobs', 'mgrs', 'tags']),
+    ...mapState(['currentUser','eventInfo', 'venues', 'clients', 'jobs', 'mgrs', 'tags']),
     event() {
       return this.eventInfo
     },
@@ -514,6 +514,12 @@ export default {
           venue: doc.data()
         })
       })
+      let logFields = {
+          staffMember: this.currentUser.email,
+          export: 'Venue Sync(Events)',
+          eventId: this.eventInfo.id
+      }
+      this.$store.dispatch('sendEventLog', logFields)
     },
     previewImage(event) {
       this.uploadValue=0;
@@ -567,22 +573,46 @@ export default {
       event.days.push(this.day)
       this.day = ''
       this.$store.dispatch('updateEvent', event)
+        let logFields = {
+          staffMember: this.currentUser.email,
+          export: 'Add Day (Events)',
+          eventId: this.event
+      }
+      this.$store.dispatch('sendEventLog', logFields)
     },
     addJob() {
       let event = this.event
       event.jobs.push(this.job)
       this.job = ''
       this.$store.dispatch('updateEvent', event)
+      let logFields = {
+          staffMember: this.currentUser.email,
+          export: 'Add Job (Events)',
+          eventId: this.event
+      }
+      this.$store.dispatch('sendEventLog', logFields)
     },
     deleteDay(index) {
       let event = this.event
       event.days.splice(index, 1)
       this.$store.dispatch('updateEvent', event)
+      let logFields = {
+          staffMember: this.currentUser.email,
+          export: 'Delete Day (Events)',
+          eventId: this.event
+      }
+      this.$store.dispatch('sendEventLog', logFields)
     },
     deleteJob(index) {
       let event = this.event
       event.jobs.splice(index, 1)
       this.$store.dispatch('updateEvent', event)
+      let logFields = {
+          staffMember: this.currentUser.email,
+          export: 'Delete Job (Events)',
+          eventId: this.event
+      }
+      this.$store.dispatch('sendEventLog', logFields)
     },
     deleteUploadedFile(u, index) {
       console.log(u)
@@ -613,6 +643,12 @@ export default {
     deleteEvent() {
       let event = this.eventInfo
       this.$store.dispatch('deleteEvent', event.id)
+      let logFields = {
+          staffMember: this.currentUser.email,
+          export: 'Delete Event',
+          eventId: this.event
+      }
+      this.$store.dispatch('sendEventLog', logFields)
       let url = `/events`
       router.push(url)
     },
@@ -620,10 +656,22 @@ export default {
       let event = this.event
       event.venueId = this.event.venue.id
       this.$store.dispatch('updateEventVenue', event)
+      let logFields = {
+          staffMember: this.currentUser.email,
+          export: 'Update Venue (Events)',
+          eventId: this.event
+      }
+      this.$store.dispatch('sendEventLog', logFields)
     },
     updateStaff() {
       let event = this.event
       this.$store.dispatch('updateEventStaff', event)
+      let logFields = {
+          staffMember: this.currentUser.email,
+          export: 'Update Staff (Events)',
+          eventId: this.event
+      }
+      this.$store.dispatch('sendEventLog', logFields)
     },
     cancelEvent() {
       this.performingRequest4 = true
@@ -635,6 +683,12 @@ export default {
       setTimeout(() => {
         this.performingRequest4 = false
       }, 500)
+      let logFields = {
+          staffMember: this.currentUser.email,
+          export: 'Cancel Event (Events)',
+          eventId: this.event
+      }
+      this.$store.dispatch('sendEventLog', logFields)
     },
     activateEvent() {
       this.performingRequest4 = true
@@ -682,6 +736,12 @@ export default {
           // router.push(url)
         }, 2000)
       }
+      let logFields = {
+          staffMember: this.currentUser.email,
+          export: 'Update Event',
+          eventId: this.event
+      }
+      this.$store.dispatch('sendEventLog', logFields)
     }
   },
   beforeDestroy () {
