@@ -90,7 +90,7 @@
               <label for="pickDate">Choose Jobs:</label>
               <v-select
                 class="mt-2"
-                label="title" 
+                label="title"
                 :options="jobs"
                 v-model="venue.job"
                 multiple
@@ -413,6 +413,12 @@ export default {
         venue: venue,
         user: item
       })
+        let logFields = {
+          staffMember: this.currentUser.email,
+          export: 'Venue User',
+          venue: venue
+      }
+      this.$store.dispatch('sendVenueLog', logFields)
       document
         .querySelectorAll('.ais-SearchBox-input')
         .forEach((e) => (e.value = ''))
@@ -515,13 +521,26 @@ export default {
     		visible: place.visible
     	}
     	console.log(newVenue)
-    	this.$store.dispatch('addVenue', newVenue)
+      this.$store.dispatch('addVenue', newVenue)
+
+          let logFields = {
+          staffMember: this.currentUser.email,
+          export: 'Add Venue',
+          venue: this.venue
+      }
+      this.$store.dispatch('sendVenueLog', logFields)
     },
     updateVenue() {
       this.performingRequest = true
       let venue = this.venueInfo
       let croppa = this.croppa
       let store = this.$store
+          let logFields = {
+          staffMember: this.currentUser.email,
+          export: 'Update Venue',
+          venue: this.venue
+      }
+      this.$store.dispatch('sendVenueLog', logFields)
       if (croppa.hasImage()) {
         croppa.generateBlob(
           blob => {
@@ -588,6 +607,12 @@ export default {
       this.$store.dispatch('deleteVenue', venue.id)
       let url = `/venues`
       router.push(url)
+          let logFields = {
+          staffMember: this.currentUser.email,
+          export: 'Delete Venue',
+          venue: this.venue,
+      }
+      this.$store.dispatch('sendVenueLog', logFields)
     },
     goBack() {
       this.$store.dispatch('clearVenueState')

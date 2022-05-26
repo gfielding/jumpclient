@@ -67,6 +67,7 @@ const reviewsCollection = db.collection('reviews')
 const userMessagesCollection = db.collection('userMessages')
 const exportLogCollection = db.collection('exportLog')
 const placementsLogCollection = db.collection('placementsLog')
+const venueLogCollection = db.collection('venueLog')
 const shiftUpdatesCollection = db.collection('shiftUpdates')
 const groupUpdatesCollection = db.collection('groupUpdates')
 const dropsCollection = db.collection('drops')
@@ -120,6 +121,7 @@ export {
   userMessagesCollection,
   exportLogCollection,
   placementsLogCollection,
+  venueLogCollection,
   faqsCollection,
   seriesCollection,
   seriesDaysCollection,
