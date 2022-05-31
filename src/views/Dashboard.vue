@@ -72,7 +72,7 @@
         </div> -->
 
 
-         <!-- <button @click="removeBadApps()">Bad Applications</button> -->
+        <!--  <button @click="removePayrollSubmitted()">Remove Submitted</button> -->
 
         <!-- <button @click="updateSocials()">Update Socials</button> -->
         <!-- <button @click="updateEvents()">Update All Events</button> -->
@@ -226,6 +226,17 @@ export default {
         exportService.export();
       });
     },
+    // removePayrollSubmitted() {
+    //   fb.usersCollection.where("payrollSubmitted", "==", true).get()
+    //   .then((querySnapshot) => {
+    //     querySnapshot.forEach((doc) => {
+    //       console.log(doc.id)
+    //       fb.usersCollection.doc(doc.id).update({
+    //         payrollSubmitted: false
+    //       })
+    //     })
+    //   })
+    // },
     // removeBadApps() {
     //   fb.assignmentsCollection.where()
     // }

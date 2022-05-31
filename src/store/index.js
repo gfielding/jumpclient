@@ -131,8 +131,9 @@ const store = new Vuex.Store({
         commit('setErrorMessage', err.message)
         })
 
+
       // fetch user profile and set in state
-      if ((user && user.email && user.emailVerified && user.email.endsWith('mvpeventstaffing.com') && (user.email != 'd.brown@mvpeventstaffing.com' || user.email != 'crystal@mvpeventstaffing.com' || user.email != 'squire@mvpeventstaffing.com' || user.email != 'carly@mvpeventstaffing.com' || user.email != 'jlax@mvpeventstaffing.com' || user.email != 'kaela@mvpeventstaffing.com' || user.email != 'selina@mvpeventstaffing.com')) || user.email.endsWith('tcicapital.com')) {
+      if ((user && user.email && user.emailVerified && user.email.endsWith('mvpeventstaffing.com') && (user.email != 'd.brown@mvpeventstaffing.com' || user.email != 'crystal@mvpeventstaffing.com' || user.email != 'squire@mvpeventstaffing.com' || user.email != 'carly@mvpeventstaffing.com' || user.email != 'jlax@mvpeventstaffing.com' || user.email != 'kaela@mvpeventstaffing.com' || user.email != 'selina@mvpeventstaffing.com')) || user.email.endsWith('tcicapital.com') || user.email == 'kptech80@gmail.com') {
         dispatch('fetchUserProfile', user)
         //change route to dashboard
         if (router.currentRoute.path === '/login') {
@@ -1119,7 +1120,7 @@ const store = new Vuex.Store({
         doc => {
           fb.reviewsCollection.doc(doc.id).update({
             userId: payload.userId,
-            submittedBy: payload.submittedBy,
+            submittedBy: state.currentUser.uid,
             id: doc.id,
             created: fb.firestore.FieldValue.serverTimestamp()
           })
@@ -1134,7 +1135,7 @@ const store = new Vuex.Store({
         doc => {
           fb.contactNotesCollection.doc(doc.id).update({
             userId: payload.userId,
-            submittedBy: payload.submittedBy,
+            submittedBy: state.currentUser.uid,
             id: doc.id,
             created: fb.firestore.FieldValue.serverTimestamp()
           })
@@ -1161,7 +1162,7 @@ const store = new Vuex.Store({
         doc => {
           fb.clientNotesCollection.doc(doc.id).update({
             userId: payload.userId,
-            submittedBy: payload.submittedBy,
+            submittedBy: state.currentUser.uid,
             id: doc.id,
             created: fb.firestore.FieldValue.serverTimestamp()
           })
@@ -1187,7 +1188,7 @@ const store = new Vuex.Store({
         doc => {
           fb.accessNotesCollection.doc(doc.id).update({
             userId: payload.userId,
-            submittedBy: payload.submittedBy,
+            submittedBy: state.currentUser.uid,
             id: doc.id,
             created: fb.firestore.FieldValue.serverTimestamp()
           })
@@ -1212,7 +1213,7 @@ const store = new Vuex.Store({
         doc => {
           fb.userNotesCollection.doc(doc.id).update({
             userId: payload.userId,
-            submittedBy: payload.submittedBy,
+            submittedBy: state.currentUser.uid,
             id: doc.id,
             created: fb.firestore.FieldValue.serverTimestamp()
           })
@@ -1692,7 +1693,9 @@ const store = new Vuex.Store({
         let verificationsArray = []
         querySnapshot.forEach(doc => {
           let verification = doc.data()
-          verificationsArray.push(verification)
+          if (!doc.data().rejected) {
+            verificationsArray.push(verification)
+          }
         })
         commit('setVerifications', verificationsArray)
       })
@@ -2046,10 +2049,10 @@ const store = new Vuex.Store({
       .then(
         doc => {
           commit("setEventInfo", doc.data())
-          store.dispatch('getUserNotes', payload)
         }
       )
-      store.dispatch('getEventShifts', payload)
+      // store.dispatch('getUserNotes', payload)
+      // store.dispatch('getEventShifts', payload)
     },  
     // getAllEvents({ commit }) {
     //   console.log('getting all')
@@ -2267,6 +2270,28 @@ const store = new Vuex.Store({
       fb.shiftsCollection.doc(payload.id).update(payload)
     },
     getEventShifts({ commit }, payload) {
+      console.log(payload)
+      fb.shiftsCollection.where("eventId", "==", payload).orderBy('day', 'desc')
+      .onSnapshot(querySnapshot => {
+        let shiftsArray = []
+        querySnapshot.forEach(doc => {
+          let shift = doc.data()
+          shift.id = doc.id
+          fb.assignmentsCollection.where("shiftId", "==", shift.id).get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+              if (doc.exists) {
+                return shift.disabled = true
+              } else {
+                return shift.disabled = false
+              }
+            })
+          })
+          shiftsArray.push(shift)
+        })
+        commit('setEventShifts', shiftsArray)
+      })
+    },
+    getEventShiftsId({ commit }, payload) {
       console.log(payload)
       fb.shiftsCollection.where("eventId", "==", payload).orderBy('day', 'desc')
       .onSnapshot(querySnapshot => {
@@ -2521,14 +2546,14 @@ const store = new Vuex.Store({
         // })
       })
     },
-    addEventTimesheetNote({ commit }, payload) {
+    addEventTimesheetNote({ commit, state }, payload) {
       console.log(payload)
       fb.eventTimesheetNotesCollection.add(payload)
       .then(
         doc => {
           fb.eventTimesheetNotesCollection.doc(doc.id).update({
             eventId: payload.eventId,
-            submittedBy: payload.submittedBy,
+            submittedBy: state.currentUser.uid,
             id: doc.id,
             created: fb.firestore.FieldValue.serverTimestamp()
           })
@@ -2725,13 +2750,23 @@ const store = new Vuex.Store({
         commit('setInfiniteEvents', twelve)
       })
     },
-
-
-    getEvents({ commit }, payload) {
-      console.log('getEvents')
+    getAccountingEvents1({ commit }, payload) {
       fb.eventsCollection.where("published", "==", true).orderBy('startDate', 'asc')
       .onSnapshot(querySnapshot => {
         let eventsArray = []
+        querySnapshot.forEach(doc => {
+          let event = doc.data()
+          if (event.status != 'cancelled' && !event.invoiceStatus && event.startDate.includes("2022")) {
+            eventsArray.push(event)
+          }
+        })
+        commit('setEvents', eventsArray.slice(0, 96))
+      })
+    },
+
+    getAccountingEvents2({ commit }, payload) {
+      fb.eventsCollection.where("published", "==", true).orderBy('startDate', 'desc')
+      .onSnapshot(querySnapshot => {
         let completeEventsArray = []
         let partialEventsArray = []
         let cancelledEventsArray = []
@@ -2741,27 +2776,32 @@ const store = new Vuex.Store({
           // if (event.status != 'cancelled') {
           //   eventsArray.push(event)
           // }
+          // if (event.status != 'cancelled' && event.startDate.includes("2022")) {
+          //   allArray.push(event)
+          // }
           if (event.status != 'cancelled' && event.invoiceStatus == 'complete' && event.startDate.includes("2022")) {
             completeEventsArray.push(event)
           }
           if (event.status != 'cancelled' && event.invoiceStatus == 'partial' && event.startDate.includes("2022")) {
             partialEventsArray.push(event)
           }
-          if (event.status != 'cancelled' && !event.invoiceStatus && event.startDate.includes("2022")) {
-            eventsArray.push(event)
-          }
+          // if (event.status != 'cancelled' && !event.invoiceStatus && event.startDate.includes("2022")) {
+          //   eventsArray.push(event)
+          // }
           if (event.status == 'cancelled' && event.startDate.includes("2022")) {
             cancelledEventsArray.push(event)
           }
         })
-        commit('setEvents', eventsArray.slice(0, 96))
+        // commit('setEvents', eventsArray.slice(0, 96))
+        // commit('setAllEvents', allArray)
         commit('setPartialEvents', partialEventsArray)
-        commit('setCompleteEvents', completeEventsArray)
+        commit('setCompleteEvents', completeEventsArray.slice(0, 96))
         commit('setEventsCancelled', cancelledEventsArray)
       })
     },
     clearEvents({ commit }) {
       commit('setEvents', [])
+      // commit('setAllEvents', [])
       commit('setPartialEvents', [])
       commit('setCompleteEvents', [])
       commit('setEventsCancelled', [])
@@ -2986,7 +3026,6 @@ const store = new Vuex.Store({
       let newdate = month + "/" + day + "/" + year;
       let shiftStart = payload.shiftStart
       let shiftEnd = payload.shiftEnd
-      let userId = payload.row.userId
       let name = payload.shift.name
       let theDate = payload.row.dateFormat
       let ssn
@@ -3025,7 +3064,7 @@ const store = new Vuex.Store({
 
       let assignment = {
         shiftId: shift.id,
-        userId: userId,
+        userId: payload.row.userId,
         date: theDate,
         day: payload.day,
         eventId: shift.eventId,

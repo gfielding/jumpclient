@@ -53,6 +53,21 @@
                   hide
                 </button>
               </span>
+              <span v-else-if="props.column.field == 'location'" v-tooltip="props.row.form.location">
+                {{props.row.form.location | readMore(40, '...')}}
+              </span>
+              <span v-else-if="props.column.field == 'howMuch'" v-tooltip="props.row.form.howMuch">
+                {{props.row.form.howMuch | readMore(40, '...')}}
+              </span>
+              <span v-else-if="props.column.field == 'clients'" v-tooltip="props.row.form.clients">
+                {{props.row.form.clients | readMore(40, '...')}}
+              </span>
+              <span v-else-if="props.column.field == 'experience'" v-tooltip="props.row.form.experience"> 
+                {{ props.row.form.experience | readMore(40, '...') }}
+              </span>
+
+
+              
               <span v-else-if="props.column.field == 'state'">
                 <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
               </span>
@@ -96,6 +111,18 @@
               <span v-else-if="props.column.field == 'jobs'">
                 <span v-for="(item, index) in props.row.jobs" :key="index">{{item.title}}, </span>
               </span>
+              <span v-else-if="props.column.field == 'location'" v-tooltip="props.row.form.location">
+                {{props.row.form.location | readMore(40, '...')}}
+              </span>
+              <span v-else-if="props.column.field == 'howMuch'" v-tooltip="props.row.form.howMuch">
+                {{props.row.form.howMuch | readMore(40, '...')}}
+              </span>
+              <span v-else-if="props.column.field == 'clients'" v-tooltip="props.row.form.clients">
+                {{props.row.form.clients | readMore(40, '...')}}
+              </span>
+              <span v-else-if="props.column.field == 'experience'" v-tooltip="props.row.form.experience"> 
+                {{ props.row.form.experience | readMore(40, '...') }}
+              </span>
               <span v-else-if="props.column.field == 'note'">
                 <button v-show="!props.row.note" class="btn btn__flat btn__icon" @click="showNote(props.row)" v-tooltip="'Leave a note'"><i class="far fa-sticky-note ml-3 mr-3" style="opacity:0.5;"></i></button>
                 <button v-show="props.row.note" class="btn btn__flat btn__icon" @click="showNote(props.row)" v-tooltip="'Leave a note'"><i class="far fa-sticky-note ml-3 mr-3" style="color:blue"></i></button>
@@ -105,6 +132,7 @@
                   </div>
                 </transition>
               </span>
+
               <span v-else-if="props.column.field == 'delete'">
                 <button class="btn btn__primary btn__small ml-2 mr-2" @click="removeEntry(props.row)">
                   hide
@@ -157,7 +185,7 @@ export default {
       {
         label: 'Created',
         field: 'created',
-        width: '120px'
+        width: '110px'
       },
       // {
       //   label: 'Status',
@@ -184,7 +212,7 @@ export default {
       {
         label: 'Phone',
         field: 'user.phone',
-        width: '120px'
+        width: '110px'
       },
       // {
       //   label: 'Skills',
@@ -193,19 +221,19 @@ export default {
       // },
       {
         label: 'Location',
-        field: 'form.location',
+        field: 'location',
       },
       {
         label: 'How Much',
-        field: 'form.howMuch',
+        field: 'howMuch',
       },
       {
         label: 'Clients',
-        field: 'form.clients',
+        field: 'clients',
       },
       {
         label: 'Experience',
-        field: 'form.experience',
+        field: 'experience',
       },
       // {
       //   label: 'Updated By',
