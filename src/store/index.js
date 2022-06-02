@@ -2234,7 +2234,8 @@ const store = new Vuex.Store({
     sendShiftEmail({ commit }, payload) {
       console.log(payload)
       fb.userDaysCollection.doc(payload.userDay.id).update({
-        shiftEmailSent: fb.firestore.FieldValue.serverTimestamp()
+        shiftEmailSent: fb.firestore.FieldValue.serverTimestamp(),
+        emailsSent: fb.firestore.FieldValue.increment(1)
       })
     },
 

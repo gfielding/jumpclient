@@ -640,13 +640,17 @@
                     </span>
 
                     <span v-else-if="props.column.field == 'email'">
-                      <button v-if="(props.row.shiftEmailSent || (props.row.shiftEmailSent && Object.keys(props.row.shiftEmailSent).length))" class="icon" v-tooltip="'email sent'" @click="sendInfoEmail(props.row, shift)">
-                        <i class="fa-solid fa-envelope ml-2 mr-2" style="opacity: 0.4;"></i>
+                      <button v-if="(props.row.shiftEmailSent || (props.row.shiftEmailSent && Object.keys(props.row.shiftEmailSent).length))" class="icon" v-tooltip="`Emails sent ` + props.row.emailsSent" @click="sendInfoEmail(props.row, shift)">
+                        <span class="fa-layers fa-fw">
+                          <i class="fa-solid fa-envelope"></i>
+                          <span class="fa-layers-counter fa-xs" style="background:red; color:white; padding:0.1rem 0.25rem 0.2rem 0.25rem; border-radius: 50%;">{{props.row.emailsSent}}</span>
+                        </span>
+                        <!-- <i class="fa-solid fa-envelope-open ml-2 mr-2 blueHue" style="opacity: 0.6;"></i> -->
                       </button>
 
 
-                      <button v-if="(!props.row.shiftEmailSent || (props.row.shiftEmailSent && Object.keys(!props.row.shiftEmailSent).length))" class="icon" v-tooltip="'send info email'" @click="sendInfoEmail(props.row, shift)">
-                        <i class="fa-solid fa-envelope ml-2 mr-2 blueHue"></i>
+                      <button v-if="(!props.row.shiftEmailSent || (props.row.shiftEmailSent && Object.keys(!props.row.shiftEmailSent).length))" class="icon" v-tooltip="`send info email`" @click="sendInfoEmail(props.row, shift)">
+                        <i class="fa-solid fa-envelope ml-2 mr-2"></i>
                       </button>
                     </span>
 
