@@ -107,26 +107,123 @@
               </span>
 
               <span v-if="props.column.field == 'moreInfo'" class="flex">
+                      <span v-for="u in filteredInfo(props.row)" class="flex">
+                          <v-popover v-if="u.docHold && u.docHold == true">
+                          <i class="fa-solid fa-octagon-exclamation ml-2 mr-2 danger"></i>
+                          <template slot="popover">
+                              <span>Do Not Hire Until Onboarding Complete</span>
+                            </template>
+                          </v-popover>
 
-                        <span v-if="props.row.onboarded && props.row.onboarded == true">
-                          <v-popover>
+                          <v-popover v-if="u.onboarded && u.onboarded == true">
                           <i class="fa-solid fa-square-check ml-2 mr-2 success"></i>
                           <template slot="popover">
                               <span>Fully Onboarded</span>
                             </template>
                           </v-popover>
-                        </span>
 
-                        <span v-if="!props.row.onboarded || props.row.onboarded != true">
-                          <v-popover>
+                          <v-popover v-if="!u.onboarded || u.onboarded != true">
                             <i class="fa-solid fa-square-check ml-2 mr-2" style="opacity: 50%;"></i>
                             <template slot="popover">
                               <span>Not Onboarded</span>
                             </template>
                           </v-popover>
+
+                          <span v-if="!u.skills || u.skills.length == 0">
+                          <i class="fad fa-briefcase ml-2 mr-2" style="opacity:50%;"></i>
+                          </span>
+
+                          <span v-if="u.skills && u.skills.length > 0">
+                          <v-popover>
+                            <i class="fad fa-briefcase ml-2 mr-2 success"></i>
+                            <template slot="popover">
+                              <span v-for="z in props.row.skills">{{z.title}} / </span>
+                            </template>
+                          </v-popover>
                         </span>
 
-                        <span v-if="!props.row.skills || props.row.skills.length == 0">
+                        <span v-if="!u.blacklist || u.blacklist.length == 0">
+                          <i class="fas fa-exclamation-triangle ml-2 mr-2" style="opacity:50%;"></i>
+                        </span>
+                        <span v-if="u.blacklist && u.blacklist.length > 0">
+                          <v-popover>
+                            <i class="fas fa-exclamation-triangle ml-2 mr-2 danger"></i>
+                            <template slot="popover">
+                              <span v-for="z in u.blacklist">{{z.title}} / </span>
+                            </template>
+                          </v-popover>
+                        </span>
+
+                        <span v-if="!u.groups || u.groups.length == 0">
+                          <i class="fa-solid fa-user-group ml-2 mr-2" style="opacity:50%;"></i>
+                        </span>
+                        <span v-if="u.groups && u.groups.length > 0">
+                          <v-popover>
+                            <i class="fa-solid fa-user-group ml-2 mr-2 blueHue"></i>
+                            <template slot="popover">
+                              <span v-for="z in u.groups">{{z}} / </span>
+                            </template>
+                          </v-popover>
+                        </span>
+
+                        <span v-if="!u.certs || u.certs.length == 0">
+                          <i class="fa-solid fa-certificate ml-2 mr-2" style="opacity:50%;"></i>
+                        </span>
+                        <span v-if="u.certs && u.certs.length > 0">
+                          <v-popover>
+                            <i class="fa-solid fa-certificate ml-2 mr-2 orangeHue"></i>
+                            <template slot="popover">
+                              <span v-for="z in u.certs">{{z.type}} / </span>
+                            </template>
+                          </v-popover>
+                        </span>
+
+                        <span v-if="u.fullyVaccinated && u.fullyVaccinated === `yes`">
+                          <v-popover>
+                          <i class="fa-solid fa-virus-covid ml-2 mr-2 success"></i>
+                          <template slot="popover">
+                              <span>Vaccinated</span>
+                            </template>
+                          </v-popover>
+                        </span>
+                        <span v-if="!u.fullyVaccinated">
+                          <v-popover>
+                            <i class="fa-solid fa-virus-covid ml-2 mr-2" style="opacity:50%;"></i>
+                            <template slot="popover">
+                              <span>Not Vaccinated</span>
+                            </template>
+                          </v-popover>
+                        </span>
+                        <span v-if="u.fullyVaccinated && u.fullyVaccinated === `no`">
+                          <v-popover>
+                            <i class="fa-solid fa-virus-covid ml-2 mr-2 danger"></i>
+                            <template slot="popover">
+                              <span>Not Vaccinated</span>
+                            </template>
+                          </v-popover>
+                        </span>
+
+
+                      </span>
+
+                        <!-- <span v-if="props.row.docHold && props.row.docHold == true">
+                          <v-popover>
+                          <i class="fa-solid fa-octagon-exclamation ml-2 mr-2 danger"></i>
+                          <template slot="popover">
+                              <span>Do Not Hire Until Onboarding Complete</span>
+                            </template>
+                          </v-popover>
+                        </span> -->
+
+                        <!-- <span v-if="props.row.onboarded && props.row.onboarded == true">
+                          
+                        </span> -->
+
+                        <!-- <span v-if="!props.row.onboarded || props.row.onboarded != true">
+                          
+                        </span> -->
+
+                        <!-- <span v-if="!props.row.skills || props.row.skills.length == 0">
                           <i class="fad fa-briefcase ml-2 mr-2" style="opacity:50%;"></i>
                         </span>
                         <span v-if="props.row.skills && props.row.skills.length > 0">
@@ -197,7 +294,7 @@
                               <span>Not Vaccinated</span>
                             </template>
                           </v-popover>
-                        </span>
+                        </span> -->
                       </span>
 
                       <span v-if="props.column.field == 'phone'">
@@ -268,7 +365,11 @@
 
               <span v-else-if="props.column.field == 'fullName'">
                 <router-link :to="'/users/' + props.row.userId" class="darkLink">
-                  {{props.row.fullName}}
+
+
+                  <span :class="{ danger: (props.row.blacklist && props.row.blacklist.length >= 1) }">
+                    {{props.row.fullName}}
+                  </span>
                 </router-link>
                 <div class="flex justify-flex-start mt-1">
                   <star-rating :read-only="true" :star-size="12" v-if="props.row && props.row.rating" v-model="props.row.rating" class="caption"></star-rating>
@@ -1111,7 +1212,6 @@ export default {
     event() {
       return this.eventInfo
     },
-
     activeDay() {
       if (this.eventInfo && this.eventInfo.days && this.eventInfo.days.length > 0) {
         return this.newActiveDay ? this.newActiveDay : this.eventInfo.days[0]
@@ -1275,6 +1375,7 @@ export default {
         let lastName = doc.data().lastName || null
         let phone = doc.data().phone || null
         let ssn = doc.data().ssn || null
+        let docHold = doc.data().docHold || null
         fb.userDaysCollection.add({
           onboarded: onboarded,
           address: address,
@@ -1292,6 +1393,7 @@ export default {
           lastName: lastName,
           phone: phone,
           ssn: ssn,
+          docHold: docHold,
           userId: item.objectID,
           firstName: item.firstName,
           lastName: item.lastName,
@@ -1900,8 +2002,8 @@ export default {
       fb.userDaysCollection.doc(user.id).update({dayStatus: null})
     },
     filteredInfo(user) {
-      return this.users.filter(member => {
-        return member.id == user.userId
+      return this.eventUsers.filter(member => {
+        return member.id == user.id
       })
     },
     formatAMPM(date) {

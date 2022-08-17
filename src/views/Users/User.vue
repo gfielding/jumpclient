@@ -1,9 +1,9 @@
 <template>
   <div class="dashboard">
-    <div class="dashboard__container">
-      <div class="dashboard__container--header">
+    <div class="dashboard__container" :class="{ held: docHeld }" v-if="user">
+      <div class="dashboard__container--header mb-3">
         <span class="flex">
-        <h1 v-if="user && user.firstName && user.lastName">{{user.firstName}} {{user.lastName}}</h1>
+        <h1 :class="{ danger: dnr }" v-if="user && user.firstName && user.lastName">{{user.firstName}} {{user.lastName}}</h1>
         <star-rating :read-only="true" :star-size="30" v-if="user && user.rating" v-model="user.rating" class="ml-5"></star-rating>
         <span v-if="user && user.points" class="flex align-center ml-5">
           <span class="points animated-box">
@@ -12,26 +12,47 @@
         </span>
         <Rewards v-if="user" :user="user" />
         </span>
-        <span>
+        <span class="flex align-center">
+          <button class="btn btn__outlined mr-3" @click="goEvents()">Work History</button>
+          <button class="btn btn__outlined mr-3" @click="goPayroll()">Pay History</button>
           <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
         </span>
       </div>
-      <ProfileSkills :user="user" class="mb-1" v-if="user" />
-      <div class="caption mb-2 ml-2" v-if="user && user.id">UID #{{user.id}}</div>
+      <!-- <ProfileSkills :user="user" class="mb-1" v-if="user" /> -->
+      <!-- <div class="caption mb-2 ml-2" v-if="user && user.id">UID #{{user.id}} - Signed Up: 
+        {{joined | moment("dddd, MMMM Do YYYY") }}
+      </div> -->
       <div class="dashboard__container--body" v-if="user">
         <div class="dashboard__container--body--col">
           <ProfileImage :user="user" />
         </div>
         <div class="dashboard__container--body--col">
-          <h2 class="mb-3">I-9 Verifications</h2>
-          <ProfileVerifications :user="user" :verifications="userVerifications" />
+          <ProfileId :user="user" />
         </div>
-        <div class="dashboard__container--body--col">
+      </div>
+      <div v-if="user">
+        <ProfileContact :user="user" :currentUser="currentUser" />
+      </div>
+        <!-- <div class="dashboard__container--body--col">
+          <ProfileContact :user="user" />
+        </div> -->
+      <div class="dashboard__container--body" v-if="user">
+        <!-- <div class="dashboard__container--body--col">
           <ProfileStatus :user="user" />
-        </div>
-        <div class="dashboard__container--body--col" v-if="currentUser && (currentUser.email == 'greg@mvpeventstaffing.com' || 'katy@mvpeventstaffing.com' || 'tai@mvpeventstaffing.com')">
+        </div> -->
+        <!-- <div class="dashboard__container--body--col" v-if="currentUser && (currentUser.email == 'greg@mvpeventstaffing.com' || 'katy@mvpeventstaffing.com' || 'tai@mvpeventstaffing.com')">
           <ProfileSSN :userProfile="user" />
+        </div> -->
+
+        <div class="dashboard__container--body--col">
+          <ProfileBio :user="user" />
         </div>
+        
+        
+        <div class="dashboard__container--body--col">
+          <ProfileSocial :user="user" />
+        </div>
+       
         <div class="dashboard__container--body--col">
           <ProfileBlacklist :user="user" />
         </div>
@@ -45,24 +66,24 @@
          <div class="dashboard__container--body--col">
           <ProfileMessagingAvailability :user="user" />
         </div> -->
+        
+        
+        <!-- <div class="dashboard__container--body--col">
+          <ProfileAddress :user="user" />
+        </div> -->
+        <div class="dashboard__container--body--col">
+          <ProfileSkills :user="user" />
+        </div>
         <div class="dashboard__container--body--col">
           <ProfileTags :user="user" :userProfile="userProfile" />
         </div>
         
         <div class="dashboard__container--body--col">
-          <ProfileContact :user="user" />
-        </div>
-        <div class="dashboard__container--body--col">
-          <ProfileSocial :user="user" />
-        </div>
-        <div class="dashboard__container--body--col">
-          <ProfileAddress :user="user" />
-        </div>
-        <div class="dashboard__container--body--col">
-          <ProfileBio :user="user" />
-        </div>
-        <div class="dashboard__container--body--col">
           <ProfileEmergency :user="user" />
+        </div>
+         <div class="dashboard__container--body--col">
+          <h2 class="mb-3">I-9 Verifications</h2>
+          <ProfileVerifications :user="user" :verifications="userVerifications" />
         </div>
         <div class="dashboard__container--body--col">
           <ProfileCerts :user="user" />
@@ -100,31 +121,39 @@
       </div>
       <hr>
 
-      <div class="dashboard__container--body" v-if="user">
+      <!-- <div class="dashboard__container--body" v-if="user">
         <div class="dashboard__container--body--col">
           <UserEvents :events="userEvents" />
         </div>
         <div class="dashboard__container--body--col">
           <UserAssignments :assignments="userAssignments" />
         </div>
-      </div>
+      </div> -->
 
 
     </div>
 
-    <Loader v-if="!user" />
+    <Loader v-if="(!user || !user.id)" />
 
   </div>
 </template>
+
+<style scoped>
+  .held {
+    opacity: 0.8;
+    filter: grayscale(100%);
+  }
+</style>
 
 <script>
 import { mapState } from 'vuex'
 import StarRating from 'vue-star-rating'
 import Loader from '@/components/Loader.vue'
 import ProfileImage from '@/components/Profile/ProfileImage.vue'
+import ProfileId from '@/components/Profile/ProfileId.vue'
 import ProfileContact from '@/components/Profile/ProfileContact.vue'
 import ProfileAddress from '@/components/Profile/ProfileAddress.vue'
-import ProfileSSN from '@/components/Profile/ProfileSSN.vue'
+// import ProfileSSN from '@/components/Profile/ProfileSSN.vue'
 import ProfileEmergency from '@/components/Profile/ProfileEmergency.vue'
 import ProfileBio from '@/components/Profile/ProfileBio.vue'
 import ProfileSocial from '@/components/Profile/ProfileSocial.vue'
@@ -143,8 +172,8 @@ import UserNote from '@/components/Profile/UserNote.vue'
 import UserReview from '@/components/Profile/UserReview.vue'
 import NotesTable from '@/components/Profile/NotesTable.vue'
 import ReviewsTable from '@/components/Profile/ReviewsTable.vue'
-import UserEvents from '@/components/Profile/UserEvents.vue'
-import UserAssignments from '@/components/Profile/UserAssignments.vue'
+// import UserEvents from '@/components/Profile/UserEvents.vue'
+// import UserAssignments from '@/components/Profile/UserAssignments.vue'
 import Rewards from '@/components/Rewards.vue'
 import ProfileVerifications from '@/components/Profile/ProfileVerifications.vue'
 import router from '@/router'
@@ -152,27 +181,44 @@ import router from '@/router'
 export default {
   name: 'user',
   computed: {
-    ...mapState(['currentUser', 'userInfo', 'reviews', 'userNotes', 'userProfile', 'userEvents', 'userVerifications', 'userAssignments', 'groups', 'userMessages']),
+    ...mapState(['currentUser', 'userInfo', 'reviews', 'userNotes', 'userProfile', 'userVerifications', 'userMessages']),
     user() {
       return this.userInfo
+    },
+    docHeld() {
+      if (this.user && this.user.docHold) {
+        return true
+      }
+    },
+    dnr() {
+     if (this.user && this.user.blacklist && this.user.blacklist.length >= 1) {
+      return true
+     }
     }
+    // joined() {
+    //   if(this.user && this.user.created) {
+    //     return new Date(this.user.created.seconds*1000)
+    //     console.log(this.currentUser.metaData)
+    //   }
+    // }
   },
   created () {
     this.$store.dispatch("getUserFromId", this.$route.params.id);
-    if (!this.groups || this.groups.length < 1) {
-      this.$store.dispatch("getGroups")
-    }
+    // if (!this.groups || this.groups.length < 1) {
+    //   this.$store.dispatch("getGroups")
+    // }
   },
   components: {
     Loader,
     StarRating,
     ProfileImage,
+    ProfileId,
     ProfileContact,
     ProfileAddress,
     ProfileEmergency,
     ProfileBio,
     ProfileSocial,
-    ProfileSSN,
+    // ProfileSSN,
     ProfileCerts,
     ProfileSkills,
     ProfileBlacklist,
@@ -184,8 +230,8 @@ export default {
     NotesTable,
     UserReview,
     ReviewsTable,
-    UserEvents,
-    UserAssignments,
+    // UserEvents,
+    // UserAssignments,
     ProfileTags,
     ProfileMessage,
     MessageTable,
@@ -196,6 +242,14 @@ export default {
   methods: {
     goBack() {
       router.go(-1)
+    },
+    goEvents() {
+      let url = `/users/` + this.$route.params.id + `/assignments`
+      router.push(url)
+    },
+    goPayroll() {
+      let url = `/users/` + this.$route.params.id + `/payroll`
+      router.push(url)
     },
   },
   beforeDestroy() {

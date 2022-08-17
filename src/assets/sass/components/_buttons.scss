@@ -90,6 +90,26 @@
 		background:transparent;
 		color:$text !important;
 	}
+	&__outlined-success {
+		border:1px solid $success;
+		background:transparent;
+		color:$success;
+		&:hover {
+			border:1px solid $success;
+			background: $success;
+			color: white !important;
+		}
+	}
+	&__outlined-danger {
+		border:1px solid $danger;
+		background:transparent;
+		color:$danger;
+		&:hover {
+			border:1px solid $danger;
+			background: $danger;
+			color: white !important;
+		}
+	}
 	&__gradient {
 		color:white;
 		z-index: 1;

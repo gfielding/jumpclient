@@ -561,6 +561,22 @@ const router = new VueRouter({
       },
     },
     {
+      path: '/users/:id/assignments',
+      name: 'userAssignments',
+      component: () => import('../views/Users/UserAssignments.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
+      path: '/users/:id/payroll',
+      name: 'userPayroll',
+      component: () => import('../views/Users/UserPayroll.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    {
       path: '/dashboard',
       name: 'dashboard',
       component: () => import('../views/Dashboard.vue'),

@@ -71,7 +71,7 @@ export default {
     if (!this.userProfile) {
       this.$store.dispatch("getUserProfile");
     }
-    this.$store.dispatch("getInfiniteEvents")
+    // this.$store.dispatch("getInfiniteEvents")
     this.$store.dispatch("getVenues")
     // this.carlyCheck()
   },
