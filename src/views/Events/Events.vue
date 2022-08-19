@@ -52,7 +52,7 @@
         <Loader v-if="(!infiniteEvents || infiniteEvents.length < 1)" />
 
         <!--VENUE RESULTS-->
-        <EventCard v-if="venueEventsSearchResults.length > 0 && !results && taggedEvents.length == 0 && showVenues" :events="venueEventsSearchResults" :accounting="false" :tags="tags" />
+        <EventCard v-if="venueEventsSearchResults.length > 0 && !results && taggedEvents.length == 0 && showVenues" :events="venueEventsSearchResults" :accounting="true" :tags="tags" />
        
         <!--CANCELLED RESULTS-->
         <EventCard v-if="showCancelled" :events="cancelledEvents" :accounting="false" :tags="tags" />
@@ -64,7 +64,7 @@
         <EventCard v-if="showInfinite" :events="infiniteEvents" :accounting="false" :tags="tags" />
 
         <!--PREV AND NEXT-->
-        <EventCard v-if="(!venueEventsSearchResults || venueEventsSearchResults.length == 0) && !results && (!taggedEvents || taggedEvents.length == 0) && !showVenues && showPrevNext" :events="visibleEvents" :accounting="false" :tags="tags" />
+        <EventCard v-if="(!venueEventsSearchResults || venueEventsSearchResults.length == 0) && !results && (!taggedEvents || taggedEvents.length == 0) && !showVenues && showPrevNext" :events="visibleEvents" :accounting="true" :tags="tags" />
 
 
 
