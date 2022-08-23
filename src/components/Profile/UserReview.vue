@@ -48,10 +48,6 @@ export default {
           this.performingRequest = false
       }, 1000)
   	}
-  },
-  beforeDestroy () {
-    this.$store.dispatch('clearUserState')
-    this.$store.dispatch('clearErrors')
   }
 }
 </script>

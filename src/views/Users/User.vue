@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard">
-    <div class="dashboard__container" :class="{ held: docHeld }" v-if="user">
-      <div class="dashboard__container--header mb-3">
+    <div class="dashboard__container pb-0" :class="{ held: docHeld }" v-if="user">
+      <div class="dashboard__container--header">
         <span class="flex">
         <h1 :class="{ danger: dnr }" v-if="user && user.firstName && user.lastName">{{user.firstName}} {{user.lastName}}</h1>
         <star-rating :read-only="true" :star-size="30" v-if="user && user.rating" v-model="user.rating" class="ml-5"></star-rating>
@@ -13,128 +13,20 @@
         <Rewards v-if="user" :user="user" />
         </span>
         <span class="flex align-center">
-          <button class="btn btn__outlined mr-3" @click="goEvents()">Work History</button>
-          <button class="btn btn__outlined mr-3" @click="goPayroll()">Pay History</button>
-          <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
+          <router-link :to="`/users/${$route.params.id}/details`">
+            <button class="btn  ml-3" v-bind:class="{ 'btn__dark': isDetails, 'btn__outlined': !isDetails }">Details</button>
+          </router-link>
+          <router-link :to="`/users/${$route.params.id}/payroll`">
+            <button class="btn  ml-3" v-bind:class="{ 'btn__dark': isPayroll, 'btn__outlined': !isPayroll }">Payroll</button>
+          </router-link>
+          <router-link :to="`/users/${$route.params.id}/assignments`">
+            <button class="btn  ml-3" v-bind:class="{ 'btn__dark': isAssignments, 'btn__outlined': !isAssignments }">Assignments</button>
+          </router-link>
         </span>
       </div>
-      <!-- <ProfileSkills :user="user" class="mb-1" v-if="user" /> -->
-      <!-- <div class="caption mb-2 ml-2" v-if="user && user.id">UID #{{user.id}} - Signed Up: 
-        {{joined | moment("dddd, MMMM Do YYYY") }}
-      </div> -->
-      <div class="dashboard__container--body" v-if="user">
-        <div class="dashboard__container--body--col">
-          <ProfileImage :user="user" />
-        </div>
-        <div class="dashboard__container--body--col">
-          <ProfileId :user="user" />
-        </div>
-      </div>
-      <div v-if="user">
-        <ProfileContact :user="user" :currentUser="currentUser" />
-      </div>
-        <!-- <div class="dashboard__container--body--col">
-          <ProfileContact :user="user" />
-        </div> -->
-      <div class="dashboard__container--body" v-if="user">
-        <!-- <div class="dashboard__container--body--col">
-          <ProfileStatus :user="user" />
-        </div> -->
-        <!-- <div class="dashboard__container--body--col" v-if="currentUser && (currentUser.email == 'greg@mvpeventstaffing.com' || 'katy@mvpeventstaffing.com' || 'tai@mvpeventstaffing.com')">
-          <ProfileSSN :userProfile="user" />
-        </div> -->
-
-        <div class="dashboard__container--body--col">
-          <ProfileBio :user="user" />
-        </div>
-        
-        
-        <div class="dashboard__container--body--col">
-          <ProfileSocial :user="user" />
-        </div>
-       
-        <div class="dashboard__container--body--col">
-          <ProfileBlacklist :user="user" />
-        </div>
-        
-        <div class="dashboard__container--body--col">
-          <ProfileMessagingProfile :user="user" />
-        </div>
-        <!-- <div class="dashboard__container--body--col">
-          <ProfileMessagingPay :user="user" />
-        </div>
-         <div class="dashboard__container--body--col">
-          <ProfileMessagingAvailability :user="user" />
-        </div> -->
-        
-        
-        <!-- <div class="dashboard__container--body--col">
-          <ProfileAddress :user="user" />
-        </div> -->
-        <div class="dashboard__container--body--col">
-          <ProfileSkills :user="user" />
-        </div>
-        <div class="dashboard__container--body--col">
-          <ProfileTags :user="user" :userProfile="userProfile" />
-        </div>
-        
-        <div class="dashboard__container--body--col">
-          <ProfileEmergency :user="user" />
-        </div>
-         <div class="dashboard__container--body--col">
-          <h2 class="mb-3">I-9 Verifications</h2>
-          <ProfileVerifications :user="user" :verifications="userVerifications" />
-        </div>
-        <div class="dashboard__container--body--col">
-          <ProfileCerts :user="user" />
-        </div>
-      </div>
-      <hr>
-      <div class="dashboard__container--body" v-if="user">
-        <div class="dashboard__container--body--col">
-          <MessageTable :messages="userMessages" />
-        </div>
-        <div class="dashboard__container--body--col">
-          <ProfileMessage :user="user" :admin="userProfile" />
-        </div>
-      </div>
-
-      <hr>
-      <div class="dashboard__container--body" v-if="user">
-        <div class="dashboard__container--body--col">
-          <ReviewsTable :reviews="reviews" />
-        </div>
-        <div class="dashboard__container--body--col">
-          <UserReview :user="user" :me="userProfile" />
-        </div>
-      </div>
-      <hr>
-
-
-      <div class="dashboard__container--body" v-if="user">
-        <div class="dashboard__container--body--col">
-          <NotesTable :notes="userNotes" />
-        </div>
-        <div class="dashboard__container--body--col">
-          <UserNote :user="user" :me="userProfile" />
-        </div>
-      </div>
-      <hr>
-
-      <!-- <div class="dashboard__container--body" v-if="user">
-        <div class="dashboard__container--body--col">
-          <UserEvents :events="userEvents" />
-        </div>
-        <div class="dashboard__container--body--col">
-          <UserAssignments :assignments="userAssignments" />
-        </div>
-      </div> -->
-
-
     </div>
-
+    <router-view :key="$route.params.id" :user="user" :dnr="dnr" :docHeld="docHeld" />
     <Loader v-if="(!user || !user.id)" />
-
   </div>
 </template>
 
@@ -149,39 +41,13 @@
 import { mapState } from 'vuex'
 import StarRating from 'vue-star-rating'
 import Loader from '@/components/Loader.vue'
-import ProfileImage from '@/components/Profile/ProfileImage.vue'
-import ProfileId from '@/components/Profile/ProfileId.vue'
-import ProfileContact from '@/components/Profile/ProfileContact.vue'
-import ProfileAddress from '@/components/Profile/ProfileAddress.vue'
-// import ProfileSSN from '@/components/Profile/ProfileSSN.vue'
-import ProfileEmergency from '@/components/Profile/ProfileEmergency.vue'
-import ProfileBio from '@/components/Profile/ProfileBio.vue'
-import ProfileSocial from '@/components/Profile/ProfileSocial.vue'
-import ProfileCerts from '@/components/Profile/ProfileCerts.vue'
-import ProfileSkills from '@/components/Profile/ProfileSkills.vue'
-import ProfileBlacklist from '@/components/Profile/ProfileBlacklist.vue'
-import ProfileTags from '@/components/Profile/ProfileTags.vue'
-import Verification from '@/components/Profile/Verification.vue'
-import ProfileStatus from '@/components/Profile/ProfileStatus.vue'
-import ProfileMessage from '@/components/Profile/ProfileMessage.vue'
-import MessageTable from '@/components/Profile/MessageTable.vue'
-import ProfileMessagingProfile from '@/components/Profile/ProfileMessagingProfile.vue'
-// import ProfileMessagingPay from '@/components/Profile/ProfileMessagingPay.vue'
-import ProfileMessagingAvailability from '@/components/Profile/ProfileMessagingAvailability.vue'
-import UserNote from '@/components/Profile/UserNote.vue'
-import UserReview from '@/components/Profile/UserReview.vue'
-import NotesTable from '@/components/Profile/NotesTable.vue'
-import ReviewsTable from '@/components/Profile/ReviewsTable.vue'
-// import UserEvents from '@/components/Profile/UserEvents.vue'
-// import UserAssignments from '@/components/Profile/UserAssignments.vue'
 import Rewards from '@/components/Rewards.vue'
-import ProfileVerifications from '@/components/Profile/ProfileVerifications.vue'
 import router from '@/router'
 
 export default {
-  name: 'user',
+  name: 'userHome',
   computed: {
-    ...mapState(['currentUser', 'userInfo', 'reviews', 'userNotes', 'userProfile', 'userVerifications', 'userMessages']),
+    ...mapState(['currentUser', 'userInfo']),
     user() {
       return this.userInfo
     },
@@ -194,73 +60,39 @@ export default {
      if (this.user && this.user.blacklist && this.user.blacklist.length >= 1) {
       return true
      }
+    },
+    isDetails() {
+      return this.$route.name == 'userDetails';
+    },
+    isPayroll() {
+      return this.$route.name == 'userPayroll';
+    },
+    isAssignments() {
+      return this.$route.name == 'userAssignments';
     }
-    // joined() {
-    //   if(this.user && this.user.created) {
-    //     return new Date(this.user.created.seconds*1000)
-    //     console.log(this.currentUser.metaData)
-    //   }
-    // }
   },
   created () {
     this.$store.dispatch("getUserFromId", this.$route.params.id);
-    // if (!this.groups || this.groups.length < 1) {
-    //   this.$store.dispatch("getGroups")
-    // }
+  },
+  async mounted () {
+    this.$store.dispatch('getUserNotes', this.$route.params.id)
+    this.$store.dispatch('getUserMessages', this.$route.params.id)
+    this.$store.dispatch('getUserReviews', this.$route.params.id)
+    this.$store.dispatch('getUserEvents', this.$route.params.id)
+    this.$store.dispatch('getUserAssignments', this.$route.params.id)
+    this.$store.dispatch('getUserVerifications', this.$route.params.id)
+    this.$store.dispatch('getUserPayroll', this.$route.params.id)
   },
   components: {
     Loader,
     StarRating,
-    ProfileImage,
-    ProfileId,
-    ProfileContact,
-    ProfileAddress,
-    ProfileEmergency,
-    ProfileBio,
-    ProfileSocial,
-    // ProfileSSN,
-    ProfileCerts,
-    ProfileSkills,
-    ProfileBlacklist,
-    ProfileStatus,
-    ProfileMessagingProfile,
-    // ProfileMessagingPay,
-    ProfileMessagingAvailability,
-    UserNote,
-    NotesTable,
-    UserReview,
-    ReviewsTable,
-    // UserEvents,
-    // UserAssignments,
-    ProfileTags,
-    ProfileMessage,
-    MessageTable,
     Rewards,
-    Verification,
-    ProfileVerifications
   },
-  methods: {
-    goBack() {
-      router.go(-1)
-    },
-    goEvents() {
-      let url = `/users/` + this.$route.params.id + `/assignments`
-      router.push(url)
-    },
-    goPayroll() {
-      let url = `/users/` + this.$route.params.id + `/payroll`
-      router.push(url)
-    },
-  },
-  beforeDestroy() {
-    this.$store.dispatch('clearUserState')
+  destroyed() {
+    // this.$store.dispatch('clearUserState')
     this.$store.dispatch('clearErrors')
-    console.log(this)
+    console.log('destroyed')
   }
 }
 
 </script>
-
-<style lang="scss" scoped>
-
-</style>

@@ -13,12 +13,5 @@
 <script>
 export default {
   props: ['user'],
-  methods: {
-   
-  },
-  beforeDestroy () {
-    this.$store.dispatch('clearUserState')
-  	this.$store.dispatch('clearErrors')
-  }
 }
 </script>

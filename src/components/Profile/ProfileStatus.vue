@@ -107,15 +107,5 @@ export default {
     //   this.$store.dispatch("removeUserOpr", user)
     // },
   },
-  beforeDestroy () {
-  	// this.showButton2 = false
-  	// this.showButton3 = false
-  	// delete this.showButton2
-  	// delete this.showButton3
-  	// this.performingRequest = false
-  	// delete this.performingRequest
-    this.$store.dispatch('clearUserState')
-    this.$store.dispatch('clearErrors')
-  }
 }
 </script>

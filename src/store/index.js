@@ -322,7 +322,6 @@ const store = new Vuex.Store({
       // )
     },
     updateTheUser({ commit }, payload) {
-      console.log(payload)
       fb.usersCollection.doc(payload.id).update(payload)
     },
     updateUserEmail({ commit }, payload) {
@@ -1188,12 +1187,6 @@ const store = new Vuex.Store({
       .onSnapshot((doc) => {
         commit("setUserInfo", doc.data())
       })
-      store.dispatch('getUserNotes', payload)
-      store.dispatch('getUserMessages', payload)
-      store.dispatch('getUserReviews', payload)
-      store.dispatch('getUserEvents', payload)
-      store.dispatch('getUserAssignments', payload)
-      store.dispatch('getUserVerifications', payload)
     },
     // getUserFromId({ commit }, payload) {
     //   fb.usersCollection.where("id", "==", payload).onSnapshot(querySnapshot => {
@@ -1425,6 +1418,7 @@ const store = new Vuex.Store({
       })
     },
     clearUserState({ commit }) {
+      console.log('clearing user state')
       commit('setUserInfo', {})
       commit('setUserNotes', [])
       commit('setUserMessages', [])
@@ -1432,6 +1426,7 @@ const store = new Vuex.Store({
       commit('setUserEvents', [])
       commit('setUserAssignments', [])
       commit('setUserVerifications', [])
+      commit('setUserPayroll', [])
     },
     clearUsersState({ commit }) {
       commit('setUsers', [])

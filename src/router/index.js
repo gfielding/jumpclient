@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import { auth } from '../firebaseConfig'
+import store from '../store';
 
 Vue.use(VueRouter)
 
@@ -551,31 +552,59 @@ const router = new VueRouter({
       meta: {
         requiresAuth: true
       },
+      afterRouteLeave(to, from, next) {
+        return $store.dispatch('clearUserState').then(next)
+        console.log('changing')
+        
+      },
     },
     {
-      path: '/users/:id',
-      name: 'user',
+      path: '/users/:id', redirect: '/users/:id/details',
+      name: 'userHome',
       component: () => import('../views/Users/User.vue'),
       meta: {
-        requiresAuth: true
+        requiresAuth: true,
+        refreshUser: true
       },
+      children: [
+        {
+          path: '/users/:id/details',
+          name: 'userDetails',
+          component: () => import('../views/Users/UserDetails.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/users/:id/assignments',
+          name: 'userAssignments',
+          component: () => import('../views/Users/UserAssignments.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/users/:id/payroll',
+          name: 'userPayroll',
+          component: () => import('../views/Users/UserPayroll.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+      ]
     },
-    {
-      path: '/users/:id/assignments',
-      name: 'userAssignments',
-      component: () => import('../views/Users/UserAssignments.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
-    {
-      path: '/users/:id/payroll',
-      name: 'userPayroll',
-      component: () => import('../views/Users/UserPayroll.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
+    // {
+    //   path: '/users/:id',
+    //   name: 'user',
+    //   component: () => import('../views/Users/User.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    // },
+    
     {
       path: '/dashboard',
       name: 'dashboard',
@@ -691,7 +720,17 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const requiresAuth = to.matched.some(x => x.meta.requiresAuth)
+  const requiresAuth = from.matched.some(x => x.meta.requiresAuth)
+  const refreshUser = to.matched.some(x => x.meta.refreshUser)
+
+  if (refreshUser && (to.name == "userDetails" || to.name == "userPayroll" || to.name == "userAssignments")) {
+    console.log('not clearing state')
+  } else {
+    console.log(to.name)
+    console.log('clearing state')
+    store.dispatch('clearUserState')
+    
+  }
 
   if (requiresAuth && !auth.currentUser) {
     next('/login')

@@ -43,11 +43,5 @@ export default {
       }, 1000)
   	},
   },
-  beforeDestroy () {
-  	this.performingRequest = null
-    delete this.performingRequest
-    this.$store.dispatch('clearUserState')
-    this.$store.dispatch('clearErrors')
-  }
 }
 </script>

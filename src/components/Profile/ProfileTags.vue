@@ -69,9 +69,5 @@ export default {
   // computed: {
   //   ...mapState(['clients']),
   // },
-  beforeDestroy () {
-    this.$store.dispatch('clearUserState')
-  	this.$store.dispatch('clearErrors')
-  }
 }
 </script>

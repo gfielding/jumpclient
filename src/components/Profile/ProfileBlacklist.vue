@@ -61,9 +61,6 @@ export default {
   beforeDestroy () {
   	this.newBlack = ''
   	delete this.newBlack
-  	this.$store.dispatch("clearClientsState")
-    this.$store.dispatch('clearUserState')
-  	this.$store.dispatch('clearErrors')
   }
 }
 </script>

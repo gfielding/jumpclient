@@ -60,10 +60,6 @@ export default {
       let user = this.user
       this.$store.dispatch('updateTheUser', user)
     },
-  },
-  beforeDestroy () {
-    this.$store.dispatch('clearUserState')
-    this.$store.dispatch('clearErrors')
   }
 }
 </script>

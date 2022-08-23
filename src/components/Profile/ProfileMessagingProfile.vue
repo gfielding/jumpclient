@@ -68,8 +68,6 @@ export default {
     this.performingRequest2 = null
     delete this.performingRequest1
     delete this.performingRequest2
-    this.$store.dispatch('clearUserState')
-    this.$store.dispatch('clearErrors')
   }
 }
 </script>

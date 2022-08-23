@@ -25,7 +25,7 @@
 
 
         <span v-else-if="props.column.field == 'delete'">
-          <button class="btn btn__icon pa-0" @click="deleteItem(props.row)" :disabled="props.row.verified">
+          <button class="btn btn__icon pa-0" @click="deleteItem(props.row)">
             <i class="fas fa-trash"></i>
           </button>
         </span>

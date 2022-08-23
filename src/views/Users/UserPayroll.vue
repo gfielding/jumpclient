@@ -1,19 +1,8 @@
 <template>
-  <div class="dashboard">
-    <Loader v-if="performingRequest || userPayroll.length < 1" />
-    <div class="dashboard__container">
-      <div class="dashboard__container--header mb-3">
-        <div class="flex align-center">
-          <h1>User Payroll</h1>
-          <!-- <button class="btn btn__large btn__danger ml-5" v-if="eventInfo && eventInfo.cancelled">
-            Cancelled
-          </button> -->
-        </div>
-        <span class="flex align-center">
-          <button class="btn btn__outlined mr-3" @click="goEvents()">Work History</button>
-          <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
-        </span>
-      </div>
+  
+    
+    <div class="dashboard__container" :class="{ held: docHeld }">
+      
       <!-- <div class="dashboard__container--body" v-if="eventInfo">
         <div class="eventdays mb-3">
           <button class="mr-2 mb-2" @click="showStaff()" v-bind:class="{ 'chipDark': !activeDay, 'chip': activeDay }">
@@ -173,12 +162,9 @@
                
             </template>
           </vue-good-table>
-          
-          
-      </div>
-    
     </div>
-  </div>
+
+    </div>
 </template>
 
 <style scoped type="text/css">
@@ -197,6 +183,7 @@ import * as moment from 'moment'
 const fb = require('../../firebaseConfig.js')
 
 export default {
+  props: ['user', 'dnr', 'docHeld'],
   name: 'userPayroll',
   data: () => ({
     performingRequest: false,
@@ -332,19 +319,8 @@ export default {
       },
     ],
   }),
-  created () {
-    this.$store.dispatch("getUserPayroll", this.$route.params.id)
-  },
-  // async mounted() {
-  //   this.decryptRow()
-  // },
   computed: {
-    ...mapState(['currentUser', 'userPayroll']),
-    // visibleAssignments() {
-    //   return this.allPayroll.filter(item => {
-    //     return ((!item.hidden || item.hidden != true) && (!item.paystatus || item.paystatus != 'paid'))
-    //   })
-    // },
+    ...mapState(['userPayroll']),
 
   },
   components: {
@@ -352,17 +328,17 @@ export default {
     TimesheetNote
   },
   methods: {
-    goBack() {
-      router.go(-1)
-    },
-    goEvents() {
-      let url = `/users/` + this.$route.params.id + `/assignments`
-      router.push(url)
-    },
-    goPayroll() {
-      let url = `/users/` + this.$route.params.id + `/payroll`
-      router.push(url)
-    },
+    // goBack() {
+    //   router.go(-1)
+    // },
+    // goEvents() {
+    //   let url = `/users/` + this.$route.params.id + `/assignments`
+    //   router.push(url)
+    // },
+    // goPayroll() {
+    //   let url = `/users/` + this.$route.params.id + `/payroll`
+    //   router.push(url)
+    // },
     decryptedText() {
       if (this.userProfile.ssn) {
       return (this.$CryptoJS.AES.decrypt(this.userProfile.ssn, this.encryptionKey).toString(this.CryptoJS.enc.Utf8) || this.$CryptoJS.AES.encrypt(this.ssn, this.encryptionKey).toString())
@@ -713,8 +689,8 @@ export default {
   beforeDestroy () {
     this.columns = null
     delete this.columns
-    this.$store.dispatch("clearUserPayroll")
-    this.$store.dispatch('clearErrors')
+    // this.$store.dispatch("clearUserPayroll")
+    // this.$store.dispatch('clearErrors')
   }
 }
 </script>
