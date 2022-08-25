@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h2>Blacklisted By Clients</h2>
+		<h2>DNR'd By Clients</h2>
     <transition name="fadeStop">
       <div class="mb-2 mt-2 flex" v-if="user && user.blacklist && user.blacklist.length >= 1">
         <button class="chip mr-2" v-for="(item, index) in user.blacklist" :key="index" @click="deleteClient(index)">{{item.title}} <i class="far fa-times-circle ml-2"></i></button>
@@ -61,9 +61,6 @@ export default {
   beforeDestroy () {
   	this.newBlack = ''
   	delete this.newBlack
-  	this.$store.dispatch("clearClientsState")
-    this.$store.dispatch('clearUserState')
-  	this.$store.dispatch('clearErrors')
   }
 }
 </script>

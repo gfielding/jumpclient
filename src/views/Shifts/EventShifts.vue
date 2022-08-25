@@ -46,6 +46,10 @@
               mode: 'records',
               perPage: 50,
             }"
+            :search-options="{
+              enabled: true,
+              placeholder: 'Search this table',
+            }"
            
           >
             <template slot="table-row" slot-scope="props">
@@ -810,7 +814,7 @@ export default {
   //   this.decryptRow()
   // },
   computed: {
-    ...mapState(['eventShifts', 'eventInfo', 'eventAssignments', 'eventAssignmentsByDay', 'currentUser']),
+    ...mapState(['eventInfo', 'eventAssignments', 'eventAssignmentsByDay', 'currentUser']),
     visibleAssignments() {
       return this.eventAssignments.filter(item => {
         return ((!item.hidden || item.hidden != true) && (!item.paystatus || item.paystatus != 'paid'))
@@ -1038,10 +1042,6 @@ export default {
     unlock(item) {
       fb.assignmentsCollection.doc(item.id).update({ locked: false })
     },
-    // showEventShfts(day) {
-    //   let url = `/timesheets/` + this.$route.params.id + `/` + day
-    //   router.push(url)
-    // },
     showEventShfts(day) {
       this.performingRequest = true
       this.$store.dispatch("clearEventAssignmentsByDay")
@@ -1519,7 +1519,6 @@ export default {
     this.columns = null
     delete this.columns
     this.$store.dispatch("clearEventState")
-    this.$store.dispatch("clearEventShifts")
     this.$store.dispatch("clearEventAssignments")
     this.$store.dispatch('clearErrors')
   }

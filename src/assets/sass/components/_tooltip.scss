@@ -1,6 +1,10 @@
 .tooltip {
   display: block !important;
   z-index: 10000;
+   max-width:50vw;
+  @include respond(tablet-port) {
+    max-width:80vw;
+  }
 
   .tooltip-inner {
     background: black;

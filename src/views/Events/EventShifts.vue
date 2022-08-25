@@ -314,9 +314,10 @@ export default {
     }
   },
   created () {
-    this.$store.dispatch("getEventFromId", this.$route.params.id);
+  	this.$store.dispatch("getEventFromId", this.$route.params.id);
+    this.$store.dispatch("getEventShiftsId", this.$route.params.id);
   },
-  async mounted () {
+  mounted () {
     if (!this.jobs || this.jobs.length < 1) {
       this.$store.dispatch("getJobsState")
     }

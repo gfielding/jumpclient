@@ -1,7 +1,7 @@
 <template>
 	<div class="dashboard">
     <div class="dashboard__container">
-    	<Loader v-if="!eventInfo" />
+    	<Loader v-if="(!eventInfo && !eventInfo.id)" />
       <div class="dashboard__container--header" v-if="eventInfo">
         <div class="flex align-center justify-space-between align-center" style="width:100%;">
           <h1>{{eventInfo.title}}</h1>
@@ -180,7 +180,7 @@
   					</button>
   				</div>
   			</div>
-  			<div class="dashboard__container--body--col--inner" style="margin-top:3.2rem;">
+  			<div class="dashboard__container--body--col--inner" style="margin-top:3.2rem;" v-if="accountingNotes && accountingNotes.length >= 1">
   				<h2>Accounting Notes</h2>
   				<div class="mb-3">
   					<vue-good-table
@@ -229,7 +229,7 @@
 <script>
 import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
-import { VueEditor } from "vue2-editor";
+// import { VueEditor } from "vue2-editor";
 import router from '@/router'
 const fb = require('../../firebaseConfig.js')
 
@@ -317,11 +317,12 @@ export default {
     ]
   }),
   components: {
-    VueEditor,
+    // VueEditor,
     Loader
   },
   created () {
     this.$store.dispatch("getEventFromId", this.$route.params.id);
+    
   },
   mounted() {
   	this.$store.dispatch("getAccountingNotes", this.$route.params.id);

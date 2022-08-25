@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<h2>Leave a Review</h2>
-    <star-rating @rating-selected ="setRating" :star-size="30" :show-rating="false"></star-rating>
+    <star-rating clearable @rating-selected ="setRating" :star-size="30" :show-rating="false"></star-rating>
 		<label for="review">Review:</label>
      <textarea name="review" id="review" cols="30" rows="6" v-model="review"></textarea>
      <button class="btn btn__primary mt-3" @click="onAddReview()">
@@ -48,10 +48,6 @@ export default {
           this.performingRequest = false
       }, 1000)
   	}
-  },
-  beforeDestroy () {
-    this.$store.dispatch('clearUserState')
-    this.$store.dispatch('clearErrors')
   }
 }
 </script>

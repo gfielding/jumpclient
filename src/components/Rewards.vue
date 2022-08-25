@@ -9,7 +9,7 @@
 	  <button @click="clear" class="btn btn__dark btn__small ml-3" v-if="newPoints && newPoints != null">
 	  	X
 	  </button>
-	  <button @click="increment" class="btn btn__outlined btn__small ml-3" v-if="newPoints && newPoints != null">
+	  <button @click="increment()" class="btn btn__outlined btn__small ml-3" v-if="newPoints && newPoints != null">
 	  	<span v-if="!performingRequest">Add</span>
 	  	<transition name="fade">
 	      <span class="ml-2" v-if="performingRequest">
@@ -19,6 +19,7 @@
 	  </button>
   </div>
 </template>
+
 
 <style scoped>
 	.light {
@@ -47,14 +48,15 @@ export default {
   	},
     increment() {
     	this.performingRequest = true,
+    	console.log(this.user)
       this.$store.dispatch("incrementUser", ({
         user: this.user,
         points: this.newPoints
       }));
       setTimeout(() => {
         this.performingRequest = false
-        this.newPoints = ''
-       }, 500)
+        this.newPoints = null
+       }, 200)
     }
   }
 }

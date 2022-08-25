@@ -71,8 +71,9 @@ export default {
     if (!this.userProfile) {
       this.$store.dispatch("getUserProfile");
     }
-    this.$store.dispatch("getInfiniteEvents")
+    // this.$store.dispatch("getInfiniteEvents")
     this.$store.dispatch("getVenues")
+    // this.carlyCheck()
   },
   computed: {
     ...mapState(['currentUser', 'errorMessage', 'userProfile']),
@@ -83,13 +84,13 @@ export default {
         return false
       }
     },
-    carlyCheck() {
-      if (this.currentUser && ((this.currentUser.email == 'carly@mvpeventstaffing.com') || (this.currentUser.email == 'crystal@mvpeventstaffing.com'))) {
-        this.logout()
-      } else {
+    // carlyCheck() {
+    //   if (this.currentUser && ((this.currentUser.email == 'carly@mvpeventstaffing.com') || (this.currentUser.email == 'crystal@mvpeventstaffing.com'))) {
+    //     this.logout()
+    //   } else {
 
-      }
-    }
+    //   }
+    // }
     
     
   },

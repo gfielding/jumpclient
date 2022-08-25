@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard">
+    <Loader v-if="performingRequest" />
     <div class="dashboard__container">
       <div class="dashboard__container--header">
         <h1>I-9 Verifications</h1>
@@ -83,6 +84,7 @@ const fb = require('../../firebaseConfig.js')
 export default {
   name: 'verifications',
   data: () => ({
+    performingRequest: false,
     columns: [
       {
         label: 'Uploaded',
@@ -126,16 +128,25 @@ export default {
   },
   methods: {
     verify(item) {
+      this.performingRequest = true
       console.log(item)
       fb.verificationsCollection.doc(item.id).update({
         verified: true
       })
+      setTimeout(() => {
+        this.performingRequest = false
+      }, 1000)
     },
     unVerify(item) {
+      this.performingRequest = true
       console.log(item)
       fb.verificationsCollection.doc(item.id).update({
-        verified: false
+        verified: false,
+        rejected: true,
       })
+      setTimeout(() => {
+        this.performingRequest = false
+      }, 2000)
     },
     exportAll() {
       let logFields = {

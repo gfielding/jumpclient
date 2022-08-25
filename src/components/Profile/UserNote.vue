@@ -37,9 +37,5 @@ export default {
       }, 1000)
   	}
   },
-  beforeDestroy () {
-    this.$store.dispatch('clearUserState')
-    this.$store.dispatch('clearErrors')
-  }
 }
 </script>

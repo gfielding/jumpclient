@@ -1,6 +1,7 @@
 <template>
 	<div class="dashboard">
-    <div class="dashboard__container">
+    <Loader v-if="!eventInfo.id" />
+    <div class="dashboard__container" v-if="eventInfo.id">
       <div class="dashboard__container--header">
         <div class="flex align-center">
           <h1>Edit Event</h1>
@@ -27,7 +28,7 @@
         </div>
       </div>
       <form ref="form" @submit.prevent>
-        <Loader v-if="!eventInfo || !eventInfo.id" />
+        
       	<div class="dashboard__container--body mt-3" v-if="eventInfo">
       		<div class="dashboard__container--body--col">
 
@@ -380,7 +381,7 @@
                 </transition>
               </button>
 
-              <button class="btn btn__danger btn__large" @click="showCancellation = true" v-if="!showCancellation">
+              <button class="btn btn__danger btn__large" @click="showCancellation = true" v-if="!showCancellation && event.status != 'cancelled'">
                 Cancel Event
                 <transition name="fade">
                   <span class="ml-2" v-if="performingRequest4">
@@ -477,7 +478,7 @@ export default {
   created () {
     this.$store.dispatch("getEventFromId", this.$route.params.id);
   },
-  beforeMount() {
+  async mounted() {
     if (!this.venues || this.venues.length < 1) {
       this.$store.dispatch("getVenues")
     }
@@ -527,7 +528,7 @@ export default {
     },
     onUploadFile() {
       this.showBar = true
-      let event = this.event
+      let event = this.eventInfo
       let fileTitle = this.fileTitle
       let fileDescription = this.fileDescription
       let rand = (Math.random().toString(36).substring(2, 16) + Math.random().toString(36).substring(2, 16)).toUpperCase()

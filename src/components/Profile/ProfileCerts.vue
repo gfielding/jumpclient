@@ -55,9 +55,5 @@ export default {
       this.$store.dispatch('updateUser', userProfile)
     },
   },
-  beforeDestroy () {
-    this.$store.dispatch('clearUserState')
-    this.$store.dispatch('clearErrors')
-  }
 }
 </script>
