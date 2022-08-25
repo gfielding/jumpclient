@@ -20,6 +20,7 @@
   </div>
 </template>
 
+
 <style scoped>
 	.light {
 		display: flex;
