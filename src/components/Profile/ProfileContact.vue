@@ -114,6 +114,11 @@
       <span class="caption bold">Onboarding Started - {{submitted | moment("dddd, MMMM Do YYYY") }}</span>
     </div>
 
+
+<div class="mb-5 mt-1 flex align-center" v-if="user && user.OnboardStatus">
+<i class="fa-solid fa-circle-check fa-2x mr-2"  style="color: #5FA052;"></i>
+      <span class="caption bold">Onboarding Completed - {{user.OnboardStatus}} </span>
+    </div>
      
     <div  v-if="currentUser && (currentUser.email == 'greg@mvpeventstaffing.com' || 'katy@mvpeventstaffing.com' || 'tai@mvpeventstaffing.com')">
       <span class="flex align-center justify-space-between">
