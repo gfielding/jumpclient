@@ -63,12 +63,22 @@ const router = new VueRouter({
       },
     },
     {
-      path: '/reports',
-      name: 'userReports',
-      component: () => import('../views/Reports/UserReports.vue'),
+      path: '/reports', redirect: '/reports/payrollsubmissions',
+      name: 'reportsHome',
+      component: () => import('../views/Reports/ReportsHome.vue'),
       meta: {
         requiresAuth: true
       },
+      children: [
+        {
+          path: '/reports/payrollsubmissions',
+          name: 'payrollSubmissions',
+          component: () => import('../views/Reports/PayrollSubmissions.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+      ]
     },
     {
       path: '/markets',

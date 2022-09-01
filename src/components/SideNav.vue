@@ -140,7 +140,7 @@
             </div>
           </div>
           <div class="nav__menu--item">
-            <router-link :to="{name: 'userReports'}">
+            <router-link :to="{name: 'reportsHome'}">
               Reports <i class="fas fa-chevron-right"></i>
             </router-link>
           </div>

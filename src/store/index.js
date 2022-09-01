@@ -121,7 +121,8 @@ const store = new Vuex.Store({
     marketLeads: [],
     eventAssignmentsByDay: [],
     shiftLeads: [],
-    userPayroll: []
+    userPayroll: [],
+    payrollSubmissions: []
   },
   actions: {
     async login({ dispatch, commit }, form) {
@@ -357,6 +358,39 @@ const store = new Vuex.Store({
 
 
     /*USER REPORTS*/
+
+    getPayrollSubmissions({ commit, state }) {
+      fb.payrollSubmissionsCollection.orderBy('created', 'desc').onSnapshot(querySnapshot => {
+        let usersArray = []
+        querySnapshot.forEach(doc => {
+          let user = doc.data()
+          usersArray.push(user)
+        })
+        const unique = Array.from(new Set(usersArray.map(a => a.userId)))
+         .map(userId => {
+           return usersArray.find(a => a.userId === userId)
+         })
+        commit('setPayrollSubmissions', unique)
+      })
+    },
+    clearPayrollSubmissions({ commit }) {
+      commit('setPayrollSubmissions', [])
+    },
+    onboardSubmission({ commit }, payload) {
+      console.log(payload)
+      fb.payrollSubmissionsCollection.doc(payload.id).update({
+        Onboarded: true
+      })
+    },
+    unonboardSubmission({ commit }, payload) {
+      console.log(payload)
+      fb.payrollSubmissionsCollection.doc(payload.id).update({
+        Onboarded: false
+      })
+    },
+
+
+
     getUserReports({ commit, state }) {
        fb.usersCollection.onSnapshot(querySnapshot => {
         let usersArray = []
@@ -3492,6 +3526,13 @@ const store = new Vuex.Store({
         state.pastEvents = val
       } else {
         state.pastEvents = []
+      }
+    },
+    setPayrollSubmissions(state, val) {
+      if (val) {
+        state.payrollSubmissions = val
+      } else {
+        state.payrollSubmissions = []
       }
     },
     setUsers(state, val) {
