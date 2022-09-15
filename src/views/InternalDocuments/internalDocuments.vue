@@ -11,6 +11,16 @@
       <div class="dashboard__container--body">
         <div class="dashboard__container--body--col" style="width:100%;">
           <h2>
+            <a href="https://drive.google.com/file/d/18T0bjtgUFTZEKPe2gzkZwFUzT7LToca5/view?ts=6320a22b">Payday Notice</a
+            >
+          </h2>
+          <br />
+          <h2>
+            <a href="https://drive.google.com/file/d/18L___PcylvV7duAGMpjT4_tjwtOMXFt7/view?ts=6320a244">Paid Sick Days</a
+            >
+          </h2>
+          <br />
+          <h2>
             <a
               href="https://docs.google.com/forms/d/e/1FAIpQLSeWvZpURTLwGPF6i3tP4BX6TbCwASvXacFC98klMnt1l9EBSg/viewform"
               >Event Recap Form (Incident Form included)</a
