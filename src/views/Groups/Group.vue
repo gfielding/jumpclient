@@ -19,9 +19,10 @@
               </template>
             </ais-state-results>
           </ais-instant-search>
-          <button class="btn btn__outlined mr-3" @click="exportGroup()">export group</button>
+         
+          <button class="btn btn__small btn__dark mr-3" @click="exportGroup()">export group</button>
       </div>
-      <div class="dashboard__container--body pt-3">
+      <div class="dashboard__container--body pt-3" v-if="groupUsers && groupUsers.length >= 1">
           <vue-good-table
               :columns="columns"
               :rows="groupUsers"
@@ -37,18 +38,44 @@
               }"
             >
             <template slot="table-row" slot-scope="props">
-              <span v-if="props.column.field == 'link'">
+              <span v-if="props.column.field == 'photoUrl'">
+                <span v-if="props.row.photoUrl">
+                  <img :src="(props.row.photoUrl || `https://firebasestorage.googleapis.com/v0/b/mvpes-25aef.appspot.com/o/avatar%20copy.png?alt=media&token=966c07c4-125a-490f-81be-4e2d26bf33fa`)" alt="" style="width: 3.5rem; height:3.5rem; border-radius: 50%; padding: 0.25rem;">
+                </span>
+              </span>
+              <span v-else-if="props.column.field == 'fullName'">
+                <router-link :to="'/users/' + props.row.id" class="darkLink">
+                  <h5>
+                  {{props.row.firstName}} {{props.row.lastName}}
+                  </h5>
+                </router-link>
+                <div class="flex justify-flex-start mt-0">
+                  <star-rating :read-only="true" :star-size="12" v-if="props.row && props.row.rating" v-model="props.row.rating" class="caption"></star-rating>
+                  <span v-if="props.row && props.row.points" class="caption flex align-center">
+                    {{props.row.points}} Points
+                  </span>
+                </div>
+                <div class="flex justify-flex-start mt-0 mb-2 caption">
+                  {{props.row.dob | moment("MMMM Do YYYY") }}
+                </div>
+              </span>
+              <span v-else-if="props.column.field == 'link'">
                 <router-link :to="`/users/` + props.row.id" target="_blank">
                   <i class="fas fa-external-link ml-3 mr-3"></i>
                 </router-link>
               </span>
-              <span v-if="props.column.field == 'skills'">
-                <span v-for="sk in props.row.skills">
+              <span v-else-if="props.column.field == 'skills'">
+
+                <span v-for="sk in props.row.skills" class="caption">
                    {{sk.title}} | 
                 </span>
               </span>
               <span v-else-if="props.column.field == 'delete'">
-                <button class="icon" v-tooltip="'delete instance'" @click="deleteUser(props.row)">
+          <!--       <button class="icon" v-tooltip="'delete user'" @click.prevent="deleteUser(props.row, props.index)">
+                    <i class="fa-solid fa-octagon-exclamation fa-2x" style="color: red"></i>
+                  </button> -->
+                  
+                <button class="icon" v-tooltip="'delete instance'" @click.prevent="deleteUser(props.row, props.index)">
                   <i class="fas fa-trash ml-2 mr-2"></i>
                 </button>
               </span>
@@ -59,52 +86,7 @@
           </vue-good-table>
        
       </div>
-      <!-- <hr>
-      <div class="dashboard__container--body">
-        <div class="dashboard__container--body--col">
-          <h2>Messages</h2>
 
-          <vue-good-table
-            :columns="columns2"
-            :rows="groupMessages"
-            compactMode
-            :pagination-options="{
-              enabled: true,
-              mode: 'records',
-              perPage: 10,
-            }"
-          >
-           <template slot="table-row" slot-scope="props">
-              
-
-              <span v-if="props.column.field == 'created'">
-                <span>{{formatDate(props.row.created)}}</span>
-              </span>
-
-              <span v-if="props.column.field == 'message'">
-                <span>{{props.row.message}}</span>
-              </span>
-
-            </template>
-
-            
-          </vue-good-table>
-        </div>
-        <div class="dashboard__container--body--col" v-if="groupUsers && groupUsers.length > 0">
-          <div class="mb-3">
-            <h3>Send Message to Group:</h3>
-            <textarea name="updateMessage" id="updateMessage" cols="20" rows="4" v-model="message"></textarea>
-          </div>
-          <button class="btn btn__outlined btn__large" @click="sendMessage()">
-            Update Group
-            <transition name="fade">
-              <span class="ml-2" v-if="performingRequest2">
-              <i class="fa fa-spinner fa-spin"></i>
-              </span>
-            </transition>
-          </button>
-        </div>
-      </div> -->
   </div>
 </template>
 
@@ -113,6 +95,7 @@ import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
 import ExportService from "@/services/ExportService"
 import algoliasearch from 'algoliasearch/lite';
+import StarRating from 'vue-star-rating'
 import router from '@/router'
 import * as moment from 'moment'
 
@@ -120,6 +103,8 @@ export default {
   name: 'group',
   data: () => ({
     message: '',
+    activeItem: null,
+    activeNote: null,
     showAll: true,
     performingRequest: false,
     performingRequest2: false,
@@ -139,72 +124,88 @@ export default {
     ],
     columns: [
       {
-        label: 'Link',
-        field: 'link',
+        field: 'photoUrl',
         sortable: false,
+        width:'42px',
+        tdClass: 'text-center',
       },
       {
-        label: 'First Name',
-        field: 'firstName',
+        label: '',
+        field: 'fullName',
+        sortable: false,
+        width:'140px',
       },
-      {
-        label: 'Last Name',
-        field: 'lastName',
-      },
+      // {
+      //   label: 'Note',
+      //   field: 'note',
+      //   sortable: false,
+      //   tdClass: 'text-left',
+      //   width:'60px',
+      // },
       {
         label: 'Phone',
         field: 'phone',
-      },
-      {
-        label: 'Email',
-        field: 'email',
-      },
-      {
-        label: 'DOB',
-        field: 'dob',
         sortable: false,
+        width:'120px',
       },
-      {
-        label: 'Points',
-        field: 'points',
-      },
+      // {
+      //   label: 'DOB',
+      //   field: 'dob',
+      //   sortable: false,
+      //   width:'60px',
+      // },
       {
         label: 'Skills',
         field: 'skills',
         sortable: false,
       },
       {
-        label: 'Delete',
+        label: 'Remove',
         field: 'delete',
         sortable: false,
       }
     ]
   }),
   computed: {
-    ...mapState(['groupUsers', 'group', 'currentUser', 'userProfile', 'groupMessages']),
-    clean() {
-      return (!this.groupUsers || this.groupUsers.length == 0)
-    },
-    isAdmin() {
-      return this.group.admins.some(person => person.userId == this.currentUser.uid)
-    },
-    isUser() {
-      return this.group.users.some(person => person.userId == this.currentUser.uid)
-    }
+    ...mapState(['groupUsers', 'group', 'currentUser', 'userProfile']),
+    // clean() {
+    //   return (!this.groupUsers || this.groupUsers.length == 0)
+    // },
+    // isAdmin() {
+    //   return this.group.admins.some(person => person.userId == this.currentUser.uid)
+    // },
+    // isUser() {
+    //   return this.group.users.some(person => person.userId == this.currentUser.uid)
+    // }
   },
   components: {
     Loader,
+    StarRating
   },
-  created () {
-    this.$store.dispatch("getGroupFromId", this.$route.params.id);
-  },
+  // created () {
+  //   this.$store.dispatch("getGroupFromId", this.$route.params.id);
+  // },
   methods: {
+    showNote(r) {
+      console.log(r)
+      this.activeItem = r
+    },
+    closeNote(r) {
+      this.activeItem = null
+    },
+    showItem(r) {
+      console.log(r)
+      this.activeNote = r
+    },
+    closeItem(r) {
+      this.activeNote = null
+    },
     addUser(item) {
       console.log(item)
       let group = this.group
       this.performingRequest = true;
       this.$store.dispatch("addUserToGroup", {
-        id: item.objectID,
+        user: item,
         group: this.group
       })
       setTimeout(() => {
@@ -215,13 +216,18 @@ export default {
         document.querySelectorAll('.ais-Hits-item').forEach((e) => e.remove())
       }, 250)
     },
-    deleteUser(item) {
+    deleteUser(item, index) {
       console.log(item)
+      let groupUsers = this.groupUsers
+      groupUsers.splice(index, 1)
       this.$store.dispatch("removeUserFromGroup", {
         group: this.group,
-        userId: item.id
+        user: item
       })
+      // this.$store.dispatch("getGroupFromId", this.$route.params.id);
     },
+
+
     formatDate(q) {
       if(q) {
         const postedDate = new Date(q.seconds) * 1000;
@@ -230,20 +236,20 @@ export default {
         return null
       }
     },
-    sendMessage () {
-      this.performingRequest2 = true
-      let newMessage = {
-        groupId: this.group.id,
-        groupUsers: this.groupUsers,
-        message: this.message,
-        from: this.userProfile.twilioNumber || null
-      }
-      this.$store.dispatch('updateGroupStaff', newMessage)
-      setTimeout(() => {
-          this.performingRequest2 = false,
-          this.message = ''
-      }, 1000)
-    },
+    // sendMessage () {
+    //   this.performingRequest2 = true
+    //   let newMessage = {
+    //     groupId: this.group.id,
+    //     groupUsers: this.groupUsers,
+    //     message: this.message,
+    //     from: this.userProfile.twilioNumber || null
+    //   }
+    //   this.$store.dispatch('updateGroupStaff', newMessage)
+    //   setTimeout(() => {
+    //       this.performingRequest2 = false,
+    //       this.message = ''
+    //   }, 1000)
+    // },
     // updateStaff() {
     //   let group = this.group
     //   this.$store.dispatch('updateGroupStaff', group)
@@ -307,12 +313,12 @@ export default {
       let url = `/users/` + params.row.id
       router.push(url)
     },
-    goBack() {
-      router.go(-1)
-    },
+    // goBack() {
+    //   router.go(-1)
+    // },
   },
-  beforeDestroy () {
-    this.$store.dispatch('clearGroupState')
-  }
+  // beforeDestroy () {
+  //   this.$store.dispatch('clearGroupState')
+  // }
 }
 </script>

@@ -5,7 +5,7 @@
   },
   "hosting": {
     "public": "dist",
-    "site": "mvpadmin",
+    "site": "jumpadmin",
     "ignore": [
       "firebase.json",
       "**/.*",

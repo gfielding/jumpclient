@@ -1,13 +1,13 @@
 <template>
 	<div>
-    <h2>Ask to Update Profile</h2>
-		<div class="mb-3 mt-1">
-			 <!-- <span v-if="user.updateProfileReminderSent" class="caption">
+    <h4>Ask to Update Profile</h4>
+		<div class="mb-1 mt-0">
+			 <span v-if="user.updateProfileReminderSent" class="caption">
         Last Sent: {{user.updateProfileReminderSent.toDate() | moment("MMMM Do YYYY, h:mm a") }}
-        </span> -->
+        </span>
 		</div>
 		 <div>
-      <button class="btn btn__outlined" @click="onTextProfile">
+      <button class="btn btn__outlined btn__small" @click="onTextProfile">
       	Text
      	 	<transition name="fade">
           <span class="ml-2" v-if="performingRequest2">
@@ -15,7 +15,7 @@
           </span>
         </transition>
       </button>
-      <button class="ml-3 btn btn__outlined" @click="onEmailProfile">
+      <button class="ml-3 btn btn__outlined btn__small" @click="onEmailProfile">
       	Email
       	<transition name="fade">
           <span class="ml-2" v-if="performingRequest1">

@@ -1,9 +1,8 @@
 <template>
-	<div>
-    <h2>Job Skills</h2>
-    <div class="mb-3">
-      <label for="client">Add User to a Group:</label>
-      <v-select :options="jobs" label="title" taggable multiple push-tags v-model="user.skills" @input="updateProfile()" />
+	<div class="mb-5">
+    <h4 class="mb-2">Job Skills</h4>
+    <div>
+      <v-select :options="jobs" label="title" taggable multiple v-model="user.skills" @input="updateProfile()" />
 
        <!--  <v-select :reduce="group => jobs.title" :options="jobs" label="title" taggable multiple push-tags v-model="user.skills" @input="updateUser()" /> -->
 
@@ -38,16 +37,6 @@ export default {
     }
   },
   methods: {
-    updateUser() {
-      let user = this.user
-      console.log(user)
-      let userSkills = (this.user.skills || null)
-      console.log(userSkills)
-      // this.$store.dispatch('updateSkills', {
-      //   skills: userSkills,
-      //   user: user
-      // })
-    },
     updateProfile(){
       let user = this.user
       // let userSkills = (this.user.skills || null)

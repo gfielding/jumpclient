@@ -1,13 +1,13 @@
 <template>
-	<div>
-    <h2>Ask to Complete Payroll</h2>
-		<div class="mb-3 mt-1">
-			 <!-- <span v-if="user.updatePayrollReminderSent" class="caption">
+	<div class="mt-3 whiteBack">
+    <h4>Ask to Complete Payroll</h4>
+		<div class="mb-1 mt-0">
+			 <span v-if="user.updatePayrollReminderSent" class="caption">
         Last Sent: {{user.updatePayrollReminderSent.toDate() | moment("MMMM Do YYYY, h:mm a") }}
-        </span> -->
+        </span>
 		</div>
 		 <div>
-      <button class="btn btn__outlined" @click="onTextPayroll">
+      <button class="btn btn__outlined btn__small" @click="onTextPayroll">
       	Text
      	 	<transition name="fade">
           <span class="ml-2" v-if="performingRequest2">
@@ -15,7 +15,7 @@
           </span>
         </transition>
       </button>
-      <button class="ml-3 btn btn__outlined" @click="onEmailPayroll">
+      <button class="ml-3 btn btn__outlined btn__small" @click="onEmailPayroll">
       	Email
       	<transition name="fade">
           <span class="ml-2" v-if="performingRequest1">

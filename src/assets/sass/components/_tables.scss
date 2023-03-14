@@ -57,11 +57,12 @@ table input, table textarea {
   background: white;
   border-radius: 0 !important;
 }
-table.vgt-table td {
-    padding: 0.15rem 0.5rem;
-  }
+// table.vgt-table td {
+//     padding: 0.15rem 0.5rem;
+//   }
  table .vs__dropdown-toggle {
-    background: white !important;
+    background: #f5f5f5 !important;
     border-radius: 0 !important;
     border:none;
+        padding: 1rem 0.25rem;
   }

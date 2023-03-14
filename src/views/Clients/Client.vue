@@ -2,52 +2,54 @@
   <form ref="form" @submit.prevent v-if="client">
     <div class="dashboard__container--body pt-3">
       <div class="dashboard__container--body--col">
-        <div class="mb-3">
-          <label for="title">Client Name:</label>
-          <input type="text" v-model.trim="client.title" id="title" />
+        <div>
+          <div class="mb-3">
+            <label for="title">Client Name:</label>
+            <input type="text" v-model.trim="client.title" id="title" />
+          </div>
+          
+          <div class="mb-3">
+            <label for="desc">Client Description:</label>
+            <textarea name="desc" id="desc" cols="30" rows="10" v-model="client.description"></textarea>
+          </div>
         </div>
-        
-        <div class="mb-3">
-          <label for="desc">Client Description:</label>
-          <textarea name="desc" id="desc" cols="30" rows="10" v-model="client.description"></textarea>
-        </div>
-
       </div>
       <div class="dashboard__container--body--col">
+        <div>
+          <div class="mb-3" v-if="statuses.length > 1">
+            <label for="status">Status:</label>
+            <v-select
+              class="mt-2"
+              label="title" 
+              :options="statuses"
+              v-model="client.status"
+              required
+              >
+            </v-select>
+          </div>
 
-        <div class="mb-3" v-if="statuses.length > 1">
-          <label for="status">Status:</label>
-          <v-select
-            class="mt-2"
-            label="title" 
-            :options="statuses"
-            v-model="client.status"
-            required
-            >
-          </v-select>
-        </div>
+          <div class="mb-3" v-if="reps.length > 1">
+            <label for="rep">Account Manager:</label>
+            <v-select
+              class="mt-2"
+              label="name" 
+              :options="reps"
+              v-model="client.accountrep"
+              required
+              >
+            </v-select>
+          </div>
 
-        <div class="mb-3" v-if="reps.length > 1">
-          <label for="rep">Account Manager:</label>
-          <v-select
-            class="mt-2"
-            label="name" 
-            :options="reps"
-            v-model="client.accountrep"
-            required
-            >
-          </v-select>
-        </div>
-
-        <div class="flex justify-space-between mt-5">
-          <button class="btn btn__primary" @click="updateClient()">
-            Update
-            <transition name="fade">
-              <span class="ml-2" v-if="performingRequest">
-              <i class="fa fa-spinner fa-spin"></i>
-              </span>
-            </transition>
-          </button>
+          <div class="flex justify-space-between mt-5">
+            <button class="btn btn__primary" @click="updateClient()">
+              Update
+              <transition name="fade">
+                <span class="ml-2" v-if="performingRequest">
+                <i class="fa fa-spinner fa-spin"></i>
+                </span>
+              </transition>
+            </button>
+          </div>
         </div>
       </div>
     </div>

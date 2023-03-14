@@ -78,32 +78,83 @@ const router = new VueRouter({
             requiresAuth: true
           },
         },
+        {
+          path: '/reports/parse',
+          name: 'userParse',
+          component: () => import('../views/Reports/UserParse.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
       ]
     },
+    // {
+    //   path: '/markets',
+    //   name: 'markets',
+    //   component: () => import('../views/Leads/Markets.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    // },
     {
-      path: '/markets',
-      name: 'markets',
-      component: () => import('../views/Leads/Markets.vue'),
+      path: '/leads', redirect: '/leads/all',
+      name: 'leadsHome',
+      component: () => import('../views/Leads/LeadsHome.vue'),
       meta: {
         requiresAuth: true
       },
+      children: [
+        {
+          path: '/leads/all',
+          name: 'allLeads',
+          component: () => import('../views/Leads/AllLeads.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/leads/hidden',
+          name: 'archivedLeads',
+          component: () => import('../views/Leads/HiddenLeads.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/leads/my',
+          name: 'myLeads',
+          component: () => import('../views/Leads/MyLeads.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/leads/markets',
+          name: 'markets',
+          component: () => import('../views/Leads/Markets.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/leads/add',
+          name: 'enterNewLead',
+          component: () => import('../views/Leads/AddLead.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        // {
+        //   path: '/reports/parse',
+        //   name: 'userParse',
+        //   component: () => import('../views/Reports/UserParse.vue'),
+        //   meta: {
+        //     requiresAuth: true
+        //   },
+        // },
+      ]
     },
-    {
-      path: '/leads',
-      name: 'marketingLeads',
-      component: () => import('../views/Leads/Leads.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
-    {
-      path: '/leads/add',
-      name: 'enterNewLead',
-      component: () => import('../views/Leads/AddLead.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
+    
     {
       path: '/shiftleads',
       name: 'shiftLeads',
@@ -145,6 +196,22 @@ const router = new VueRouter({
           },
         },
         {
+          path: '/groups/:id/applicants',
+          name: 'groupApplicants',
+          component: () => import('../views/Groups/Applicants.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/groups/:id/waitlist',
+          name: 'groupWaitlist',
+          component: () => import('../views/Groups/Waitlist.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
           path: '/groups/:id/edit',
           name: 'groupEdit',
           component: () => import('../views/Groups/EditGroup.vue'),
@@ -163,97 +230,9 @@ const router = new VueRouter({
       ]
     },
     {
-      path: '/followersgroups/grouphome', redirect: '/followergroups/:id',
-      name: 'followersGroupHome',
-      component: () => import('../views/Groups/FollowersGroupHome.vue'),
-      meta: {
-        requiresAuth: true
-      },
-      children: [
-        {
-          path: '/followersgroups/:id',
-          name: 'followersGroup',
-          component: () => import('../views/Groups/FollowersGroup.vue'),
-          meta: {
-            requiresAuth: true
-          },
-        },
-        {
-          path: '/followersgroups/:id/edit',
-          name: 'followersGroupEdit',
-          component: () => import('../views/Groups/EditFollowersGroup.vue'),
-          meta: {
-            requiresAuth: true
-          },
-        },
-        {
-          path: '/followersgroups/:id/messages',
-          name: 'followersGroupMessages',
-          component: () => import('../views/Groups/FollowersGroupMessages.vue'),
-          meta: {
-            requiresAuth: true
-          },
-        },
-      ]
-    },
-    {
       path: '/payroll/help',
       name: 'payrollHelp',
       component: () => import('../views/PayrollHelp/PayrollHelp.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
-
- 
-
-
-    // {
-    //   path: '/accounting/events', redirect: '/accounting/events/year/2022',
-    //   name: 'accountingEvents',
-    //   component: () => import('../views/Accounting/Events.vue'),
-    //   meta: {
-    //     requiresAuth: true
-    //   },
-    //   children: [
-    //     {
-    //       path: '/accounting/events/year/:id',
-    //       name: 'accountingEventsTable',
-    //       component: () => import('../views/Accounting/EventsTable.vue'),
-    //       meta: {
-    //         requiresAuth: true
-    //       },
-    //     },
-    //   ]
-    // },
-    {
-      path: '/accounting/events/',
-      name: 'accountingEvents',
-      component: () => import('../views/Accounting/Events.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
-    {
-      path: '/accounting/events/:id',
-      name: 'accountingEvent',
-      component: () => import('../views/Accounting/Event.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
-    {
-      path: '/accounting/referrals',
-      name: 'accountReferrals',
-      component: () => import('../views/Accounting/Referrals.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
-    {
-      path: '/accounting/payroll',
-      name: 'allPayroll',
-      component: () => import('../views/Accounting/AllPayroll.vue'),
       meta: {
         requiresAuth: true
       },
@@ -275,45 +254,126 @@ const router = new VueRouter({
       },
     },
     {
-      path: '/events/:id',
-      name: 'event',
-      component: () => import('../views/Events/Event.vue'),
+      path: '/events/:id', redirect: '/events/:id/details',
+      name: 'eventHome',
+      component: () => import('../views/Events/EventHome.vue'),
+      meta: {
+        requiresAuth: true,
+        refreshEvent: true
+      },
+      children: [
+        {
+          path: '/events/:id/details',
+          name: 'eventDetails',
+          component: () => import('../views/Events/Event.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/events/:id/checkin',
+          name: 'eventCheckin',
+          component: () => import('../views/Events/EventCheckin.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/events/:id/shifts',
+          name: 'eventshifts',
+          component: () => import('../views/Events/EventShifts.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/events/:id/placement',
+          name: 'eventplacement',
+          component: () => import('../views/Placements/Event.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/events/:id/timesheets',
+          name: 'eventtimesheets',
+          component: () => import('../views/Shifts/EventShifts.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/events/:id/files',
+          name: 'eventFiles',
+          props: true,
+          component: () => import('../views/Events/EventFiles.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+
+
+        
+      ]
+    },
+    {
+      path: '/jobs',
+      name: 'weeks',
+      component: () => import('../views/Weeks/Weeks.vue'),
       meta: {
         requiresAuth: true
       },
     },
     {
-      path: '/events/:id/email',
-      name: 'eventemail',
-      component: () => import('../views/Events/EventEmail.vue'),
+      path: '/addjob',
+      name: 'addweek',
+      component: () => import('../views/Weeks/AddWeek.vue'),
       meta: {
         requiresAuth: true
       },
     },
     {
-      path: '/events/:id/shifts',
-      name: 'eventshifts',
-      component: () => import('../views/Events/EventShifts.vue'),
+      path: '/jobs/:id', redirect: '/jobs/:id/details',
+      name: 'weekHome',
+      component: () => import('../views/Weeks/WeekHome.vue'),
       meta: {
-        requiresAuth: true
+        requiresAuth: true,
+        refreshEvent: true
       },
+      children: [
+        {
+          path: '/jobs/:id/details',
+          name: 'weekDetails',
+          component: () => import('../views/Weeks/Week.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+      ]
     },
-    {
-      path: '/events/:id/checkin',
-      name: 'eventcheckin',
-      component: () => import('../views/Events/EventCheckin.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
-    {
-      path: '/events/:id/timesheets',
-      name: 'eventtimesheets',
-      component: () => import('../views/Shifts/EventShifts.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
+    // {
+    //   path: '/events/:id',
+    //   name: 'event',
+    //   component: () => import('../views/Events/Event.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    // },
+    // {
+    //   path: '/events/:id/email',
+    //   name: 'eventemail',
+    //   component: () => import('../views/Events/EventEmail.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    // },
+    
     {
       path: '/timesheets/:id/:day',
       name: 'daytimesheets',
@@ -347,7 +407,7 @@ const router = new VueRouter({
       },
     },
     {
-      path: '/jobs',
+      path: '/positions',
       name: 'jobs',
       component: () => import('../views/Jobs/Jobs.vue'),
       meta: {
@@ -355,7 +415,7 @@ const router = new VueRouter({
       },
     },
     {
-      path: '/jobs/:id',
+      path: '/positions/:id',
       name: 'job',
       component: () => import('../views/Jobs/Job.vue'),
       meta: {
@@ -386,42 +446,11 @@ const router = new VueRouter({
         requiresAuth: true
       },
     },
+
     {
-      path: '/pagetext',
-      name: 'pageText',
-      component: () => import('../views/PageText/PageText.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
-    {
-      path: '/addfaq',
-      name: 'addfaq',
-      component: () => import('../views/FAQ/AddFAQ.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
-    {
-      path: '/faqs',
-      name: 'faqs',
-      component: () => import('../views/FAQ/FAQS.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
-    {
-      path: '/faqs/:id',
-      name: 'faq',
-      component: () => import('../views/FAQ/FAQ.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
-    {
-      path: '/internalDocuments',
-      name: 'internalDocuments',
-      component: () => import('../views/InternalDocuments/internalDocuments.vue'),
+      path: '/shifts',
+      name: 'activeShifts',
+      component: () => import('../views/Shifts/ActiveShifts.vue'),
       meta: {
         requiresAuth: true
       },
@@ -442,32 +471,7 @@ const router = new VueRouter({
         requiresAuth: true
       },
     },
-    // {
-    //   path: '/events', redirect: '/events/2022-04',
-    //   name: 'eventsHome',
-    //   component: () => import('../views/Events/EventsHome.vue'),
-    //   meta: {
-    //     requiresAuth: true
-    //   },
-    //   children: [
-    //     {
-    //       path: '/events/:id',
-    //       name: 'eventsByMonth',
-    //       component: () => import('../views/Events/EventsByMonth.vue'),
-    //       meta: {
-    //         requiresAuth: true
-    //       },
-    //     },
-    //     {
-    //       path: '/events/venue/:id',
-    //       name: 'eventsByVenue',
-    //       component: () => import('../views/Events/EventsByVenue.vue'),
-    //       meta: {
-    //         requiresAuth: true
-    //       },
-    //     },
-    //   ]
-    // },
+
     {
       path: '/clients/clienthome', redirect: '/clients/:id',
       name: 'clientHome',
@@ -556,6 +560,22 @@ const router = new VueRouter({
       },
     },
     {
+      path: '/contractors',
+      name: 'evereeContractors',
+      component: () => import('../views/Everee/Contractors.vue'),
+      meta: {
+        requiresAuth: true
+      },
+    },
+    // {
+    //   path: '/payrolldata2',
+    //   name: 'evereeContractorsTable',
+    //   component: () => import('../views/Everee/Contractors2.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    // },
+    {
       path: '/users',
       name: 'users',
       component: () => import('../views/Users/Users.vue'),
@@ -576,16 +596,80 @@ const router = new VueRouter({
         requiresAuth: true,
         refreshUser: true
       },
-      children: [
-        {
-          path: '/users/:id/details',
-          name: 'userDetails',
-          component: () => import('../views/Users/UserDetails.vue'),
-          props: true,
-          meta: {
-            requiresAuth: true
+        children: [
+          {
+            path: '/users/:id/details',
+            name: 'userDetails',
+            component: () => import('../views/Users/UserDetails.vue'),
+            props: true,
+            meta: {
+              requiresAuth: true
+            },
           },
-        },
+          {
+            path: '/users/:id/certs',
+            name: 'userCerts',
+            component: () => import('../views/Users/UserCerts.vue'),
+            props: true,
+            meta: {
+              requiresAuth: true
+            },
+          },
+          {
+            path: '/users/:id/groups',
+            name: 'userGroups',
+            component: () => import('../views/Users/UserGroups.vue'),
+            props: true,
+            meta: {
+              requiresAuth: true
+            },
+          },
+          {
+            path: '/users/:id/skills',
+            name: 'userSkills',
+            component: () => import('../views/Users/UserSkills.vue'),
+            props: true,
+            meta: {
+              requiresAuth: true
+            },
+          },
+          {
+            path: '/users/:id/payhistory',
+            name: 'userPayHistory',
+            component: () => import('../views/Users/UserPayHistory.vue'),
+            props: true,
+            meta: {
+              requiresAuth: true
+            },
+          },
+          {
+            path: '/users/:id/everee',
+            name: 'userEveree',
+            component: () => import('../views/Users/UserEveree.vue'),
+            props: true,
+            meta: {
+              requiresAuth: true
+            },
+          },
+          {
+            path: '/users/:id/emergency',
+            name: 'userEmergency',
+            component: () => import('../views/Users/UserEmergency.vue'),
+            props: true,
+            meta: {
+              requiresAuth: true
+            },
+          },
+          {
+            path: '/users/:id/id',
+            name: 'userId',
+            component: () => import('../views/Users/UserId.vue'),
+            props: true,
+            meta: {
+              requiresAuth: true
+            },
+          },
+
         {
           path: '/users/:id/assignments',
           name: 'userAssignments',
@@ -599,6 +683,42 @@ const router = new VueRouter({
           path: '/users/:id/payroll',
           name: 'userPayroll',
           component: () => import('../views/Users/UserPayroll.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/users/:id/notes',
+          name: 'userNotes',
+          component: () => import('../views/Users/UserNotes.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/users/:id/gallery',
+          name: 'userGallery',
+          component: () => import('../views/Users/UserGallery.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/users/:id/reviews',
+          name: 'userReviews',
+          component: () => import('../views/Users/UserReviews.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/users/:id/messages',
+          name: 'userMessages',
+          component: () => import('../views/Users/UserMessages.vue'),
           props: true,
           meta: {
             requiresAuth: true
@@ -659,14 +779,14 @@ const router = new VueRouter({
     //     requiresAuth: true
     //   },
     // },
-    {
-      path: '/eventplacements/:id',
-      name: 'eventplacement',
-      component: () => import('../views/Placements/Event.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
+    // {
+    //   path: '/eventplacements/:id',
+    //   name: 'eventplacement',
+    //   component: () => import('../views/Placements/Event.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    // },
     // {
     //   path: '/placements', redirect: '/placements/day',
     //   name: 'placementshome',
@@ -710,43 +830,92 @@ const router = new VueRouter({
         requiresAuth: true
       },
     },
-    {
-      path: '/opr',
-      name: 'opr',
-      component: () => import('../views/OPR/OPR.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
-    {
-      path: '/verifications',
-      name: 'verifications',
-      component: () => import('../views/Verifications/Verifications.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
+    // {
+    //   path: '/opr',
+    //   name: 'opr',
+    //   component: () => import('../views/OPR/OPR.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    // },
+    // {
+    //   path: '/verifications',
+    //   name: 'verifications',
+    //   component: () => import('../views/Verifications/Verifications.vue'),
+    //   meta: {
+    //     requiresAuth: true
+    //   },
+    // },
   ]
 })
 
 router.beforeEach((to, from, next) => {
-  const requiresAuth = from.matched.some(x => x.meta.requiresAuth)
-  const refreshUser = to.matched.some(x => x.meta.refreshUser)
+  let currentUser = auth.currentUser;
+  let requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+  let refreshUser = to.matched.some(x => x.meta.refreshUser)
+  let refreshEvent = to.matched.some(x => x.meta.refreshEvent)
 
-  if (refreshUser && (to.name == "userDetails" || to.name == "userPayroll" || to.name == "userAssignments")) {
+  if (requiresAuth && !currentUser) next('login');
+  else if (!requiresAuth && currentUser) next('dashboard');
+  else next();
+
+  if (refreshUser && (to.name == "userDetails" || to.name == "userPayroll" || to.name == "userAssignments" || to.name == "userNotes" || to.name == "userGallery" || to.name == "userReviews" || to.name == "userMessages")) 
+  {
     console.log('not clearing state')
-  } else {
+  
+  } else  {
     console.log(to.name)
     console.log('clearing state')
     store.dispatch('clearUserState')
-    
   }
 
-  if (requiresAuth && !auth.currentUser) {
-    next('/login')
-  } else {
-    next()
+  if (refreshEvent && (to.name == "eventDetails" || to.name == "eventplacement" || to.name == "eventshifts" || to.name == "eventCheckin" || to.name == "eventtimesheets" || to.name == "weekCheckin" || to.name == "weekDetails"))
+  {
+    console.log('not clearing state')
+  } else  {
+    store.dispatch('clearEventState')
+    store.dispatch('clearWeekState')
   }
-})
+});
 
-export default router
+export default router;
+
+// // router.beforeEach((to, from, next) => {
+// //   const requiresAuth = from.matched.some(x => x.meta.requiresAuth)
+// //   // const refreshUser = to.matched.some(x => x.meta.refreshUser)
+// //   // const refreshEvent = to.matched.some(x => x.meta.refreshEvent)
+
+//   if (refreshUser && (to.name == "userDetails" || to.name == "userPayroll" || to.name == "userAssignments" || to.name == "userNotes" || to.name == "userGallery" || to.name == "userReviews" || to.name == "userMessages")) 
+//   {
+//     console.log('not clearing state')
+  
+//   } else  {
+//     console.log(to.name)
+//     console.log('clearing state')
+//     store.dispatch('clearUserState')
+//   }
+
+//   if (refreshEvent && (to.name == "eventDetails" || to.name == "eventplacement" || to.name == "eventshifts" || to.name == "eventCheckin" || to.name == "eventtimesheets"))
+//   {
+//     console.log('not clearing state')
+//   } else  {
+//     store.dispatch('clearEventState')
+//   }
+
+//   if (requiresAuth) {
+//       console.log('not currentUser')
+//       store.dispatch('logout')
+//       next('/login')
+
+// //   }
+// //   // else if (requiresAuth && currentUser) {
+//   //   console.log('currentUser')
+// //   //     next()
+// //   // } 
+// //   else {
+// //     console.log('else')
+// //       next()
+// //   }
+// // })
+
+// // export default router

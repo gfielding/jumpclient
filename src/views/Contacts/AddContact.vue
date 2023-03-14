@@ -8,6 +8,7 @@
       <form ref="form" @submit.prevent>
         <div class="dashboard__container--body">
           <div class="dashboard__container--body--col">
+            <div>
             <div class="mb-3">
               <label for="contact1name">Contact Name:</label>
               <input type="text" v-model.trim="contact.name" id="contactname" />
@@ -33,7 +34,9 @@
               <input type="text" v-model.trim="contact.email" id="contact1email" />
             </div>
           </div>
+          </div>
           <div class="dashboard__container--body--col">
+            <div>
             <div class="mb-3" v-if="venues.length > 1">
               <label for="venue">Venue:</label>
               <v-select
@@ -41,9 +44,12 @@
                 label="title" 
                 :options="venues"
                 v-model="contact.venue"
-                required
+                taggable multiple push-tags
                 >
               </v-select>
+
+             
+
             </div>
             <div class="mb-3" v-if="clients.length > 1">
               <label for="company">Company:</label>
@@ -68,6 +74,7 @@
                 </span>
               </transition>
             </button>
+          </div>
           </div>
         </div>
       </form>

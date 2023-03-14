@@ -21,6 +21,7 @@
           <vue-good-table
             :columns="columns"
             :rows="marketingLeads"
+            styleClass="vgt-table condensed"
             :pagination-options="{
               enabled: false,
               mode: 'records',
@@ -78,6 +79,7 @@
           <vue-good-table
             :columns="columns"
             :rows="archivedLeads"
+            styleClass="vgt-table condensed"
             :pagination-options="{
               enabled: false,
               mode: 'records',
@@ -135,6 +137,7 @@
           <vue-good-table
             :columns="columns"
             :rows="marketLeads"
+            styleClass="vgt-table condensed"
             :pagination-options="{
               enabled: false,
               mode: 'records',
@@ -213,6 +216,11 @@ export default {
     performingRequest: false,
     columns: [
       {
+        label: 'Hide',
+        field: 'delete',
+        sortable: false,
+      },
+      {
         label: 'Created',
         field: 'created',
         width: '120px'
@@ -272,11 +280,6 @@ export default {
         field: 'addedBy',
         width: '120px'
       },
-      {
-        label: 'Hide',
-        field: 'delete',
-        sortable: false,
-      },
     ]
   }),
   computed: {
@@ -287,7 +290,8 @@ export default {
     LeadNote
   },
   created () {
-    this.$store.dispatch("getMarketetingLeads")
+    // this.$store.dispatch("getMarketetingLeads")
+    // this.$store.dispatch('getMyLeads')
   },
   methods: {
     exportMyLeads() {

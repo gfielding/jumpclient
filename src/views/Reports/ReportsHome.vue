@@ -7,6 +7,9 @@
           <router-link :to="{name: 'payrollSubmissions'}">
             <button class="btn  ml-3" v-bind:class="{ 'btn__dark': isPayrollSubmissions, 'btn__outlined': !isPayrollSubmissions }">Payroll Submissions</button>
           </router-link>
+          <router-link :to="{name: 'userParse'}">
+            <button class="btn  ml-3" v-bind:class="{ 'btn__dark': isUserParse, 'btn__outlined': !isUserParse }">User Parse</button>
+          </router-link>
           <!-- <router-link :to="{name: 'clientContacts'}">
             <button class="btn  ml-3" v-bind:class="{ 'btn__dark': isContacts, 'btn__outlined': !isContacts }">Contacts</button>
           </router-link>
@@ -37,6 +40,9 @@ export default {
   computed: {
     isPayrollSubmissions() {
       return this.$route.name == 'payrollSubmissions';
+    },
+    isUserParse() {
+      return this.$route.name == 'userParse';
     },
     // isSummary() {
     //   return this.$route.name == 'client';

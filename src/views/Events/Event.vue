@@ -1,37 +1,42 @@
 <template>
-	<div class="dashboard">
+	<div>
     <Loader v-if="!eventInfo.id" />
-    <div class="dashboard__container" v-if="eventInfo.id">
+    <div class="dashboard__container pt-3" v-if="eventInfo.id">
       <div class="dashboard__container--header">
-        <div class="flex align-center">
-          <h1>Edit Event</h1>
-          <button class="btn btn__large btn__success ml-5" v-if="event && event.published" :disabled="event.cancelled">
-            Published
-          </button>
-          <button class="btn btn__large btn__warning ml-5" v-if="event && !event.published" :disabled="event.status == 'cancelled'">
-            Draft
-          </button>
-          <button class="btn btn__large btn__danger ml-5" v-if="event && event.status == 'cancelled'">
-            Cancelled
-          </button>
+        <div class="flex align-center justify-space-between" style="width:100%;">
+          <h4 style="width:auto;">Edit Event</h4>
+          <span class="flex flex-wrap justify-flex-end">
+            <button class="btn btn__success btn__small ml-5 mr-3" v-if="event && event.published" :disabled="event.cancelled">
+              Published
+            </button>
+            <button class="btn btn__warning btn__small ml-5 mr-3" v-if="event && !event.published" :disabled="event.status == 'cancelled'">
+              Draft
+            </button>
+            <button class="btn btn__danger btn__small ml-5 mr-3" v-if="event && event.status == 'cancelled'">
+              Cancelled
+            </button>
+            <!-- <button class="btn btn__outlined btn__small mr-3" @click="venueSync()">Sync Venue Details</button> -->
+            <button class="btn btn__outlined btn__small mr-3" @click="email()">Preview Info Email</button>
+          </span>
         </div>
-        <div class="flex align-center flex-wrap ml-3 justify-flex-end">
+        <!-- <div class="flex align-center flex-wrap ml-3 justify-flex-end">
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="venueSync()">Sync Venue Details</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="email()">Preview Info Email</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="checkIn()">Check-In</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="shifts()">Shifts</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="sheets()">Timesheets</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="placements()">Placements</button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="files()">Files</button>
 
 
           <button class="btn btn__outlined btn__small mb-3" @click="goBack()"><i class="fas fa-arrow-left"></i></button>
-        </div>
+        </div> -->
       </div>
       <form ref="form" @submit.prevent>
         
       	<div class="dashboard__container--body mt-3" v-if="eventInfo">
       		<div class="dashboard__container--body--col">
-
+            <div>
     				<div class="mb-3">
     					<label for="eventName">Event Name:</label>
     					<input type="text" v-model.trim="event.title" id="eventName" required />
@@ -98,14 +103,30 @@
                 >
               </v-select>
             </div>
+          <div class="mb-3" v-if="groups && groups.length >= 1">
+            <label for="mgrs">Restrict to Groups:</label>
+              <v-select
+                class="mt-2"
+                label="title" 
+                :options="groups"
+                v-model="event.groups"
+                multiple
+                @option:selected="addGroup"
+                @option:deselected="removeGroup"
+                >
+              </v-select>
+            </div>
           </div>
-          <div class="dashboard__container--body--col">
+          </div>
+          <div class="dashboard__container--body--col" v-if="event">
             <div class="mb-3">
               <label for="eventDescription">Description:</label>
               <vue-editor id="eventDescription" v-model="event.description" required></vue-editor>
             </div>
           </div>
           <div class="dashboard__container--body--col">
+            <div>
+            <h4>Days to Staff</h4>
 
             <div class="mb-3">
               <label for="multiDay">Multiple Days:</label>
@@ -133,10 +154,7 @@
               </div>
             </transition>
 
-          </div>
-          <div class="dashboard__container--body--col">
-
-            <h3>Days to Staff</h3>
+            
             <transition name="fadeStop">
               <div class="mt-2 flex" style="flex-wrap: wrap;" v-if="event.days && event.days.length >= 1">
                 <button class="chip mr-2 mb-2" v-for="(day, index) in event.days" :key="day" @click="deleteDay(index)">{{day}} <i class="far fa-times-circle ml-2"></i></button>
@@ -149,10 +167,12 @@
               </div>
             </transition>
           </div>
+          </div>
 
           <div class="dashboard__container--body--col" v-if="event.venue">
+            <div>
             <div class="flex justify-space-between align-center">
-              <h3>Jobs to Staff</h3>
+              <h4>Jobs to Staff</h4>
               
             </div>
             
@@ -172,6 +192,7 @@
                 <div v-for="job in event.venue.job" class="mb-3 flex justify-space-between">
                   <input type="text" readonly v-model.trim="job.title" />
                   <input class="ml-3" type="number" step=".01" placeholder="pay rate" v-model.trim="job.rate" />
+                  <input class="ml-3" type="number" step=".01" placeholder="bill rate" v-model.trim="job.billRate" />
                   <input class="ml-3" type="text" placeholder="new label" v-model.trim="job.label" />
                   <div class="ml-3">
                     <label for="tipped">Tipped?</label>
@@ -181,11 +202,12 @@
                 </div>
               </div>
             </transition>
+            </div>
           </div>
 
           <!-- <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3" v-if="clients.length >= 1">
-              <h3>Client</h3>
+              <h4>Client</h4>
               <v-select
                 class="mt-2"
                 label="title"
@@ -198,7 +220,8 @@
           </div>
            -->
           <div class="dashboard__container--body--col">
-            <h3>Attach Files</h3>
+            <div>
+            <h4>Attach Files</h4>
 
             <div class="mb-3">
               <label for="fileTitle">Details:</label>
@@ -238,10 +261,12 @@
                 </vue-good-table>
               </div>
             </div>
+            </div>
           </div>
 
       		<div class="dashboard__container--body--col">
-            <h3 class="mb-3">Background Image</h3>
+            <div>
+            <h4 class="mb-3">Background Image</h4>
             <div class="flex flex-column align-center">
               <div class="event-wrapper" :style="{ backgroundImage: 'url(' + backgroundUrl + ')' }">
                 <croppa 
@@ -263,53 +288,60 @@
               </div>
               <p class="caption mt-3">jpg or png file. 2MB max</p>
             </div>
+            </div>
           </div>
           <div class="dashboard__container--body--col" v-if="event.venue">
-            <h3>Attire</h3>
+            <div>
+            <h4>Attire</h4>
             <div class="mb-3">
               <vue-editor id="attire" v-model="event.venue.attire"></vue-editor>
             </div>
+            </div>
           </div>
           <div class="dashboard__container--body--col" v-if="event.venue">
-
+            <div>
             <div class="mb-3">
-              <h3>Pay</h3>
+              <h4>Pay</h4>
               <vue-editor id="pay" v-model="event.venue.pay"></vue-editor>
             </div>
           </div>
+          </div>
           <div class="dashboard__container--body--col" v-if="event.venue">
-
+            <div>
             <div class="mb-3">
-              <h3>Check-In Instructions</h3>
+              <h4>Check-In Instructions</h4>
               <vue-editor id="checkin" v-model="event.venue.checkin"></vue-editor>
             </div>
+          </div>
 
           </div>
 
           <div class="dashboard__container--body--col" v-if="event.venue">
+            <div>
             <div class="mb-3">
-              <h3>Parking Instructions</h3>
+              <h4>Parking Instructions</h4>
               <vue-editor id="parking" v-model="event.venue.parking"></vue-editor>
             </div>
           </div>
+          </div>
 
           <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3">
-              <h3>Camping Instructions</h3>
+              <h4>Camping Instructions</h4>
               <vue-editor id="camping" v-model="event.venue.camping"></vue-editor>
             </div>
           </div>
 
           <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3">
-              <h3>Credentials Instructions</h3>
+              <h4>Credentials Instructions</h4>
               <vue-editor id="creds" v-model="event.venue.creds"></vue-editor>
             </div>
           </div>
 
           <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3">
-              <h3>COVID Requirements:</h3>
+              <h4>COVID Requirements:</h4>
               <vue-editor id="covid" v-model="event.venue.covid"></vue-editor>
             </div>
           </div>
@@ -317,7 +349,7 @@
 
           <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3">
-              <h3>Additional Notes:</h3>
+              <h4>Additional Notes:</h4>
               <vue-editor id="notes" v-model="event.venue.notes"></vue-editor>
             </div>
           </div>
@@ -337,7 +369,7 @@
           </div>
           <div class="dashboard__container--body--col">
             <div class="mb-3">
-              <h3>Send Message to Update Staff:</h3>
+              <h4>Send Message to Update Staff:</h4>
               <textarea name="updateMessage" id="updateMessage" cols="20" rows="4" v-model="event.updateMessage"></textarea>
             </div>
             <button class="btn btn__outlined btn__large" @click="updateStaff()">
@@ -433,7 +465,7 @@ import router from '@/router'
 const fb = require('../../firebaseConfig.js')
 
 export default {
-  name: 'event',
+  name: 'eventDetails',
   data: () => ({
     croppa: {},
     day:'',
@@ -479,9 +511,9 @@ export default {
     this.$store.dispatch("getEventFromId", this.$route.params.id);
   },
   async mounted() {
-    if (!this.venues || this.venues.length < 1) {
-      this.$store.dispatch("getVenues")
-    }
+    // if (!this.venues || this.venues.length < 1) {
+    //   this.$store.dispatch("getVenues")
+    // }
     if (!this.clients || this.clients.length < 1) {
       this.$store.dispatch("getClients")
     }
@@ -491,12 +523,15 @@ export default {
     if (!this.mgrs || this.mgrs.length < 1) {
       this.$store.dispatch("getMgrsState")
     }
-     if (!this.tags || this.tags.length < 1) {
+    if (!this.tags || this.tags.length < 1) {
       this.$store.dispatch("getTagsState")
+    }
+    if (!this.groups || this.groups.length < 1) {
+      this.$store.dispatch("getGroups")
     }
   },
   computed: {
-    ...mapState(['currentUser','eventInfo', 'venues', 'clients', 'jobs', 'mgrs', 'tags']),
+    ...mapState(['currentUser', 'eventInfo', 'venues', 'clients', 'jobs', 'mgrs', 'tags', 'groups']),
     event() {
       return this.eventInfo
     },
@@ -505,6 +540,16 @@ export default {
     },
   },
   methods: {
+    addGroup (item) {
+      console.log(item)
+      let event = this.event
+      this.$store.dispatch('updateEvent', event)
+    },
+    removeGroup (item) {
+      console.log(item)
+      let event = this.event
+      this.$store.dispatch('updateEvent', event)
+    },
     venueSync() {
       let venueId = this.eventInfo.venueId
       fb.venuesCollection.doc(venueId).get()
@@ -515,12 +560,12 @@ export default {
           venue: doc.data()
         })
       })
-      let logFields = {
-          staffMember: this.currentUser.email,
-          export: 'Venue Sync(Events)',
-          eventId: this.eventInfo.id
-      }
-      this.$store.dispatch('sendEventLog', logFields)
+      // let logFields = {
+      //     staffMember: this.currentUser.email,
+      //     export: 'Venue Sync(Events)',
+      //     eventId: this.eventInfo.id
+      // }
+      // this.$store.dispatch('sendEventLog', logFields)
     },
     previewImage(event) {
       this.uploadValue=0;
@@ -641,6 +686,10 @@ export default {
       let url = `/events/` + this.$route.params.id + `/checkin`
       router.push(url)
     },
+    files() {
+      let url = `/events/` + this.$route.params.id + `/files`
+      router.push(url)
+    },
     deleteEvent() {
       let event = this.eventInfo
       this.$store.dispatch('deleteEvent', event.id)
@@ -737,12 +786,12 @@ export default {
           // router.push(url)
         }, 2000)
       }
-      let logFields = {
-          staffMember: this.currentUser.email,
-          export: 'Update Event',
-          eventId: this.event
-      }
-      this.$store.dispatch('sendEventLog', logFields)
+      // let logFields = {
+      //     staffMember: this.currentUser.email,
+      //     export: 'Update Event',
+      //     eventId: this.event
+      // }
+      // this.$store.dispatch('sendEventLog', logFields)
     }
   },
   beforeDestroy () {

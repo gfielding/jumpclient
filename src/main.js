@@ -1,4 +1,5 @@
 import Vue from 'vue'
+require('dotenv').config()
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -22,6 +23,7 @@ import VueCryptojs from 'vue-cryptojs'
 import VueHtmlToPaper from 'vue-html-to-paper';
 import VueQr from 'vue-qr'
 import VueMoment from 'vue-moment'
+import VueIframe from 'vue-iframes'
 import moment from 'moment-timezone'
 import 'instantsearch.css/themes/satellite-min.css';
 import './assets/sass/main.scss'
@@ -42,6 +44,10 @@ const options = {
   windowTitle: "MVP Event Staffin Checkin-Checkout", // override the window title
 }
 
+const axios = require('axios');
+const cors = require('cors')
+
+
 Vue.use(VueHtmlToPaper, options);
 Vue.component('v-select', vSelect)
 Vue.use(VueGoodTablePlugin)
@@ -52,6 +58,7 @@ Vue.use(VueMask)
 Vue.use(VueCryptojs)
 Vue.use(StarRating)
 Vue.use(VTooltip)
+Vue.use(VueIframe)
 Vue.use(VueClipboard)
 Vue.use(vClickOutside)
 Vue.use(VueMoment, {

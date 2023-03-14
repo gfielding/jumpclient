@@ -19,7 +19,7 @@
             v-if="showAll"
             :columns="columns"
             :rows="clients"
-            compactMode
+            styleClass="vgt-table condensed"
             :search-options="{
               enabled: true,
               placeholder: 'Search this table',

@@ -1,6 +1,6 @@
 <template>
-	<div>
-    <h2 class="mb-3">Emergency Contacts</h2>
+	<div class="whiteBack">
+    <h4 class="mb-3">Emergency Contacts</h4>
 		<div class="mb-3">
       <label for="name1">Emergency Contact Name:</label>
       <input type="text" placeholder="Spouse, friend, etc." v-model.trim="user.emergency1name" id="name1" readonly />

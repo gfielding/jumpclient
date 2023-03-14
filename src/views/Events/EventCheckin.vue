@@ -1,23 +1,21 @@
 <template>
-  <div class="dashboard">
-    <div class="dashboard__container">
+  <div>
+    <div class="dashboard__container pt-3">
       <div class="dashboard__container--header mb-3" v-if="event">
         <div>
           <div class="flex align-center">
-          <h1 v-if="event">{{event.title}} Check-In-Out</h1>
+          <h4 v-if="event">Check-In-Out</h4>
         </div>
-          <!-- <h2 v-if="event &&event.title">Staff Placements for {{event.title}}</h2> -->
-          <span v-if="event && event.venue && event.venue.title">
-          <p>{{event.venue.title}}<span v-if="event.venue && event.venue.address"> | {{event.venue.address.city}}, {{event.venue.address.state}}</span> | {{event.startDate | moment("ddd, MMM Do YYYY") }}<span v-if="event.endDate"> - {{event.endDate | moment("ddd, MMM Do YYYY") }}</span></p>
-        </span> 
-        </div>
-        <span class="flex justify-flex-end flex-wrap">
+
+      </div>
+        <!-- <span class="flex justify-flex-end flex-wrap">
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="editEvent()">Edit</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="shifts()">Shifts</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="sheets()">Timesheets</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="placements()">Placements</button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="files()">Files</button>
           <button class="btn btn__outlined btn__small mb-3" @click="goBack"><i class="fas fa-arrow-left"></i></button>
-        </span>
+        </span> -->
       </div>
       <div class="dashboard__container--body mb-3" v-if="event && event.days && event.days.length > 1">
         <div>
@@ -52,6 +50,7 @@
           <vue-good-table
               :columns="columns"
               :rows="filteredUsers"
+              styleClass="vgt-table condensed"
               :pagination-options="{
                 enabled: true,
                 mode: 'records',
@@ -287,7 +286,7 @@
           <div v-for="shift in activeShifts" :key="shift.id" style=" padding:1.6rem; background: white; margin-bottom:1.6rem;">
             <div class="flex align-center justify-space-between mb-1">
               <span>
-                <h3 v-if="shift.name">{{shift.name}} | <span v-if="activeDay">{{activeDay | moment("dddd, MMM Do") }}</span></h3>
+                <h4 v-if="shift.name">{{shift.name}} | <span v-if="activeDay">{{activeDay | moment("dddd, MMM Do") }}</span></h4>
                 <div class="caption" v-if="shift.position">Default position: {{shift.position.label || shift.position.title}}</div>
                 
                 <div class="caption" v-if="shift.startTime"> Default Shift Times: {{ [ shift.startTime, "HH:mm" ] | moment("hh:mm A") }}<span v-if="shift.endTime"> - {{ [ shift.endTime, "HH:mm" ] | moment("hh:mm A") }}</span></div>
@@ -348,6 +347,7 @@
                   <vue-good-table
                     :columns="columns2"
                     :id="shift.id"
+                    styleClass="vgt-table condensed"
                     :ref="shift.id"
                     :rows="orderedPlacedUsers(shift)"
                     >
@@ -697,7 +697,8 @@ import EditTimeModal from "@/components/EditTimeModal.vue";
 const fb = require('../../firebaseConfig.js')
 
 export default {
-  name: 'eventplacement',
+  name: 'eventCheckin',
+  props: ['eventInfo'],
   data() {
     return {
       performingRequest: false,
@@ -941,7 +942,7 @@ export default {
     // this.setInitialDay()
   },
   computed: {
-    ...mapState(['currentUser', 'venueInfo', 'eventUsers', 'eventShifts', 'eventInfo', 'eventDrops', 'userProfile']),
+    ...mapState(['currentUser', 'venueInfo', 'eventUsers', 'eventShifts', 'eventDrops', 'userProfile']),
     event() {
       return this.eventInfo
     },
@@ -1722,6 +1723,10 @@ export default {
     },
     placements() {
       let url = `/eventplacements/` + this.event.id
+      router.push(url)
+    },
+    files() {
+      let url = `/events/` + this.$route.params.id + `/files`
       router.push(url)
     },
     sheets() {

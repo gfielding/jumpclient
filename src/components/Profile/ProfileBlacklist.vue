@@ -1,6 +1,6 @@
 <template>
-	<div>
-		<h2>DNR'd By Clients</h2>
+  <div class="whiteBack mb-5">
+		<h4>DNR'd By Clients</h4>
     <transition name="fadeStop">
       <div class="mb-2 mt-2 flex" v-if="user && user.blacklist && user.blacklist.length >= 1">
         <button class="chip mr-2" v-for="(item, index) in user.blacklist" :key="index" @click="deleteClient(index)">{{item.title}} <i class="far fa-times-circle ml-2"></i></button>
@@ -15,7 +15,7 @@
         </option>
       </select>
     </div>
-	</div>
+  </div>
 
 </template>
 

@@ -1,6 +1,6 @@
 <template>
 	<div>
-    <h2>Send a Custom Message</h2>
+    <h4>Send a Custom Message</h4>
 		<div class="mb-3 mt-1">
 		</div>
 		 <div>
@@ -29,7 +29,7 @@ export default {
   	sendMessage () {
   		this.performingRequest = true
   		let newMessage = {
-        name: this.user.firstName,
+        name: (this.user.firstName + ' ' + this.user.lastName),
         email: this.user.email,
         userId: this.user.id,
         phone: this.user.phone,

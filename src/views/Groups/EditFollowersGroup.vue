@@ -137,8 +137,8 @@ export default {
       router.go(-1)
     },
   },
-  beforeDestroy () {
-    this.$store.dispatch('clearGroupState')
-  }
+  // beforeDestroy () {
+  //   this.$store.dispatch('clearGroupState')
+  // }
 }
 </script>

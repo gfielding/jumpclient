@@ -1,24 +1,34 @@
 <template>
   <div class="dashboard">
     <div class="dashboard__container">
-      <Loader v-if="!group" />
+      <Loader v-if="!group || (!groupUsers || groupUsers.length < 1)" />
       <div class="dashboard__container--header" v-if="group">
         <div>
-        <h1>{{group.title}}</h1>
-        <span class="caption" v-if="group.description && (currentUser.uid != group.owner)">{{group.description}}</span>
-        </div>
-        <span class="flex align-center">
-          <button class="btn btn__outlined mr-3" @click="deleteGroup()" :disabled="!clean" v-if="isOwner || isKaela">delete group</button>
+        <h1>{{group.title}} Group</h1>
+        <span class="flex mb-3">
+          
           <router-link :to="{name: 'group'}">
-            <button class="btn" v-bind:class="{ 'btn__dark': isMembers, 'btn__outlined': !isMembers }">Members</button>
+            <button class="btn btn__small" v-bind:class="{ 'btn__dark': isMembers, 'btn__outlined': !isMembers }">Members</button>
+          </router-link>
+          <router-link :to="{name: 'groupApplicants'}">
+            <button class="btn btn__small ml-3" v-bind:class="{ 'btn__dark': isApplicants, 'btn__outlined': !isApplicants }">New Applications</button>
+          </router-link>
+          <router-link :to="{name: 'groupWaitlist'}">
+            <button class="btn btn__small ml-3" v-bind:class="{ 'btn__dark': isWaitlist, 'btn__outlined': !isWaitlist }">Waitlist</button>
+          </router-link>
+          
+          <router-link :to="{name: 'groupMessages'}">
+            <button class="btn btn__small ml-3" v-bind:class="{ 'btn__dark': isMessages, 'btn__outlined': !isMessages }" v-if="isOwner || isUser || isAdmin">Messages</button>
           </router-link>
           <router-link :to="{name: 'groupEdit'}">
-            <button class="btn ml-3" v-bind:class="{ 'btn__dark': isEdit, 'btn__outlined': !isEdit }" v-if="isOwner || isUser || isAdmin || isKaela">Settings</button>
+            <button class="btn btn__small ml-3" v-bind:class="{ 'btn__dark': isEdit, 'btn__outlined': !isEdit }" v-if="isOwner || isUser || isAdmin">Settings</button>
           </router-link>
-          <router-link :to="{name: 'groupMessages'}">
-            <button class="btn ml-3" v-bind:class="{ 'btn__dark': isMessages, 'btn__outlined': !isMessages }" v-if="isOwner || isUser || isAdmin || isKaela">Messages</button>
-          </router-link>
-          <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
+        </span>
+        </div>
+        <span class="flex align-center">
+          <!-- <button class="btn btn__outlined mr-3" @click="deleteGroup()" :disabled="!clean" v-if="isOwner || isKaela">delete group</button> -->
+          
+          <button class="btn btn__outlined ml-3" @click="goBack"><i class="fas fa-arrow-left"></i></button>
         </span>
         
       </div>
@@ -56,6 +66,12 @@ export default {
     },
     isMessages() {
       return this.$route.name == 'groupMessages';
+    },
+    isWaitlist() {
+      return this.$route.name == 'groupWaitlist';
+    },
+    isApplicants() {
+      return this.$route.name == 'groupApplicants';
     },
     isMembers() {
       return this.$route.name == 'group';

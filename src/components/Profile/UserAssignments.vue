@@ -1,14 +1,15 @@
 <template>
 	<div style="width:100%;">
-		<h2>User Assignments:</h2>
+		<h4>User Assignments:</h4>
 		<vue-good-table
       :columns="columns"
       :rows="assignments"
+      styleClass="vgt-table condensed"
       compactMode
       :pagination-options="{
         enabled: true,
         mode: 'records',
-        perPage: 10,
+        perPage: 20,
       }"
     >
      <template slot="table-row" slot-scope="props">

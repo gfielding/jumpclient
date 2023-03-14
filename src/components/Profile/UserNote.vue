@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h2>Add Note About User</h2>
+		<h4>Add Note About User</h4>
 		<label for="note">Note:</label>
      <textarea name="note" id="note" cols="30" rows="10" v-model="note"></textarea>
      <button class="btn btn__primary mt-3" @click="onAddNote()">
@@ -30,6 +30,7 @@ export default {
   			userId: this.user.id,
         submittedBy: name
   		}
+      console.log(name)
   		this.$store.dispatch('addUserNote', theNote)
   		setTimeout(() => {
   				this.note = ''

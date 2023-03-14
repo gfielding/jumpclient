@@ -1,7 +1,7 @@
 <template>
 	<div class="footer">
 		<div class="footer__container">
-			© MVP Event Productions, 2022
+			© Jump Staffing, 2023
 		</div>
 	</div>
 </template>

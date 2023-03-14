@@ -55,7 +55,10 @@ hr {
   border-bottom:1px solid $textLight;
   margin:2rem 0;
 }
-
+.whiteBack {
+  background: white;
+  padding: 1.6rem;
+}
 .notification {
   width: 100%;
   background: $accentDark;
@@ -69,6 +72,33 @@ hr {
   @include respond(tablet-port) {
     display:none !important;
   }
+}
+.only-xs {
+  @include respond(phone) {
+    display:block !important;
+  }
+  @include respond(tablet-land) {
+    display:none !important;
+  }
+  @include respond(desktop) {
+    display:none !important;
+  }
+  @include respond(tv) {
+    display:none !important;
+  }
+  @include respond(tablet-port) {
+    display:block !important;
+  }
+  
+}
+
+.hidden-xs {
+  @include respond(tablet-port) {
+    display:none !important;
+  }
+  // @include respond(tablet-land) {
+  //   display:block !important;
+  // }
 }
 
 .hidden-large {
@@ -107,6 +137,9 @@ hr {
 .success {
   color:$success;
 }
+.successDark {
+  color:$successDark;
+}
 .warning {
   color:$warning;
 }
@@ -118,4 +151,17 @@ hr {
 }
 .orangeHue {
   color:$orangeHue;
+}
+
+.w100 {
+  width:100%;
+}
+
+
+iframe {
+  width: 390px; 
+  height: 844px;
+  background: white;
+  border-radius: $radius;
+  max-width: calc(100% - 3.2rem);
 }

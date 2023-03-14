@@ -8,6 +8,7 @@
       <form ref="form" @submit.prevent>
       	<div class="dashboard__container--body">
       		<div class="dashboard__container--body--col">
+            <div>
       			<div class="flex flex-column align-center mb-5">
               <div class="event-wrapper" :style="{ backgroundImage: 'url(' + backgroundUrl + ')' }">
                 <croppa 
@@ -86,7 +87,9 @@
 	    				</div>
 	    			</transition>
       		</div>
+          </div>
       		<div class="dashboard__container--body--col">
+            <div>
       			<gmap-map
               :center="center"
               :zoom="12"
@@ -100,6 +103,7 @@
               @click="center=marker.position"
             ></gmap-marker>
             </gmap-map>
+            </div>
       		</div>
 
           <!-- <div class="dashboard__container--body--col">

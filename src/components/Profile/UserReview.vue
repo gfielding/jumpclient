@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h2>Leave a Review</h2>
+		<h4>Leave a Review</h4>
     <star-rating clearable @rating-selected ="setRating" :star-size="30" :show-rating="false"></star-rating>
 		<label for="review">Review:</label>
      <textarea name="review" id="review" cols="30" rows="6" v-model="review"></textarea>

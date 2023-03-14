@@ -6,20 +6,20 @@
         <span>
           <button class="btn mr-3" v-bind:class="{ 'btn__dark': showAllGroups, 'btn__outlined': !showAllGroups }"  @click="showAll()">All Groups</button>
           <button class="btn mr-3" v-bind:class="{ 'btn__dark': showMyGroups, 'btn__outlined': !showMyGroups }" @click="showMine()">My Groups</button>
-          <button class="btn mr-3" v-bind:class="{ 'btn__dark': showFollower, 'btn__outlined': !showFollower }" @click="showFollowerGroups()">Follower Groups</button>
+          <!-- <button class="btn mr-3" v-bind:class="{ 'btn__dark': showFollower, 'btn__outlined': !showFollower }" @click="showFollowerGroups()">Follower Groups</button> -->
           <router-link :to="{name: 'addgroup'}" class="color--text">
             <button class="btn btn__flat ml-3"><i class="fas fa-plus fa-2x"></i></button>
           </router-link>
         </span>
         
       </div>
-      <div class="dashboard__container--body pt-4">
+      <div class="dashboard__container--body pt-3">
           <Loader v-if="!groups || groups.length == 0" />
           <vue-good-table
             v-if="showAllGroups"
               :columns="columns"
               :rows="groups"
-               styleClass="vgt-table striped"
+               styleClass="vgt-table condensed"
               :search-options="{
                 enabled: true,
                 placeholder: 'Search this table',
@@ -41,6 +41,21 @@
                 </span>
                 <span v-if="props.row.owner">
                   {{props.row.owner.lastName}}
+                </span>
+              </span>
+              <span v-else-if="props.column.field == 'applicants'">
+                <span v-if="props.row.applicants" style="color:green;">
+                  {{props.row.applicants.length}}
+                </span>
+              </span>
+              <span v-else-if="props.column.field == 'members'">
+                <span v-if="props.row.members">
+                  {{props.row.members.length}}
+                </span>
+              </span>
+              <span v-else-if="props.column.field == 'admins'">
+                <span v-if="props.row.admins && props.row.admins.length > 0">
+                  <button class="btn btn__small chip mr-2" v-for="(item, index) in props.row.admins" :key="item.id">{{item.name}}</button>
                 </span>
               </span>
               <span v-else>
@@ -53,7 +68,7 @@
             v-if="showMyGroups"
               :columns="columns"
               :rows="myGroups"
-               styleClass="vgt-table striped"
+               styleClass="vgt-table condensed"
               :search-options="{
                 enabled: true,
                 placeholder: 'Search this table',
@@ -77,17 +92,32 @@
                   {{props.row.owner.lastName}}
                 </span>
               </span>
+              <span v-else-if="props.column.field == 'applicants'">
+                <span v-if="props.row.applicants" style="color:green;">
+                  {{props.row.applicants.length}}
+                </span>
+              </span>
+              <span v-else-if="props.column.field == 'members'">
+                <span v-if="props.row.members">
+                  {{props.row.members.length}}
+                </span>
+              </span>
+              <span v-else-if="props.column.field == 'admins'">
+                <span v-if="props.row.admins && props.row.admins.length > 0">
+                  <button class="btn btn__small chip mr-2" v-for="(item, index) in props.row.admins" :key="item.id">{{item.name}}</button>
+                </span>
+              </span>
               <span v-else>
                 {{props.formattedRow[props.column.field]}}
               </span>
             </template>
           </vue-good-table>
 
-          <vue-good-table
+         <!--  <vue-good-table
           v-if="showFollower"
             :columns="columns2"
             :rows="venues"
-            styleClass="vgt-table striped"
+            styleClass="vgt-table condensed"
             :search-options="{
               enabled: true,
               placeholder: 'Search this table',
@@ -99,7 +129,7 @@
             }"
             @on-row-click="onRowClick2"
           >
-        </vue-good-table>
+        </vue-good-table> -->
         
       </div>
     </div>
@@ -124,8 +154,16 @@ export default {
         field: 'title',
       },
       {
-        label: 'Created',
-        field: 'created',
+        label: 'Admins',
+        field: 'admins',
+      },
+      {
+        label: 'Members',
+        field: 'members',
+      },
+      {
+        label: 'New Applicants',
+        field: 'applicants',
       },
     ],
     columns2: [
@@ -153,15 +191,12 @@ export default {
     if (!this.groups || this.groups.length < 1) {
       this.$store.dispatch("getGroups")
     }
-    if (!this.venues || this.venues.length < 1) {
-      this.$store.dispatch("getVenues")
-    }
   },
   computed: {
-    ...mapState(['groups', 'currentUser', 'venues']),
+    ...mapState(['groups', 'currentUser']),
     myGroups: function() {
       return this.groups.filter(group => {
-        return group.owner == this.currentUser.uid
+        return (group.owner == this.currentUser.uid || group.admins.includes(this.currentUser.uid))
       })
     },
   },
@@ -189,11 +224,11 @@ export default {
       console.log(url)
       router.push(url)
     },
-    onRowClick2(params) {
-      let url = `/followersgroups/` + params.row.id
-      console.log(url)
-      router.push(url)
-    },
+    // onRowClick2(params) {
+    //   let url = `/followersgroups/` + params.row.id
+    //   console.log(url)
+    //   router.push(url)
+    // },
     formatDate(q) {
       if(q) {
         const postedDate = new Date(q.seconds) * 1000;

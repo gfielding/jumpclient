@@ -4,7 +4,7 @@
         
         <div class="dashboard__container--body--col" v-if="groupUsers && groupUsers.length > 0">
           <div class="mb-3">
-            <h3>Send Message to Group:</h3>
+            <h4>Send Message to Group:</h4>
             <textarea name="updateMessage" id="updateMessage" cols="20" rows="4" v-model="message"></textarea>
           </div>
           <button class="btn btn__outlined btn__large" @click="sendMessage()">
@@ -19,7 +19,7 @@
       </div>
       <div class="dashboard__container--body">
         <div class="dashboard__container--body--col" style="width:100%;">
-          <h2>Messages</h2>
+          <h4>Messages</h4>
 
           <vue-good-table
             :columns="columns2"
@@ -83,17 +83,18 @@ export default {
       return this.group.owner == this.currentUser.uid
     },
     isAdmin() {
-      return this.group.admins.some(person => person.userId == this.currentUser.uid)
+      return this.group.admins && this.group.admins.some(person => person.userId == this.currentUser.uid)
     },
     isUser() {
-      return this.group.users.some(person => person.userId == this.currentUser.uid)
+      return this.group.users && this.group.users.some(person => person.userId == this.currentUser.uid)
     }
   },
   components: {
     Loader,
   },
   created () {
-    this.$store.dispatch("getGroupFromId", this.$route.params.id);
+    // this.$store.dispatch("getGroupFromId", this.$route.params.id);
+    this.$store.dispatch("getGroupMessages", this.$route.params.id);
   },
   methods: {
     formatDate(q) {

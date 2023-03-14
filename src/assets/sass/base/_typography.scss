@@ -7,23 +7,25 @@ html {
   // }
 }
 
-@import url("//hello.myfonts.net/count/3eb1be");
-  
-@font-face {
-  font-family: "BankGothicBT-Light";
-  src: url('./fonts/BankGothicBTLight/font.woff2') format('woff2'), url('./fonts/BankGothicBTLight/font.woff') format('woff');
-}
-@font-face {
-  font-family: "BankGothicBT-Medium";
-  src: url('./fonts/BankGothicBTMedium/font.woff2') format('woff2'), url('./fonts/BankGothicBTMedium/font.woff') format('woff');
-}
+// @import url("//hello.myfonts.net/count/3eb1be");
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300;500;700&display=swap');
+
+
 // @font-face {
-// font-family: 'D-DIN Regular';
-// font-style: normal;
-// font-weight: normal;
-// src: url('./fonts/D-DIN.woff') format('woff');
+//   font-family: "Dazzed-Heavy";
+//   src: url('./fonts/Dazzed-Heavy.woff2') format('woff2'), url('./fonts/Dazzed-Heavy.woff') format('woff');
 // }
 
+// @font-face {
+//   font-family: "Dazzed-Bold";
+//   src: url('./fonts/Dazzed-Bold.woff2') format('woff2'), url('./fonts/Dazzed-Bold.woff') format('woff');
+// }
+
+// @font-face {
+//   font-family: "Dazzed-SemiBold";
+//   src: url('./fonts/Dazzed-SemiBold.woff2') format('woff2'), url('./fonts/Dazzed-SemiBold.woff') format('woff');
+// }
 
 // @font-face {
 // font-family: 'D-DIN DIN-Italic';
@@ -91,45 +93,81 @@ html {
 //     local("Droid Sans"), local("Helvetica Neue"), sans-serif;
 // }
 
+
+
 a {
-  cursor: pointer;
+  cursor: pointer !important;
   text-decoration:none;
-  color: $accent;
+  color: $primary;
   &.color--text {
     color:$text;
   }
   &:hover {
-    color: $accentDark;
+    color: $primaryDark;
   }
 }
 
 h1 {
   // font-family: "BankGothicBT-Medium";
   // font-family: 'D-DIN DIN-Bold';
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
-  font-weight:600;
-  line-height:1.3;
+  // font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+  // font-weight:600;
+  // letter-spacing: 0.06rem;
+  // line-height:1.35;
+  // font-family: "Dazzed-Heavy";
+  // font-family: "Dosis";
+  font-family: "Montserrat", sans-serif;
+    font-weight: 700;
+    line-height: 1.1;
+  padding:2vh 0;
   // letter-spacing:0.05rem;
   @include respond(tv) { 
     font-size: 2vw !important;
   }
   @include respond(desktop) { 
-    font-size: 3.3rem !important;
-  }
-  @include respond(tablet-port) { 
     font-size: 3rem !important;
   }
+  @include respond(tablet-port) { 
+    font-size: 2.6rem !important;
+  }
   @include respond(phone) { 
-    font-size: 2.8rem !important;
+    font-size: 2.2rem !important;
   }
 }
 
-#welcome h1 {
+.home__hero h1 {
+  // font-family: "Dazzed-Heavy";
+  // font-family: "Dosis";
+  font-family: "Montserrat", sans-serif;
+    font-weight: 300;
+    line-height: 1.1;
+  line-height:1.1;
+  padding:2vh 0;
+  color:white;
+  // letter-spacing:0.05rem;
+  @include respond(tv) { 
+    font-size: 4vw !important;
+  }
+  @include respond(desktop) { 
+    font-size: 10rem !important;
+  }
+  @include respond(tablet-port) { 
+    font-size: 4.2rem !important;
+  }
+  @include respond(phone) { 
+    font-size: 3.6rem !important;
+  }
+}
+#welcome h1, #workers h1, #businesses h1 {
   // font-family: "BankGothicBT-Medium";
-  // font-family: 'D-DIN DIN-Bold';
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
-  font-weight:600;
-  line-height:1.3;
+  // font-family: "Dazzed-Heavy";
+  // font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+  // font-weight:200;
+  font-family: 'Montserrat', sans-serif;
+  font-weight:300;
+  line-height:1.1;
+  letter-spacing: 0.1rem;
+  color:white;
   // letter-spacing:0.05rem;
   @include respond(tv) { 
     font-size: 3vw !important;
@@ -138,7 +176,7 @@ h1 {
     font-size: 6rem !important;
   }
   @include respond(tablet-port) { 
-    font-size: 4.8rem !important;
+    font-size: 4.2rem !important;
   }
   @include respond(phone) { 
     font-size: 3.6rem !important;
@@ -148,19 +186,32 @@ h1 {
 h2 {
   // font-family: "BankGothicBT-Light";
   // font-family: 'D-DIN Exp Regular';
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
-  font-weight:600;
+  // font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+  // font-weight:300;
+  // font-family: "Dazzed-Bold";
+  
+  // font-family: "Dazzed-Heavy";
+  // font-family: 'Montserrat', sans-serif;
+  // font-weight: 500;
+  font-family: 'Montserrat', sans-serif;
+  font-weight:300;
+  // letter-spacing: 0.06rem;
+  color: $dark;
+  line-height:1.1;
   @include respond(tv) { 
-    font-size: 1.6vw !important;
+    font-size: 1.8vw !important;
   }
   @include respond(desktop) { 
-    font-size: 2.2rem !important;
+    font-size: 3rem !important;
   }
   @include respond(tablet-port) { 
-    font-size: 2rem !important;
+    font-size: 2.6rem !important;
   }
   @include respond(phone) { 
-    font-size: 1.8rem !important;
+    font-size: 2.2rem !important;
+  }
+  .light {
+    opacity: 0.4;
   }
 }
 
@@ -169,18 +220,43 @@ h3 {
   // font-family: 'D-DIN Condensed DINCondensed-Bold';
   // font-family: 'D-DIN DIN-Bold';
   font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
-  font-weight:600;
+  font-weight:500;
+  line-height:1.5;
+      width: 100%;
+  text-transform: uppercase;
   @include respond(tv) { 
     font-size: 1.6vw !important;
   }
   @include respond(desktop) { 
-    font-size: 2.2rem !important;
+    font-size: 1.9rem !important;
   }
   @include respond(tablet-port) { 
-    font-size: 2rem !important;
+    font-size: 1.7rem !important;
   }
   @include respond(phone) { 
+    font-size: 1.6rem !important;
+  }
+}
+
+h4 {
+  // font-family: "BankGothicBT-Medium";
+  // font-family: 'D-DIN Condensed DINCondensed-Bold';
+  // font-family: 'D-DIN DIN-Bold';
+  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
+  font-weight:600;
+  line-height:1.4;
+      width: 100%;
+  @include respond(tv) { 
+    font-size: 1.3vw !important;
+  }
+  @include respond(desktop) { 
     font-size: 1.8rem !important;
+  }
+  @include respond(tablet-port) { 
+    font-size: 1.7rem !important;
+  }
+  @include respond(phone) { 
+    font-size: 1.6rem !important;
   }
 }
 
@@ -197,7 +273,7 @@ h5 {
 address, .caption {
   font-size:1.2rem;
   @include respond(phone) { 
-    font-size: 1.2rem !important;
+    font-size: 1.3rem !important;
   }
 }
 .bold {
@@ -226,18 +302,61 @@ address, .caption {
 }
 
 .pointsNumber {
-  font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Ubuntu, roboto, noto, arial, sans-serif;
-  font-weight:400;
+  font-weight:500;
+  color: $primary;
 }
 
-.errorText {
-  color: $danger;
-}
+// .nav-heading {
+//   font-family: "BankGothicBT-Medium";
+// }
 
-.strike {
-  text-decoration: line-through;
-  color:$danger;
-}
 // .fa-2x {
 //   font-size: 1.6rem !important;
 // }
+
+p {
+  color: $text;
+  // font-family: "Dazzed-SemiBold", sans-serif;
+  font-size: 1.6rem;
+  line-height: 1.3;
+  padding-bottom: 0.625125rem;
+  margin-bottom: 0;
+}
+
+p.page-intro__caption {
+    color: #737373;
+    // font-family: "Dazzed-SemiBold", sans-serif;
+    font-size: 2rem;
+    line-height: 1.6;
+    padding-bottom: 0.625125rem;
+    margin-bottom: 0;
+}
+
+p.page-intro {
+    // color: $primary;
+    // font-family: "Dazzed-SemiBold", sans-serif;
+    font-size: 2.4rem;
+    line-height: 1.4;
+    padding-bottom: 0.625125rem;
+    margin-bottom: 0;
+    color:white;
+}
+.strong {
+  font-weight:bold !important;
+}
+
+em {
+  // position: relative;
+  // background: linear-gradient(94.55deg, $primary 13.45%, $primaryLight 96.08%);
+  // background-clip: text;
+  // -webkit-text-fill-color: transparent;
+  color: $primary;
+}
+
+.fa-check {
+  color:$primary;
+}
+
+i {
+ font-style: italic;
+}

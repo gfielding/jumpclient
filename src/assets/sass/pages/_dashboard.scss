@@ -24,18 +24,28 @@
 				display: block;
 			}
 			&--col {
-				width: calc(49% - 3.2rem);
-		    padding: 1.6rem;
-		    background: white;
+				width: calc(50% - 1.6rem);
+		    
+		    margin-bottom: 2rem;
+		    color: $text;
+				// width: calc(49% - 3.2rem);
+		    // padding: 1.6rem;
+		    // background: white;
 		    margin-bottom: 2rem;
 		    border-radius:$radius;
 				@include respond(tablet-port) {
-					width:calc(100% - 3.2rem);
-					padding: 1.6rem;
+					// width:calc(100% - 3.2rem);
+					width: 100%;
+					// padding: 1.6rem;
 				}
 			}
 		}
 	}
+}
+
+.dashboard__container--body--col > div:first-child {
+	background-color:white;
+	padding: 1.6rem;
 }
 
 .alt-col {

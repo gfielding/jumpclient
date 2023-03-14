@@ -1,6 +1,6 @@
 <template>
 	<div>
-    <h2>Sent Messages</h2>
+    <h4>Sent Messages</h4>
 		<div class="mb-3 mt-1">
 			
 		</div>
@@ -9,6 +9,7 @@
     <vue-good-table
       :columns="columns"
       :rows="messages"
+      styleClass="vgt-table condensed"
       compactMode
       :pagination-options="{
         enabled: true,
@@ -25,6 +26,10 @@
 
         <span v-if="props.column.field == 'message'">
           <span>{{props.row.message}}</span>
+        </span>
+
+        <span v-if="props.column.field == 'name'">
+          <span>{{props.row.name}}</span>
         </span>
 
       </template>
@@ -45,13 +50,18 @@ export default {
     performingRequest: false,
     message: '',
     columns: [
+      
       {
-        label: 'Created',
+        label: 'Message',
+        field: 'message',
+      },
+      {
+        label: 'Sent',
         field: 'created',
       },
       {
-        label: 'message',
-        field: 'message',
+        label: 'From',
+        field: 'name',
       },
     ]
   }),

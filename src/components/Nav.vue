@@ -4,8 +4,7 @@
       <div class="nav__container">
         <div class="nav__logo">
           <router-link to="/dashboard">
-            <SVG_TriangleLogo />
-            MVP ADMIN
+            <h1>j<em>u</em>mp</h1>
           </router-link>
         </div>
         <div class="nav__menu">
@@ -145,17 +144,18 @@
             </a>
           </div>
          
-
-          <div class="nav__menu--item mt-5">
-            <router-link :to="{name: 'events'}">
-              events <i class="fas fa-chevron-right"></i>
-            </router-link>
-          </div>
-          <div class="nav__menu--item">
+         <div class="nav__menu--item">
             <router-link :to="{name: 'users'}">
               users <i class="fas fa-chevron-right"></i>
             </router-link>
           </div>
+
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'events'}">
+              events <i class="fas fa-chevron-right"></i>
+            </router-link>
+          </div>
+          
           <div class="nav__menu--item">
             <router-link :to="{name: 'groups'}">
               groups <i class="fas fa-chevron-right"></i>
@@ -166,10 +166,33 @@
               Venues <i class="fas fa-chevron-right"></i>
             </router-link>
           </div>
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'evereeContractors'}">
+              Contractors <i class="fas fa-chevron-right"></i>
+            </router-link>
+          </div>
+
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'leadsHome'}">
+              Leads <i class="fas fa-chevron-right"></i>
+            </router-link>
+          </div>
+
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'clients'}">
+              Customers <i class="fas fa-chevron-right"></i>
+            </router-link>
+          </div>
+
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'contacts'}">
+              Contacts <i class="fas fa-chevron-right"></i>
+            </router-link>
+          </div>
           
           
         
-          <div class="nav__menu--item dropdown">
+          <!-- <div class="nav__menu--item dropdown">
             <span>Customers</span>
             <div class="dropdown-content">
               <div class="mb-3">
@@ -188,7 +211,7 @@
                 </router-link>
               </div>
             </div>
-          </div>
+          </div> -->
 
           <div class="nav__menu--item">
             <router-link :to="{name: 'team'}">
@@ -200,7 +223,7 @@
           
          
           
-          <div class="nav__menu--item dropdown">
+          <!-- <div class="nav__menu--item dropdown">
             <span>App Text</span>
             <div class="dropdown-content">
               <div class="mb-3">
@@ -224,8 +247,8 @@
                 </router-link>
               </div>
             </div>
-          </div>
-<div class="nav__menu--item dropdown">
+          </div> -->
+<!-- <div class="nav__menu--item dropdown">
             <span>Internal Documents</span>
             <div class="dropdown-content">
               <div class="mb-3">
@@ -234,11 +257,11 @@
                 </router-link>
               </div>
             </div>
-          </div>
+          </div> -->
 
 
 
-          <div class="nav__menu--item">
+          <!-- <div class="nav__menu--item">
             <router-link :to="{name: 'reportsHome'}">
               Reports <i class="fas fa-chevron-right"></i>
             </router-link>
@@ -247,8 +270,8 @@
             <router-link :to="{name: 'verifications'}">
               verifications <i class="fas fa-chevron-right"></i>
             </router-link>
-          </div>
-          <div class="nav__menu--item dropdown">
+          </div> -->
+          <!-- <div class="nav__menu--item dropdown">
             <span>Accounting</span>
             <div class="dropdown-content">
               <div class="mb-3">
@@ -268,7 +291,7 @@
                 </router-link>
               </div>
             </div>
-          </div>
+          </div> -->
           <div class="nav__menu--item">
             <a @click="logout()">logout</a>
           </div>

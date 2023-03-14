@@ -1,14 +1,8 @@
 <template>
-  <div class="dashboard">
-    <div class="dashboard__container">
-      <div class="dashboard__container--header">
-        <h1>Markets</h1>
-        <!-- <router-link :to="{name: 'addjob'}" class="color--text">
-          <button class="btn btn__flat"><i class="fas fa-plus fa-2x"></i></button>
-        </router-link> -->
-      </div>
-      <div class="dashboard__container--body pt-3">
+  <div style="width:100%;">
+      <div class="dashboard__container--body">
       	<div class="dashboard__container--body--col">
+          <div>
           <form ref="form">
             <div class="mb-3">
               <label for="city">Market City:</label>
@@ -27,6 +21,7 @@
             </div>
           </form>
         </div>
+        </div>
       </div>
       <div class="dashboard__container--body">
         <Loader v-if="!markets || markets.length == 0 || performingRequest" />
@@ -34,6 +29,7 @@
           <vue-good-table
             :columns="columns"
             :rows="markets"
+            styleClass="vgt-table condensed"
             :pagination-options="{
               enabled: false,
               mode: 'records',
@@ -96,7 +92,6 @@
         </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>

@@ -1,9 +1,10 @@
 <template>
-	<div>
-		<h2>User Notes:</h2>
+	<div style="width:100%;">
+		<h4>User Notes:</h4>
 		<vue-good-table
       :columns="columns"
       :rows="notes"
+      styleClass="vgt-table condensed"
       compactMode
       :pagination-options="{
         enabled: true,

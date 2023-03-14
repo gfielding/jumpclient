@@ -2,11 +2,33 @@
   <div class="pt-3">
       <div class="dashboard__container--body">
         <div class="dashboard__container--body--col">
+          <div>
           <form ref="form" @submit.prevent>
             <div class="mb-3">
               <label for="title">Group Title:</label>
               <input type="text" v-model.trim="group.title" id="title" />
             </div>
+            <div class="mb-3">
+              <label for="groupVisible">Visible on Website:</label>
+              <input type="checkbox" v-model.trim="group.visible" id="groupVisible" class="ml-3" />
+            </div>
+            <div class="mb-3">
+              <label for="location">Location (Ex: Monterey, CA):</label>
+              <input type="text" v-model.trim="group.location" id="location" />
+            </div>
+
+            <div class="mb-3">
+              <label for="pickDate">Specify Jobs:</label>
+              <v-select
+                class="mt-2"
+                label="title" 
+                :options="jobs"
+                v-model="group.job"
+                multiple
+                >
+              </v-select>
+            </div>
+            
             <div class="mb-3">
               <label for="desc">Group Description:</label>
               <textarea name="desc" id="desc" cols="30" rows="6" v-model="group.description"></textarea>
@@ -19,10 +41,12 @@
               </transition>
             </button>
           </form>
+          </div>
         </div>
         <div class="dashboard__container--body--col">
+          <div>
           <form ref="form" @submit.prevent>
-            <div class="mb-3" v-if="(reps.length > 1) && (isOwner || isKaela)">
+            <div class="mb-3" v-if="(reps.length > 1) && (isOwner)">
               <label for="rep">Account Admins:</label>
               <v-select
                 class="mt-2"
@@ -33,7 +57,7 @@
                 >
               </v-select>
             </div>
-            <div class="mb-3" v-if="(reps.length > 1) && (isOwner || isAdmin || isKaela)">
+            <div class="mb-3" v-if="(reps.length > 1) && (isOwner || isAdmin)">
               <label for="rep">Account Users:</label>
               <v-select
                 class="mt-2"
@@ -53,7 +77,9 @@
                 </transition>
               </button>
             </div>
+            
           </form>
+          </div>
         </div>
       </div>
   </div>
@@ -74,7 +100,7 @@ export default {
     performingRequest2: false,
   }),
   computed: {
-    ...mapState(['groupUsers', 'group', 'currentUser', 'userProfile', 'groupMessages', 'mgrs']),
+    ...mapState(['group', 'currentUser', 'userProfile', 'mgrs', 'jobs']),
     clean() {
       return (!this.groupUsers || this.groupUsers.length == 0)
     },
@@ -83,23 +109,26 @@ export default {
         return mgr.userId
       })
     },
-    isKaela() {
-      return this.currentUser.uid == 'YjqnBY7AbUZuZWcinHab9TNiH9n1'
-    },
+    // isKaela() {
+    //   return this.currentUser.uid == 'YjqnBY7AbUZuZWcinHab9TNiH9n1'
+    // },
     isOwner() {
       return this.group.owner == this.currentUser.uid
     },
     isAdmin() {
-      return this.group.admins.some(person => person.userId == this.currentUser.uid)
+      return (this.group.admins && this.group.admins.some(person => person.userId == this.currentUser.uid))
     },
     isUser() {
-      return this.group.users.some(person => person.userId == this.currentUser.uid)
+      return (this.group.users && this.group.users.some(person => person.userId == this.currentUser.uid))
     }
   },
   created () {
-    this.$store.dispatch("getGroupFromId", this.$route.params.id);
+    // this.$store.dispatch("getGroupFromId", this.$route.params.id);
     if (!this.mgrs || this.mgrs.length < 1) {
       this.$store.dispatch("getMgrsState")
+    }
+    if (!this.jobs || this.jobs.length < 1) {
+      this.$store.dispatch("getJobsState")
     }
   },
   components: {
@@ -130,15 +159,15 @@ export default {
         router.push(url)
       }, 500)
     },
-    addUser() {
+    // addUser() {
 
-    },
-    goBack() {
-      router.go(-1)
-    },
+    // },
+    // goBack() {
+    //   router.go(-1)
+    // },
   },
-  beforeDestroy () {
-    this.$store.dispatch('clearGroupState')
-  }
+  // beforeDestroy () {
+  //   this.$store.dispatch('clearGroupState')
+  // }
 }
 </script>

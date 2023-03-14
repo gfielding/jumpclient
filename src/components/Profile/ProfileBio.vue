@@ -1,21 +1,19 @@
 <template>
 	<div>
     <div class="flex justify-space-between align-center">
-  		<h2 class="mb-3">Bio</h2>
-
+  		<h3 class="mb-3">Bio</h3>
+<!-- 
       
     
       <div>
         <button v-if="!user.bio || !user.picture" class="btn btn__small btn__primary btn__flat mb-2" @click="requestBio()">Request</button>
-        <a :href="user.picture" v-if="user.picture" target="_blank">
-          <button class="btn btn__small btn__outlined mb-2">View Resumé <i class="fas fa-external-link ml-2"></i></button>
-        </a>
+        
 
         <span class="flex justify-flex-end caption" v-if="user.BioReminderSent">
           {{formatDate(user.BioReminderSent)}}
         </span>
       </div>
-
+ -->
     </div>
 		<div class="mb-3">
       <div v-html="user.bio"> 

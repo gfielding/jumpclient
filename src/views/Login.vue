@@ -3,7 +3,7 @@
     <div class="home__containerLogin text-center">
       <div>
         <router-link :to="{name: 'home'}">
-          <img src="https://firebasestorage.googleapis.com/v0/b/mvpes-25aef.appspot.com/o/MVPTriangleText.svg?alt=media&token=518da9ea-28e1-4f7c-9d89-fc13c303c62b" alt="" class="login-logo mb-4">
+         <h1>j<em>u</em>mp</h1>
         </router-link>
         <transition name="fadeStop">
           <PasswordReset v-if="showPasswordReset" @close="hidePassword()"></PasswordReset>

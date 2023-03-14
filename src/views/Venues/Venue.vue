@@ -17,6 +17,7 @@
       <form ref="form" @submit.prevent>
       	<div class="dashboard__container--body" v-if="venue">
       		<div class="dashboard__container--body--col">
+            <div>
     				<!-- <div class="mb-3">
     					<label>
 				        <gmap-autocomplete
@@ -24,142 +25,152 @@
 				        </gmap-autocomplete>
 				      </label>
     				</div> -->
-            <div class="flex flex-column align-center">
-              <div class="event-wrapper" :style="{ backgroundImage: 'url(' + backgroundUrl + ')' }">
-                <croppa 
-                v-model="croppa"
-                :prevent-white-space="true"
-                :width="300"
-                :height="100"
-                accept=".jpeg,.png,.jpg,.svg"
-                :file-size-limit="2048000"
-                :quality="6"
-                :placeholder="'Upload Image'"
-                placeholder-color="white"
-                initial-size="cover"
-                :remove-button-size="32"
-                @file-size-exceed="onFileSizeExceed"
-                @file-type-mismatch="onFileTypeMismatch"
-              >
-              </croppa>
-              </div>
-              <p class="caption mt-3">jpg or png file. 2MB max</p>
-            </div>
-
-    				<div class="mb-3">
-    					<label for="venueName">Venue Name:</label>
-    					<input type="text" v-model.trim="venue.title" id="venueName" />
-    				</div>
-            <div class="mb-3">
-              <label for="venueFeatured">Featured:</label>
-              <input type="checkbox" v-model.trim="venue.featured" id="venueFeatured" class="ml-3" />
-            </div>
-    				<div class="mb-3">
-    					<label for="venueVisibility">Visible:</label>
-    					<input type="checkbox" v-model.trim="venue.visible" id="venueVisibility" class="ml-3" />
-    				</div>
-            <div class="mb-3">
-              <label for="venueVisibility">Vaccination Required:</label>
-              <input type="checkbox" v-model.trim="venue.requiredVaccine" id="venueVisibility" class="ml-3" />
-            </div>
-            <div class="mb-3" v-if="clients.length >= 1">
-              <label for="client">Clients:</label>
-              <v-select
-                class="mt-2"
-                label="title" 
-                multiple
-                :options="clients"
-                v-model="venue.client"
+              <div class="flex flex-column align-center">
+                <div class="event-wrapper" :style="{ backgroundImage: 'url(' + backgroundUrl + ')' }">
+                  <croppa 
+                  v-model="croppa"
+                  :prevent-white-space="true"
+                  :width="300"
+                  :height="100"
+                  accept=".jpeg,.png,.jpg,.svg"
+                  :file-size-limit="2048000"
+                  :quality="6"
+                  :placeholder="'Upload Image'"
+                  placeholder-color="white"
+                  initial-size="cover"
+                  :remove-button-size="32"
+                  @file-size-exceed="onFileSizeExceed"
+                  @file-type-mismatch="onFileTypeMismatch"
                 >
-              </v-select>
-              <!-- <label for="pickDate">Default Jobs:</label>
+                </croppa>
+                </div>
+                <p class="caption mt-3">jpg or png file. 2MB max</p>
+              </div>
+
+      				<div class="mb-3">
+      					<label for="venueName">Venue Name:</label>
+      					<input type="text" v-model.trim="venue.title" id="venueName" />
+      				</div>
+              <div class="mb-3">
+                <label for="venueFeatured">Featured:</label>
+                <input type="checkbox" v-model.trim="venue.featured" id="venueFeatured" class="ml-3" />
+              </div>
+      				<div class="mb-3">
+      					<label for="venueVisibility">Visible:</label>
+      					<input type="checkbox" v-model.trim="venue.visible" id="venueVisibility" class="ml-3" />
+      				</div>
+              <div class="mb-3">
+                <label for="venueVisibility">Vaccination Required:</label>
+                <input type="checkbox" v-model.trim="venue.requiredVaccine" id="venueVisibility" class="ml-3" />
+              </div>
+              <div class="mb-3" v-if="clients.length >= 1">
+                <label for="client">Clients:</label>
                 <v-select
                   class="mt-2"
                   label="title" 
-                  :options="jobs"
                   multiple
-                  v-model="venue.job"
+                  :options="clients"
+                  v-model="venue.client"
                   >
-                </v-select> -->
+                </v-select>
+                <!-- <label for="pickDate">Default Jobs:</label>
+                  <v-select
+                    class="mt-2"
+                    label="title" 
+                    :options="jobs"
+                    multiple
+                    v-model="venue.job"
+                    >
+                  </v-select> -->
+              </div>
             </div>
       		</div>
 
           <div class="dashboard__container--body--col" v-if="venue">
-            <h3>Jobs to Staff</h3>
-            <div class="mb-3">
-              <label for="pickDate">Choose Jobs:</label>
-              <v-select
-                class="mt-2"
-                label="title"
-                :options="jobs"
-                v-model="venue.job"
-                multiple
-                >
-              </v-select>
-            </div>
-            <transition name="fadeStop">
-              <div class="mb-3" v-if="venue.job && venue.job.length >= 1">
-                <div v-for="job in venue.job" class="mb-3 flex justify-space-between">
-                  <input type="text" readonly v-model.trim="job.title" />
-                  <input class="ml-3" type="number" step=".01" placeholder="pay rate" v-model.trim="job.rate" />
-                  <input class="ml-3" type="text" placeholder="new label" v-model.trim="job.label" />
-                  <div class="ml-3">
-                    <label for="tipped">Tipped?</label>
-                    <input class="ml-3" type="checkbox" v-model="job.tipped" id="tipped" />
-                  </div>
-                  <!-- <button class="btn btn__accent btn__small ml-3">save</button> -->
-                </div>
+            <div>
+            <h4>Jobs to Staff</h4>
+              <div class="mb-3">
+                <label for="pickDate">Choose Jobs:</label>
+                <v-select
+                  class="mt-2"
+                  label="title"
+                  :options="jobs"
+                  v-model="venue.job"
+                  multiple
+                  >
+                </v-select>
               </div>
-            </transition>
+              <transition name="fadeStop">
+                <div class="mb-3" v-if="venue.job && venue.job.length >= 1">
+                  <div v-for="job in venue.job" class="mb-3 flex justify-space-between">
+                    <input type="text" readonly v-model.trim="job.title" />
+                    <input class="ml-3" type="number" step=".01" placeholder="pay rate" v-model.trim="job.rate" @blur="updateVenue()" />
+                    <input class="ml-3" type="number" step=".01" placeholder="bill rate" v-model.trim="job.billRate" @blur="updateVenue()" />
+                    <input class="ml-3" type="text" placeholder="new label" v-model.trim="job.label" @blur="updateVenue()" />
+                    <div class="ml-3">
+                      <label for="tipped">Tipped?</label>
+                      <input class="ml-3" type="checkbox" v-model="job.tipped" id="tipped" @blur="updateVenue()" />
+                    </div>
+                    <!-- <button class="btn btn__accent btn__small ml-3">save</button> -->
+                  </div>
+                </div>
+              </transition>
+            </div>
           </div>
           
           
       		<div class="dashboard__container--body--col">
-      			<gmap-map v-if="venue && venue.center" class="mb-5" :center="venue.center" :zoom="12"  style="width: 100%; height: 300px">
-              <GmapMarker
-                :position="venue.center"
-                :clickable="false"
-              >
-              </GmapMarker>
-            </gmap-map>
+            <div>
+        			<gmap-map v-if="venue && venue.center" class="mb-5" :center="venue.center" :zoom="12"  style="width: 100%; height: 300px">
+                <GmapMarker
+                  :position="venue.center"
+                  :clickable="false"
+                >
+                </GmapMarker>
+              </gmap-map>
+            </div>
       		</div>
 
           <div class="dashboard__container--body--col">
-            <h3>Managers</h3>
-            <div class="mb-5" v-if="mgrs.length >= 1">
-              <label for="client">Select Managers:</label>
-              <v-select
-                class="mt-2"
-                label="name" 
-                multiple
-                :options="mgrs"
-                v-model="venue.mgrs"
-                >
-              </v-select>
-            </div>
-            <h3>Client Access</h3>
-            <div class="mb-3">
-              <ais-instant-search :search-client="searchClient" index-name="a_users" >
-                <ais-search-box placeholder="Add a User" />
-                <ais-state-results>
-                  <template slot-scope="{ state: { query } }">
-                    <ais-hits v-show="query.length > 0">
-                      <template v-slot:item="{ item }">
-                        <div>
-                          <button class="btn btn__icon btn__flat mr-2 mb-2" @click="addUser(item)"><i class="fad fa-plus"></i></button>
-                          <h4 style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</h4>
-                        </div>
-                      </template>
-                    </ais-hits>
-                  </template>
-                </ais-state-results>
-              </ais-instant-search>
+            <div>
+              <h4>Managers</h4>
+              <div class="mb-5" v-if="mgrs.length >= 1">
+                <label for="client">Select Managers:</label>
+                <v-select
+                  class="mt-2"
+                  label="name" 
+                  multiple
+                  :options="mgrs"
+                  v-model="venue.mgrs"
+                  >
+                </v-select>
+              </div>
+              <h4>Client Access</h4>
+              <div class="mb-3">
+                <ais-instant-search :search-client="searchClient" index-name="a_users" >
+                  <ais-search-box placeholder="Add a User" />
+                  <ais-state-results>
+                    <template slot-scope="{ state: { query } }">
+                      <ais-hits v-show="query.length > 0">
+                        <template v-slot:item="{ item }">
+                          <div>
+                            <button class="btn btn__icon btn__flat mr-2 mb-2" @click="addUser(item)"><i class="fad fa-plus"></i></button>
+                            <h4 style="display: inline;">{{ item.firstName }} {{ item.lastName }} | <span v-if="item.address && item.address">{{item.address.city}} | </span>{{item.email}} | {{item.phone}}</h4>
+                          </div>
+                        </template>
+                      </ais-hits>
+                    </template>
+                  </ais-state-results>
+                </ais-instant-search>
+              </div>
             </div>
             
           </div>
 
+
           <div class="dashboard__container--body--col">
-            <h3>Attach Files</h3>
+            <div>
+            <h4>Attach Files</h4>
 
             <div class="mb-3">
               <label for="fileTitle">Details:</label>
@@ -198,6 +209,7 @@
                   </template>
                 </vue-good-table>
               </div>
+            </div>
             </div>
           </div>
 
@@ -276,7 +288,7 @@
       	</div>
       </form>
      <!--  <div class="dashboard__container--body" v-if="venueEvents && venueEvents.length >= 1">
-        <h3>Events for this Venue</h3>
+        <h4>Events for this Venue</h4>
          <vue-good-table
             :columns="columns"
             :rows="venueEvents"
@@ -397,8 +409,13 @@ export default {
     VueEditor
   },
   methods: {
+    deleteUploadedFile(u, index) {
+      let venue = this.venueInfo
+      venue.files.splice(index, 1)
+      this.$store.dispatch('updateVenue', venue)
+    },
     deleteAccess(index) {
-      let venue = this.venue
+      let venue = this.venueInfo
       venue.access.splice(index, 1)
       this.$store.dispatch('updateVenue', venue)
     },
@@ -559,8 +576,8 @@ export default {
         setTimeout(() => {
           this.performingRequest = false
           croppa.remove()
-          let url = `/venues`
-          router.push(url)
+          // let url = `/venues`
+          // router.push(url)
         }, 2000)
       } else {
         console.log(venue)
@@ -568,8 +585,8 @@ export default {
         setTimeout(() => {
           croppa.remove()
           this.performingRequest = false
-          let url = `/venues`
-          router.push(url)
+          // let url = `/venues`
+          // router.push(url)
         }, 2000)
       }
     },
@@ -615,7 +632,6 @@ export default {
       this.$store.dispatch('sendVenueLog', logFields)
     },
     goBack() {
-      this.$store.dispatch('clearVenueState')
       router.go(-1)
     },
   },

@@ -1,7 +1,11 @@
 <template>
-	<div class="dashboard__container--body">
-    <div class="dashboard__container--body--col">
-		<h2 class="mb-3">Employee Info</h2>
+    <div class="mb-3">
+      <div class="caption">User ID: {{user.id}}</div>
+      <span class="flex align-center">
+    		<h4>Employee Info</h4>
+       
+      </span>
+
 		<div class="mb-3">
       <label for="firstName">First Name:</label>
       <input type="text" placeholder="" v-model.trim="user.firstName" id="firstName" @change="updateUser()" />
@@ -50,22 +54,7 @@
       <input type="date" placeholder="" v-model.trim="user.dob" id="dob" @change="updateUser" />
     </div>
 
-    <div class="mb-3">
-      <span class="flex align-center justify-space-between">
-      <label>Address</label>
-      <button v-if="!user.address || Object.keys(user.address).length == 0" class="btn btn__small btn__primary btn__flat mb-2" @click="requestAddress()">Request</button>
-      </span>
-      <span class="flex justify-flex-end caption" v-if="user.addressReminderSent && (user.address || Object.keys(user.address).length == 0)">
-        {{formatDate(user.addressReminderSent)}}
-       <!--  {{user.addressReminderSent | moment("dddd, MMMM Do YYYY, hh:mm a") }} -->
-      </span>
-      <div v-if="user.address && Object.keys(user.address).length >= 1">
-        <div class="caption bold">Current Address:</div>
-          <div class="caption">{{user.address.street_number}} {{user.address.street}} <span v-if="user.address.unit">#{{user.address.unit}}</span><br />{{user.address.city}}, {{user.address.state}} {{user.address.zip}}</div>
-        </div>
-      </div>
-
-      <div class="mb-3">
+      <!-- <div class="mb-3">
       <label for="shirtsize">Shirt Size (unisex):</label>
       <select v-model="user.shirtsize" @change="updateUser()">
         <option v-for="option in options" v-bind:value="option">
@@ -73,9 +62,9 @@
         </option>
       </select>
     </div>
-
+ -->
     </div>
-    <div class="dashboard__container--body--col">
+    <!-- <div class="dashboard__container--body--col">
 
      
       <span class="flex align-center justify-space-between">
@@ -130,27 +119,10 @@
         {{formatDate(user.SSNReminderSent)}}
       </span>
 
-    <div class="mb-3">
-      <form @submit.prevent>
-        <!-- <div class="flex align-center justify-space-between">
-          <label for="social" class="mb-2">Enter your social security number:</label>
-        </div> -->
-        <div style="display: flex; justify-content: space-between;" class="mb-3" v-if="!showEdit">
-          <input style="width: 100%;" v-mask="'###-##-####'" placeholder="###-##-####" :value="decryptedText" type="text" maxlength = "11" id="ssn2" readonly  />
-        </div>
-
-        <button class="btn btn__outlined btn__small mb-3" @click="showChange()" v-if="!showEdit">Edit</button>
-
-        <div style="display: flex; justify-content: space-between;" class="mb-3" v-if="showEdit">
-          <input style="width: 100%;" v-mask="'###-##-####'" placeholder="###-##-####" v-model.trim="ssn" type="text" maxlength = "11" id="ssn" />
-        </div>
-
-        <button class="btn btn__accent btn__small" @click="updateProfile()" v-if="showEdit" :disabled="ssn.length != 11" >update</button>
-      </form>
-    </div>
+    
   </div>
 
-  </div>
+  </div> -->
 	</div>
 </template>
 
@@ -239,6 +211,15 @@ export default {
       userProfile.ssn = this.encryptedText
       this.$store.dispatch('updateTheUser', userProfile)
       this.showEdit = false
+    },
+    branchOnboard() {
+      this.performingRequest = true
+      this.user.branchOnboard = true
+      let user = this.user
+      this.$store.dispatch('updateTheUser', user)
+      setTimeout(() => {
+        this.performingRequest = false
+      }, 2000)
     },
     formatDate(q) {
       if(q) {

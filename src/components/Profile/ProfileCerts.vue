@@ -1,6 +1,6 @@
 <template>
-	<div>
-		<h2 class="mb-3">Certfications</h2>
+	<div class="mb-3">
+		<h4 class="mb-3">Certifications</h4>
     <div class="mb-3">
       <div v-if="user && user.certs && user.certs.length >= 1">
                 <vue-good-table

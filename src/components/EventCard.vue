@@ -12,9 +12,9 @@
         <span class="ml-3" v-if="accounting && !event.invoiceStatus" v-tooltip="'incomplete'">
           <i class="fas fa-square" style="font-size: 2rem; margin-top: 0.12rem; color:#d9534f;"></i>
         </span>
-        <span v-if="event.timesheetsUrl && accounting">
+        <!-- <span v-if="event.timesheetsUrl && accounting">
         	<a :href="event.timesheetsUrl" target="_blank" class="ml-3">Open Timesheets in Drive <i class="fas fa-external-link"></i></a>
-        </span>
+        </span> -->
         <button v-if="!accounting && event.published" class="btn btn__icon ml-5" @click="unpublish(event)">
           <i class="fas fa-eye" style="color:#5cb85c;"></i>
         </button>
@@ -47,15 +47,18 @@
           <router-link :to="`/events/` + event.id + `/shifts`">
             <button class="btn btn__small btn__outlined mr-3 mb-1" >Shifts</button>
           </router-link>
-          <router-link :to="`/eventplacements/` + event.id">
+          <router-link :to="`/events/` + event.id + `/placement`">
             <button class="btn btn__small btn__outlined mr-3 mb-1" >Placements</button>
           </router-link>
           <router-link :to="`/events/` + event.id + `/checkin`">
             <button class="btn btn__small btn__outlined mr-3 mb-1" >Check-In</button>
           </router-link>
-          <router-link :to="`/accounting/events/` + event.id" target="_blank" v-if="accounting">
-            <button class="btn btn__small btn__primary mr-3 mb-1" >Accounting</button>
+          <router-link :to="`/events/` + event.id + `/files`">
+            <button class="btn btn__small btn__outlined mr-3 mb-1" >Files</button>
           </router-link>
+          <!-- <router-link :to="`/accounting/events/` + event.id" target="_blank" v-if="accounting">
+            <button class="btn btn__small btn__primary mr-3 mb-1" >Accounting</button>
+          </router-link> -->
 
         </div>
       <!-- </div>

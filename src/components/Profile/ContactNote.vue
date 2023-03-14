@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h3>Add Contact Note</h3>
+		<h4>Add Contact Note</h4>
 		<label for="note">Note:</label>
      <textarea name="note" id="note" cols="30" rows="6" v-model="note"></textarea>
      <button class="btn btn__primary mt-3" @click="onAddNote()">

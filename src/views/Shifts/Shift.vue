@@ -10,6 +10,7 @@
           <button class="btn btn__outlined mr-3" @click="shifts()">Shifts</button>
           <button class="btn btn__outlined mr-3" @click="editEvent()">Edit</button>
           <button class="btn btn__outlined mr-3" @click="placements()">Placements</button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="files()">Files</button>
           <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
         </div>
       </div>
@@ -1341,6 +1342,10 @@ export default {
     },
     checkIn() {
       let url = `/events/` + this.$route.params.id + `/checkin`
+      router.push(url)
+    },
+    files() {
+      let url = `/events/` + this.$route.params.id + `/files`
       router.push(url)
     },
   },

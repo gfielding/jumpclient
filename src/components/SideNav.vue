@@ -17,23 +17,29 @@
           <div class="nav__menu--item">
             <div class="nav__logo">
               <router-link to="/dashboard" style="width:100%;">
-                <SVG_TriangleLogo />
-                MVP ADMIN
+                <span style="text-transform: none; font-size: 3.6rem;
+    font-weight: 300;">j<em>u</em>mp</span>
               </router-link>
             </div>
             
           </div>
 
-          <div class="nav__menu--item">
-            <router-link :to="{name: 'events'}">
-              events <i class="fas fa-chevron-right"></i>
-            </router-link>
-          </div>
+          
           <div class="nav__menu--item">
             <router-link :to="{name: 'users'}">
               users <i class="fas fa-chevron-right"></i>
             </router-link>
           </div>
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'events'}">
+              events <i class="fas fa-chevron-right"></i>
+            </router-link>
+          </div>
+          <!-- <div class="nav__menu--item">
+            <router-link :to="{name: 'weeks'}">
+              jobs <i class="fas fa-chevron-right"></i>
+            </router-link>
+          </div> -->
           <div class="nav__menu--item">
             <router-link :to="{name: 'groups'}">
               groups <i class="fas fa-chevron-right"></i>
@@ -44,11 +50,54 @@
               Venues <i class="fas fa-chevron-right"></i>
             </router-link>
           </div>
-          <div class="nav__menu--item dropdown">
-            <span>Marketing Leads</span>
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'evereeContractors'}">
+              Contractors <i class="fas fa-chevron-right"></i>
+            </router-link>
+          </div>
+
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'clients'}">
+              Customers <i class="fas fa-chevron-right"></i>
+            </router-link>
+          </div>
+
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'contacts'}">
+              Contacts <i class="fas fa-chevron-right"></i>
+            </router-link>
+          </div>
+
+
+   <!--        <div class="nav__menu--item dropdown">
+            <span>Customers</span>
             <div class="dropdown-content">
               <div class="mb-3">
-                <router-link :to="{name: 'marketingLeads'}">
+                
+              </div>
+              <div class="mb-3">
+                <router-link :to="{name: 'contacts'}">
+                  leads <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+              <div class="mb-3">
+                <router-link :to="{name: 'clientAccess'}">
+                  client portal access <i class="fas fa-chevron-right"></i>
+                </router-link>
+              </div>
+            </div>
+          </div>
+ -->
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'leadsHome'}">
+              Marketing Leads <i class="fas fa-chevron-right"></i>
+            </router-link>
+          </div>
+<!--           <div class="nav__menu--item dropdown">
+            <span>Marketing</span>
+            <div class="dropdown-content">
+              <div class="mb-3">
+                <router-link :to="{name: 'leadsHome'}">
                   Leads <i class="fas fa-chevron-right"></i>
                 </router-link>
               </div>
@@ -63,36 +112,17 @@
                 </router-link>
               </div>
             </div>
-          </div>
-          <div class="nav__menu--item">
+          </div> -->
+          <!-- <div class="nav__menu--item">
             <router-link :to="{name: 'shiftLeads'}">
               Shift Leads <i class="fas fa-chevron-right"></i>
             </router-link>
-          </div>
+          </div> -->
          
           
           
         
-          <div class="nav__menu--item dropdown">
-            <span>Customers</span>
-            <div class="dropdown-content">
-              <div class="mb-3">
-                <router-link :to="{name: 'clients'}">
-                  Customers <i class="fas fa-chevron-right"></i>
-                </router-link>
-              </div>
-              <div class="mb-3">
-                <router-link :to="{name: 'contacts'}">
-                  leads <i class="fas fa-chevron-right"></i>
-                </router-link>
-              </div>
-              <div class="mb-3">
-                <router-link :to="{name: 'clientAccess'}">
-                  client portal access <i class="fas fa-chevron-right"></i>
-                </router-link>
-              </div>
-            </div>
-          </div>
+          
 
           <div class="nav__menu--item">
             <router-link :to="{name: 'team'}">
@@ -104,7 +134,7 @@
           
          
           
-          <div class="nav__menu--item dropdown">
+          <!-- <div class="nav__menu--item dropdown">
             <span>App Text</span>
             <div class="dropdown-content">
               <div class="mb-3">
@@ -128,8 +158,8 @@
                 </router-link>
               </div>
             </div>
-          </div>
-          <div class="nav__menu--item dropdown">
+          </div> -->
+          <!-- <div class="nav__menu--item dropdown">
             <span>Internal Documents</span>
             <div class="dropdown-content">
               <div class="mb-3">
@@ -138,21 +168,21 @@
                 </router-link>
               </div>
             </div>
-          </div>
-          <div class="nav__menu--item">
+          </div> -->
+         <!--  <div class="nav__menu--item">
             <router-link :to="{name: 'reportsHome'}">
               Reports <i class="fas fa-chevron-right"></i>
             </router-link>
-          </div>
+          </div> -->
 
           
           
-          <div class="nav__menu--item">
+          <!-- <div class="nav__menu--item">
             <router-link :to="{name: 'verifications'}">
               verifications <i class="fas fa-chevron-right"></i>
             </router-link>
-          </div>
-          <div class="nav__menu--item dropdown">
+          </div> -->
+          <!-- <div class="nav__menu--item dropdown">
             <span>Accounting</span>
             <div class="dropdown-content">
               <div class="mb-3">
@@ -160,24 +190,9 @@
                   payroll <i class="fas fa-chevron-right"></i>
                 </router-link>
               </div>
-              <div class="mb-3">
-                <router-link :to="{name: 'accountingEvents'}">
-                  Event Accounting <i class="fas fa-chevron-right"></i>
-                </router-link>
-              </div>
-              <div class="mb-3">
-                <router-link :to="{name: 'payrollHelp'}">
-                  Payroll Help <i class="fas fa-chevron-right"></i>
-                </router-link>
-              </div>
-
-              <div class="mb-3">
-                <router-link :to="{name: 'accountReferrals'}">
-                  referrals <i class="fas fa-chevron-right"></i>
-                </router-link>
-              </div>
+           
             </div>
-          </div>
+          </div> -->
 
          
           <div class="nav__menu--item">
@@ -192,7 +207,7 @@
 
       </div>
       <div class="nav__menu--item">
-            © MVP Event Productions, 2022
+            © Jump Staffing, 2023
           </div>
     </div>
 </template>

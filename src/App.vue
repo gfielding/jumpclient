@@ -1,13 +1,13 @@
 <template>
   <div id="app">
-    <Nav :userProfile="currentUser" />
+    <Nav :userProfile="(userProfile && userProfile.id)" />
     <!-- <keep-alive  max="2" :exclude="['day','user', 'event', 'venue', 'shift', 'eventplacement', 'addfaq', 'shift', 'placements']">
       <router-view :key="$route.fullPath"></router-view> 
     </keep-alive> -->
 
     <div class="app-wrapper">
-      <div class="nav-wrapper hidden-small" v-if="currentUser">
-        <SideNav :userProfile="currentUser" />
+      <div class="nav-wrapper hidden-small" v-if="(userProfile && userProfile.id)">
+        <SideNav :userProfile="(userProfile && userProfile.id)" />
       </div>
 
      <!--  <keep-alive  max="5" :include="['users', 'events', 'shifts', 'accountingEvents', 'groups', 'eventplacements', 'accountingEventsTable']">
@@ -16,7 +16,7 @@
      <!--  <keep-alive  max="3" :include="['eventsHome', 'eventsByMonth']">
         
       </keep-alive> -->
-      <keep-alive  max="4" :include="['events', 'venues', 'accountingEvents']">
+      <keep-alive  max="4" :include="['events']">
         <router-view :key="$route.fullPath"></router-view> 
       </keep-alive>
      <!--  <router-view :key="$route.fullPath"></router-view>  -->
@@ -72,7 +72,7 @@ export default {
       this.$store.dispatch("getUserProfile");
     }
     // this.$store.dispatch("getInfiniteEvents")
-    this.$store.dispatch("getVenues")
+    // this.$store.dispatch("getVenues")
     // this.carlyCheck()
   },
   computed: {

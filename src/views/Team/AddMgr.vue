@@ -8,6 +8,7 @@
       <form ref="form" @submit.prevent>
         <div class="dashboard__container--body">
           <div class="dashboard__container--body--col">
+            <div>
             <div class="mb-3">
               <label for="title">Name:</label>
               <input type="text" v-model.trim="mgr.name" id="title" />
@@ -50,6 +51,7 @@
                 </span>
               </transition>
             </button>
+          </div>
           </div>
         </div>
       </form>

@@ -8,7 +8,7 @@
       <form ref="form" @submit.prevent>
       	<div class="dashboard__container--body">
       		<div class="dashboard__container--body--col">
-
+            <div>
     				<div class="mb-3">
     					<label for="eventName">Event Name:</label>
     					<input type="text" v-model.trim="event.title" id="eventName" required />
@@ -75,8 +75,20 @@
                 >
               </v-select>
             </div>
+            <div class="mb-3" v-if="groups && groups.length >= 1">
+            <label for="mgrs">Restrict to Groups:</label>
+              <v-select
+                class="mt-2"
+                label="title" 
+                :options="groups"
+                v-model="event.groups"
+                multiple
+               
+                >
+              </v-select>
+            </div>
             
-
+            </div>
           </div>
           <div class="dashboard__container--body--col">
             <div class="mb-3">
@@ -85,7 +97,7 @@
             </div>
           </div>
           <div class="dashboard__container--body--col" v-if="event.venue">
-
+            <div>
             <div class="mb-3">
               <label for="multiDay">Multiple Days:</label>
               <input type="checkbox" v-model.trim="multiDay" id="multiDay" class="ml-3" />
@@ -111,10 +123,10 @@
                 <input type="date" v-model.trim="event.startDate"  id="Date"  />
               </div>
             </transition>
-
+            </div>
           </div>
           <div class="dashboard__container--body--col" v-if="event.venue">
-
+            <div>
             <h3>Days to Staff</h3>
             <transition name="fadeStop">
               <div class="mt-2 flex" style="flex-wrap: wrap;" v-if="event.days && event.days.length >= 1">
@@ -128,6 +140,7 @@
               </div>
             </transition>
 
+          </div>
           </div>
 
           <!-- <div class="dashboard__container--body--col">
@@ -308,6 +321,7 @@ export default {
       days:[],
       jobs:[],
       published: true,
+      groups: [],
     },
     // tags: ['#concert', '#comedy', '#convention', '#musicfestival', '#pga', '#nfl', '#nba', '#nhl', '#mlb', '#mls', '#minorleaguebaseball', '#ncaabasketball', '#ncaafootball'],
     croppa: {},
@@ -341,9 +355,12 @@ export default {
     if (!this.tags || this.tags.length < 1) {
       this.$store.dispatch("getTagsState")
     }
+    if (!this.groups || this.groups.length < 1) {
+      this.$store.dispatch("getGroups")
+    }
   },
   computed: {
-    ...mapState(['venues', 'clients', 'jobs', 'mgrs', 'tags']),
+    ...mapState(['venues', 'clients', 'jobs', 'mgrs', 'tags', 'groups']),
     backgroundUrl() {
       return this.event.photoUrl || 'https://firebasestorage.googleapis.com/v0/b/mvpes-25aef.appspot.com/o/stadium.png?alt=media&token=89f2362c-d1bc-4338-a837-fad1d664c51d'
     },

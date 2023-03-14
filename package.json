@@ -1,6 +1,6 @@
 {
-  "name": "mvp",
-  "version": "0.1.0",
+  "name": "jumpadmin",
+  "version": "2.1.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -8,7 +8,11 @@
   },
   "dependencies": {
     "algoliasearch": "^4.10.5",
+    "axios": "^1.3.4",
     "core-js": "^3.6.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
     "firebase": "^8.6.8",
     "instantsearch.css": "^7.4.5",
     "moment-timezone": "^0.5.34",
@@ -23,6 +27,7 @@
     "vue-gapi": "^1.1.0",
     "vue-good-table": "^2.21.10",
     "vue-html-to-paper": "^1.4.4",
+    "vue-iframes": "^0.0.20",
     "vue-instantsearch": "^4.0.0",
     "vue-js-star-rating": "^1.1.1",
     "vue-meta": "^2.4.0",

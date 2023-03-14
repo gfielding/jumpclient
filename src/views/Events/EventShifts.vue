@@ -1,70 +1,48 @@
 <template>
-	<div class="dashboard">
-    <div class="dashboard__container">
-      <div class="dashboard__container--header">
-        <div class="flex align-center">
-          <h1 v-if="eventInfo && eventInfo.title">{{eventInfo.title}} Event Shifts</h1>
-          <button class="btn btn__large btn__danger ml-5" v-if="event && event.cancelled">
-            Cancelled
-          </button>
-        </div>
-        <span class="flex justify-flex-end flex-wrap">
-        	<button class="btn btn__outlined btn__small mr-3 mb-3" @click="editEvent()">Edit</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="checkIn()">Check-In</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="sheets()">Timesheets</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="placements()">Placements</button>
-        <button class="btn btn__outlined btn__small mb-3" @click="goBack"><i class="fas fa-arrow-left"></i></button>
-        </span>
-      </div>
-
-
+	<div>
+    <div class="dashboard__container pt-3">
       
       <Loader v-if="!event || !event.id" />
     	<div class="dashboard__container--body pt-3" v-if="event">
-    		<!-- <div class="dashboard__container--body--col">
-	    		<form ref="form" @submit.prevent style="width:100%;">
-	    			<div class="mb-3">
-	            <label for="eventShiftsDetails">Shifts Details:</label>
-	            <vue-editor id="eventShiftsDetails" v-model="event.shiftsDetails"></vue-editor>
-	          </div>
-	          <button class="btn btn__primary mt-3 ml-1" @click="updateEvent()" :disabled="event.cancelled">Save</button>
-	        </form>
-	      </div> -->
+
 	      <div class="dashboard__container--body--col" style="overflow: auto;" v-if="event && event.venue && jobs">
-	    		<h2>Event Jobs</h2>
-	    		<div class="mb-3">
-            <label for="pickDate">Choose Jobs:</label>
-            <v-select
-              class="mt-2"
-              label="title" 
-              :options="jobs"
-              v-model="event.venue.job"
-              multiple
-              >
-            </v-select>
-          </div>
-    			<div class="mb-3" v-if="event.venue.job && event.venue.job.length >= 1">
-            <div v-for="job in event.venue.job" class="mb-3 flex justify-space-between">
-              <input type="text" readonly v-model.trim="job.title" @change="updateJob()" />
-              <input class="ml-3" type="number" step=".01" placeholder="pay rate" v-model.trim="job.rate" @change="updateJob()" />
-              <input class="ml-3" type="text" placeholder="new label" v-model.trim="job.label" @change="updateJob()" />
-              <div class="ml-3">
-	    					<label for="tipped">Tipped?</label>
-	    					<input class="ml-3" type="checkbox" v-model="job.tipped" id="tipped" @change="updateJob()" />
-	    				</div>
-              <!-- <button class="btn btn__accent btn__small ml-3">save</button> -->
-            </div>
+	      	<div>
+		    		<h4>Event Jobs</h4>
+		    		<div class="mb-3">
+	            <label for="pickDate">Choose Jobs:</label>
+	            <v-select
+	              class="mt-2"
+	              label="title" 
+	              :options="jobs"
+	              v-model="event.venue.job"
+	              >
+	            </v-select>
+	          </div>
+	    			<div class="mb-3" v-if="event.venue.job && event.venue.job.length >= 1">
+	            <div v-for="job in event.venue.job" class="mb-3 flex justify-space-between">
+	              <input type="text" readonly v-model.trim="job.title" @change="updateJob()" />
+	              <input class="ml-3" type="number" step=".01" placeholder="pay rate" v-model.trim="job.rate" @change="updateJob()" />
+	              <input class="ml-3" type="text" placeholder="new label" v-model.trim="job.label" @change="updateJob()" />
+	              <div class="ml-3">
+		    					<label for="tipped">Tipped?</label>
+		    					<input class="ml-3" type="checkbox" v-model="job.tipped" id="tipped" @change="updateJob()" />
+		    				</div>
+	              <!-- <button class="btn btn__accent btn__small ml-3">save</button> -->
+	            </div>
+	          </div>
           </div>
 	    	</div>
 	    	<div class="dashboard__container--body--col" style="overflow: auto;" v-if="event && event.venue">
-	    		<h2>Shift/Location Names</h2>
-	    		<form ref="form" @submit.prevent>
-	    			<label for="addname">Create New Shift or Location Name:</label>
-	    			<v-select id="addname" label="title" taggable multiple push-tags v-model="event.venue.shiftNames" @input="submitName(value)" />
+	    		<div>
+		    		<h4>Shift/Location Names</h4>
+		    		<form ref="form" @submit.prevent>
+		    			<label for="addname">Create New Shift or Location Name:</label>
+		    			<v-select id="addname" label="title" taggable multiple push-tags v-model="event.venue.shiftNames" @input="submitName(value)" />
 
-	    			<!-- <input type="text" v-model.trim="newName" placeholder="Cabana 1, Concessions Staff, etc." class="mb-3" /> -->
-	    			<!-- <button class="btn btn__primary" @click="submitName()">Add</button> -->
-	    		</form>
+		    			<!-- <input type="text" v-model.trim="newName" placeholder="Cabana 1, Concessions Staff, etc." class="mb-3" /> -->
+		    			<!-- <button class="btn btn__primary" @click="submitName()">Add</button> -->
+		    		</form>
+		    	</div>
 	    	</div>
     	</div>
     	<hr>
@@ -73,16 +51,23 @@
 		    	<div class="dashboard__container--body--col" style="width:calc(100% - 3.2rem);">
 
 			    	<div class="list">
-			    		<h2>Create New Shift</h2>
+			    		<h4>Create New Shift</h4>
 			    		<span class="caption mb-3">*You can enter these shift defaults just as before, then override them per person when you place them if needed.</span>
 	  					<div class="flex">
 	  						<div>
-	  							<label for="name">Shift Name:</label>
+	  							<label for="day">Shift Name:</label>
+	  							<v-select
+			              :options="event.venue.shiftNames"
+			              v-model="newShift.name"
+			              style="min-width: 180px;"
+			              >
+			            </v-select>
+	  							<!-- <label for="name">Shift Name:</label>
 			            <select v-model="newShift.name" id="name" style="min-width: 160px;" class="mb-3">
 			              <option v-for="(name, index) in event.venue.shiftNames" :key="index" v-bind:value="name">
 			              	<span v-if="name">{{name}}</span>
 			              </option>
-			            </select>
+			            </select> -->
 	  						</div>
 	  						<div class="pl-3" v-if="event && event.days">
 	  							<label for="day">Select day:</label>
@@ -90,7 +75,6 @@
 			              label="title" 
 			              :options="event.days"
 			              v-model="newShift.day"
-			              multiple
 			              style="min-width: 180px;"
 			              >
 			            </v-select>
@@ -108,13 +92,21 @@
 	  					</div>
 	  					<div class="flex mb-3">
 	  						<div>
-			            <label for="job">Set Default Job for Shift:</label>
+	  							<label for="day">Set Default Job for Shift:</label>
+	  							<v-select
+			              label="title" 
+			              :options="event.venue.job"
+			              v-model="newShift.job"
+			              style="min-width: 180px;"
+			              >
+			            </v-select>
+			           <!--  <label for="job">Set Default Job for Shift:</label>
 			            <select v-model="newShift.job" id="job">
 			              <option v-for="(job, index) in event.venue.job" :key="index" v-bind:value="job">
 			              	<span v-if="job.label">{{job.label}}</span>
 			              	<span v-if="!job.label">{{job.title}}</span>
 			              </option>
-			            </select>
+			            </select> -->
 			          </div>
 	  						<div class="pl-3">
 		            <label for="start">Default Start Time:</label>
@@ -127,6 +119,17 @@
 
 	  					</div>
 
+	  					<div class="mb-3" style="max-width: 300px;">
+	              <label for="rep">Required Certifications:</label>
+	              <v-select
+	                class="mt-2"
+	                :options="certs"
+	                v-model="newShift.certs"
+	                multiple
+	                >
+	              </v-select>
+	  					</div>
+
 	  					<div class="mb-3">
 		            <label for="details">Shift-Specific Details From Client:</label>
 		            <textarea name="details" id="details" cols="30" rows="2" v-model.lazy="newShift.details" style="background: #efefef;"></textarea>
@@ -136,43 +139,9 @@
 		            <label for="info">Shift Into to Email Staff:</label>
 		            <textarea name="info" id="info" cols="30" rows="2" v-model.lazy="newShift.info" style="background: #efefef;"></textarea>
 		          </div>
-		          <!-- <div class="mb-3 pr-3 pl-3">
-		            <label for="location">Shift Location:</label>
-		            <input type="text" v-model.trim="newShift.location" id="location" />
-		          </div> -->
-<!-- 				          <div class="mb-3 pr-3 pl-3">
-		          	<button class="btn btn__flat btn__icon" @click="showNewNote = true" v-tooltip="'Leave a note'"><i class="far fa-sticky-note ml-3 mr-3" style="color:blue"></i></button>
-                <transition name="modal">
-                  <div v-if="showNewNote">
-                    <ShiftNote :item="newShift" @close="showNewNote = false" />
-                  </div>
-                </transition>
-		          </div> -->
-		          <!-- <div class="flex">
-				    	<div class="mb-3">
-		            <label for="job">Select Job:</label>
-		            <select v-model="newShift.job" id="job">
-		              <option v-for="(job, index) in event.venue.job" :key="index" v-bind:value="job">
-		              	<span v-if="job.label">{{job.label}}</span>
-		              	<span v-if="!job.label">{{job.title}}</span>
-		              </option>
-		            </select>
-		          </div>
 		          
-		          <div class="mb-3 pl-3">
-		            <label for="staff">Total Staff Requested:</label>
-		            <input type="number" v-model.trim="newShift.staffReqested" id="staff" />
-		          </div>
-		          <div class="mb-3 pl-3">
-		            <label for="start">Start Time:</label>
-		            <input type="time" v-model.trim="newShift.start" id="start" />
-		          </div>
-		          <div class="mb-3 pl-3">
-		            <label for="end">End Time:</label>
-		            <input type="time" v-model.trim="newShift.end" id="end" />
-		          </div> -->
 		          <div>
-		          <button :disabled="!newShift.staffReqested || !newShift.day || !newShift.name || event.cancelled" class="btn btn__success mt-2" @click="addNewShift">Add Shift</button>
+		          <button :disabled="!newShift.staffReqested || !newShift.day || !newShift.name || event.cancelled" class="btn btn__success mt-2" @click="addNewShift()">Add Shift</button>
 		          </div>
 						</div>
 					</div>
@@ -181,7 +150,8 @@
 		  <hr>
 		  <div class="dashboard__container--body">
 		  	<div v-for="(eventShift, index) in eventShifts" :key="eventShift.id" class="dashboard__container--body--col" style="width:calc(100% - 3.2rem);">
-		  		<div class="flex">
+		  		<div>
+		  			<div class="flex">
 
 			  				<div class="mb-3">
 			            <label for="name">Shift Name:</label>
@@ -209,7 +179,6 @@
 			              label="title" 
 			              :options="event.days"
 			              v-model="eventShift.day"
-			              multiple
 			              style="min-width: 180px;"
 			              >
 			            </v-select>
@@ -234,17 +203,23 @@
 			        </div>
 			        <div class="flex mb-3">
 
-			        	
-
-
 	  						<div v-if="event.venue && event.venue.job && event.venue.job.length > 0">
-			            <label for="job">Default Job for Shift:</label>
+	  							<label for="day">Set Default Job for Shift:</label>
+	  							<v-select
+			              label="title" 
+			              :options="event.venue.job"
+			              v-model="eventShift.position"
+			              style="min-width: 180px;"
+			              >
+			            </v-select>
+
+			            <!-- <label for="job">Default Job for Shift:</label>
 			            <select v-model="eventShift.position" id="job">
 			              <option v-for="(job, index) in event.venue.job" :key="index" v-bind:value="job">
 			              	<span v-if="job.label">{{job.label}}</span>
 			              	<span v-if="!job.label">{{job.title}}</span>
 			              </option>
-			            </select>
+			            </select> -->
 
 			           <!--  <input readonly v-model="eventShift.position.label || eventShift.position.title" /> -->
 			            <!-- <select v-model="eventShift.job" id="job">
@@ -263,6 +238,16 @@
 			            <input type="time" v-model.trim="eventShift.endTime" id="end" />
 			          </div>
 
+	  					</div>
+	  					<div class="mb-3" style="max-width: 300px;">
+	              <label for="rep">Required Certifications:</label>
+	              <v-select
+	                class="mt-2"
+	                :options="certs"
+	                v-model="eventShift.certs"
+	                multiple
+	                >
+	              </v-select>
 	  					</div>
 			        <div class="mb-3">
 		            <label for="details">Details from Client:</label>
@@ -284,7 +269,7 @@
 			          
 			  			</div>
 
-
+				</div>
 		  </div>
 		</div>
 	</div>
@@ -300,6 +285,7 @@ const fb = require('../../firebaseConfig.js')
 
 export default {
   name: 'eventshifts',
+  props: ['eventInfo'],
   components: {
     VueEditor,
     Loader,
@@ -310,11 +296,12 @@ export default {
       performingRequest: false,
       showNewNote: false,
       newShift: {},
-      newName: ''
+      newName: '',
+      certs: ['Food Hander', 'Alcohol Awareness']
     }
   },
   created () {
-  	this.$store.dispatch("getEventFromId", this.$route.params.id);
+  	// this.$store.dispatch("getEventFromId", this.$route.params.id);
     this.$store.dispatch("getEventShiftsId", this.$route.params.id);
   },
   mounted () {
@@ -326,12 +313,19 @@ export default {
 	  // }
   },
   computed: {
-    ...mapState(['eventInfo', 'jobs', 'eventShifts']),
+    ...mapState(['jobs', 'eventShifts']),
     event() {
       return this.eventInfo
     },
     eventId() {
     	return this.eventInfo.id
+    },
+    groupIDs() {
+    	let idsArray = []
+    	this.event.groups.forEach(group => {
+    		idsArray.push(group.id)
+    	})
+    	return idsArray
     }
   },
   methods: {
@@ -374,11 +368,16 @@ export default {
         startTime: this.newShift.start || null,
         endTime: this.newShift.end || null,
         name: this.newShift.name || null,
+        certs: this.newShift.certs || null,
         // location: this.newShift.location || null,
         staff: this.newShift.staffReqested,
         eventId: this.event.id,
         event: this.event.title,
-        day: this.newShift.day
+        day: this.newShift.day,
+        groups: this.event.groups,
+        groupIds: this.groupIDs,
+        location: this.event.venue.address.city + ', ' +  this.event.venue.address.state,
+        venue: this.event.venue.title,
       }
       console.log(shift)
       fb.shiftsCollection.add(shift)
@@ -394,6 +393,9 @@ export default {
     },
     updateShift(eventShift) {
     	this.performingRequest = true
+    	eventShift.location = this.event.venue.address.city + ', ' +  this.event.venue.address.state;
+    	eventShift.venue = this.event.venue.title;
+    	eventShift.groupIds = this.groupIDs
     	this.$store.dispatch("updateEventShift", eventShift)
     	setTimeout(() => {
         this.performingRequest = false
@@ -425,6 +427,10 @@ export default {
     },
     checkIn() {
       let url = `/events/` + this.$route.params.id + `/checkin`
+      router.push(url)
+    },
+    files() {
+      let url = `/events/` + this.$route.params.id + `/files`
       router.push(url)
     },
   },

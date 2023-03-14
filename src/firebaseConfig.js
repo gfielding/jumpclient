@@ -30,6 +30,7 @@ const functions = firebase.functions()
 
 
 const usersCollection = db.collection('users')
+const oldUsersCollection = db.collection('oldUsers')
 const tipsCollection = db.collection('tips')
 const foodCollection = db.collection('food')
 const jobsCollection = db.collection('jobs')
@@ -63,6 +64,7 @@ const accountingNotesCollection = db.collection('accountingNotes')
 const coprCollection = db.collection('copr')
 const payHelpCollection = db.collection('payHelp')
 const groupsCollection = db.collection('groups')
+const groupNotesCollection = db.collection('groupNotes')
 const reviewsCollection = db.collection('reviews')
 const userMessagesCollection = db.collection('userMessages')
 const exportLogCollection = db.collection('exportLog')
@@ -87,7 +89,7 @@ const marketsCollection = db.collection('markets')
 const marketingLeadsCollection = db.collection('marketingLeads')
 const leadApplicationsCollection = db.collection('leadApplications')
 const payrollSubmissionsCollection = db.collection('payrollSubmissions')
-
+const weeksCollection = db.collection('weeks')
 
 export {
   db,
@@ -97,6 +99,7 @@ export {
   currentUser,
   functions,
   usersCollection,
+  oldUsersCollection,
   tipsCollection,
   foodCollection,
   jobsCollection,
@@ -134,6 +137,7 @@ export {
   coprCollection,
   payHelpCollection,
   groupsCollection,
+  groupNotesCollection,
   reviewsCollection,
   dropsCollection,
   shiftUpdatesCollection,
@@ -153,5 +157,6 @@ export {
   marketsCollection,
   marketingLeadsCollection,
   leadApplicationsCollection,
-  payrollSubmissionsCollection
+  payrollSubmissionsCollection,
+  weeksCollection
 }

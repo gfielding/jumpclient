@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<h2>Contact Notes:</h2>
+		<h4>Contact Notes</h4>
 		<vue-good-table
       :columns="columns"
       :rows="notes"

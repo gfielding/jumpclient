@@ -1,26 +1,15 @@
 <template>
-	<div class="dashboard">
-    <Loader v-if="performingRequest" />
-    <div class="dashboard__container">
+	<div>
+    
+    <div class="dashboard__container pt-3">
+      <Loader v-if="performingRequest" />
       <div class="dashboard__container--header mb-3" v-if="event">
         <div class="mb-3">
           <div class="flex align-center">
-          <h1 v-if="event">{{event.title}} Staff Placements</h1>
-          <button class="btn btn__large btn__danger ml-5" v-if="event && event.cancelled">
-            Cancelled
-          </button>
+          <h4 v-if="event">Staff Placements</h4>
         </div>
           <!-- <h2 v-if="event &&event.title">Staff Placements for {{event.title}}</h2> -->
-          <span v-if="event && event.venue && event.venue.title">
-            <p>{{event.venue.title}}<span v-if="event.venue && event.venue.address"> | {{event.venue.address.city}}, {{event.venue.address.state}}</span>
-            <span v-if="event.startDate">
-             | {{event.startDate | moment("ddd, MMM Do YYYY") }}
-            </span>
-            <span v-if="event.endDate">
-               - {{event.endDate | moment("ddd, MMM Do YYYY") }}
-             </span>
-           </p>
-        </span> 
+         
         </div>
         <span class="flex flex-wrap justify-flex-end">
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="exportAll()">export all</button>
@@ -31,12 +20,13 @@
                 </span>
               </transition>
           </button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="email()">Preview Info Email</button>
+          <!-- <button class="btn btn__outlined btn__small mr-3 mb-3" @click="email()">Preview Info Email</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="checkIn()">Check-In</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="shifts()">Shifts</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="editEvent()">Edit</button>
           <button class="btn btn__outlined btn__small mr-3 mb-3" @click="sheets()">Timesheets</button>
-          <button class="btn btn__outlined btn__small mb-3" @click="goBack"><i class="fas fa-arrow-left"></i></button>
+          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="files()">Files</button>
+          <button class="btn btn__outlined btn__small mb-3" @click="goBack"><i class="fas fa-arrow-left"></i></button> -->
         </span>
       </div>
       <div class="dashboard__container--body mb-3" v-if="event && event.days && event.days.length > 1">
@@ -72,6 +62,7 @@
             <button class="btn btn__outlined btn__small mb-2 mt-3" @click="exportUnplaced()">export unplaced</button>
           </div>
           <vue-good-table
+            v-if="eventUsers && eventUsers.length >= 1"
               :columns="columns"
               :rows="filteredUsers"
               :search-options="{
@@ -107,37 +98,45 @@
               </span>
 
               <span v-if="props.column.field == 'moreInfo'" class="flex">
-                      <span v-for="u in filteredInfo(props.row)" class="flex">
-                          <v-popover v-if="u.docHold && u.docHold == true">
-                          <i class="fa-solid fa-octagon-exclamation ml-2 mr-2 danger"></i>
-                          <template slot="popover">
-                              <span>Do Not Hire Until Onboarding Complete</span>
-                            </template>
-                          </v-popover>
+                  <span v-for="u in filteredInfo(props.row)" class="flex">
 
-                          <v-popover v-if="u.onboarded && u.onboarded == true">
+                          <v-popover v-if="u.evereeOnboardingComplete">
                           <i class="fa-solid fa-square-check ml-2 mr-2 success"></i>
                           <template slot="popover">
-                              <span>Fully Onboarded</span>
+                              <span>Contractor</span>
                             </template>
                           </v-popover>
 
-                          <v-popover v-if="!u.onboarded || u.onboarded != true">
+                          <v-popover v-if="!u.evereeOnboardingComplete">
                             <i class="fa-solid fa-square-check ml-2 mr-2" style="opacity: 50%;"></i>
                             <template slot="popover">
-                              <span>Not Onboarded</span>
+                              <span>Not Contractor</span>
                             </template>
                           </v-popover>
+
+                          <!-- <v-popover v-if="u.employeeOnboard && u.employeeOnboard == true">
+                          <i class="fa-solid fa-square-check ml-2 mr-2 successDark"></i>
+                          <template slot="popover">
+                              <span>Employee</span>
+                            </template>
+                          </v-popover>
+
+                          <v-popover v-if="!u.employeeOnboard || u.employeeOnboard != true">
+                            <i class="fa-solid fa-square-check ml-2 mr-2" style="opacity: 50%;"></i>
+                            <template slot="popover">
+                              <span>Not Employee</span>
+                            </template>
+                          </v-popover> -->
 
                           <span v-if="!u.skills || u.skills.length == 0">
                           <i class="fad fa-briefcase ml-2 mr-2" style="opacity:50%;"></i>
                           </span>
 
-                          <span v-if="u.skills && u.skills.length > 0">
+                        <span v-if="u.skills && u.skills.length > 0">
                           <v-popover>
                             <i class="fad fa-briefcase ml-2 mr-2 success"></i>
                             <template slot="popover">
-                              <span v-for="z in props.row.skills">{{z.title}} / </span>
+                              <span v-for="(z, index) in props.row.skills" :key="index">{{z.title}} / </span>
                             </template>
                           </v-popover>
                         </span>
@@ -149,7 +148,7 @@
                           <v-popover>
                             <i class="fas fa-exclamation-triangle ml-2 mr-2 danger"></i>
                             <template slot="popover">
-                              <span v-for="z in u.blacklist">{{z.title}} / </span>
+                              <span v-for="z in u.blacklist" :key="z.id">{{z.title}} / </span>
                             </template>
                           </v-popover>
                         </span>
@@ -157,11 +156,13 @@
                         <span v-if="!u.groups || u.groups.length == 0">
                           <i class="fa-solid fa-user-group ml-2 mr-2" style="opacity:50%;"></i>
                         </span>
-                        <span v-if="u.groups && u.groups.length > 0">
+
+                        <span v-if="u.groups && u.groups.length  > 0">
                           <v-popover>
                             <i class="fa-solid fa-user-group ml-2 mr-2 blueHue"></i>
                             <template slot="popover">
-                              <span v-for="z in u.groups">{{z}} / </span>
+                              <span v-for="(z, index) in u.groups" :key="index">{{z.title}} / </span>
+                              <!-- <span v-for="z in u.groups" :key="z.id">{{z.title}} / </span> -->
                             </template>
                           </v-popover>
                         </span>
@@ -170,131 +171,18 @@
                           <i class="fa-solid fa-certificate ml-2 mr-2" style="opacity:50%;"></i>
                         </span>
                         <span v-if="u.certs && u.certs.length > 0">
-                          <v-popover>
-                            <i class="fa-solid fa-certificate ml-2 mr-2 orangeHue"></i>
+                          <v-popover v-for="(item, index) in u.certs" :key="index" style="display:inline-block;">
+                            <i class="fa-solid fa-certificate ml-2 mr-2 success"></i>
                             <template slot="popover">
-                              <span v-for="z in u.certs">{{z.type}} / </span>
+                              <span>{{item.type}}</span>
                             </template>
                           </v-popover>
+                          
+                          
                         </span>
-
-                        <span v-if="u.fullyVaccinated && u.fullyVaccinated === `yes`">
-                          <v-popover>
-                          <i class="fa-solid fa-virus-covid ml-2 mr-2 success"></i>
-                          <template slot="popover">
-                              <span>Vaccinated</span>
-                            </template>
-                          </v-popover>
-                        </span>
-                        <span v-if="!u.fullyVaccinated">
-                          <v-popover>
-                            <i class="fa-solid fa-virus-covid ml-2 mr-2" style="opacity:50%;"></i>
-                            <template slot="popover">
-                              <span>Not Vaccinated</span>
-                            </template>
-                          </v-popover>
-                        </span>
-                        <span v-if="u.fullyVaccinated && u.fullyVaccinated === `no`">
-                          <v-popover>
-                            <i class="fa-solid fa-virus-covid ml-2 mr-2 danger"></i>
-                            <template slot="popover">
-                              <span>Not Vaccinated</span>
-                            </template>
-                          </v-popover>
-                        </span>
-
-
                       </span>
 
-                        <!-- <span v-if="props.row.docHold && props.row.docHold == true">
-                          <v-popover>
-                          <i class="fa-solid fa-octagon-exclamation ml-2 mr-2 danger"></i>
-                          <template slot="popover">
-                              <span>Do Not Hire Until Onboarding Complete</span>
-                            </template>
-                          </v-popover>
-                        </span> -->
-
-                        <!-- <span v-if="props.row.onboarded && props.row.onboarded == true">
-                          
-                        </span> -->
-
-                        <!-- <span v-if="!props.row.onboarded || props.row.onboarded != true">
-                          
-                        </span> -->
-
-                        <!-- <span v-if="!props.row.skills || props.row.skills.length == 0">
-                          <i class="fad fa-briefcase ml-2 mr-2" style="opacity:50%;"></i>
-                        </span>
-                        <span v-if="props.row.skills && props.row.skills.length > 0">
-                          <v-popover>
-                            <i class="fad fa-briefcase ml-2 mr-2 success"></i>
-                            <template slot="popover">
-                              <span v-for="z in props.row.skills">{{z.title}} / </span>
-                            </template>
-                          </v-popover>
-                        </span>
-
-                        <span v-if="!props.row.blacklist || props.row.blacklist.length == 0">
-                          <i class="fas fa-exclamation-triangle ml-2 mr-2" style="opacity:50%;"></i>
-                        </span>
-                        <span v-if="props.row.blacklist && props.row.blacklist.length > 0">
-                          <v-popover>
-                            <i class="fas fa-exclamation-triangle ml-2 mr-2 danger"></i>
-                            <template slot="popover">
-                              <span v-for="z in props.row.blacklist">{{z.title}} / </span>
-                            </template>
-                          </v-popover>
-                        </span>
-
-                        <span v-if="!props.row.groups || props.row.groups.length == 0">
-                          <i class="fa-solid fa-user-group ml-2 mr-2" style="opacity:50%;"></i>
-                        </span>
-                        <span v-if="props.row.groups && props.row.groups.length > 0">
-                          <v-popover>
-                            <i class="fa-solid fa-user-group ml-2 mr-2 blueHue"></i>
-                            <template slot="popover">
-                              <span v-for="z in props.row.groups">{{z}} / </span>
-                            </template>
-                          </v-popover>
-                        </span>
-
-                        <span v-if="!props.row.certs || props.row.certs.length == 0">
-                          <i class="fa-solid fa-certificate ml-2 mr-2" style="opacity:50%;"></i>
-                        </span>
-                        <span v-if="props.row.certs && props.row.certs.length > 0">
-                          <v-popover>
-                            <i class="fa-solid fa-certificate ml-2 mr-2 orangeHue"></i>
-                            <template slot="popover">
-                              <span v-for="z in props.row.certs">{{z.type}} / </span>
-                            </template>
-                          </v-popover>
-                        </span>
-
-                        <span v-if="props.row.fullyVaccinated && props.row.fullyVaccinated === `yes`">
-                          <v-popover>
-                          <i class="fa-solid fa-virus-covid ml-2 mr-2 success"></i>
-                          <template slot="popover">
-                              <span>Vaccinated</span>
-                            </template>
-                          </v-popover>
-                        </span>
-                        <span v-if="!props.row.fullyVaccinated">
-                          <v-popover>
-                            <i class="fa-solid fa-virus-covid ml-2 mr-2" style="opacity:50%;"></i>
-                            <template slot="popover">
-                              <span>Not Vaccinated</span>
-                            </template>
-                          </v-popover>
-                        </span>
-                        <span v-if="props.row.fullyVaccinated && props.row.fullyVaccinated === `no`">
-                          <v-popover>
-                            <i class="fa-solid fa-virus-covid ml-2 mr-2 danger"></i>
-                            <template slot="popover">
-                              <span>Not Vaccinated</span>
-                            </template>
-                          </v-popover>
-                        </span> -->
+                
                       </span>
 
                       <span v-if="props.column.field == 'phone'">
@@ -398,8 +286,8 @@
                 </button>
               </span>
               <span v-else-if="props.column.field == 'requestedJob.title'">
-                <span v-if="props.row.requestedJob && props.row.requestedJob.title">
-                   {{props.row.requestedJob.title}}
+                <span v-if="props.row.requestedShift && props.row.requestedShift.name">
+                   {{props.row.requestedShift.name}}
                 </span>
               </span>
               <span v-else>
@@ -424,7 +312,7 @@
 
               <button class="btn btn__outlined btn__small mb-2 mr-3" @click="showShiftModal(shift)">Preview Email</button>
             
-              <InfoEmailTemplate v-if="modalValue == shift" @close="closeShiftModal" :eventInfo="eventInfo" :shift="shift" :venueInfo="venueInfo" />
+              <InfoEmailTemplate v-if="(modalValue == shift) && eventInfo" @close="closeShiftModal" :eventInfo="eventInfo" :shift="shift" :venueInfo="venueInfo" />
 
                 <button class="btn btn__small btn__outlined mb-2 mr-5" @click="exportStaff(shift)">export</button>
                 <button class="btn btn__icon" @click="expand(shift)" v-if="shift.collapse"><i class="fas fa-chevron-up"></i></button>
@@ -485,11 +373,6 @@
                       <button class="btn btn__small btn__flat" @click="lockAll(shift)">Lock All <i class="fas fa-lock-alt"></i></button>
                     </div>
                     <template slot="table-row" slot-scope="props">
-                      <!-- <span v-if="props.column.field == 'preview'">
-                <i class="far fa-search ml-2 mr-2" @click="showModal(props.row)"></i>
-                <UserModal v-if="modalValue == props.row" @close="closeModal" :staff="modalValue" />
-              </span> -->
- 
 
                       <span v-if="props.column.field == 'photoUrl'">
                         <span v-if="props.row.photoUrl">
@@ -499,7 +382,8 @@
 
                       <span v-if="props.column.field == 'moreInfo'" class="flex">
 
-                        <span v-if="props.row.onboarded && props.row.onboarded == true">
+
+                        <span v-if="props.row.branchOnboard && props.row.branchOnboard == true">
                           <v-popover>
                           <i class="fa-solid fa-square-check ml-2 mr-2 success"></i>
                           <template slot="popover">
@@ -508,7 +392,7 @@
                           </v-popover>
                         </span>
 
-                        <span v-if="!props.row.onboarded || props.row.onboarded != true">
+                        <span v-if="!props.row.branchOnboard || props.row.branchOnboard != true">
                           <v-popover>
                             <i class="fa-solid fa-square-check ml-2 mr-2" style="opacity: 50%;"></i>
                             <template slot="popover">
@@ -565,30 +449,6 @@
                           </v-popover>
                         </span>
 
-                        <span v-if="props.row.fullyVaccinated && props.row.fullyVaccinated === `yes`">
-                          <v-popover>
-                          <i class="fa-solid fa-virus-covid ml-2 mr-2 success"></i>
-                          <template slot="popover">
-                              <span>Vaccinated</span>
-                            </template>
-                          </v-popover>
-                        </span>
-                        <span v-if="!props.row.fullyVaccinated">
-                          <v-popover>
-                            <i class="fa-solid fa-virus-covid ml-2 mr-2" style="opacity:50%;"></i>
-                            <template slot="popover">
-                              <span>Not Vaccinated</span>
-                            </template>
-                          </v-popover>
-                        </span>
-                        <span v-if="props.row.fullyVaccinated && props.row.fullyVaccinated === `no`">
-                          <v-popover>
-                            <i class="fa-solid fa-virus-covid ml-2 mr-2 danger"></i>
-                            <template slot="popover">
-                              <span>Not Vaccinated</span>
-                            </template>
-                          </v-popover>
-                        </span>
                       </span>
 
                          
@@ -680,13 +540,7 @@
                           <i class="fas fa-calendar-check" style="color:green;"></i>
                         </button>
                       </span>
-                      <!-- <span v-if="
-                        (props.row.dayStatus == 'hired' || props.row.dayStatus == 'assigned')
-                      " style="display:inline;">
-                        <button class="icon" v-tooltip="'cancel reservation'" @click="unreserveUser(props.row)">
-                          <i class="fas fa-calendar-check ml-2 mr-2" style="color:green;"></i>
-                        </button>
-                      </span> -->
+
 
 
 
@@ -712,13 +566,7 @@
                       </span>
 
 
-<!--                       if (row.job && row.job.title) {
-        positioned = row.job.title
-      } else if (!row.job || !row.job.title) {
-        positioned = shift.position.title
-      } else {
-        positioned = {}
-      } -->
+
                       <span v-if="((shift.position && shift.position.title) || (props.row.job && props.row.job.title))">
                        <!--  <span> -->
 
@@ -819,9 +667,9 @@
                         <i class="fas fa-times ml-2 mr-2"></i>
                       </button> -->
                     <!-- </span> -->
-                      <span v-else-if="props.column.field == 'requestedJob.title'">
-                        <span v-if="props.row.requestedJob && props.row.requestedJob.title">
-                           {{props.row.requestedJob.title}}
+                      <span v-else-if="props.column.field == 'requestedShift.name'">
+                        <span v-if="props.row.requestedShift && props.row.requestedShift.name">
+                           {{props.row.requestedShift.name}}
                         </span>
                       </span>
                       <!-- <span v-else>
@@ -836,7 +684,7 @@
         </div>
 
         <div class="dashboard__container--body--col" style="width:100%;">
-          <h3>Drops</h3>
+          <h4>Drops</h4>
           <vue-good-table
               :columns="columnsD"
               :rows="eventDrops"
@@ -933,11 +781,6 @@ export default {
         'f03dc899fbdd294d6797791724cdb402',
       ),
       columns: [
-        // {
-        //   label: '',
-        //   field: 'preview',
-        //   sortable: false,
-        // },
         {
           label: '',
           field: 'photoUrl',
@@ -968,56 +811,14 @@ export default {
           sortable: false,
           width:'120px',
         },
-        // {
-        //   label: 'Start Time',
-        //   field: 'start',
-        //   width:'120px',
-        // },
-        // {
-        //   label: 'End Time',
-        //   field: 'end',
-        //   width:'120px',
-        // },
-        // {
-        //   label: 'Day',
-        //   field: 'day',
-        // },
-        // {
-        //   label: '',
-        //   field: 'days',
-        // },
         {
-          label: 'Requested Job',
+          label: 'Requested Shift',
           field: 'requestedJob.title',
           sortable: false,
           width:'140px',
         },
-        // {
-        //   label: 'Assigned Job',
-        //   field: 'assigned',
-        //   sortable: false,
-        //   width:'120px',
-        // },
-        // {
-        //   label: '',
-        //   field: 'jobs',
-        //   tdClass: 'text-center',
-        //   sortable: false,
-        // },
-        // {
-        //   label: '',
-        //   field: 'extras',
-        //   tdClass: 'text-center',
-        //   sortable: false,
-        // },
-        // {
-        //   label: '',
-        //   field: 'vaccinated',
-        //   tdClass: 'text-center',
-        //   sortable: false,
-        // },
         {
-          label: '',
+          label: 'Notes',
           field: 'notes',
           sortable: false,
           tdClass: 'text-center',
@@ -1058,29 +859,12 @@ export default {
           field: 'dropped',
           sortable: false,
         },
-        // {
-        //   label: 'Requested Job',
-        //   field: 'requestedJob.title',
-        // },
         {
           label: 'Notes',
           field: 'notes',
           sortable: false,
           tdClass: 'text-center',
         },
-        // {
-        //   label: '',
-        //   field: 'reservations',
-        //   tdClass: 'text-center',
-        //   sortable: false,
-        // },
-        
-        // {
-        //   label: '',
-        //   field: 'delete',
-        //   tdClass: 'text-center',
-        //   sortable: false,
-        // },
       ],
       columns2: [
         // {
@@ -1098,11 +882,11 @@ export default {
           field: 'fullName',
           width: '120px',
         },
-        {
-          label: '',
-          field: 'moreInfo',
-          sortable: false,
-        },
+        // {
+        //   label: '',
+        //   field: 'moreInfo',
+        //   sortable: false,
+        // },
         {
           label: 'Phone',
           field: 'phone',
@@ -1120,33 +904,10 @@ export default {
           // width: '120px'
         },
         {
-          label: 'Requested Job',
-          field: 'requestedJob.title',
+          label: 'Requested Shift',
+          field: 'requestedShift.name',
           // width: '144px',
         },
-        {
-          label: 'Overwrite Job',
-          field: 'assigned',
-          // width: '144px',
-        },
-        // {
-        //   label: '',
-        //   field: 'jobs',
-        //   tdClass: 'text-center',
-        //   sortable: false,
-        // },
-        // {
-        //   label: '',
-        //   field: 'extras',
-        //   tdClass: 'text-center',
-        //   sortable: false,
-        // },
-        // {
-        //   label: '',
-        //   field: 'notes',
-        //   sortable: false,
-        //   tdClass: 'text-center',
-        // },
         {
           label: '',
           field: 'email',
@@ -1208,9 +969,22 @@ export default {
     // this.setInitialDay()
   },
   computed: {
-    ...mapState(['currentUser', 'venueInfo', 'eventUsers', 'eventShifts', 'eventInfo', 'eventDrops', 'userProfile']),
+    ...mapState(['currentUser', 'venueInfo', 'eventUsers', 'eventShifts', 'eventInfo', 'eventDrops', 'userProfile', 'eventUsersRef']),
     event() {
       return this.eventInfo
+    },
+    referencedUsers() { 
+      // let uniqueChars = this.eventUsersRef.filter((id, index) => {
+      //     return this.eventUsersRef.indexOf(id) === index;
+      // });
+      // let uniqueChars = [...new Set(this.eventUsersRef)];
+      return this.eventUsersRef.filter((item, index) => this.eventUsersRef.indexOf(item) === index);
+      // if (this.eventUsersRef) {
+      //   return this.eventUsersRef.filter((v,i,a)=>a.findIndex(v2=>(v2.id===v.id))===i)
+      // }
+      
+     // let arrUniq = [...new Map(this.eventUsersRef.map(v => [v.id, v])).values()]
+     //  return arrUniq
     },
     activeDay() {
       if (this.eventInfo && this.eventInfo.days && this.eventInfo.days.length > 0) {
@@ -1239,7 +1013,6 @@ export default {
       })
     },
     filteredPlacedDayUsers () {
-      console.log(this.activeDay)
       if (this.activeDay) {
         return this.eventUsers.filter(user => {
           return (((user.status == 'placed') || (user.status == 'assigned')) && (user.day == this.activeDay))
@@ -1359,7 +1132,7 @@ export default {
 
       fb.usersCollection.doc(item.objectID).get()
       .then(doc => {
-        let onboarded = doc.data().onboarded || null
+        let branchOnboard = doc.data().branchOnboard || null
         let address = doc.data().address || null
         let blacklist = doc.data().blacklist || null
         let certs = doc.data().certs || null
@@ -1377,7 +1150,7 @@ export default {
         let ssn = doc.data().ssn || null
         let docHold = doc.data().docHold || null
         fb.userDaysCollection.add({
-          onboarded: onboarded,
+          branchOnboard: branchOnboard,
           address: address,
           blacklist: blacklist,
           certs: certs,
@@ -1972,13 +1745,13 @@ export default {
       user.dayStatus = "hired"
       this.$store.dispatch('reserveUser', user)
 
-     let logFields = {
-          staffMember: this.currentUser.email,
-          export: 'Reserve User',
-          event: this.event.title,
-          user: user.id
-      }
-      this.$store.dispatch('sendPlacementsLog', logFields)
+     // let logFields = {
+     //      staffMember: this.currentUser.email,
+     //      export: 'Reserve User',
+     //      event: this.event.title,
+     //      user: user.id
+     //  }
+     //  this.$store.dispatch('sendPlacementsLog', logFields)
     },
     notRequestUser(user) {
       user.dayStatus = "not requested"
@@ -2002,8 +1775,10 @@ export default {
       fb.userDaysCollection.doc(user.id).update({dayStatus: null})
     },
     filteredInfo(user) {
-      return this.eventUsers.filter(member => {
-        return member.id == user.id
+      return this.referencedUsers.filter(member => {
+        if (member && member.id) {
+          return (member.id == user.userId)
+        }
       })
     },
     formatAMPM(date) {
@@ -2052,6 +1827,10 @@ export default {
     },
     editEvent() {
       let url = `/events/` + this.$route.params.id
+      router.push(url)
+    },
+    files() {
+      let url = `/events/` + this.$route.params.id + `/files`
       router.push(url)
     },
     shifts() {

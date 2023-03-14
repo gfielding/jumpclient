@@ -64,7 +64,7 @@ export default {
   },
   methods: {
     onRowClick(params) {
-      let url = `/jobs/` + params.row.id
+      let url = `/positions/` + params.row.id
       console.log(url)
       router.push(url)
     }

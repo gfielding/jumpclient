@@ -23,6 +23,7 @@
         <vue-good-table
           @on-selected-rows-change="selectionChanged"
             :columns="columns2"
+            styleClass="vgt-table condensed"
             :rows="userPayroll"
             :pagination-options="{
               enabled: true,

@@ -16,7 +16,7 @@ export default class ExportService {
     createSpreadsheet() {
         this.gapi.client.sheets.spreadsheets.create({
             properties: {
-                title: 'MVP Data Export'
+                title: 'JUMP Data Export'
             }
         }).then((response) => {
             this.spreadsheetId = response.result.spreadsheetId;

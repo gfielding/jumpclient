@@ -12,6 +12,16 @@
 			box-shadow:none;
 		}
 	}
+	&__letter {
+		border: none;
+		border-color: #2e96ff; 
+		color: #2e96ff;
+		font-weight: bold;
+		background:#2e96ff;
+		color: white;
+		padding: 0.75rem;
+    margin: 0 0.5rem;
+	}
 	&__flat {
 		border:1px transparent;
 		background:transparent;
@@ -25,6 +35,7 @@
 	&__primary {
 		background:$primary;
 		border-color:$primary;
+		border:1px solid $primary;
 		color:white;
 		&:hover {
 			background:$primaryDark;
@@ -34,6 +45,7 @@
 	&__success {
 		background:$success;
 		border-color:$success;
+		border:1px solid $success;
 		color:white;
 		&:hover {
 			box-shadow:none;
@@ -45,6 +57,7 @@
 		background:$warning;
 		border-color:$warning;
 		color:white;
+		border:1px solid $warning;
 		&:hover {
 			box-shadow:none;
 		}
@@ -53,6 +66,7 @@
 		background:$danger;
 		border-color:$danger;
 		color:white;
+		border:1px solid $danger;
 		&:hover {
 			background:$dangerDark;
 			border-color:$dangerDark;
@@ -60,8 +74,9 @@
 		}
 	}
 	&__dark {
-		background:$backgroundAlt;
-		border-color:$backgroundAlt;
+		background:$dark;
+		border-color:$dark;
+		border:1px solid $dark;
 		color:white;
 		&:hover {
 			background:$dark;
@@ -71,6 +86,7 @@
 	&__accent {
 		background:$accent;
 		border-color:$accent;
+		border:1px solid $accent;
 		color:white;
 		&:hover {
 			background:$accentDark;

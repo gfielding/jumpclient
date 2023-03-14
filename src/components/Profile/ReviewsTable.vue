@@ -1,10 +1,11 @@
 <template>
 	<div>
-		<h2>User Reviews:</h2>
+		<h4>User Reviews:</h4>
 		<vue-good-table
       :columns="columns"
       :rows="reviews"
       compactMode
+      styleClass="vgt-table condensed"
       :pagination-options="{
         enabled: true,
         mode: 'records',
@@ -63,6 +64,9 @@ export default {
       }
     ]
   }),
+  created () {
+    this.$store.dispatch('getUserReviews', this.$route.params.id)
+  },
   methods: {
   	formatDate(q) {
       if(q) {

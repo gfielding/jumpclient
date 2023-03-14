@@ -8,10 +8,14 @@
 		display:flex;
 		justify-content:space-between;
 		align-items:center;
+		font-family: "Montserrat", sans-serif;
+	}
+	a {
+		color:$lightText;
 	}
 	&__logo {
 		font-size:1.6rem;
-		font-family: "BankGothicBT-Medium";
+		// font-family: "BankGothicBT-Medium";
 		a {
 			color:$lightText;
 			display: flex;
@@ -93,6 +97,7 @@
   color:$lightText !important;
   justify-content: space-between;
   flex-direction: column;
+  font-family: "Montserrat", sans-serif;
 	.nav__menu--item {
 		display:flex;
 		align-items:center;

@@ -1,14 +1,8 @@
 <template>
-  <div class="dashboard">
-    <div class="dashboard__container">
-      <div class="dashboard__container--header">
-        <h1>Enter New Lead</h1>
-        <router-link :to="{name: 'marketingLeads'}" class="color--text">
-          <button class="btn btn__flat">All Leads</button>
-        </router-link>
-      </div>
-      <div class="dashboard__container--body pt-3">
+
+      <div class="dashboard__container--body ">
       	<div class="dashboard__container--body--col">
+          <div>
           <form ref="form">
             <div class="mb-3">
               <label for="first">First Name:</label>
@@ -65,10 +59,9 @@
               </button>
             </div>
           </form>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
 </template>
 
 <script>

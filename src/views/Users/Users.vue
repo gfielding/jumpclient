@@ -3,9 +3,11 @@
     <div class="dashboard__container">
       <div class="dashboard__container--header flex justify-space-between align-center mb-3">
         <h1>Users</h1>
-        <!-- <div class="flex align-center"> 
-          <button class="btn btn__outlined mb-3" @click="exportAll()">export all</button>
-        </div> -->
+        <div class="flex align-center"> 
+          <button class="btn btn__outlined mb-3" @click="exportUsers()">Everee Export</button>
+          <!-- <button class="btn btn__outlined mb-3" @click="exportOldUsers()">Old User Export</button> -->
+          <!-- <button class="btn btn__outlined mb-3" @click="addCreated()">add created</button> -->
+        </div>
       </div>
 
       <ais-instant-search :search-client="searchClient" index-name="a_users" >
@@ -28,6 +30,7 @@
     <hr>
     <div class="dashboard__container--body pt-3" v-if="states">
         <div class="dashboard__container--body--col">
+          <div>
           <label for="client">Users By State (CA, FL, TX):</label>
             <v-select
               class="mt-2"
@@ -37,8 +40,10 @@
               @input="setSelectedState" 
               >
             </v-select>
+            </div>
         </div>
         <div class="dashboard__container--body--col">
+          <div>
           <label for="client">Users By City:</label>
             <v-select
               class="mt-2"
@@ -49,11 +54,12 @@
               >
             </v-select>
         </div>
+        </div>
       </div>
       <Loader v-if="state && stateUsers.length == 0" />
       <div class="dashboard__container--body" v-if="stateUsers.length > 0">
         <span class="flex align-center justify-space-between" style="width:100%;">
-          <h3>Users by State</h3>
+          <h4>Users by State</h4>
           <button class="btn btn__outlined mb-3 mt-3" @click="exportState()">export by State</button>
         </span>
         <vue-good-table
@@ -277,20 +283,19 @@ export default {
     };
   },
   computed: {
-    ...mapState(['currentUser', 'userProfile', 'stateUsers', 'cityUsers', 'groups']),
+    ...mapState(['currentUser', 'userProfile', 'stateUsers', 'cityUsers', 'groups', 'users']),
   },
   components: {
     Loader,
   },
-  // created () {
-  //   if (!this.users || this.users.length < 1) {
-  //     this.$store.dispatch("getUsers")
-  //   }
-  // },
   created () {
     if (!this.groups || this.groups.length < 1) {
       this.$store.dispatch("getGroups")
     }
+    if (!this.users || this.users.length < 1) {
+      this.$store.dispatch("getUsers")
+    }
+    // this.$store.dispatch("getOldUsersByState")
   },
   methods: {
     updateUser(row) {
@@ -379,6 +384,88 @@ export default {
         exportService.export();
       });
     },
+    exportOldUsers() {
+      const exportHeaders = [
+        "First Name",
+        "Last Name",
+        "State",
+        "City"
+        ]
+      const exportItems = [];
+      for (var key in this.oldUsersByState) {
+
+        let state = (this.findState(this.oldUsersByState[key]))
+        let city = (this.findCity(this.oldUsersByState[key]))
+
+        exportItems.push([
+          this.oldUsersByState[key].firstName,
+          this.oldUsersByState[key].lastName,
+          state,
+          city
+          
+        ])
+      }
+      this.$gapi.getGapiClient().then(gapi => {
+        const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+        exportService.export();
+      });
+    },
+    exportUsers() {
+      const exportHeaders = [
+        "Created",
+        "First Name",
+        "Middle Name",
+        "Last Name",
+        "Phone",
+        "Email",
+        "Start Date",
+        "End Date",
+        "Approval Group",
+        "Legal work location",
+        "External worker id",
+        "Payee type",
+        "Business legal name",
+      ]
+      const exportItems = [];
+      for (var key in this.users) {
+
+        let created = (this.formatDate(this.users[key].created) || null)
+
+        exportItems.push([
+          created,
+          this.users[key].firstName,
+          '',
+          this.users[key].lastName,
+          this.users[key].phone,
+          this.users[key].email,
+          'YYYY-MM-DD',
+          '',
+          '',
+          '',
+          this.users[key].id,
+          "INDIVIDUAL",
+          '',
+        ])
+      }
+      this.$gapi.getGapiClient().then(gapi => {
+        const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
+        exportService.export();
+      });
+    },
+    findState(user) {
+      if (user && user.address && user.address.state) {
+        return user.address.state
+      } else {
+        return null
+      }
+    },
+    findCity(user) {
+      if (user && user.address && user.address.city) {
+        return user.address.city
+      } else {
+        return null
+      }
+    },
     onRowClick(params) {
       let url = `/users/` + params.row.id
       console.log(url)
@@ -392,12 +479,17 @@ export default {
         return null
       }
     },
+    addCreated(){
+      this.$store.dispatch("addCreated")
+    }
   },
   beforeDestroy () {
     this.search = ''
     delete this.search
     this.$store.dispatch("clearUsersByState")
     this.$store.dispatch("clearUsersByCity")
+    this.$store.dispatch("clearUsersState")
+    this.$store.dispatch("clearOldUsersByState")
   }
 }
 </script>
