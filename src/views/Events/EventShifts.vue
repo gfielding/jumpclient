@@ -48,7 +48,7 @@
     	<hr>
      	<transition name="fade">
 		    <div class="dashboard__container--body pt-3" style="justify-content: space-evenly;" v-if="event && event.venue && event.venue.job && event.venue.job.length > 0">
-		    	<div class="dashboard__container--body--col" style="width:calc(100% - 3.2rem);">
+		    	<div class="dashboard__container--body--col" style="width:100%;">
 
 			    	<div class="list">
 			    		<h4>Create New Shift</h4>

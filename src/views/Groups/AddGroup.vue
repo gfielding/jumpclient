@@ -10,29 +10,24 @@
           <div class="dashboard__container--body--col">
               <div class="mb-3">
                 <label for="title">Group Title:</label>
-                <input type="text" v-model.trim="group.title" id="title" />
-              </div>
-              <div class="mb-3">
-                <label for="groupVisible">Visible on Website:</label>
-                <input type="checkbox" v-model.trim="group.visible" id="groupVisible" class="ml-3" />
-              </div>
-              <div class="mb-3">
-              <label for="location">Location (Ex: Monterey, CA):</label>
-              <input type="text" v-model.trim="group.location" id="location" />
-            </div>
+                <input class="mb-5" type="text" v-model.trim="group.title" id="title" />
 
-            <div class="mb-3">
+                <label for="groupVisible">Visible on Website:</label>
+                <input type="checkbox" v-model.trim="group.visible" id="groupVisible" class="mb-5 ml-3" />
+                <div>
+              <label for="location">Location (Ex: Monterey, CA):</label>
+              <input type="text" v-model.trim="group.location" id="location" class="mb-5"  />
+              </div>
               <label for="pickDate">Specify Jobs:</label>
               <v-select
-                class="mt-2"
+                class="mt-2 mb-5"
                 label="title" 
                 :options="jobs"
                 v-model="group.job"
                 multiple
                 >
               </v-select>
-            </div>
-              <div class="mb-3">
+
                 <label for="desc">Group Description:</label>
                 <textarea name="desc" id="desc" cols="30" rows="10" v-model="group.description"></textarea>
               </div>
@@ -45,17 +40,17 @@
             <div class="mb-3" v-if="(reps.length >= 1)">
               <label for="rep">Account Admins:</label>
               <v-select
-                class="mt-2"
+                class="mt-2 mb-5"
                 label="name" 
                 :options="reps"
                 v-model="group.admins"
                 multiple
                 >
               </v-select>
-            </div>
-            <div class="mb-3" v-if="(reps.length >= 1)">
+
               <label for="rep">Account Users:</label>
               <v-select
+              v-if="(reps.length >= 1)"
                 class="mt-2"
                 label="name" 
                 :options="reps"

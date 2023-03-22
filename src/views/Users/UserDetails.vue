@@ -8,6 +8,9 @@
       </div>
       <div class="dashboard__container--body--col">
         <ProfileOnboard :user="user" :userContractorPayProfile="userContractorPayProfile" class="mb-5" />
+
+        <!-- <ProfileEmployeeOnboard :user="user" :userEmployeePayProfile="userEmployeePayProfile" class="mb-5" /> -->
+
         <ProfileAddress :user="user" class="mb-5" />
         <!-- <ProfileSkills :user="user" /> -->
         <!-- <ProfileId :user="user" /> -->
@@ -25,6 +28,7 @@ import StarRating from 'vue-star-rating'
 import Loader from '@/components/Loader.vue'
 import ProfileContact from '@/components/Profile/ProfileContact.vue'
 import ProfileAddress from '@/components/Profile/ProfileAddress.vue'
+import ProfileEmployeeOnboard from '@/components/Profile/ProfileEmployeeOnboard.vue'
 import ProfileOnboard from '@/components/Profile/ProfileOnboard.vue'
 import ProfileBlacklist from '@/components/Profile/ProfileBlacklist.vue'
 import Rewards from '@/components/Rewards.vue'
@@ -34,7 +38,7 @@ export default {
   props: ['user', 'dnr', 'docHeld',],
   name: 'userDetails',
   computed: {
-    ...mapState(['currentUser', 'userInfo', 'userProfile', 'userVerifications', 'userContractorPayProfile']),
+    ...mapState(['currentUser', 'userInfo', 'userProfile', 'userVerifications', 'userContractorPayProfile', 'userEmployeePayProfile']),
     // docHeld() {
     //   if (this.user && this.user.docHold) {
     //     return true
@@ -58,6 +62,7 @@ export default {
     ProfileContact,
     ProfileAddress,
     ProfileOnboard,
+    ProfileEmployeeOnboard,
     // ProfileEmergency,
     ProfileBlacklist,
    

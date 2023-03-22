@@ -126,6 +126,16 @@
 			color: white !important;
 		}
 	}
+	&__outlined-primary {
+		border:1px solid $primary;
+		background:transparent;
+		color:$primary;
+		&:hover {
+			border:1px solid $primary;
+			background: $primary;
+			color: white !important;
+		}
+	}
 	&__gradient {
 		color:white;
 		z-index: 1;

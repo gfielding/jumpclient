@@ -4,7 +4,8 @@
       <div class="nav__container">
         <div class="nav__logo">
           <router-link to="/dashboard">
-            <h1>j<em>u</em>mp</h1>
+            <span style="text-transform: none; font-size: 2.8rem;
+    font-weight: 300;">J<em>u</em>mp</span>
           </router-link>
         </div>
         <div class="nav__menu">

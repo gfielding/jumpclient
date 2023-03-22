@@ -137,6 +137,10 @@ const store = new Vuex.Store({
     workerFiles: {},
     unpaidPayables: {},
     workerPayHistory: {},
+    userEmployeePayProfile: {},
+    employeeFiles: {},
+    employeeUnpaidPayables: {},
+    employeePayHistory: {},
     evereeContractors: {}
   },
   actions: {
@@ -1515,6 +1519,53 @@ const store = new Vuex.Store({
     },
 
 
+    /*EVEREE*/
+
+    onboardEmployee({ commit }, payload) {
+      console.log(payload)
+      const userProfile = fb.usersCollection.doc(payload.id).get()
+      .then(doc => {
+
+        let phone = doc.data().phone.replace(/[^0-9]/g, '');
+        let firstName = doc.data().firstName
+        let lastName = doc.data().lastName
+        let email = doc.data().email
+        let id = doc.data().id
+        let line1 = doc.data().address.street_number + ' ' + doc.data().address.street
+        let city = doc.data().address.city
+        let state = doc.data().address.state
+        let zip = doc.data().address.zip
+        let line2 = (doc.data().address.unit || '')
+
+        console.log(line1)
+
+        const onboardEvereeEmployee = firebase.functions().httpsCallable('employeeEmbeddedOnboarding')
+        onboardEvereeEmployee({
+          firstName: firstName,
+          lastName: lastName,
+          phone: phone,
+          email: email,
+          id: id,
+          line1: line1,
+          city: city,
+          state: state,
+          zip: zip,
+          line2: line2
+        })
+        .then(result => {
+          console.log(result.data)
+          fb.usersCollection.doc(payload.id).update({
+            employeeId: result.data.workerId,
+            employmentType: result.data.employmentType,
+            hireDate: result.data.hireDate,
+            lifecycleStatus: result.data.lifecycleStatus,
+            onboardingStatus: result.data.onboardingStatus,
+          })
+        })
+
+      })
+    },
+
 
 
 
@@ -1561,6 +1612,51 @@ const store = new Vuex.Store({
         commit("setUserInfo", doc.data())
       })
       store.dispatch('retrieveByExternalId', payload)
+      store.dispatch('retrieveByExternalEmployeeId', payload)
+    },
+
+    async retrieveByExternalEmployeeId({ commit }, payload) {
+      const retrieveByExternalId = firebase.functions().httpsCallable('retrieveEmployeeByExternalId')
+        await retrieveByExternalId({
+        id: payload
+      })
+      .then(result => {
+        console.log(result.data)
+        commit('setUserEmployeePayProfile', result.data)
+      })
+      store.dispatch('retrieveEmployeeFiles', payload)
+      store.dispatch('retrieveEmployeeUnpaidPayables', payload)
+      store.dispatch('retrieveEmployeePayHistory', payload)
+    },
+    async retrieveEmployeeUnpaidPayables({ commit }, payload) {
+      const retrieveUnpaidPayables = firebase.functions().httpsCallable('retrieveUnpaidPayables')
+        await retrieveUnpaidPayables({
+        id: payload
+      })
+      .then(result => {
+        console.log(result.data)
+        commit('setEmployeeUnpaidPayables', result.data)
+      })
+    },
+    async retrieveEmployeeFiles({ commit }, payload) {
+      const retrieveWorkerFiles = firebase.functions().httpsCallable('retrieveWorkerFiles')
+        await retrieveWorkerFiles({
+        id: payload
+      })
+      .then(result => {
+        console.log(result.data)
+        commit('setEmployeeFiles', result.data)
+      })
+    },
+    async retrieveEmployeePayHistory({ commit }, payload) {
+      const retrieveWorkerPayHistory = firebase.functions().httpsCallable('retrieveWorkerPayHistory')
+        await retrieveWorkerPayHistory({
+        id: payload
+      })
+      .then(result => {
+        console.log(result.data)
+        commit('setEmployeePayHistory', result.data)
+      })
     },
 
     async retrieveByExternalId({ commit }, payload) {
@@ -1883,6 +1979,10 @@ const store = new Vuex.Store({
       commit('setWorkerFiles', {})
       commit('setUnpaidPayables', {})
       commit('setWorkerPayHistory', {})
+      commit('setUserEmployeePayProfile', {})
+      commit('setEmployeeFiles', {})
+      commit('setEmployeeUnpaidPayables', {})
+      commit('setEmployeePayHistory', {})
     },
     clearUsersState({ commit }) {
       commit('setUsers', [])
@@ -4751,6 +4851,18 @@ const store = new Vuex.Store({
     },
     setWorkerPayHistory(state, val) {
       state.workerPayHistory = val
+    },
+    setUserEmployeePayProfile(state, val) {
+      state.userEmployeePayProfile = val
+    },
+    setEmployeeFiles(state, val) {
+      state.employeeFiles = val
+    },
+    setEmployeeUnpaidPayables(state, val) {
+      state.employeeUnpaidPayables = val
+    },
+    setEmployeePayHistory(state, val) {
+      state.employeePayHistory = val
     },
     setEvereeContractors(state, val) {
       state.evereeContractors = val

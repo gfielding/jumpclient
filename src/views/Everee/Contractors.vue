@@ -5,8 +5,8 @@
       <div class="dashboard__container--header">
         <h1>Everee Contractors</h1>
       </div>
-      <!-- <button @click="updateAccounts()">Update Users</button> -->
-      <button @click="updateWorkerIds()">Update Ids</button>
+      <!-- <button @click="updateAccounts()">Update Users</button>
+      <button @click="updateWorkerIds()">Update Ids</button> -->
       <div class="dashboard__container--body">
         
         <div v-if="evereeContractors && evereeContractors.length >= 1" class="mb-5 w100">
@@ -127,7 +127,7 @@ export default {
         usersArray.forEach(user => {
           fb.usersCollection.doc(user.externalWorkerId).get()
           .then(doc => {
-            if (!doc.data().evereeOnboardingComplete) {
+            if (doc.data() && !doc.data().evereeOnboardingComplete) {
               console.log(doc.data().id)
               fb.usersCollection.doc(doc.data().id)
               .update({

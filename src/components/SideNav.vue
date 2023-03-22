@@ -18,7 +18,7 @@
             <div class="nav__logo">
               <router-link to="/dashboard" style="width:100%;">
                 <span style="text-transform: none; font-size: 3.6rem;
-    font-weight: 300;">j<em>u</em>mp</span>
+    font-weight: 300;">J<em>u</em>mp</span>
               </router-link>
             </div>
             
