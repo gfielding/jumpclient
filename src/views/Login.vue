@@ -2,10 +2,8 @@
   <div class="home">
     <div class="home__containerLogin text-center">
       <div>
-        <router-link :to="{name: 'home'}">
-         <span style="text-transform: none; font-size: 3.6rem;
+        <span style="text-transform: none; font-size: 3.6rem;
     font-weight: 300;">J<em>u</em>mp</span>
-        </router-link>
         <transition name="fadeStop">
           <PasswordReset v-if="showPasswordReset" @close="hidePassword()"></PasswordReset>
         </transition>

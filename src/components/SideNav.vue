@@ -17,8 +17,8 @@
           <div class="nav__menu--item">
             <div class="nav__logo">
               <router-link to="/dashboard" style="width:100%;">
-                <span style="text-transform: none; font-size: 3.6rem;
-    font-weight: 300;">J<em>u</em>mp</span>
+                <span style="text-transform: none; font-size: 2.6rem;
+    font-weight: 300;">J<em>u</em>mp Cli<em>e</em>nt</span>
               </router-link>
             </div>
             
@@ -47,7 +47,7 @@
           </div>
           <div class="nav__menu--item">
             <router-link :to="{name: 'venues'}">
-              Venues <i class="fas fa-chevron-right"></i>
+              My Venues <i class="fas fa-chevron-right"></i>
             </router-link>
           </div>
           <div class="nav__menu--item">
@@ -213,7 +213,7 @@
 
       </div>
       <div class="nav__menu--item">
-            © Jump Staffing, 2023
+            © J<em>u</em>mp Staffing, 2023
           </div>
     </div>
 </template>

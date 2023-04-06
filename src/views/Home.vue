@@ -1,7 +1,8 @@
 <template>
 	<div class="home">
 		<div class="home__container">
-			<h1>j<em>u</em>mp</h1>
+         <span style="text-transform: none; font-size: 3.6rem;
+    font-weight: 300;">J<em>u</em>mp</span>
 			<router-link :to="{name: 'login'}">
 				<button class="btn mt-4 btn__ghost">Enter</button>
 			</router-link>

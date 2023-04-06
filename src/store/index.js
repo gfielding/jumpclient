@@ -174,12 +174,8 @@ const store = new Vuex.Store({
 
 
       // fetch user profile and set in state
-      if ((user && user.email && user.emailVerified && user.email.endsWith('jumpstaffing.com'))) {
+       if (user && user.email) {
         dispatch('fetchUserProfile', user)
-        //change route to dashboard
-        if (router.currentRoute.path === '/login') {
-          router.push('/dashboard')
-        }
       } else {
         store.dispatch('logout')
       }
@@ -188,44 +184,25 @@ const store = new Vuex.Store({
     
 
 
-    async signup({ dispatch }, form) {
-      // sign user up
-      const { user } = await fb.auth.createUserWithEmailAndPassword(form.email, form.password)
-
-      // create user object in userCollections
-      await fb.usersCollection.doc(user.uid).set({
-        firstName: form.firstName,
-        lastName: form.lastName,
-        id: user.uid,
-        email: form.email,
-        skills: [],
-        status: 'applied',
-        created: fb.firestore.FieldValue.serverTimestamp(),
-      })
-
-
-      // fetch user profile and set in state
-      dispatch('fetchUserProfile', user)
-    },
+   
     async fetchUserProfile({ commit }, user) {
-      console.log('fetchUserProfile')
+
       // fetch user profile
-      const userProfile = await fb.usersCollection.doc(user.uid).get()
+      const userProfile = await fb.clientAccessCollection.doc(user.uid).get()
 
       // set user profile in state
       commit('emailVerified', user.emailVerified)
 
-      // set user profile in state
-      // commit('setUserProfile', userProfile.data())
-      store.dispatch('getUserProfile')
-      // store.dispatch('getJobsState')
-      // store.dispatch('getClients')
-      // store.dispatch('getGroups')
+      if (userProfile && userProfile.data()) {
+        commit('setUserProfile', userProfile.data())
+        store.dispatch('getVenues', userProfile.data().venue)
+      } else {
+        store.dispatch('logout')
+      }
 
-      // change route to dashboard
-      // if (router.currentRoute.path === '/login') {
-      //   router.push('/dashboard')
-      // }
+      if (router.currentRoute.path === '/login') {
+        router.push('/dashboard')
+      }
     },
     async logout({ commit }) {
       // log user out
@@ -233,20 +210,20 @@ const store = new Vuex.Store({
 
       // clear user data from state
       commit('setUserProfile', {})
-      commit('setEvents', [])
       commit('setCurrentUser', null)
-      commit('setVenues', [])
-      commit('setJobs', [])
-      commit('setClients', [])
-      commit('setContacts', [])
-      commit('setGroups', [])
+      // commit('setEvents', [])
+      // commit('setVenues', [])
+      // commit('setJobs', [])
+      // commit('setClients', [])
+      // commit('setContacts', [])
+      // commit('setGroups', [])
 
       // redirect to login view
-      router.push('/')
+      router.push('/login')
     },
     getUserProfile({ commit, state }) {
       console.log('getUserProfile')
-      fb.usersCollection.doc(state.currentUser.uid)
+      fb.clientAccessCollection.doc(state.currentUser.uid)
       .onSnapshot(function (doc) {
         if (doc.exists) {
           commit('setUserProfile', doc.data())
@@ -1438,23 +1415,31 @@ const store = new Vuex.Store({
         })
       })
     },
-    getVenues({ commit }) {
-      console.log('getVenues')
-      fb.venuesCollection.orderBy('title', 'asc')
-      .get().then((querySnapshot) => {
-        let venuesArray = []
-        let venuesHiddenArray = []
-        querySnapshot.forEach((doc) => {
-          let venue = doc.data()
-          if (doc.data().visible) {
-            venuesArray.push(venue)
-          } else {
-            venuesHiddenArray.push(venue)
-          }
+    async getVenues({ commit }, payload) {
+      console.log(payload)
+      let venuesArray = []
+      if (payload) {
+        await payload.forEach(item => {
+          fb.venuesCollection.doc(item.id).get().then(doc => {
+            venuesArray.push(doc.data())
+          })
         })
-        commit('setVenues', venuesArray)
-        commit('setHiddenVenues', venuesHiddenArray)
-      })
+      }
+      commit('setVenues', venuesArray)
+      // fb.venuesCollection.orderBy('title', 'asc')
+      // .get().then((querySnapshot) => {
+      //   let venuesArray = []
+      //   let venuesHiddenArray = []
+      //   querySnapshot.forEach((doc) => {
+      //     let venue = doc.data()
+      //     if (doc.data().visible) {
+      //       venuesArray.push(venue)
+      //     } else {
+      //       venuesHiddenArray.push(venue)
+      //     }
+      //   })
+      //   commit('setVenues', venuesArray)
+      // })
     },
     getVenueFromIdWithoutEvents({ commit }, payload) {
       console.log('getVenueFromId')

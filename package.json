@@ -1,6 +1,6 @@
 {
-  "name": "jumpadmin",
-  "version": "2.1.0",
+  "name": "jumpclient",
+  "version": "1.1.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",

@@ -2,13 +2,12 @@
   <div class="dashboard">
     <div class="dashboard__container">
       <div class="dashboard__container--header">
-        <h1>Venues</h1>
-        <span>
+        <h1>My Venues</h1>
+        <!-- <span>
           <router-link :to="{name: 'addvenue'}" class="color--text">
             <button class="btn btn__outlined btn__small ml-3">Add Venue</button>
           </router-link>
-          <!-- <button class="btn btn__outlined ml-3" @click="exportAll()">Export</button> -->
-        </span>
+        </span> -->
         
       </div>
       <div class="dashboard__container--body">
@@ -18,7 +17,7 @@
             :rows="venues"
             styleClass="vgt-table condensed"
             :search-options="{
-              enabled: true,
+              enabled: false,
               placeholder: 'Search this table',
             }"
             :pagination-options="{
@@ -48,7 +47,7 @@
 <script>
 import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
-import ExportService from "@/services/ExportService"
+// import ExportService from "@/services/ExportService"
 import router from '@/router'
 import * as moment from 'moment'
 
@@ -62,14 +61,6 @@ export default {
         label: 'Name',
         field: 'title',
       },
-      // {
-      //   label: 'Featured',
-      //   field: 'featured',
-      // },
-      // {
-      //   label: 'Followers',
-      //   field: 'followers',
-      // },
       {
         label: 'City',
         field: 'address.city',
@@ -80,15 +71,10 @@ export default {
         label: 'State',
         field: 'address.state',
       },
-      {
-        label: 'Client',
-        field: 'client',
-        sortable: false
-      },
     ]
   }),
   computed: {
-    ...mapState(['currentUser', 'venues', 'hiddenVenues']),
+    ...mapState(['currentUser', 'userProfile', 'venues']),
     filteredVenues() {
       if (this.searchText && this.searchText.length > 2) {
         return this.venues.filter(
@@ -109,48 +95,14 @@ export default {
       let url = `/venues/` + params.row.id
       router.push(url)
     },
-    exportAll() {
-      const exportHeaders = [
-        "ID",
-        "Title",
-        // "Clients",
-        "Address",
-        "Street",
-        "City",
-        "State",
-        "Zip Code",
-      ]
-
-      // let clients = (this.venues[key].client[0].title || null)
-
-      const exportItems = [];
-      for (var key in this.venues) {
-        exportItems.push([
-          this.venues[key].id || null,
-          this.venues[key].title || null,
-          // clients,
-          this.venues[key].address.street_number || null,
-          this.venues[key].address.street || null,
-          this.venues[key].address.city || null,
-          this.venues[key].address.state || null,
-          this.venues[key].address.zip || null,
-        ])
-        
-      }
-      console.log(exportItems)
-      this.$gapi.getGapiClient().then(gapi => {
-        const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
-        exportService.export();
-      });
-    },
   },
   created () {
     if (!this.venues || this.venues.length < 1) {
       this.$store.dispatch("getVenues")
     }
   },
-  beforeDestroy () {
-    this.$store.dispatch('clearVenuesState')
-  }
+  // beforeDestroy () {
+  //   this.$store.dispatch('clearVenuesState')
+  // }
 }
 </script>
