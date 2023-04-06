@@ -1,8 +1,8 @@
 <template>
 	<div>
-    
+    <Loader v-if="performingRequest" />
     <div class="dashboard__container pt-3">
-      <Loader v-if="performingRequest" />
+      
       <div class="dashboard__container--header mb-3" v-if="event">
         <div class="mb-3">
           <div class="flex align-center">
@@ -588,6 +588,7 @@
                       
                     </span>
 
+
                     <span v-else-if="props.column.field == 'email'">
                       <button v-if="(props.row.shiftEmailSent || (props.row.shiftEmailSent && Object.keys(props.row.shiftEmailSent).length))" class="icon" v-tooltip="`Emails sent ` + props.row.emailsSent" @click="sendInfoEmail(props.row, shift)">
                         <span class="fa-layers fa-fw">
@@ -1124,7 +1125,7 @@ export default {
     addUser(item) {
       console.log(item)
       this.performingRequest = true;
-      let dateObj = new Date(this.event.startDate);
+      let dateObj = new Date(this.activeDay);
       let month = dateObj.getUTCMonth() + 1;
       let day = dateObj.getUTCDate();
       let year = dateObj.getUTCFullYear();
@@ -1132,7 +1133,6 @@ export default {
 
       fb.usersCollection.doc(item.objectID).get()
       .then(doc => {
-        let branchOnboard = doc.data().branchOnboard || null
         let address = doc.data().address || null
         let blacklist = doc.data().blacklist || null
         let certs = doc.data().certs || null
@@ -1150,7 +1150,6 @@ export default {
         let ssn = doc.data().ssn || null
         let docHold = doc.data().docHold || null
         fb.userDaysCollection.add({
-          branchOnboard: branchOnboard,
           address: address,
           blacklist: blacklist,
           certs: certs,

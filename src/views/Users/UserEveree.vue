@@ -4,7 +4,6 @@
       <iframe v-if="iframaData && (iframaData != null)" 
         :src="iframaData" 
         >
-        
       </iframe>
     </div>
   </div>
@@ -21,9 +20,6 @@ export default {
   data: () => ({ 
     iframaData: null,
   }),
-  // mounted() {
-  //   this.createComponentSession()
-  // },
   methods: {
     createComponentSession() {
       const createComponentSession = firebase.functions().httpsCallable('createComponentSession')

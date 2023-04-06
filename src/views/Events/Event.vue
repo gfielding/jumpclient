@@ -2,43 +2,15 @@
 	<div>
     <Loader v-if="!eventInfo.id" />
     <div class="dashboard__container pt-3" v-if="eventInfo.id">
-      <div class="dashboard__container--header">
-        <div class="flex align-center justify-space-between" style="width:100%;">
-          <h4 style="width:auto;">Edit Event</h4>
-          <span class="flex flex-wrap justify-flex-end">
-            <button class="btn btn__success btn__small ml-5 mr-3" v-if="event && event.published" :disabled="event.cancelled">
-              Published
-            </button>
-            <button class="btn btn__warning btn__small ml-5 mr-3" v-if="event && !event.published" :disabled="event.status == 'cancelled'">
-              Draft
-            </button>
-            <button class="btn btn__danger btn__small ml-5 mr-3" v-if="event && event.status == 'cancelled'">
-              Cancelled
-            </button>
-            <!-- <button class="btn btn__outlined btn__small mr-3" @click="venueSync()">Sync Venue Details</button> -->
-            <button class="btn btn__outlined btn__small mr-3" @click="email()">Preview Info Email</button>
-          </span>
-        </div>
-        <!-- <div class="flex align-center flex-wrap ml-3 justify-flex-end">
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="venueSync()">Sync Venue Details</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="email()">Preview Info Email</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="checkIn()">Check-In</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="shifts()">Shifts</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="sheets()">Timesheets</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="placements()">Placements</button>
-          <button class="btn btn__outlined btn__small mr-3 mb-3" @click="files()">Files</button>
-
-
-          <button class="btn btn__outlined btn__small mb-3" @click="goBack()"><i class="fas fa-arrow-left"></i></button>
-        </div> -->
-      </div>
+      
       <form ref="form" @submit.prevent>
         
       	<div class="dashboard__container--body mt-3" v-if="eventInfo">
       		<div class="dashboard__container--body--col">
             <div>
+              <h4>Event Details</h4>
     				<div class="mb-3">
-    					<label for="eventName">Event Name:</label>
+    					<label for="eventName">Event Title:</label>
     					<input type="text" v-model.trim="event.title" id="eventName" required />
     				</div>
 
@@ -70,7 +42,7 @@
               </v-select>
             </div>
             <div class="mb-3" v-if="event.venue">
-              <label for="clients">Clients:</label>
+              <label for="clients">Client:</label>
               <v-select
                 class="mt-2"
                 label="title"
@@ -81,7 +53,7 @@
               </v-select>
             </div>
 
-            <div class="mb-3" v-if="event.venue && tags.length > 1">
+           <!--  <div class="mb-3" v-if="event.venue && tags.length > 1">
               <label for="tags">Tags:</label>
               <v-select
                 class="mt-2"
@@ -91,9 +63,9 @@
                 v-model="event.tags"
                 >
               </v-select>
-            </div>
+            </div> -->
             <div class="mb-3" v-if="event.venue && mgrs.length >= 1">
-            <label for="mgrs">Managers:</label>
+            <label for="mgrs">Staffing Managers:</label>
               <v-select
                 class="mt-2"
                 label="name" 
@@ -118,17 +90,44 @@
             </div>
           </div>
           </div>
-          <div class="dashboard__container--body--col" v-if="event">
-            <div class="mb-3">
-              <label for="eventDescription">Description:</label>
-              <vue-editor id="eventDescription" v-model="event.description" required></vue-editor>
-            </div>
-          </div>
+          
           <div class="dashboard__container--body--col">
-            <div>
-            <h4>Days to Staff</h4>
-
             <div class="mb-3">
+            <div class="flex justify-space-between align-center">
+              <h4>Jobs to Staff</h4>
+              
+            </div>
+            
+            <div class="mb-3">
+              <label for="pickDate">Choose Jobs:</label>
+              <v-select
+                class="mt-2"
+                label="title" 
+                :options="jobs"
+                v-model="event.venue.job"
+                multiple
+                >
+              </v-select>
+            </div>
+            <transition name="fadeStop">
+              <div class="mb-5" v-if="event.venue.job && event.venue.job.length >= 1">
+                <div v-for="job in event.venue.job" class="mb-3 flex justify-space-between">
+                  <input type="text" readonly v-model.trim="job.title" />
+                  <input class="ml-3" type="number" step=".01" placeholder="pay rate" v-model.trim="job.rate" />
+                  <input class="ml-3" type="number" step=".01" placeholder="bill rate" v-model.trim="job.billRate" />
+                  <input class="ml-3" type="text" placeholder="new label" v-model.trim="job.label" />
+                  <div class="ml-3">
+                    <label for="tipped">Tipped?</label>
+                    <input class="ml-3" type="checkbox" v-model="job.tipped" id="tipped" />
+                  </div>
+                  <!-- <button class="btn btn__accent btn__small ml-3">save</button> -->
+                </div>
+              </div>
+            </transition>
+ 
+            <h4 class="mt-5">Days to Staff</h4>
+
+            <div class="mb-3 mt-2">
               <label for="multiDay">Multiple Days:</label>
               <input type="checkbox" v-model.trim="multiDay" id="multiDay" class="ml-3" />
             </div>
@@ -150,75 +149,26 @@
             <transition name="fadeStop">
               <div class="mb-3" v-if="!multiDay">
                 <label for="Date">Date:</label>
-                <input type="date" v-model.trim="event.startDate"  id="Date"  />
+                <input type="date" v-model.trim="event.startDate"  id="Date" @change="addInitialDay()" />
               </div>
             </transition>
 
             
             <transition name="fadeStop">
-              <div class="mt-2 flex" style="flex-wrap: wrap;" v-if="event.days && event.days.length >= 1">
+              <div class="mt-2 flex" style="flex-wrap: wrap;" v-if="(event.days && event.days.length >= 1) && multiDay">
                 <button class="chip mr-2 mb-2" v-for="(day, index) in event.days" :key="day" @click="deleteDay(index)">{{day}} <i class="far fa-times-circle ml-2"></i></button>
               </div>
             </transition> 
             <transition name="fadeStop">
-              <div class="mb-3" v-if="event.startDate">
-                <label for="pickDate">Choose Date:</label>
+              <div class="mb-3" v-if="event.startDate && multiDay">
+                <label for="pickDate">Select All Event Days to Staff:</label>
                 <input type="date" v-model.trim="day" id="pickDate" @change="addDay()" />
               </div>
             </transition>
           </div>
           </div>
 
-          <div class="dashboard__container--body--col" v-if="event.venue">
-            <div>
-            <div class="flex justify-space-between align-center">
-              <h4>Jobs to Staff</h4>
-              
-            </div>
-            
-            <div class="mb-3">
-              <label for="pickDate">Choose Jobs:</label>
-              <v-select
-                class="mt-2"
-                label="title" 
-                :options="jobs"
-                v-model="event.venue.job"
-                multiple
-                >
-              </v-select>
-            </div>
-            <transition name="fadeStop">
-              <div class="mb-3" v-if="event.venue.job && event.venue.job.length >= 1">
-                <div v-for="job in event.venue.job" class="mb-3 flex justify-space-between">
-                  <input type="text" readonly v-model.trim="job.title" />
-                  <input class="ml-3" type="number" step=".01" placeholder="pay rate" v-model.trim="job.rate" />
-                  <input class="ml-3" type="number" step=".01" placeholder="bill rate" v-model.trim="job.billRate" />
-                  <input class="ml-3" type="text" placeholder="new label" v-model.trim="job.label" />
-                  <div class="ml-3">
-                    <label for="tipped">Tipped?</label>
-                    <input class="ml-3" type="checkbox" v-model="job.tipped" id="tipped" />
-                  </div>
-                  <!-- <button class="btn btn__accent btn__small ml-3">save</button> -->
-                </div>
-              </div>
-            </transition>
-            </div>
-          </div>
-
-          <!-- <div class="dashboard__container--body--col" v-if="event.venue">
-            <div class="mb-3" v-if="clients.length >= 1">
-              <h4>Client</h4>
-              <v-select
-                class="mt-2"
-                label="title"
-                multiple
-                :options="clients"
-                v-model="event.venue.client"
-                >
-              </v-select>
-            </div>
-          </div>
-           -->
+          
           <div class="dashboard__container--body--col">
             <div>
             <h4>Attach Files</h4>
@@ -264,7 +214,7 @@
             </div>
           </div>
 
-      		<div class="dashboard__container--body--col">
+      		<!-- <div class="dashboard__container--body--col">
             <div>
             <h4 class="mb-3">Background Image</h4>
             <div class="flex flex-column align-center">
@@ -290,6 +240,17 @@
             </div>
             </div>
           </div>
+ -->
+          <div class="dashboard__container--body--col" v-if="event">
+
+            <div class="mb-3">
+              <h4>Event Description</h4>
+              <!-- <label for="eventDescription">Description:</label> -->
+              <vue-editor id="eventDescription" v-model="event.description" required></vue-editor>
+            </div>
+          </div>
+
+          
           <div class="dashboard__container--body--col" v-if="event.venue">
             <div>
             <h4>Attire</h4>
@@ -298,14 +259,14 @@
             </div>
             </div>
           </div>
-          <div class="dashboard__container--body--col" v-if="event.venue">
+<!--           <div class="dashboard__container--body--col" v-if="event.venue">
             <div>
             <div class="mb-3">
               <h4>Pay</h4>
               <vue-editor id="pay" v-model="event.venue.pay"></vue-editor>
             </div>
           </div>
-          </div>
+          </div> -->
           <div class="dashboard__container--body--col" v-if="event.venue">
             <div>
             <div class="mb-3">
@@ -398,20 +359,20 @@
             </div>
           </div> -->
 
-          <div class="dashboard__container--body--col" style="background: transparent;">
-            <div class="flex justify-space-between">
-              <!-- <button class="btn btn__outlined btn__large" @click="exportStaff()">
-              export Staff
+          <div class="floating_buttons">
+            <button class="btn btn__success btn__large" @click="updateEvent()" :disabled="event.status == 'cancelled'">
+            Update Event
+              <transition name="fade">
+                <span class="ml-2" v-if="performingRequest">
+                <i class="fa fa-spinner fa-spin"></i>
+                </span>
+              </transition>
+            </button>
+          </div>
 
-              </button> -->
-              <button class="btn btn__success btn__large" @click="updateEvent()" :disabled="event.status == 'cancelled'">
-              Update Event
-                <transition name="fade">
-                  <span class="ml-2" v-if="performingRequest">
-                  <i class="fa fa-spinner fa-spin"></i>
-                  </span>
-                </transition>
-              </button>
+          <div class="dashboard__container--body--col" style="background: transparent;">
+            <div class="flex justify-space-between" style="background: transparent;">
+
 
               <button class="btn btn__danger btn__large" @click="showCancellation = true" v-if="!showCancellation && event.status != 'cancelled'">
                 Cancel Event
@@ -614,51 +575,32 @@ export default {
     goBack() {
       router.go(-1)
     },
+    addInitialDay() {
+      let event = this.event
+      event.days.push(this.event.startDate)
+      this.$store.dispatch('updateEvent', event)
+    },
     addDay() {
       let event = this.event
       event.days.push(this.day)
       this.day = ''
       this.$store.dispatch('updateEvent', event)
-        let logFields = {
-          staffMember: this.currentUser.email,
-          export: 'Add Day (Events)',
-          eventId: this.event
-      }
-      this.$store.dispatch('sendEventLog', logFields)
     },
     addJob() {
       let event = this.event
       event.jobs.push(this.job)
       this.job = ''
       this.$store.dispatch('updateEvent', event)
-      let logFields = {
-          staffMember: this.currentUser.email,
-          export: 'Add Job (Events)',
-          eventId: this.event
-      }
-      this.$store.dispatch('sendEventLog', logFields)
     },
     deleteDay(index) {
       let event = this.event
       event.days.splice(index, 1)
       this.$store.dispatch('updateEvent', event)
-      let logFields = {
-          staffMember: this.currentUser.email,
-          export: 'Delete Day (Events)',
-          eventId: this.event
-      }
-      this.$store.dispatch('sendEventLog', logFields)
     },
     deleteJob(index) {
       let event = this.event
       event.jobs.splice(index, 1)
       this.$store.dispatch('updateEvent', event)
-      let logFields = {
-          staffMember: this.currentUser.email,
-          export: 'Delete Job (Events)',
-          eventId: this.event
-      }
-      this.$store.dispatch('sendEventLog', logFields)
     },
     deleteUploadedFile(u, index) {
       console.log(u)

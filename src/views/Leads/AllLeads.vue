@@ -20,6 +20,16 @@
           <span v-if="props.column.field == 'created'">
             <span v-if="props.row.created">{{formatDate(props.row.created)}}</span>
           </span>
+
+          <span v-else-if="props.column.field == 'followUp'">
+            <button class="btn btn__outlined btn__small relative" v-if="!props.row.sendFollowUp" @click="sendFollowUp(props.row)">
+              Send Text
+            </button>
+
+            <button class="btn btn__outlined btn__small relative" v-if="props.row.sendFollowUp">
+              Sent <i class="fa-solid fa-check ml-3" style="color:#00C897;"></i>
+            </button>
+          </span>
           <span v-else-if="props.column.field == 'updated'">
             <span v-if="props.row.updated">{{formatDate(props.row.updated)}}</span>
           </span>
@@ -66,6 +76,15 @@
   </div>
 </template>
 
+<style scoped>
+  .statusCheck {
+    position: absolute;
+    bottom: 0.25rem;
+    right: 0.25rem;
+    font-size: 1.2rem;
+  }
+</style>
+
 <script>
 import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
@@ -85,6 +104,11 @@ export default {
         label: 'Hide',
         field: 'delete',
         sortable: false,
+      },
+      {
+        label: 'Send Text',
+        field: 'followUp',
+        width: '120px'
       },
       {
         label: 'Created',
@@ -157,6 +181,12 @@ export default {
     LeadNote
   },
   methods: {
+    sendFollowUp(row) {
+      console.log(row)
+      fb.marketingLeadsCollection.doc(row.id).update({
+        sendFollowUp: true
+      })
+    },
     updateLead(row) {
       fb.marketingLeadsCollection.doc(row.id).update({
         status: row.status,

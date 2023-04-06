@@ -200,6 +200,12 @@ export default {
     closeItem(r) {
       this.activeNote = null
     },
+    // addAll() {
+    //   let group = this.group
+    //   this.$store.dispatch("addAllUsersToGroup", {
+    //     group: this.group
+    //   })
+    // },
     addUser(item) {
       console.log(item)
       let group = this.group

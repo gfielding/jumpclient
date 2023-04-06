@@ -1,8 +1,12 @@
 <template>
   <div class="dashboard__container" v-if="user">
-    <div class="dashboard__container--body flex flex-wrap" v-if="user && user.groups">
-
+    <div class="dashboard__container--body flex flex-wrap">
+      <div class="mb-3 whiteBack pa-3" style="width:50%; min-width: 200px;">
+        <label for="">Add Group to User:</label>
+        <v-select :options="groups" label="title" v-model="newGroup" @input="addGroup" />
+      </div>
       <vue-good-table
+        v-if="user && user.groups"
         :columns="columns"
         @on-row-click="onRowClick"
         :rows="userGroups"
@@ -63,6 +67,7 @@ import Loader from '@/components/Loader.vue'
 export default {
   props: ['user'],
   data: () => ({ 
+    newGroup: '',
     columns: [
       {
         label: 'Title',
@@ -96,6 +101,14 @@ export default {
     Loader,
   },
   methods: {
+    addGroup(group) {
+      console.log(group)
+      this.$store.dispatch("addUserToGroup", {
+        group: group,
+        user: this.user
+      })
+      
+    },
     onRowClick(params) {
       let url = `/groups/` + params.row.id
       console.log(url)

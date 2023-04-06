@@ -9,7 +9,7 @@
       <div class="dashboard__container--body--col">
         <ProfileOnboard :user="user" :userContractorPayProfile="userContractorPayProfile" class="mb-5" />
 
-        <!-- <ProfileEmployeeOnboard :user="user" :userEmployeePayProfile="userEmployeePayProfile" class="mb-5" /> -->
+        <ProfileEmployeeOnboard :user="user" :userEmployeePayProfile="userEmployeePayProfile" class="mb-5" />
 
         <ProfileAddress :user="user" class="mb-5" />
         <!-- <ProfileSkills :user="user" /> -->

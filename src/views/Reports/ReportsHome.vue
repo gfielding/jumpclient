@@ -5,11 +5,14 @@
         <h1>Reports</h1>
         <span class="flex align-center">
           <router-link :to="{name: 'payrollSubmissions'}">
-            <button class="btn  ml-3" v-bind:class="{ 'btn__dark': isPayrollSubmissions, 'btn__outlined': !isPayrollSubmissions }">Payroll Submissions</button>
+            <button class="btn btn__small mr-3" v-bind:class="{ 'btn__dark': isPayrollQueue, 'btn__outlined': !isPayrollQueue }">Payroll Queue</button>
           </router-link>
-          <router-link :to="{name: 'userParse'}">
+          <!-- <router-link :to="{name: 'evereeUsersWithoutExternalId'}">
+            <button class="btn btn__small mr-3" v-bind:class="{ 'btn__dark': isEvereeUsersWithoutExternalId, 'btn__outlined': !isEvereeUsersWithoutExternalId }">EvereeUsersWithoutExternalId</button>
+          </router-link> -->
+          <!-- <router-link :to="{name: 'userParse'}">
             <button class="btn  ml-3" v-bind:class="{ 'btn__dark': isUserParse, 'btn__outlined': !isUserParse }">User Parse</button>
-          </router-link>
+          </router-link> -->
           <!-- <router-link :to="{name: 'clientContacts'}">
             <button class="btn  ml-3" v-bind:class="{ 'btn__dark': isContacts, 'btn__outlined': !isContacts }">Contacts</button>
           </router-link>
@@ -22,7 +25,7 @@
           <router-link :to="{name: 'clientFiles'}">
             <button class="btn  ml-3" v-bind:class="{ 'btn__dark': isFiles, 'btn__outlined': !isFiles }">Files</button>
           </router-link> -->
-          <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
+          <button class="btn btn__outlined btn__small" @click="goBack()"><i class="fas fa-arrow-left"></i></button>
         </span>
         
       </div>
@@ -38,12 +41,19 @@ import router from '@/router'
 export default {
   name: 'reportsHome',
   computed: {
-    isPayrollSubmissions() {
-      return this.$route.name == 'payrollSubmissions';
+    ...mapState(['currentUser', 'userProfile']),
+    isPayrollQueue() {
+      return this.$route.name == 'payrollQueue';
     },
-    isUserParse() {
-      return this.$route.name == 'userParse';
+    isEvereeUsersWithoutExternalId() {
+      return this.$route.name == 'evereeUsersWithoutExternalId';
     },
+
+
+    
+    // isUserParse() {
+    //   return this.$route.name == 'userParse';
+    // },
     // isSummary() {
     //   return this.$route.name == 'client';
     // },
@@ -57,9 +67,6 @@ export default {
     //   return this.$route.name == 'clientFiles';
     // }
   },
-  // created () {
-  //   this.$store.dispatch("getClientFromId", this.$route.params.id);
-  // },
   methods: {
     goBack() {
       router.go(-1)

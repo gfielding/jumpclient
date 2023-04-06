@@ -1,7 +1,7 @@
 <template>
 	<div class="white_back">
 		<div id="printMe" class="pa-5">
-			<h1>MVP Check-In / Check-Out</h1>
+			<h1>Jump Check-In / Check-Out</h1>
 			<h2 v-if="venueInfo">{{venueInfo.title}}</h2>
 			<vue-qr v-if="venueInfo" :text="`https://mvpeventstaffing.com/checkinout/` + venueInfo.id" :size="300" style="margin:auto;"></vue-qr>
 			<p>Scan this QR code and open the link to sign in and out of your shift</p>

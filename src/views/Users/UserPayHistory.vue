@@ -45,6 +45,41 @@
           </template>
       </vue-good-table>
       </div>
+      <div v-if="employeePayHistory && employeePayHistory.items && employeePayHistory.items.length >= 1" class="mb-5 w100">
+        <h4 class="mb-2">Pay History Jump Employee Services LLC</h4>
+        <vue-good-table
+          :columns="columnsPayHistory"
+          :rows="employeePayHistory.items"
+           styleClass="vgt-table condensed"
+          :search-options="{
+            enabled: false,
+            placeholder: 'Search this table',
+          }"
+          :pagination-options="{
+            enabled: true,
+            mode: 'records',
+            perPage: 25,
+          }"
+          
+        >
+        <template slot="table-row" slot-scope="props">
+            <span v-if="props.column.field == 'payableNotes'">
+              <span v-if="props.row.payableNotes">{{props.row.payableNotes[0]}}</span>
+            </span>
+            <span v-else-if="props.column.field == 'deposits'">
+              <span v-if="props.row.deposits">{{props.row.deposits[0].destinationLabel}}</span>
+            </span>
+            <span v-else-if="props.column.field == 'depositsAmount'">
+              <span v-if="props.row.deposits">{{props.row.deposits[0].amount.amount}}</span>
+            </span>
+
+            
+            <span v-else>
+              {{props.formattedRow[props.column.field]}}
+            </span>
+          </template>
+      </vue-good-table>
+      </div>
     </div>
   </div>
 
@@ -109,7 +144,7 @@ export default {
 
   },
   computed: {
-    ...mapState(['currentUser', 'userProfile', 'userContractorPayProfile', 'workerFiles', 'unpaidPayables', 'workerPayHistory']),
+    ...mapState(['currentUser', 'userProfile', 'userContractorPayProfile', 'workerFiles', 'unpaidPayables', 'workerPayHistory', 'employeePayHistory']),
   },
   // created () {
   //   this.retrieveByExternalId()

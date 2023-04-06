@@ -137,11 +137,16 @@ const store = new Vuex.Store({
     workerFiles: {},
     unpaidPayables: {},
     workerPayHistory: {},
+    employeePayHistory: {},
     userEmployeePayProfile: {},
     employeeFiles: {},
     employeeUnpaidPayables: {},
     employeePayHistory: {},
-    evereeContractors: {}
+    evereeContractors: {},
+    userBackgroundChecks: [],
+    backgroundCheck: {},
+    payrollQueue: [],
+    evereeUsersWithoutExternalId: []
   },
   actions: {
 
@@ -682,6 +687,7 @@ const store = new Vuex.Store({
 
     /*Client Access*/
     getClientAccess({ commit }) {
+      console.log('getting client access')
       fb.clientAccessCollection.orderBy('lastName', 'asc').onSnapshot(querySnapshot => {
         let clientAccessArray = []
         querySnapshot.forEach(doc => {
@@ -787,12 +793,32 @@ const store = new Vuex.Store({
       console.log(payload)
       fb.groupsCollection.doc(payload.id).update(payload)
     },
+
+
+    addAllUsersToGroup({ commit }, payload) {
+      console.log(payload)
+      fb.groupsCollection.doc(payload.id).get()
+      .then(doc => {
+        console.log(doc)
+        doc.data().members.forEach(member => {
+          fb.usersCollection.doc(member).get()
+          .then(doc => {
+            console.log(doc.data())
+            // store.dispatch("addUserToGroup", {
+            //   group: payload,
+            //   user: doc.data()
+            // })
+          })
+        })
+      })
+    },
     addUserToGroup({ commit }, payload) {
       console.log(payload)
+      let userId = (payload.user.objectID || payload.user.id)
       let newText = {
         name: payload.user.firstName,
         phone: payload.user.phone,
-        userId: payload.user.objectID,
+        userId: userId,
         type: 'groupAcceptance',
         group: payload.group.title
       }
@@ -804,11 +830,11 @@ const store = new Vuex.Store({
           created: fb.firestore.FieldValue.serverTimestamp()
         })
       })
-      fb.usersCollection.doc(payload.user.objectID).update({
+      fb.usersCollection.doc(userId).update({
         groups: firebase.firestore.FieldValue.arrayUnion(payload.group.id)
       })
       fb.groupsCollection.doc(payload.group.id).update({
-        members: firebase.firestore.FieldValue.arrayUnion(payload.user.objectID)
+        members: firebase.firestore.FieldValue.arrayUnion(userId)
       })
       // store.dispatch('getGroupFromId', payload.group.id)
     },
@@ -936,22 +962,22 @@ const store = new Vuex.Store({
       let user = payload.user
       fb.usersCollection.doc(user.id).update(user)
       payload.groups.forEach(p => {
-        if (state.groups.some(i => i.title.includes(p))) {
-          console.log("includes")
-        } else {
-          console.log(p)
-          fb.groupsCollection.add({
-            title: p,
-            owner: state.currentUser.uid
-          })
-          .then(
-            doc => {
-            fb.groupsCollection.doc(doc.id).update({
-              id: doc.id,
-              created: fb.firestore.FieldValue.serverTimestamp()
-            })
-          })
-        }
+        // if (state.groups.some(i => i.title.includes(p))) {
+        //   console.log("includes")
+        // } else {
+        //   console.log(p)
+        //   fb.groupsCollection.add({
+        //     title: p,
+        //     owner: state.currentUser.uid
+        //   })
+        //   .then(
+        //     doc => {
+        //     fb.groupsCollection.doc(doc.id).update({
+        //       id: doc.id,
+        //       created: fb.firestore.FieldValue.serverTimestamp()
+        //     })
+        //   })
+        // }
       })
     },
     getGroups({ commit }) {
@@ -984,7 +1010,10 @@ const store = new Vuex.Store({
               fb.usersCollection.doc(member).get()
               .then(
                 doc => {
-                  groupUsersArray.push(doc.data())
+                  if(doc.exists) {
+                    groupUsersArray.push(doc.data())
+                  }
+                  
                 }
               )
             })
@@ -994,7 +1023,9 @@ const store = new Vuex.Store({
               fb.usersCollection.doc(applicant).get()
               .then(
                 doc => {
-                  applicationsArray.push(doc.data())
+                  if(doc.exists) {
+                    applicationsArray.push(doc.data())
+                  }
                 }
               )
             })
@@ -1004,7 +1035,9 @@ const store = new Vuex.Store({
               fb.usersCollection.doc(wait).get()
               .then(
                 doc => {
-                  waitlistArray.push(doc.data())
+                  if(doc.exists) {
+                    waitlistArray.push(doc.data())
+                  }
                 }
               )
             })
@@ -1562,7 +1595,17 @@ const store = new Vuex.Store({
             onboardingStatus: result.data.onboardingStatus,
           })
         })
-
+        const onboardEvereeEmployeeText = firebase.functions().httpsCallable('newOnboardText')
+        onboardEvereeEmployeeText({
+          firstName: firstName,
+          lastName: lastName,
+          phone: phone,
+          email: email,
+        })
+        .then(result => {
+          console.log(result.data)
+        })
+        store.dispatch('getUserFromId', payload)
       })
     },
 
@@ -1570,9 +1613,7 @@ const store = new Vuex.Store({
 
 
     /*USERS*/
-    // getUsersForEveree({ commit }) {
-    //   fb.usersCollection
-    // },
+
     addCreated({ commit }) {
       fb.usersCollection
       .get().then((querySnapshot) => {
@@ -1589,15 +1630,10 @@ const store = new Vuex.Store({
       })
     },
     getUsers({ commit }) {
-      console.log('getUsers')
-      fb.usersCollection.orderBy('created', 'asc')
-      .get().then((querySnapshot) => {
-         let usersArray = []
+      console.log('getting users')
+      fb.usersCollection.orderBy('id', 'asc').get().then((querySnapshot) => {
+        let usersArray = []
         querySnapshot.forEach((doc) => {
-
-      // .onSnapshot(querySnapshot => {
-      //   let usersArray = []
-      //   querySnapshot.forEach(doc => {
           let user = doc.data()
           usersArray.push(user)
         })
@@ -1625,8 +1661,8 @@ const store = new Vuex.Store({
         commit('setUserEmployeePayProfile', result.data)
       })
       store.dispatch('retrieveEmployeeFiles', payload)
-      store.dispatch('retrieveEmployeeUnpaidPayables', payload)
-      store.dispatch('retrieveEmployeePayHistory', payload)
+      // store.dispatch('retrieveEmployeeUnpaidPayables', payload)
+      // store.dispatch('retrieveEmployeePayHistory', payload)
     },
     async retrieveEmployeeUnpaidPayables({ commit }, payload) {
       const retrieveUnpaidPayables = firebase.functions().httpsCallable('retrieveUnpaidPayables')
@@ -1648,9 +1684,19 @@ const store = new Vuex.Store({
         commit('setEmployeeFiles', result.data)
       })
     },
-    async retrieveEmployeePayHistory({ commit }, payload) {
+    async retrieveWorkerPayHistory({ commit }, payload) {
       const retrieveWorkerPayHistory = firebase.functions().httpsCallable('retrieveWorkerPayHistory')
         await retrieveWorkerPayHistory({
+        id: payload
+      })
+      .then(result => {
+        console.log(result.data)
+        commit('setWorkerPayHistory', result.data)
+      })
+    },
+    async retrieveEmployeePayHistory({ commit }, payload) {
+      const retrieveEmployeePayHistory = firebase.functions().httpsCallable('retrieveEmployeePayHistory')
+        await retrieveEmployeePayHistory({
         id: payload
       })
       .then(result => {
@@ -1668,8 +1714,8 @@ const store = new Vuex.Store({
         console.log(result.data)
         commit('setUserContractorPayProfile', result.data)
       })
-      store.dispatch('retrieveWorkerFiles', payload)
-      store.dispatch('retrieveUnpaidPayables', payload)
+      // store.dispatch('retrieveWorkerFiles', payload)
+      // store.dispatch('retrieveUnpaidPayables', payload)
       store.dispatch('retrieveWorkerPayHistory', payload)
     },
     async retrieveUnpaidPayables({ commit }, payload) {
@@ -1710,8 +1756,41 @@ const store = new Vuex.Store({
       })
     },
 
+    getEvereeUsersWithoutExternalId({ commit }) {
+      fb.usersCollection.onSnapshot(querySnapshot => {
+        let usersArray = []
+        querySnapshot.forEach(doc => {
+          if(doc.data().workerId && doc.data().evereeOnboardingComplete) {
+            usersArray.push(doc.data())
+          }
+        })
+        commit('setEvereeUsersWithoutExternalId', usersArray)
+      })
+    },
+    clearEvereeUsersWithoutExternalId({ commit }) {
+      commit('setEvereeUsersWithoutExternalId', [])
+    },
 
-    
+    updateExternalIds({ commit }) {
+      fb.usersCollection.onSnapshot(querySnapshot => {
+        querySnapshot.forEach(doc => {
+          if(doc.data().workerId && doc.data().evereeOnboardingComplete) {
+            console.log(doc.data().id)
+            const updateExternalIds = firebase.functions().httpsCallable('updateExternalIds')
+            updateExternalIds({
+              id: doc.data().id,
+              workerId: doc.data().workerId
+            })
+            .then((result) => {
+                console.log(result)
+              })
+
+          }
+        })
+      })
+    },
+
+
 
     // getUserFromId({ commit }, payload) {
     //   fb.usersCollection.where("id", "==", payload).onSnapshot(querySnapshot => {
@@ -1965,6 +2044,28 @@ const store = new Vuex.Store({
         commit('setUserAssignments', assignmentsArray)
       })
     },
+    getUserBackgroundChecks({ commit }, payload) {
+      fb.backgroundChecksCollection.where("userId", "==", payload).onSnapshot(querySnapshot => {
+        let backgroundChecksArray = []
+        querySnapshot.forEach(doc => {
+          let check = doc.data()
+          backgroundChecksArray.push(check)
+        })
+        commit('setUserBackgroundChecks', backgroundChecksArray)
+      })
+    },
+    getBackgroundCheck({ commit }, payload) {
+      fb.backgroundChecksCollection.doc(payload)
+      .get().then(doc => {
+        commit("setBackgroundCheck", doc.data())
+      })
+    },
+    updateCheck({ commit }, payload) {
+      fb.backgroundChecksCollection.doc(payload.id).update(payload)
+    },
+    clearBackgroundCheck({ commit }) {
+      commit("setBackgroundCheck", {})
+    },
     clearUserState({ commit }) {
       console.log('clearing user state')
       commit('setUserInfo', {})
@@ -1983,6 +2084,7 @@ const store = new Vuex.Store({
       commit('setEmployeeFiles', {})
       commit('setEmployeeUnpaidPayables', {})
       commit('setEmployeePayHistory', {})
+      commit('setUserBackgroundChecks', [])
     },
     clearUsersState({ commit }) {
       commit('setUsers', [])
@@ -2007,6 +2109,21 @@ const store = new Vuex.Store({
       commit('setShiftLeads', [])
     },
 
+    /*BACKGROUND CHECKS*/
+    addCheck({ commit }, payload) {
+      fb.backgroundChecksCollection.add(payload)
+      .then(
+        doc => {
+          fb.backgroundChecksCollection.doc(doc.id).update({
+            id: doc.id,
+            created: fb.firestore.FieldValue.serverTimestamp(),
+          })
+        }
+      )
+    },
+    
+
+
     /*MARKETS*/
     addLead({ commit }, payload) {
       fb.marketingLeadsCollection.add(payload)
@@ -2021,17 +2138,18 @@ const store = new Vuex.Store({
     },
     getMarketetingLeads({ commit }) {
       console.log('getMarketetingLeads')
-      fb.marketingLeadsCollection.orderBy('created', 'desc').limit(700)
-      .get()
-        .then(snapshot => {
-          let leadsArray = []
-          let archiveArray = []
-          snapshot.forEach(doc => {
+      fb.marketingLeadsCollection.orderBy('created', 'desc').limit(1000)
 
-      // .onSnapshot(querySnapshot => {
-      //   let leadsArray = []
-      //   let archiveArray = []
-      //   querySnapshot.forEach(function (doc) {
+      // .get()
+      //   .then(snapshot => {
+      //     let leadsArray = []
+      //     let archiveArray = []
+      //     snapshot.forEach(doc => {
+
+      .onSnapshot(querySnapshot => {
+        let leadsArray = []
+        let archiveArray = []
+        querySnapshot.forEach(function (doc) {
           let lead = doc.data()
           if (doc.data().hidden) {
             archiveArray.push(lead)
@@ -2070,11 +2188,11 @@ const store = new Vuex.Store({
             let mgrs = doc.data().mgrs
             if (mgrs && mgrs.length > 0 && (mgrs.some(e => e.userId === state.currentUser.uid))) {
               fb.marketingLeadsCollection.where("marketId", "==", doc.id).orderBy('created', 'desc')
-              .get()
-                .then(snapshot => {
-                  snapshot.forEach(doc => {
-              // .onSnapshot(querySnapshot => {
-              //   querySnapshot.forEach(function (doc) {
+              // .get()
+              //   .then(snapshot => {
+              //     snapshot.forEach(doc => {
+              .onSnapshot(querySnapshot => {
+                querySnapshot.forEach(function (doc) {
                 let lead = doc.data()
                 if (doc.data().hidden) {
                 } else {
@@ -3885,7 +4003,7 @@ const store = new Vuex.Store({
     clearShiftUser({ commit }) {
       commit("setCheckinUser", null)
     },
-    lockAShift({ commit }, payload) {
+    async lockAShift({ commit }, payload) {
       console.log(payload)
       let event = payload.event
       let row = payload.row
@@ -3968,16 +4086,16 @@ const store = new Vuex.Store({
         shift: shift
       }
       console.log(assignment)
-      fb.assignmentsCollection.add(assignment)
-      .then(
-        doc => {
-          console.log(doc.id)
-          fb.assignmentsCollection.doc(doc.id).update({
-            id: doc.id,
-            created: fb.firestore.FieldValue.serverTimestamp()
-          })
-        }
-      )
+      await fb.assignmentsCollection.add(assignment)
+      // .then(
+      //   doc => {
+      //     console.log(doc.id)
+      //     fb.assignmentsCollection.doc(doc.id).update({
+      //       id: doc.id,
+      //       created: fb.firestore.FieldValue.serverTimestamp()
+      //     })
+      //   }
+      // )
 
       // fb.userDaysCollection.where("userId", "==", assignment.userId).where("day", "==", assignment.day[0]).get()
       // .then(function (querySnapshot) {
@@ -3995,7 +4113,42 @@ const store = new Vuex.Store({
       //   })
       // })
     },
-    
+
+    async getPayrollUsers({ commit }) {
+      console.log('getting users')
+      await fb.usersCollection.orderBy('id', 'asc')
+
+
+      .get().then((querySnapshot) => {
+        let usersArray = []
+        querySnapshot.forEach((doc) => {
+          let user = doc.data()
+          usersArray.push(user)
+        })
+        commit('setUsers', usersArray)
+      })
+      store.dispatch('getPayrollQueue')
+    },
+
+
+    getPayrollQueue({ commit }) {
+      console.log('getting queue')
+      fb.assignmentsCollection.onSnapshot(querySnapshot => {
+        let assignmentsArray = []
+        querySnapshot.forEach(doc => {
+          if ((!doc.data().paystatus || doc.data().paystatus != 'paid') && !doc.data().hidden && doc.data().status == 'completed') {
+            assignmentsArray.push(doc.data())
+          } else {
+          }
+          
+        })
+        commit('setPayrollQueue', assignmentsArray)
+        // store.dispatch('getUsers')
+      })
+    },
+    clearPayrollQueue({ commit }) {
+      commit('setPayrollQueue', [])
+    },
     getUsersPerDay({ commit }) {
       console.log('getUsersPerDay')
       fb.userDaysCollection.onSnapshot(querySnapshot => {
@@ -4819,6 +4972,16 @@ const store = new Vuex.Store({
         state.shiftLeads = []
       }
     },
+    setBackgroundCheck(state, val) {
+      state.backgroundCheck = val
+    },
+    setUserBackgroundChecks(state, val) {
+      if (val) {
+        state.userBackgroundChecks = val
+      } else {
+        state.userBackgroundChecks = []
+      }
+    },
     setUserPayroll(state, val) {
       if (val) {
         state.userPayroll = val
@@ -4840,6 +5003,20 @@ const store = new Vuex.Store({
         state.oldUsersByState = []
       }
     },
+    setPayrollQueue(state, val) {
+      if (val) {
+        state.payrollQueue = val
+      } else {
+        state.payrollQueue = []
+      }
+    },
+    setEvereeUsersWithoutExternalId(state, val) {
+      if (val) {
+        state.evereeUsersWithoutExternalId = val
+      } else {
+        state.evereeUsersWithoutExternalId = []
+      }
+    },
     setUserContractorPayProfile(state, val) {
       state.userContractorPayProfile = val
     },
@@ -4851,6 +5028,9 @@ const store = new Vuex.Store({
     },
     setWorkerPayHistory(state, val) {
       state.workerPayHistory = val
+    },
+    setEmployeePayHistory(state, val) {
+      state.employeePayHistory = val
     },
     setUserEmployeePayProfile(state, val) {
       state.userEmployeePayProfile = val

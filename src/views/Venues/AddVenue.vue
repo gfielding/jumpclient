@@ -43,29 +43,29 @@
 		    					<label for="venueName">Venue Name:</label>
 	      					<input type="text" v-model.trim="place.name" id="venueName" />
 		    				</div>
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                   <label for="venueFeatured">Featured:</label>
                   <input type="checkbox" v-model.trim="place.featured" id="venueFeatured" class="ml-3" />
-                </div>
-		    				<div class="mb-3">
+                </div> -->
+		    				<!-- <div class="mb-3">
 		    					<label for="venueVisibility">Visible:</label>
 	      					<input type="checkbox" v-model.trim="place.visible" id="venueVisibility" class="ml-3" />
-		    				</div>
-                <div class="mb-3">
+		    				</div> -->
+               <!--  <div class="mb-3">
                   <label for="venueVisibility">Vaccination Required:</label>
                   <input type="checkbox" v-model.trim="place.requiredVaccine" id="venueVisibility" class="ml-3" />
-                </div>
+                </div> -->
                 <div class="mb-3" v-if="clients.length >= 1">
                   <label for="client">Default Client:</label>
                   <v-select
-                    class="mt-2"
+                    class="mt-2 mb-2"
                     label="title" 
                     :options="clients"
                     multiple
                     v-model="place.client"
                     >
                   </v-select>
-                  <label for="pickDate">Default Jobs:</label>
+                 <!--  <label for="pickDate">Default Jobs:</label>
                     <v-select
                       class="mt-2"
                       label="title" 
@@ -73,10 +73,10 @@
                       multiple
                       v-model="place.job"
                       >
-                    </v-select>
+                    </v-select> -->
                     <label for="client">Select Managers:</label>
                     <v-select
-                      class="mt-2"
+                      class="mt-2 mb-2"
                       label="name" 
                       multiple
                       :options="mgrs"
@@ -179,12 +179,12 @@
             </div>
           </div>
 
-          <div class="dashboard__container--body--col">
+          <!-- <div class="dashboard__container--body--col">
             <div class="mb-3">
               <label for="covid">COVID Requirements:</label>
               <vue-editor id="covid" v-model="place.covid"></vue-editor>
             </div>
-          </div>
+          </div> -->
           <div class="dashboard__container--body--col">
 
             <div class="mb-3">
@@ -193,13 +193,13 @@
             </div>
 
             </div>
-          <div class="dashboard__container--body--col">
+          <!-- <div class="dashboard__container--body--col">
 
             <div class="mb-3">
               <label for="pay">Pay:</label>
               <vue-editor id="pay" v-model="place.pay"></vue-editor>
             </div>
-          </div>
+          </div> -->
 
           <div class="dashboard__container--body--col">
 
@@ -208,18 +208,17 @@
               <vue-editor id="pay" v-model="place.notes"></vue-editor>
             </div>
           </div>
+
+          <div class="floating_buttons" v-if="place && place.name">
+            <button class="btn btn__success btn__large" @click="addVenue()">Add Venue
+              <transition name="fade">
+                <span class="ml-2" v-if="performingRequest">
+                <i class="fa fa-spinner fa-spin"></i>
+                </span>
+              </transition>
+            </button>
+          </div>
       		
-      		<div class="dashboard__container--body--col" style="background: transparent;">
-      			<transition name="fade">
-		    			<button v-if="place" class="btn btn__primary" @click="addVenue()">Add Venue
-                <transition name="fade">
-                  <span class="ml-2" v-if="performingRequest">
-                  <i class="fa fa-spinner fa-spin"></i>
-                  </span>
-                </transition>
-              </button>
-		    		</transition>
-      		</div>
       	</div>
       </form>
     </div>

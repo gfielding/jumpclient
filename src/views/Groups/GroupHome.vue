@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard">
     <div class="dashboard__container">
-      <Loader v-if="!group || (!groupUsers || groupUsers.length < 1)" />
+      <Loader v-if="!group" />
       <div class="dashboard__container--header" v-if="group">
         <div>
         <h1>{{group.title}} Group</h1>
@@ -102,9 +102,9 @@ export default {
       router.go(-1)
     },
   },
-  beforeDestroy () {
-    this.$store.dispatch('clearGroupState')
-    this.$store.dispatch('clearErrors')
-  }
+  // beforeDestroy () {
+  //   this.$store.dispatch('clearGroupState')
+  //   this.$store.dispatch('clearErrors')
+  // }
 }
 </script>

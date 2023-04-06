@@ -14,6 +14,8 @@
 	              class="mt-2"
 	              label="title" 
 	              :options="jobs"
+	              taggable
+	              multiple
 	              v-model="event.venue.job"
 	              >
 	            </v-select>

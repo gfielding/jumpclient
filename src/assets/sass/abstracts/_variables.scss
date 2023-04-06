@@ -1,82 +1,15 @@
 // /*VARIABLES*/
 
-// // $primary: #040f48;
-// // $primaryDark: #0a0f2c;
 
-// $primary: #00C897;
-// $primaryDark: #1F966F;
-
-// $accent: #4E97D1; //greens
-// $accent2: #3C59A8; //darker green
-// $accentDark: #0F7A56;
-// $accentLight: lighten($accent, 20%);
-
-// $background: #efefef;
-// $backDark: darken($background, 5%);
-
-// $light: #FFFFFF;
-
-// // $backgroundAlt: #272c49;
-// $backgroundAlt: #040f48;
-
-// $dark: #333333;
-// $darkDark: darken($dark, 20%);
-
-// $text: #4d4d4d;
-// $textLight: lighten($text, 20%);
-
-// $lightText:#d0d0d0;
-
-// $radius: 0.5rem;
-
-
-// $success:#5cb85c;
-// $successDark: darken($success, 20%);
-// $warning:#f0ad4e;
-// $warningDark: darken($warning, 20%);
-// $danger:#d9534f;
-// $dangerDark: darken($danger, 20%);
-
-// /*VARIABLES*/
-
-// $primBlue:#0078fb;
-// // $primary: #002F46;
-// // $primary: #002a47;
-// $primary: #00C897;
-// $primaryDark: #1F966F;
-// $primaryLight: lighten($primary, 10%);
-
-// $accentPink: darken($primBlue, 20%);
-// // $accent: #e200ab; //pink
-// // $accent2: #ff046e; //orangepink
-
-// $accent: #4E97D1; //greens
-// $accent2: #3C59A8; //darker green
-// $accentDark: #0F7A56;
-// $accentLight: lighten($accent, 20%);
-
-// // $accent: #077fb8; //blue
-// // $accent2: #0fbadf; //sky
-
-$primBlue:#0078fb;
-// $primary: #002F46;
-// $primary: #002a47;
 $primary: #00C897;
 $primaryDark: #1F966F;
 $primaryLight: lighten($primary, 10%);
 
-$accentPink: darken($primBlue, 20%);
-// $accent: #e200ab; //pink
-// $accent2: #ff046e; //orangepink
 
 $accent: #4E97D1; //greens
 $accent2: #3C59A8; //darker green
 $accentDark: #0F7A56;
 $accentLight: lighten($accent, 20%);
-
-// $accent: #077fb8; //blue
-// $accent2: #0fbadf; //sky
-
 
 $blueHue: #2196F3;
 
@@ -87,7 +20,7 @@ $lightBack: lighten($accent, 80%);
 $backBlue:#272c49;
 
 $backgroundDark: #0a0f2c;
-$background: #efefef;
+$background: #f5f5f5;
 
 $backDark: darken($primaryDark, 25%);
 $backAlt: lighten($backDark, 4%);

@@ -1,10 +1,6 @@
 <template>
-	<div class="dashboard">
-    <div class="dashboard__container">
-      <div class="dashboard__container--header">
-        <h1>Edit Client Access</h1>
-        <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
-      </div>
+	<div class="pt-3">
+  
       <form ref="form" @submit.prevent>
       	<div class="dashboard__container--body pt-3">
       		<div class="dashboard__container--body--col">
@@ -77,7 +73,7 @@
           <AccessNotesTable :notes="accessNotes" />
         </div>
       </div>
-    </div>
+
   </div>
 </template>
 

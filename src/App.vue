@@ -16,7 +16,7 @@
      <!--  <keep-alive  max="3" :include="['eventsHome', 'eventsByMonth']">
         
       </keep-alive> -->
-      <keep-alive  max="4" :include="['events']">
+      <keep-alive  max="3" :include="['users', 'groups']">
         <router-view :key="$route.fullPath"></router-view> 
       </keep-alive>
      <!--  <router-view :key="$route.fullPath"></router-view>  -->
@@ -52,6 +52,9 @@ export default {
   watch:{
     $route (to, from){
       this.$store.dispatch('clearErrors')
+      if (!this.userProfile || (this.userProfile && !this.userProfile.id)) {
+        this.userCheck()
+      }
     }
   },
 
@@ -63,6 +66,10 @@ export default {
     logout() {
       this.$store.dispatch('logout')
     },
+    userCheck() {
+      console.log('usercheck')
+      this.$store.dispatch("getUserProfile");
+    }
   },
   // beforeMount(){
   //   this.cred()

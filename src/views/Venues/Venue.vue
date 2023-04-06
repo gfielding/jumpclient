@@ -6,12 +6,12 @@
         <div>
         <h1>{{venue.title}}</h1>
         </div>
-        <span class="flex align-center">
+        <span class="flex align-center justify-flex-end">
           <router-link :to="`/venues/` + venueInfo.id + `/qr`">
-            <button class="btn btn__outlined mr-3">Get QR Code</button>
+            <button class="btn btn__outlined btn__small mr-3">Get QR Code</button>
           </router-link>
-          <button class="btn btn__outlined" @click="exportFollowers()">Followers: <span class="caption" v-if="venueFollowers">{{venueFollowers.length}}</span></button>
-          <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
+          <!-- <button class="btn btn__outlined" @click="exportFollowers()">Followers: <span class="caption" v-if="venueFollowers">{{venueFollowers.length}}</span></button> -->
+          <button class="btn btn__outlined btn__small" @click="goBack()"><i class="fas fa-arrow-left"></i></button>
         </span>
       </div>
       <form ref="form" @submit.prevent>
@@ -51,18 +51,18 @@
       					<label for="venueName">Venue Name:</label>
       					<input type="text" v-model.trim="venue.title" id="venueName" />
       				</div>
-              <div class="mb-3">
+             <!--  <div class="mb-3">
                 <label for="venueFeatured">Featured:</label>
                 <input type="checkbox" v-model.trim="venue.featured" id="venueFeatured" class="ml-3" />
-              </div>
-      				<div class="mb-3">
+              </div> -->
+      				<!-- <div class="mb-3">
       					<label for="venueVisibility">Visible:</label>
       					<input type="checkbox" v-model.trim="venue.visible" id="venueVisibility" class="ml-3" />
-      				</div>
-              <div class="mb-3">
+      				</div> -->
+             <!--  <div class="mb-3">
                 <label for="venueVisibility">Vaccination Required:</label>
                 <input type="checkbox" v-model.trim="venue.requiredVaccine" id="venueVisibility" class="ml-3" />
-              </div>
+              </div> -->
               <div class="mb-3" v-if="clients.length >= 1">
                 <label for="client">Clients:</label>
                 <v-select
@@ -86,7 +86,7 @@
             </div>
       		</div>
 
-          <div class="dashboard__container--body--col" v-if="venue">
+          <!-- <div class="dashboard__container--body--col" v-if="venue">
             <div>
             <h4>Jobs to Staff</h4>
               <div class="mb-3">
@@ -111,12 +111,11 @@
                       <label for="tipped">Tipped?</label>
                       <input class="ml-3" type="checkbox" v-model="job.tipped" id="tipped" @blur="updateVenue()" />
                     </div>
-                    <!-- <button class="btn btn__accent btn__small ml-3">save</button> -->
                   </div>
                 </div>
               </transition>
             </div>
-          </div>
+          </div> -->
           
           
       		<div class="dashboard__container--body--col">
@@ -243,12 +242,12 @@
             </div>
           </div>
 
-          <div class="dashboard__container--body--col">
+          <!-- <div class="dashboard__container--body--col">
             <div class="mb-3">
               <label for="covid">COVID Requirements:</label>
               <vue-editor id="covid" v-model="venue.covid"></vue-editor>
             </div>
-          </div>
+          </div> -->
           <div class="dashboard__container--body--col">
 
             <div class="mb-3">
@@ -257,13 +256,13 @@
             </div>
 
             </div>
-          <div class="dashboard__container--body--col">
+          <!-- <div class="dashboard__container--body--col">
 
             <div class="mb-3">
               <label for="pay">Pay:</label>
               <vue-editor id="pay" v-model="venue.pay"></vue-editor>
             </div>
-          </div>
+          </div> -->
 
           <div class="dashboard__container--body--col">
 
@@ -272,19 +271,17 @@
               <vue-editor id="pay" v-model="venue.notes"></vue-editor>
             </div>
           </div>
-          <div class="dashboard__container--body--col" style="background: transparent;">
-            <div class="flex justify-space-between">
-              <button class="btn btn__primary btn__large" @click="updateVenue()">
-                Update Venue
-                <transition name="fade">
-                  <span class="ml-2" v-if="performingRequest">
-                  <i class="fa fa-spinner fa-spin"></i>
-                  </span>
-                </transition>
-              </button>
-              <!-- <button class="btn btn__dark" @click="deleteVenue()">delete</button> -->
-            </div>
+          <div class="floating_buttons">
+            <button class="btn btn__success btn__large" @click="updateVenue()">
+            Update Venue
+              <transition name="fade">
+                <span class="ml-2" v-if="performingRequest">
+                <i class="fa fa-spinner fa-spin"></i>
+                </span>
+              </transition>
+            </button>
           </div>
+
       	</div>
       </form>
      <!--  <div class="dashboard__container--body" v-if="venueEvents && venueEvents.length >= 1">

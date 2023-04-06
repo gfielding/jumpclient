@@ -1,7 +1,7 @@
 <template>
 	<div class="dashboard">
     <div class="dashboard__container">
-      <div class="dashboard__container--header">
+      <!-- div class="dashboard__container--header">
         <div class="flex align-center mb-5">
           <h1>Preview Info Email</h1>
         </div>
@@ -9,7 +9,7 @@
 
           <button class="btn btn__outlined btn__small mb-3" @click="goBack()"><i class="fas fa-arrow-left"></i></button>
         </div>
-      </div>
+      </div> -->
       <Loader v-if="!event || !event.id" />
       <form ref="form" v-if="event && event.id" @submit.prevent style="margin:auto; max-width: 640px; background: white;">
         
@@ -47,6 +47,11 @@
                 <p><span v-if="item.phone"><a :href="`tel:${item.phone}`">{{item.phone}}</a><br /></span>
                 <a :href="`mailto:${item.email}`">{{item.email}}</a></p>
               </div>
+            </div>
+            <div v-if="event && event.description">
+              <hr>
+              <h3>Event Description</h3>
+              <div v-if="event.description" v-html="event.description"></div>
             </div>
             <div v-if="((event && event.venue && event.venue.attire) || (venueInfo && venueInfo.attire))">
               <hr>
@@ -129,6 +134,12 @@
 	</div>
 </template>
 
+<style scoped>
+  img {
+    max-width: 100% !important;
+  }
+</style>
+
 <script>
 import { mapState } from 'vuex'
 import Loader from '@/components/Loader.vue'
@@ -136,7 +147,7 @@ import router from '@/router'
 const fb = require('../../firebaseConfig.js')
 
 export default {
-  name: 'eventemail',
+  name: 'eventEmail',
   data: () => ({
     croppa: {},
     day:'',

@@ -8,15 +8,22 @@
       <form ref="form" @submit.prevent>
         <div class="dashboard__container--body">
           <div class="dashboard__container--body--col">
+            <div class="mb-3">
+              <label for="title">Group Title:</label>
+              <input class="mb-5" type="text" v-model.trim="group.title" id="title" />
               <div class="mb-3">
-                <label for="title">Group Title:</label>
-                <input class="mb-5" type="text" v-model.trim="group.title" id="title" />
-
                 <label for="groupVisible">Visible on Website:</label>
                 <input type="checkbox" v-model.trim="group.visible" id="groupVisible" class="mb-5 ml-3" />
-                <div>
-              <label for="location">Location (Ex: Monterey, CA):</label>
-              <input type="text" v-model.trim="group.location" id="location" class="mb-5"  />
+              </div>
+
+              <div class="mb-3">
+                <label for="grouprequiresEmployees">Requires Employees:</label>
+              <input type="checkbox" v-model.trim="group.requiresEmployees" id="grouprequiresEmployees" class="mb-5 ml-3" />
+              </div>
+
+              <div>
+                <label for="location">Location (Ex: Monterey, CA):</label>
+                <input type="text" v-model.trim="group.location" id="location" class="mb-5"  />
               </div>
               <label for="pickDate">Specify Jobs:</label>
               <v-select
@@ -28,13 +35,9 @@
                 >
               </v-select>
 
-                <label for="desc">Group Description:</label>
-                <textarea name="desc" id="desc" cols="30" rows="10" v-model="group.description"></textarea>
-              </div>
-
-              
-
-            
+              <label for="desc">Group Description:</label>
+              <textarea name="desc" id="desc" cols="30" rows="10" v-model="group.description"></textarea>
+            </div>
           </div>
           <div class="dashboard__container--body--col">
             <div class="mb-3" v-if="(reps.length >= 1)">

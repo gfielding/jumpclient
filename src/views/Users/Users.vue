@@ -1,10 +1,10 @@
 <template>
   <div class="dashboard">
     <div class="dashboard__container">
-      <div class="dashboard__container--header flex justify-space-between align-center mb-3">
+      <div class="dashboard__container--header flex justify-space-between align-center">
         <h1>Users</h1>
         <div class="flex align-center"> 
-          <button class="btn btn__outlined mb-3" @click="exportUsers()">Everee Export</button>
+          <!-- <button class="btn btn__outlined mb-3" @click="exportUsers()">Everee Export</button> -->
           <!-- <button class="btn btn__outlined mb-3" @click="exportOldUsers()">Old User Export</button> -->
           <!-- <button class="btn btn__outlined mb-3" @click="addCreated()">add created</button> -->
         </div>
@@ -186,7 +186,7 @@
               </span>
             </span>
             <span v-else-if="props.column.field == 'addtogroup'">
-              <v-select :reduce="group => group.title" :options="groups" label="title" taggable multiple push-tags v-model="props.row.groups" @input="updateUser(props.row)" />
+              <v-select :options="groups" label="title" taggable multiple v-model="props.row.groups" @input="updateUser(props.row)" />
             </span>
             <span v-else-if="props.column.field == 'vax'">
               <span v-if="props.row.fullyVaccinated && props.row.fullyVaccinated == `yes`" style="display:inline;">
@@ -246,11 +246,11 @@ export default {
           label: 'Email',
           field: 'email',
         },
-        {
-          label: 'Groups',
-          field: 'addtogroup',
-          width: '200px'
-        },
+        // {
+        //   label: 'Groups',
+        //   field: 'addtogroup',
+        //   width: '200px'
+        // },
         {
           label: 'Points',
           field: 'points',
@@ -283,7 +283,7 @@ export default {
     };
   },
   computed: {
-    ...mapState(['currentUser', 'userProfile', 'stateUsers', 'cityUsers', 'groups', 'users']),
+    ...mapState(['currentUser', 'userProfile', 'stateUsers', 'cityUsers', 'groups']),
   },
   components: {
     Loader,
@@ -292,20 +292,25 @@ export default {
     if (!this.groups || this.groups.length < 1) {
       this.$store.dispatch("getGroups")
     }
-    if (!this.users || this.users.length < 1) {
-      this.$store.dispatch("getUsers")
-    }
+    // if (!this.users || this.users.length < 1) {
+    //   this.$store.dispatch("getUsers")
+    // }
     // this.$store.dispatch("getOldUsersByState")
   },
   methods: {
     updateUser(row) {
       let user = row
       let userGroups = (row.groups || null)
-      console.log(userGroups)
+      // let lastGroup = userGroups.slice(-1)
+      // console.log(lastGroup)
       this.$store.dispatch('updateGroups', {
         groups: userGroups,
         user: user
       })
+      // this.$store.dispatch("addUserToGroup", {
+      //   user: user.id,
+      //   group: lastGroup
+      // })
     },
     setSelectedState(value) {
       console.log(value)
@@ -488,7 +493,7 @@ export default {
     delete this.search
     this.$store.dispatch("clearUsersByState")
     this.$store.dispatch("clearUsersByCity")
-    this.$store.dispatch("clearUsersState")
+    // this.$store.dispatch("clearUsersState")
     this.$store.dispatch("clearOldUsersByState")
   }
 }

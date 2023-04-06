@@ -13,6 +13,10 @@
               <input type="checkbox" v-model.trim="group.visible" id="groupVisible" class="ml-3" />
             </div>
             <div class="mb-3">
+              <label for="grouprequiresEmployees">Requires Employees:</label>
+              <input type="checkbox" v-model.trim="group.requiresEmployees" id="grouprequiresEmployees" class="mb-5 ml-3" />
+            </div>
+            <div class="mb-3">
               <label for="location">Location (Ex: Monterey, CA):</label>
               <input type="text" v-model.trim="group.location" id="location" />
             </div>

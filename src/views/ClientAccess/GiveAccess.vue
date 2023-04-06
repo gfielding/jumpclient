@@ -1,13 +1,10 @@
 <template>
-	<div class="dashboard">
-    <div class="dashboard__container">
-      <div class="dashboard__container--header">
-        <h1>Give Client Access</h1>
-        <button class="btn btn__flat" @click="goBack"><i class="fas fa-arrow-left fa-2x"></i></button>
-      </div>
+	<div>
+    <div>
       <form ref="form" @submit.prevent>
       	<div class="dashboard__container--body pt-3">
       		<div class="dashboard__container--body--col">
+            <div>
             <div class="mb-3">
               <label for="firstName">First Name:</label>
               <input type="text" placeholder="" v-model.trim="client.firstName" id="firstName" />
@@ -19,6 +16,18 @@
             <div class="mb-3">
               <label for="title">Title:</label>
               <input type="text" placeholder="" v-model.trim="client.title" id="title" />
+            </div>
+            <div class="mb-3">
+              <label for="role">Role:</label>
+              <v-select
+                class="mt-2"
+      
+                :options="roles"
+                multiple
+                v-model="client.role"
+                required
+                >
+              </v-select>
             </div>
             <div class="mb-3">
               <label for="phone">Phone:</label>
@@ -33,7 +42,9 @@
               <input type="text" placeholder="" v-model.trim="client.password" id="password" />
             </div>
           </div>
+          </div>
           <div class="dashboard__container--body--col">
+            <div>
             <div class="mb-3" v-if="clients.length > 1">
               <label for="company">Company:</label>
               <v-select
@@ -58,14 +69,17 @@
                 >
               </v-select>
             </div>
-            <button class="btn btn__primary mt-3" @click="addUser()">
-              Send Invite
-              <transition name="fade">
-                <span class="ml-2" v-if="performingRequest">
-                <i class="fa fa-spinner fa-spin"></i>
-                </span>
-              </transition>
+            </div>
+            <div class="floating_buttons">
+              <button class="btn btn__primary mt-3" @click="addUser()">
+                Send Invite
+                <transition name="fade">
+                  <span class="ml-2" v-if="performingRequest">
+                  <i class="fa fa-spinner fa-spin"></i>
+                  </span>
+                </transition>
               </button>
+            </div>
           </div>
         </div>
       </form>
@@ -86,6 +100,7 @@ export default {
   data: () => ({
     client: {},
     performingRequest:false,
+    roles: ['Admin', 'User']
   }),
   components: {
     Loader
@@ -106,16 +121,7 @@ export default {
       this.performingRequest = true
       let client = this.client
       var createUser = firebase.functions().httpsCallable('createUser');
-      createUser({ 
-        email: this.client.email,
-        phone: this.client.phone,
-        password: this.client.password,
-        firstName: this.client.firstName,
-        lastName: this.client.lastName,
-        title: this.client.title,
-        company: this.client.company,
-        venue: this.client.venue,
-      })
+      createUser(client)
       .then((result) => {
         console.log(result)
       })

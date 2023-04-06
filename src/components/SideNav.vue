@@ -129,6 +129,12 @@
               company roster<i class="fas fa-chevron-right"></i>
             </router-link>
           </div>
+
+          <div class="nav__menu--item">
+            <router-link :to="{name: 'reportsHome'}">
+              reports <i class="fas fa-chevron-right"></i>
+            </router-link>
+          </div>
           
 
           

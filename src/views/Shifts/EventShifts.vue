@@ -3,7 +3,7 @@
     <Loader v-if="performingRequest || (!eventAssignments || eventAssignments.length < 1)" />
     <div class="dashboard__container pt-3" v-if="eventInfo && eventInfo.id">
       <div class="dashboard__container--header align-center">
-        <div style="width: 100%;">
+        <div style="width: 100%;" v-if="eventInfo && eventInfo.days && eventInfo.days.length >= 2">
           <!-- <h2 v-if="eventInfo.title">Timesheets</h2> -->
           <div class="text-left mb-3 mt-1" style="width: 100%;">
           <button class="mr-2 mb-2" @click="showStaff()" v-bind:class="{ 'chipDark': !activeDay, 'chip': activeDay }">
@@ -24,7 +24,7 @@
           <button class="btn btn__small mr-3" v-bind:class="{ 'btn__dark': isPaid, 'btn__outlined': !isPaid }" @click="showPaid()">Paid</button>
           <button class="btn btn__small mr-3" v-bind:class="{ 'btn__dark': isHidden, 'btn__outlined': !isHidden }" @click="showHidden()">Hidden</button>
 
-          <button class="btn btn__small btn__outlined mr-3 mb-3" @click.prevent="exportBranch()">Payroll Branch<i class="fas fa-external-link ml-3"></i></button>
+          <!-- <button class="btn btn__small btn__outlined mr-3 mb-3" @click.prevent="exportBranch()">Payroll Branch<i class="fas fa-external-link ml-3"></i></button> -->
           <button class="btn btn__small btn__outlined mr-3 mb-3" @click.prevent="exportRegister()">Billing Export<i class="fas fa-external-link ml-3"></i></button>
           <!-- <button class="btn btn__small btn__outlined mr-3" @click.prevent="exportReportEmp2()">Export Payroll-Peoplease<i class="fas fa-external-link ml-3"></i></button> -->
         </div>  
@@ -46,10 +46,10 @@
           >
             <template slot="table-row" slot-scope="props">
               <span v-if="props.column.field == 'regRate'">
-                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onEditRegRate(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regRate" id="regRate" @blur="onEditRegRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'dayRate'">
-                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onEditDayRate(props.row)" :readonly="props.row.locked" />
+                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @blur="onEditDayRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'firstName'">
                 <input type="text" v-model.trim="props.row.firstName" id="firstName" readonly />
@@ -71,13 +71,13 @@
               <span v-else-if="props.column.field == 'checkInTimeStamp'">
                 <span v-if="props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp)}}</span>
 
-                <input v-if="!props.row.checkInTimeStamp" type="time" v-model.trim="props.row.inTime" id="in" @change="onEditInOut(props.row)" :readonly="props.row.locked" />
+                <input v-if="!props.row.checkInTimeStamp" type="time" v-model.trim="props.row.inTime" id="in" @blur="onEditInOut(props.row)" :readonly="props.row.locked" />
 
               </span>
 
               <span v-else-if="props.column.field == 'onboardStatus'">
-                <span v-for="u in filteredInfo(props.row)" class="flex">
-                  <span v-if="u.evereeOnboardingComplete">
+                <span v-for="(u, index)  in filteredInfo(props.row)" class="flex" :key="index">
+                  <span v-if="(u.evereeOnboardingComplete && (index == '0'))">
                     <button class="btn btn__small btn__flat">Onboarded<i class="fa-solid fa-check ml-2"></i></button>
                   </span>
                   <span v-if="!u.evereeOnboardingComplete">
@@ -90,7 +90,7 @@
               <span v-else-if="props.column.field == 'checkOutTimeStamp'">
                 <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
 
-                <input v-if="!props.row.checkOutTimeStamp" type="time" v-model.trim="props.row.outTime" id="in" @change="onEditInOut(props.row)" :readonly="props.row.locked" />
+                <input v-if="!props.row.checkOutTimeStamp" type="time" v-model.trim="props.row.outTime" id="in" @blur="onEditInOut(props.row)" :readonly="props.row.locked" />
 
               </span>
               <span v-else-if="props.column.field == 'date'">
@@ -106,27 +106,27 @@
               </span>
 
               <span v-else-if="props.column.field == 'breakTime'">
-                <input type="number" v-model.trim="props.row.breakTime" id="breakTime" @change="onEditBreakTime(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.breakTime" id="breakTime" @blur="onEditBreakTime(props.row)" :readonly="props.row.locked" />
               </span>
 
               <span v-else-if="props.column.field == 'totalHours'">
-                <input type="number" v-model.trim="props.row.totalHours" id="totalHours" @change="onEditTotalHours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.totalHours" id="totalHours" @blur="onEditTotalHours(props.row)" :readonly="props.row.locked" />
               </span>
 
               <span v-else-if="props.column.field == 'regHours'">
-                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onEditRegHours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regHours" id="regHours" @blur="onEditRegHours(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'otHours'">
-                <input type="number" v-model.trim="props.row.otHours" id="otHours" @change="onEditotHours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.otHours" id="otHours" @blur="onEditotHours(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'ot2Hours'">
-                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @change="onEditot2Hours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @blur="onEditot2Hours(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'mbp'">
-                <input type="number" v-model.trim="props.row.mbp" id="mbp" @change="onEditMBP(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.mbp" id="mbp" @blur="onEditMBP(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'tips'">
-                <input type="number" v-model.trim="props.row.tips" id="tips" @change="onEditTips(props.row)" :readonly="props.row.locked"  />
+                <input type="number" v-model.trim="props.row.tips" id="tips" @blur="onEditTips(props.row)" :readonly="props.row.locked"  />
               </span>
               <span v-else-if="props.column.field == 'state'">
                 <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
@@ -185,8 +185,8 @@
                 <input type="text" v-model.trim="props.row.payTotal" id="payTotal" readonly />
               </span>
               <span v-else-if="props.column.field == 'save'">
-                <span v-for="u in filteredInfo(props.row)" class="flex">
-                  <span v-if="u.evereeOnboardingComplete">
+                <span v-for="(u, index) in filteredInfo(props.row)" class="flex" :key="index">
+                  <span v-if="(u.evereeOnboardingComplete && (index == '0'))">
                     <button :disabled="(!props.row.payTotal || props.row.payTotal == null)" class="btn btn__primary btn__small ml-2 mr-2" @click="sendPayment(props.row)">
                     Send Payment
                     </button>
@@ -200,7 +200,7 @@
           </vue-good-table>
           <vue-good-table
             v-if="isHidden"
-            :columns="columns2"
+            :columns="columns1"
             :rows="hiddenAssignments"
             styleClass="vgt-table bordered condensed"
             :search-options="{
@@ -217,10 +217,10 @@
           
             <template slot="table-row" slot-scope="props">
               <span v-if="props.column.field == 'regRate'">
-                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onEditRegRate(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regRate" id="regRate" @blur="onEditRegRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'dayRate'">
-                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onEditDayRate(props.row)" :readonly="props.row.locked" />
+                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @blur="onEditDayRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'firstName'">
                 <input type="text" v-model.trim="props.row.firstName" id="firstName" readonly />
@@ -242,14 +242,14 @@
               <span v-else-if="props.column.field == 'checkInTimeStamp'">
                 <span v-if="props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp)}}</span>
 
-                <input v-if="!props.row.checkInTimeStamp" type="time" v-model.trim="props.row.inTime" id="in" @change="onEditInOut(props.row)" :readonly="props.row.locked" />
+                <input v-if="!props.row.checkInTimeStamp" type="time" v-model.trim="props.row.inTime" id="in" @blur="onEditInOut(props.row)" :readonly="props.row.locked" />
 
               </span>
 
               <span v-else-if="props.column.field == 'checkOutTimeStamp'">
                 <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
 
-                <input v-if="!props.row.checkOutTimeStamp" type="time" v-model.trim="props.row.outTime" id="in" @change="onEditInOut(props.row)" :readonly="props.row.locked" />
+                <input v-if="!props.row.checkOutTimeStamp" type="time" v-model.trim="props.row.outTime" id="in" @blur="onEditInOut(props.row)" :readonly="props.row.locked" />
 
               </span>
               <span v-else-if="props.column.field == 'date'">
@@ -265,28 +265,28 @@
               </span>
 
               <span v-else-if="props.column.field == 'breakTime'">
-                <input type="number" v-model.trim="props.row.breakTime" id="breakTime" @change="onEditBreakTime(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.breakTime" id="breakTime" @blur="onEditBreakTime(props.row)" :readonly="props.row.locked" />
               </span>
 
               <span v-else-if="props.column.field == 'totalHours'">
-                <input type="number" v-model.trim="props.row.totalHours" id="totalHours" @change="onEditTotalHours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.totalHours" id="totalHours" @blur="onEditTotalHours(props.row)" :readonly="props.row.locked" />
               </span>
 
               <span v-else-if="props.column.field == 'regHours'">
-                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onEditRegHours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regHours" id="regHours" @blur="onEditRegHours(props.row)" :readonly="props.row.locked" />
               </span>
 
               <span v-else-if="props.column.field == 'otHours'">
-                <input type="number" v-model.trim="props.row.otHours" id="otHours" @change="onEditotHours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.otHours" id="otHours" @blur="onEditotHours(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'ot2Hours'">
-                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @change="onEditot2Hours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @blur="onEditot2Hours(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'mbp'">
-                <input type="number" v-model.trim="props.row.mbp" id="mbp" @change="onEditMBP(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.mbp" id="mbp" @blur="onEditMBP(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'tips'">
-                <input type="number" v-model.trim="props.row.tips" id="tips" @change="onEditTips(props.row)" :readonly="props.row.locked"  />
+                <input type="number" v-model.trim="props.row.tips" id="tips" @blur="onEditTips(props.row)" :readonly="props.row.locked"  />
               </span>
               <span v-else-if="props.column.field == 'state'">
                 <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
@@ -375,7 +375,7 @@
 
           <vue-good-table
             v-if="isPaid"
-            :columns="columns2"
+            :columns="columns1"
             :rows="paidAssignments"
             styleClass="vgt-table bordered condensed"
             :search-options="{
@@ -391,10 +391,10 @@
           >
             <template slot="table-row" slot-scope="props">
               <span v-if="props.column.field == 'regRate'">
-                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onEditRegRate(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regRate" id="regRate" readonly />
               </span>
               <span v-else-if="props.column.field == 'dayRate'">
-                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onEditDayRate(props.row)" :readonly="props.row.locked" />
+                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" readonly />
               </span>
               <span v-else-if="props.column.field == 'firstName'">
                 <input type="text" v-model.trim="props.row.firstName" id="firstName" readonly />
@@ -416,14 +416,14 @@
               <span v-else-if="props.column.field == 'checkInTimeStamp'">
                 <span v-if="props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp)}}</span>
 
-                <input v-if="!props.row.checkInTimeStamp" type="time" v-model.trim="props.row.inTime" id="in" @change="onEditInOut(props.row)" :readonly="props.row.locked" />
+                <input v-if="!props.row.checkInTimeStamp" type="time" v-model.trim="props.row.inTime" id="in" readonly />
 
               </span>
 
               <span v-else-if="props.column.field == 'checkOutTimeStamp'">
                 <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
 
-                <input v-if="!props.row.checkOutTimeStamp" type="time" v-model.trim="props.row.outTime" id="in" @change="onEditInOut(props.row)" :readonly="props.row.locked" />
+                <input v-if="!props.row.checkOutTimeStamp" type="time" v-model.trim="props.row.outTime" id="in" readonly />
 
               </span>
               <span v-else-if="props.column.field == 'date'">
@@ -443,33 +443,33 @@
               </span>
 
               <span v-else-if="props.column.field == 'breakTime'">
-                <input type="number" v-model.trim="props.row.breakTime" id="breakTime" @change="onEditBreakTime(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.breakTime" id="breakTime" readonly />
               </span>
 
               <span v-else-if="props.column.field == 'regHours'">
-                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onEditRegHours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regHours" id="regHours" readonly />
               </span>
               <span v-else-if="props.column.field == 'otHours'">
-                <input type="number" v-model.trim="props.row.otHours" id="otHours" @change="onEditotHours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.otHours" id="otHours" readonly />
               </span>
               <span v-else-if="props.column.field == 'ot2Hours'">
-                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @change="onEditot2Hours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" readonly />
               </span>
               <span v-else-if="props.column.field == 'mbp'">
-                <input type="number" v-model.trim="props.row.mbp" id="mbp" @change="onEditMBP(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.mbp" id="mbp" readonly />
               </span>
               <span v-else-if="props.column.field == 'tips'">
-                <input type="number" v-model.trim="props.row.tips" id="tips" @change="onEditTips(props.row)" :readonly="props.row.locked"  />
+                <input type="number" v-model.trim="props.row.tips" id="tips" readonly />
               </span>
               <span v-else-if="props.column.field == 'state'">
-                <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @readonly />
               </span>
               <span v-else-if="props.column.field == 'status'">
                 <v-select
                   label="status" 
                   :options="statuses"
                   v-model="props.row.status"
-                  @input="onUpdateStatus(props.row)"
+                  readonly
                   :disabled="props.row.locked"
                   :clearable=false
                   >
@@ -480,7 +480,7 @@
                   label="status" 
                   :options="paystatuses"
                   v-model="props.row.paystatus"
-                  @input="onUpdatePay(props.row)"
+                  readonly
                   :disabled="props.row.locked"
                   :clearable=true
                   >
@@ -551,10 +551,10 @@
           >
             <template slot="table-row" slot-scope="props">
               <span v-if="props.column.field == 'regRate'">
-                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onEditRegRate(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regRate" id="regRate" @blur="onEditRegRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'dayRate'">
-                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onEditDayRate(props.row)" :readonly="props.row.locked" />
+                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @blur="onEditDayRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'firstName'">
                 <input type="text" v-model.trim="props.row.firstName" id="firstName" readonly />
@@ -576,14 +576,26 @@
               <span v-else-if="props.column.field == 'checkInTimeStamp'">
                 <span v-if="props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp)}}</span>
 
-                <input v-if="!props.row.checkInTimeStamp" type="time" v-model.trim="props.row.inTime" id="in" @change="onEditInOut(props.row)" :readonly="props.row.locked" />
+                <input v-if="!props.row.checkInTimeStamp" type="time" v-model.trim="props.row.inTime" id="in" @blur="onEditInOut(props.row)" :readonly="props.row.locked" />
 
               </span>
+
+              <span v-else-if="props.column.field == 'onboardStatus'">
+                <span v-for="(u, index)  in filteredInfo(props.row)" class="flex" :key="index">
+                  <span v-if="(u.evereeOnboardingComplete && (index == '0'))">
+                    <button class="btn btn__small btn__flat">Onboarded<i class="fa-solid fa-check ml-2"></i></button>
+                  </span>
+                  <span v-if="!u.evereeOnboardingComplete">
+                    <button class="btn btn__small btn__flat">In Process<i class="fas fa-exclamation-triangle ml-2 danger"></i></button>
+                  </span>
+                </span>
+              </span>
+
 
               <span v-else-if="props.column.field == 'checkOutTimeStamp'">
                 <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
 
-                <input v-if="!props.row.checkOutTimeStamp" type="time" v-model.trim="props.row.outTime" id="in" @change="onEditInOut(props.row)" :readonly="props.row.locked" />
+                <input v-if="!props.row.checkOutTimeStamp" type="time" v-model.trim="props.row.outTime" id="in" @blur="onEditInOut(props.row)" :readonly="props.row.locked" />
 
               </span>
               <span v-else-if="props.column.field == 'date'">
@@ -599,23 +611,27 @@
               </span>
 
               <span v-else-if="props.column.field == 'breakTime'">
-                <input type="number" v-model.trim="props.row.breakTime" id="breakTime" @change="onEditBreakTime(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.breakTime" id="breakTime" @blur="onEditBreakTime(props.row)" :readonly="props.row.locked" />
+              </span>
+
+              <span v-else-if="props.column.field == 'totalHours'">
+                <input type="number" v-model.trim="props.row.totalHours" id="totalHours" @blur="onEditTotalHours(props.row)" :readonly="props.row.locked" />
               </span>
 
               <span v-else-if="props.column.field == 'regHours'">
-                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onEditRegHours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regHours" id="regHours" @blur="onEditRegHours(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'otHours'">
-                <input type="number" v-model.trim="props.row.otHours" id="otHours" @change="onEditotHours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.otHours" id="otHours" @blur="onEditotHours(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'ot2Hours'">
-                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @change="onEditot2Hours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @blur="onEditot2Hours(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'mbp'">
-                <input type="number" v-model.trim="props.row.mbp" id="mbp" @change="onEditMBP(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.mbp" id="mbp" @blur="onEditMBP(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'tips'">
-                <input type="number" v-model.trim="props.row.tips" id="tips" @change="onEditTips(props.row)" :readonly="props.row.locked"  />
+                <input type="number" v-model.trim="props.row.tips" id="tips" @blur="onEditTips(props.row)" :readonly="props.row.locked"  />
               </span>
               <span v-else-if="props.column.field == 'state'">
                 <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
@@ -627,7 +643,7 @@
                   v-model="props.row.status"
                   @input="onUpdateStatus(props.row)"
                   :disabled="props.row.locked"
-                  :clearable=false
+                  :clearable=true
                   >
                 </v-select>
               </span>
@@ -670,21 +686,12 @@
                   <i class="fas fa-external-link ml-3 mr-3"></i>
                 </router-link>
               </span>
-
-              <span v-else-if="props.column.field == 'onboardStatus'">
-                <span v-for="u in filteredInfo(props.row)" class="flex">
-                  <span v-if="u.evereeOnboardingComplete">
-                    <button class="btn btn__small btn__flat">Onboarded<i class="fa-solid fa-check ml-2"></i></button>
-                  </span>
-                  <span v-if="u.evereeOnboardingComplete">
-                    <button class="btn btn__small btn__flat">In Process<i class="fas fa-exclamation-triangle ml-2 danger"></i></button>
-                  </span>
-                </span>
+              <span v-else-if="props.column.field == 'payTotal'">
+                <input type="text" v-model.trim="props.row.payTotal" id="payTotal" readonly />
               </span>
-
               <span v-else-if="props.column.field == 'save'">
-                <span v-for="u in filteredInfo(props.row)" class="flex">
-                  <span v-if="u.evereeOnboardingComplete">
+                <span v-for="(u, index) in filteredInfo(props.row)" class="flex" :key="index">
+                  <span v-if="(u.evereeOnboardingComplete && (index == '0'))">
                     <button :disabled="(!props.row.payTotal || props.row.payTotal == null)" class="btn btn__primary btn__small ml-2 mr-2" @click="sendPayment(props.row)">
                     Send Payment
                     </button>
@@ -698,7 +705,7 @@
           </vue-good-table>   
           <vue-good-table
             v-if="isPaidByDay"
-            :columns="columns2"
+            :columns="columns1"
             :rows="paidAssignmentsByDay"
             styleClass="vgt-table bordered condensed"
             :search-options="{
@@ -714,10 +721,10 @@
           >
             <template slot="table-row" slot-scope="props">
               <span v-if="props.column.field == 'regRate'">
-                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onEditRegRate(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regRate" id="regRate" readonly />
               </span>
               <span v-else-if="props.column.field == 'dayRate'">
-                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onEditDayRate(props.row)" :readonly="props.row.locked" />
+                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" readonly />
               </span>
               <span v-else-if="props.column.field == 'firstName'">
                 <input type="text" v-model.trim="props.row.firstName" id="firstName" readonly />
@@ -739,14 +746,14 @@
               <span v-else-if="props.column.field == 'checkInTimeStamp'">
                 <span v-if="props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp)}}</span>
 
-                <input v-if="!props.row.checkInTimeStamp" type="time" v-model.trim="props.row.inTime" id="in" @change="onEditInOut(props.row)" :readonly="props.row.locked" />
+                <input v-if="!props.row.checkInTimeStamp" type="time" v-model.trim="props.row.inTime" id="in" readonly />
 
               </span>
 
               <span v-else-if="props.column.field == 'checkOutTimeStamp'">
                 <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
 
-                <input v-if="!props.row.checkOutTimeStamp" type="time" v-model.trim="props.row.outTime" id="in" @change="onEditInOut(props.row)" :readonly="props.row.locked" />
+                <input v-if="!props.row.checkOutTimeStamp" type="time" v-model.trim="props.row.outTime" id="in" readonly />
 
               </span>
               <span v-else-if="props.column.field == 'date'">
@@ -766,33 +773,33 @@
               </span>
 
               <span v-else-if="props.column.field == 'breakTime'">
-                <input type="number" v-model.trim="props.row.breakTime" id="breakTime" @change="onEditBreakTime(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.breakTime" id="breakTime" readonly />
               </span>
 
               <span v-else-if="props.column.field == 'regHours'">
-                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onEditRegHours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regHours" id="regHours" readonly />
               </span>
               <span v-else-if="props.column.field == 'otHours'">
-                <input type="number" v-model.trim="props.row.otHours" id="otHours" @change="onEditotHours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.otHours" id="otHours" readonly />
               </span>
               <span v-else-if="props.column.field == 'ot2Hours'">
                 <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @change="onEditot2Hours(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'mbp'">
-                <input type="number" v-model.trim="props.row.mbp" id="mbp" @change="onEditMBP(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.mbp" id="mbp" readonly />
               </span>
               <span v-else-if="props.column.field == 'tips'">
-                <input type="number" v-model.trim="props.row.tips" id="tips" @change="onEditTips(props.row)" :readonly="props.row.locked"  />
+                <input type="number" v-model.trim="props.row.tips" id="tips" readonly />
               </span>
               <span v-else-if="props.column.field == 'state'">
-                <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @readonly />
               </span>
               <span v-else-if="props.column.field == 'status'">
                 <v-select
                   label="status" 
                   :options="statuses"
                   v-model="props.row.status"
-                  @input="onUpdateStatus(props.row)"
+                  readonly
                   :disabled="props.row.locked"
                   :clearable=false
                   >
@@ -803,25 +810,13 @@
                   label="status" 
                   :options="paystatuses"
                   v-model="props.row.paystatus"
-                  @input="onUpdatePay(props.row)"
+                  readonly
                   :disabled="props.row.locked"
                   :clearable=true
                   >
                 </v-select>
               </span>
-              <span v-else-if="props.column.field == 'locked'">
-                <button class="btn btn__outlined btn__small" @click="lock(props.row)" v-if="!props.row.locked">
-                  Lock
-                  <i class="fas fa-lock-open-alt ml-2"></i>
-                </button>
-                <button class="btn btn__outlined btn__small" @click="unlock(props.row)" v-if="props.row.locked">
-                  Unlock
-                  <i class="fas fa-lock-alt ml-2" style="color:#5cb85c;"></i>
-                </button>
-              </span>
-              <span v-if="props.column.field == 'fileId'">
-                <span v-if="props.row.fileId">HAS SSN</span>
-              </span>
+              
 
 
               <span v-else-if="props.column.field == 'delete'">
@@ -849,7 +844,7 @@
           </vue-good-table>
           <vue-good-table
             v-if="isHiddenByDay"
-            :columns="columns2"
+            :columns="columns1"
             :rows="hiddenAssignmentsByDay"
             styleClass="vgt-table bordered condensed"
             :search-options="{
@@ -866,10 +861,10 @@
           
             <template slot="table-row" slot-scope="props">
               <span v-if="props.column.field == 'regRate'">
-                <input type="number" v-model.trim="props.row.regRate" id="regRate" @change="onEditRegRate(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regRate" id="regRate" @blur="onEditRegRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'dayRate'">
-                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @change="onEditDayRate(props.row)" :readonly="props.row.locked" />
+                <input type="text" v-model.trim="props.row.dayRate" id="dayRate" @blur="onEditDayRate(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'firstName'">
                 <input type="text" v-model.trim="props.row.firstName" id="firstName" readonly />
@@ -891,14 +886,14 @@
               <span v-else-if="props.column.field == 'checkInTimeStamp'">
                 <span v-if="props.row.checkInTimeStamp">{{formatDate(props.row.checkInTimeStamp)}}</span>
 
-                <input v-if="!props.row.checkInTimeStamp" type="time" v-model.trim="props.row.inTime" id="in" @change="onEditInOut(props.row)" :readonly="props.row.locked" />
+                <input v-if="!props.row.checkInTimeStamp" type="time" v-model.trim="props.row.inTime" id="in" @blur="onEditInOut(props.row)" :readonly="props.row.locked" />
 
               </span>
 
               <span v-else-if="props.column.field == 'checkOutTimeStamp'">
                 <span v-if="props.row.checkOutTimeStamp">{{formatDate(props.row.checkOutTimeStamp)}}</span>
 
-                <input v-if="!props.row.checkOutTimeStamp" type="time" v-model.trim="props.row.outTime" id="in" @change="onEditInOut(props.row)" :readonly="props.row.locked" />
+                <input v-if="!props.row.checkOutTimeStamp" type="time" v-model.trim="props.row.outTime" id="in" @blur="onEditInOut(props.row)" :readonly="props.row.locked" />
 
               </span>
               <span v-else-if="props.column.field == 'date'">
@@ -914,31 +909,31 @@
               </span>
 
               <span v-else-if="props.column.field == 'breakTime'">
-                <input type="number" v-model.trim="props.row.breakTime" id="breakTime" @change="onEditBreakTime(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.breakTime" id="breakTime" @blur="onEditBreakTime(props.row)" :readonly="props.row.locked" />
               </span>
 
               <span v-else-if="props.column.field == 'totalHours'">
-                <input type="number" v-model.trim="props.row.totalHours" id="totalHours" @change="onEditTotalHours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.totalHours" id="totalHours" @blur="onEditTotalHours(props.row)" :readonly="props.row.locked" />
               </span>
 
               <span v-else-if="props.column.field == 'regHours'">
-                <input type="number" v-model.trim="props.row.regHours" id="regHours" @change="onEditRegHours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.regHours" id="regHours" @blur="onEditRegHours(props.row)" :readonly="props.row.locked" />
               </span>
 
               <span v-else-if="props.column.field == 'otHours'">
-                <input type="number" v-model.trim="props.row.otHours" id="otHours" @change="onEditotHours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.otHours" id="otHours" @blur="onEditotHours(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'ot2Hours'">
-                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @change="onEditot2Hours(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.ot2Hours" id="ot2Hours" @blur="onEditot2Hours(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'mbp'">
-                <input type="number" v-model.trim="props.row.mbp" id="mbp" @change="onEditMBP(props.row)" :readonly="props.row.locked" />
+                <input type="number" v-model.trim="props.row.mbp" id="mbp" @blur="onEditMBP(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'tips'">
-                <input type="number" v-model.trim="props.row.tips" id="tips" @change="onEditTips(props.row)" :readonly="props.row.locked"  />
+                <input type="number" v-model.trim="props.row.tips" id="tips" @blur="onEditTips(props.row)" :readonly="props.row.locked"  />
               </span>
               <span v-else-if="props.column.field == 'state'">
-                <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @change="onSheetEditable(props.row)" :readonly="props.row.locked" />
+                <input type="text" v-model.trim="props.row.state" placeholder="CA" id="state" @blur="onSheetEditable(props.row)" :readonly="props.row.locked" />
               </span>
               <span v-else-if="props.column.field == 'status'">
                 <v-select
@@ -1049,11 +1044,11 @@ export default {
         label: 'Date',
         field: 'date',
       },
-      {
-        label: 'Confirmed',
-        field: 'confirmed',
-        sortable: false,
-      },
+      // {
+      //   label: 'Confirmed',
+      //   field: 'confirmed',
+      //   sortable: false,
+      // },
       {
         label: 'Pay Status',
         field: 'paystatus',
@@ -1081,6 +1076,11 @@ export default {
         width: '100px',
       },
       {
+        label: 'Link',
+        field: 'link',
+        sortable: false,
+      },
+      {
         label: 'Shift',
         field: 'position',
       },
@@ -1103,15 +1103,16 @@ export default {
         width: '88px',
         sortable: false,
       },
+      
       {
-        label: 'Break Time',
-        field: 'breakTime',
+        label: 'Total Hours',
+        field: 'totalHours',
         width: '88px',
         sortable: false,
       },
       {
-        label: 'Total Hours',
-        field: 'totalHours',
+        label: 'Break Time',
+        field: 'breakTime',
         width: '88px',
         sortable: false,
       },
@@ -1164,6 +1165,130 @@ export default {
       {
         label: 'Send Payment',
         field: 'save',
+        sortable: false,
+      },
+    ],
+    columns1: [
+      
+      {
+        field: 'delete',
+        sortable: false,
+      },
+      {
+        label: 'Date',
+        field: 'date',
+      },
+      // {
+      //   label: 'Confirmed',
+      //   field: 'confirmed',
+      //   sortable: false,
+      // },
+      {
+        label: 'Pay Status',
+        field: 'paystatus',
+        width: '152px',
+        sortable: false,
+      },
+      {
+        label: 'Event Status',
+        field: 'status',
+        width: '152px',
+        sortable: false,
+      },
+      {
+        field: 'note',
+        sortable: false,
+      },
+      {
+        label: 'First',
+        field: 'firstName',
+        width: '100px',
+      },
+      {
+        label: 'Last',
+        field: 'lastName',
+        width: '100px',
+      },
+      {
+        label: 'Link',
+        field: 'link',
+        sortable: false,
+      },
+      {
+        label: 'Shift',
+        field: 'position',
+      },
+      
+      {
+        label: 'Rate',
+        field: 'regRate',
+        width: '64px',
+        sortable: false,
+      },
+      {
+        label: 'In',
+        field: 'checkInTimeStamp',
+        width: '88px',
+        sortable: false,
+      },
+      {
+        label: 'Out',
+        field: 'checkOutTimeStamp',
+        width: '88px',
+        sortable: false,
+      },
+      
+      {
+        label: 'Total Hours',
+        field: 'totalHours',
+        width: '88px',
+        sortable: false,
+      },
+      {
+        label: 'Break Time',
+        field: 'breakTime',
+        width: '88px',
+        sortable: false,
+      },
+      {
+        label: 'Reg Hours',
+        field: 'regHours',
+        width: '88px',
+        sortable: false,
+      },
+      {
+        label: 'OT',
+        field: 'otHours',
+        width: '88px',
+        sortable: false,
+      },
+      {
+        label: '2OT',
+        field: 'ot2Hours',
+        width: '88px',
+        sortable: false,
+      },
+      {
+        label: 'MBP Penalty',
+        field: 'mbp',
+        width: '88px',
+        sortable: false,
+      },
+      {
+        label: 'Tips',
+        field: 'tips',
+        width: '88px',
+      },
+      {
+        label: 'Bonus',
+        field: 'dayRate',
+        width: '88px',
+        sortable: false,
+      },
+      {
+        label: 'Pay Total',
+        field: 'payTotal',
+        width: '88px',
         sortable: false,
       },
     ],
@@ -1247,6 +1372,7 @@ export default {
     //     return (item.day = activeDay)
     //   })
     // },
+
     filteredInfo(user) {
       return this.eventUsersRef.filter(member => {
         if (member && member.id) {
@@ -1448,29 +1574,59 @@ export default {
       this.onUpdateTotal(row)
       row.editable = false
     },
-    onEditInOut(row) {
+    async onEditInOut(row) {
       row.editable = true
-      fb.assignmentsCollection.doc(row.id).update({
-        inTime: row.inTime,
-        outTime: row.outTime
+      let inTime = row.inTime || null
+      var inhoursMinutes = inTime.split(/[.:]/);
+      var inhours = parseInt(inhoursMinutes[0], 10);
+      var inminutes = inhoursMinutes[1] ? parseInt(inhoursMinutes[1], 10) : 0;
+      let outTime = row.outTime || null
+      var outhoursMinutes = outTime.split(/[.:]/);
+      var outhours = parseInt(outhoursMinutes[0], 10);
+      var outminutes = outhoursMinutes[1] ? parseInt(outhoursMinutes[1], 10) : 0;
+      let totalHours = ((outhours + outminutes / 60).toFixed(2) - (inhours + inminutes / 60).toFixed(2))
+      row.inTime = inTime
+      row.outTime = outTime
+      row.totalHours = totalHours.toFixed(2)
+
+      await fb.assignmentsCollection.doc(row.id).update({
+        inTime: inTime,
+        outTime: outTime,
+        totalHours: totalHours
       })
-      console.log(row)
       row.editable = false
+      this.onEditTotalHours(row)
     },
-    onEditTotalHours(row) {
+    async onEditTotalHours(row) {
       row.editable = true
-      fb.assignmentsCollection.doc(row.id).update({
+      await fb.assignmentsCollection.doc(row.id).update({
         totalHours: row.totalHours
       })
-      this.onUpdateTotal(row)
+      this.onEditRegHours(row)
       row.editable = false
     },
-    onEditRegHours(row) {
+    async onEditRegHours(row) {
+      console.log(row)
       row.editable = true
-      fb.assignmentsCollection.doc(row.id).update({
-        regHours: row.regHours
+      let calcHours = (row.totalHours - row.breakTime)
+      // let baseHours = (row.regHours || 0)
+      // if (row.breakTime >= 0.5) {
+      //   let calcHours = (row.totalHours - row.breakTime)
+      // } else {
+      //   let calcHours = row.totalHours
+      // }
+      // if (row.regHours) {
+      //   let baseHours = row.regHours
+      // } else {
+      //   let baseHours = null
+      // }
+      // console.log(baseHours)
+      // row.regHours = calcHours
+      await fb.assignmentsCollection.doc(row.id).update({
+        regHours: (row.regHours || calcHours)
       })
       this.onUpdateTotal(row)
+      // this.onUpdateTotal(row)
       row.editable = false
     },
     onEditotHours(row) {
@@ -1489,22 +1645,25 @@ export default {
       this.onUpdateTotal(row)
       row.editable = false
     },
-    onEditDayRate(row) {
+    async onEditDayRate(row) {
       row.editable = true
-      fb.assignmentsCollection.doc(row.id).update({
+      await b.assignmentsCollection.doc(row.id).update({
         dayRate: row.dayRate
       })
       this.onUpdateTotal(row)
       row.editable = false
     },
-    onEditBreakTime(row) {
+    async onEditBreakTime(row) {
+      console.log(row)
+
       row.editable = true
-      fb.assignmentsCollection.doc(row.id).update({
+      await fb.assignmentsCollection.doc(row.id).update({
         breakTime: row.breakTime
       })
       row.editable = false
+      this.onEditRegHours(row)
     },
-    onUpdateTotal(row) {
+    async onUpdateTotal(row) {
       console.log('editing total')
       console.log(row)
       row.editable = true
@@ -1522,8 +1681,8 @@ export default {
       console.log(total)
 
 
-      fb.assignmentsCollection.doc(row.id).update({
-        payTotal: total,
+      await fb.assignmentsCollection.doc(row.id).update({
+        payTotal: total.toFixed(2),
         paytimestamp: new Date().getTime()
       })
       row.editable = false
@@ -1698,12 +1857,6 @@ export default {
       });
     },
     exportRegister() {
-      // let logFields = {
-      //     user: this.currentUser.email,
-      //     export: 'Register (Event Shifts) Export',
-      //     eventAssignment: this.eventAssignments.id
-      // }
-      // this.$store.dispatch('sendExportLog', logFields)
       this.performingRequest = true
       const exportHeaders = [
         "Date",
@@ -1723,8 +1876,8 @@ export default {
       for (var key in this.eventAssignments) {
         if (!this.eventAssignments[key].hidden) {
 
-          let inTime = this.formatDate(this.eventAssignments[key].checkInTimeStamp)
-          let outTime = this.formatDate(this.eventAssignments[key].checkOutTimeStamp)
+          let inTime = (this.formatDate(this.eventAssignments[key].checkInTimeStamp) || this.eventAssignments[key].inTime)
+          let outTime = (this.formatDate(this.eventAssignments[key].checkOutTimeStamp) || this.eventAssignments[key].outTime)
 
           exportItems.push([
             this.eventAssignments[key].date,
@@ -1750,345 +1903,6 @@ export default {
         this.performingRequest = false
       }, 2000)
     },
-
-    // exportReportEmp2ByDay(item) {
-    //   this.performingRequest = true
-    //   const exportHeaders = [
-    //     "first_name",
-    //     "last_name",
-    //     "type",
-    //     "id",
-    //     "ssn",
-    //     "hours",
-    //     "rate",
-    //     "treat_as_cash",
-    //     "day_worked",
-    //     "venue_id",
-    //     "wc_code"
-    //   ];
-    //   const exportItems = [];
-
-      
-
-    //   for (var key in this.eventAssignmentsByDay) {
-    //     let uid = this.eventAssignmentsByDay[key].userId
-    //     let regRate = this.eventAssignmentsByDay[key].regRate
-    //     let regHours = this.eventAssignmentsByDay[key].regHours
-    //     let otHours = this.eventAssignmentsByDay[key].otHours
-    //     let ot2Hours = this.eventAssignmentsByDay[key].ot2Hours
-    //     let mbp = this.eventAssignmentsByDay[key].mbp
-    //     let tips = this.eventAssignmentsByDay[key].tips
-    //     let event = this.eventAssignmentsByDay[key].name
-    //     let dayRate = this.eventAssignmentsByDay[key].dayRate
-    //     let venueId = this.eventAssignmentsByDay[key].eventInfo.venueId
-
-    //      fb.usersCollection.doc(uid).get()
-
-    //       .then(doc => {
-          
-    //       let wcCode
-
-    //       if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('AL'||'AK'||'AR'||'CO'||'CT'||'FL'||'GA'||'HI'||'ID'||'IL'||'IN'||'IA'||'KS'||'KY'||'MN'||'MO'||'MS'||'MT'||'NE'||'NV'||'NC'||'NH'||'NM'||'OK'||'OR'||'RI'||'SC'||'SD'||'TN'||'UT'||'VT'||'WI'||'WV')){
-    //         wcCode = '9082'
-    //       }
-    //       else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('AZ'||'LA'||'VA')){
-    //          wcCode = '9083'
-    //       }
-    //       else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('CA'||'TX')){
-    //         wcCode ='9079'
-    //       }
-    //       else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('DE'|| 'PA')){
-    //         wcCode ='9045'
-    //       }
-    //       else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('ME')){
-    //         wcCode ='9084'
-    //       }
-    //       else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('MD')){
-    //         wcCode ='9086'
-    //       }
-    //       else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('MI'||'NY')){
-    //         wcCode ='9058'
-    //       }
-    //       else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('MA')){
-    //         wcCode ='9085'
-    //       }
-    //       else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('ND'|| 'OH'|| 'WA'|| 'WY')){
-    //         wcCode ='9082OC'
-    //       }
-    //       else if (this.eventAssignmentsByDay[key].eventInfo.venue.address.state =('NJ')){
-    //         wcCode ='9078'
-    //       }
-
-          
-    //       var social
-    //       if (doc.data().ssn) {
-    //         social = (this.$CryptoJS.AES.decrypt(doc.data().ssn, this.encryptionKey).toString(this.CryptoJS.enc.Utf8))
-    //       }
-
-    //       exportItems.push([
-    //         doc.data().firstName || '',
-    //         doc.data().lastName || '',
-    //         "1",
-    //         "7",
-    //         social || '',
-    //         "1",
-    //         dayRate || '',
-    //         "1",
-    //         event || '',
-    //         venueId,
-    //         wcCode || ''
-    //       ]);
-    //       exportItems.push([
-    //         doc.data().firstName || '',
-    //         doc.data().lastName || '',
-    //         "1",
-    //         "1",
-    //         social || '',
-    //         regHours || '',
-    //         regRate || '',
-    //         "0",
-    //         event,
-    //         venueId,
-    //         wcCode || ''
-    //       ]);
-    //       exportItems.push([
-    //         doc.data().firstName || '',
-    //         doc.data().lastName || '',
-    //         "1",
-    //         "2",
-    //         social || '',
-    //         otHours || '',
-    //         regRate * 1.5 || '',
-    //         "0",
-    //         event,
-    //         venueId,
-    //         wcCode || ''
-    //       ]);
-    //       exportItems.push([
-    //         doc.data().firstName || '',
-    //         doc.data().lastName || '',
-    //         "1",
-    //         "22",
-    //         social || '',
-    //         ot2Hours || '',
-    //         regRate * 2 || '',
-    //         "0",
-    //         event,
-    //         venueId,
-    //         wcCode || ''
-    //       ]);
-    //       exportItems.push([
-    //         doc.data().firstName || '',
-    //         doc.data().lastName || '',
-    //         "1",
-    //         "125",
-    //         social || '',
-    //         "1",
-    //         tips || '',
-    //         "1",
-    //         event,
-    //         venueId,
-    //         wcCode || ''
-    //       ]);
-    //       exportItems.push([
-    //         doc.data().firstName || '',
-    //         doc.data().lastName || '',
-    //         "1",
-    //         "4",
-    //         social || '',
-    //         "0",
-    //         mbp || '',
-    //         "0",
-    //         event,
-    //         venueId,
-    //         wcCode || ''
-    //       ]);
-    //       this.$gapi.getGapiClient().then(gapi => {
-    //         const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
-    //         exportService.export();
-    //       });
-    //     })
-
-    //   }
-      
-    //   // fb.shiftsCollection.doc(this.shift.id).update({ exportedEmp: fb.firestore.FieldValue.serverTimestamp() })
-    //   setTimeout(() => {
-    //     // this.$store.dispatch("getShiftFromId", this.$route.params.id)
-    //     this.performingRequest = false
-    //   }, 2000)
-    // },
-    // exportReportEmp2(item) {
-    //   // let logFields = {
-    //   //     user: this.currentUser.email,
-    //   //     export: 'Report Emp 2 (Event Shifts) Export',
-    //   //     eventAssignment: this.eventAssignments.id
-    //   // }
-    //   // this.$store.dispatch('sendExportLog', logFields)
-    //   this.performingRequest = true
-    //   const exportHeaders = [
-    //     "first_name",
-    //     "last_name",
-    //     "type",
-    //     "id",
-    //     "ssn",
-    //     "hours",
-    //     "rate",
-    //     "treat_as_cash",
-    //     "day_worked",
-    //     "venue_id",
-    //     "wc_code"
-    //   ];
-    //   const exportItems = [];
-
-      
-
-    //   for (var key in this.eventAssignments) {
-    //     let uid = this.eventAssignments[key].userId
-    //     let regRate = this.eventAssignments[key].regRate
-    //     let regHours = this.eventAssignments[key].regHours
-    //     let otHours = this.eventAssignments[key].otHours
-    //     let ot2Hours = this.eventAssignments[key].ot2Hours
-    //     let mbp = this.eventAssignments[key].mbp
-    //     let tips = this.eventAssignments[key].tips
-    //     let event = this.eventAssignments[key].name
-    //     let dayRate = this.eventAssignments[key].dayRate
-    //     let venueId = this.eventAssignments[key].eventInfo.venueId
-
-    //      fb.usersCollection.doc(uid).get()
-
-    //       .then(doc => {
-          
-    //       let wcCode
-
-    //       if (this.eventAssignments[key].eventInfo.venue.address.state =('AL'||'AK'||'AR'||'CO'||'CT'||'FL'||'GA'||'HI'||'ID'||'IL'||'IN'||'IA'||'KS'||'KY'||'MN'||'MO'||'MS'||'MT'||'NE'||'NV'||'NC'||'NH'||'NM'||'OK'||'OR'||'RI'||'SC'||'SD'||'TN'||'UT'||'VT'||'WI'||'WV')){
-    //         wcCode = '9082'
-    //       }
-    //       else if (this.eventAssignments[key].eventInfo.venue.address.state =('AZ'||'LA'||'VA')){
-    //          wcCode = '9083'
-    //       }
-    //       else if (this.eventAssignments[key].eventInfo.venue.address.state =('CA'||'TX')){
-    //         wcCode ='9079'
-    //       }
-    //       else if (this.eventAssignments[key].eventInfo.venue.address.state =('DE'|| 'PA')){
-    //         wcCode ='9045'
-    //       }
-    //       else if (this.eventAssignments[key].eventInfo.venue.address.state =('ME')){
-    //         wcCode ='9084'
-    //       }
-    //       else if (this.eventAssignments[key].eventInfo.venue.address.state =('MD')){
-    //         wcCode ='9086'
-    //       }
-    //       else if (this.eventAssignments[key].eventInfo.venue.address.state =('MI'||'NY')){
-    //         wcCode ='9058'
-    //       }
-    //       else if (this.eventAssignments[key].eventInfo.venue.address.state =('MA')){
-    //         wcCode ='9085'
-    //       }
-    //       else if (this.eventAssignments[key].eventInfo.venue.address.state =('ND'|| 'OH'|| 'WA'|| 'WY')){
-    //         wcCode ='9082OC'
-    //       }
-    //       else if (this.eventAssignments[key].eventInfo.venue.address.state =('NJ')){
-    //         wcCode ='9078'
-    //       }
-
-          
-    //       var social
-    //       if (doc.data().ssn) {
-    //         social = (this.$CryptoJS.AES.decrypt(doc.data().ssn, this.encryptionKey).toString(this.CryptoJS.enc.Utf8))
-    //       }
-
-    //       exportItems.push([
-    //         doc.data().firstName || '',
-    //         doc.data().lastName || '',
-    //         "1",
-    //         "7",
-    //         social || '',
-    //         "1",
-    //         dayRate || '',
-    //         "1",
-    //         event || '',
-    //         venueId,
-    //         wcCode || ''
-    //       ]);
-    //       exportItems.push([
-    //         doc.data().firstName || '',
-    //         doc.data().lastName || '',
-    //         "1",
-    //         "1",
-    //         social || '',
-    //         regHours || '',
-    //         regRate || '',
-    //         "0",
-    //         event,
-    //         venueId,
-    //         wcCode || ''
-    //       ]);
-    //       exportItems.push([
-    //         doc.data().firstName || '',
-    //         doc.data().lastName || '',
-    //         "1",
-    //         "2",
-    //         social || '',
-    //         otHours || '',
-    //         regRate * 1.5 || '',
-    //         "0",
-    //         event,
-    //         venueId,
-    //         wcCode || ''
-    //       ]);
-    //       exportItems.push([
-    //         doc.data().firstName || '',
-    //         doc.data().lastName || '',
-    //         "1",
-    //         "22",
-    //         social || '',
-    //         ot2Hours || '',
-    //         regRate * 2 || '',
-    //         "0",
-    //         event,
-    //         venueId,
-    //         wcCode || ''
-    //       ]);
-    //       exportItems.push([
-    //         doc.data().firstName || '',
-    //         doc.data().lastName || '',
-    //         "1",
-    //         "125",
-    //         social || '',
-    //         "1",
-    //         tips || '',
-    //         "1",
-    //         event,
-    //         venueId,
-    //         wcCode || ''
-    //       ]);
-    //       exportItems.push([
-    //         doc.data().firstName || '',
-    //         doc.data().lastName || '',
-    //         "1",
-    //         "4",
-    //         social || '',
-    //         "0",
-    //         mbp || '',
-    //         "0",
-    //         event,
-    //         venueId,
-    //         wcCode || ''
-    //       ]);
-    //       this.$gapi.getGapiClient().then(gapi => {
-    //         const exportService = new ExportService(exportHeaders, Object.values(exportItems), gapi);
-    //         exportService.export();
-    //       });
-    //     })
-
-    //   }
-      
-    //   // fb.shiftsCollection.doc(this.shift.id).update({ exportedEmp: fb.firestore.FieldValue.serverTimestamp() })
-    //   setTimeout(() => {
-    //     // this.$store.dispatch("getShiftFromId", this.$route.params.id)
-    //     this.performingRequest = false
-    //   }, 2000)
-    // },
     files() {
       let url = `/events/` + this.$route.params.id + `/files`
       router.push(url)

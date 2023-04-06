@@ -63,7 +63,7 @@ const router = new VueRouter({
       },
     },
     {
-      path: '/reports', redirect: '/reports/payrollsubmissions',
+      path: '/reports', redirect: '/reports/payrollQueue',
       name: 'reportsHome',
       component: () => import('../views/Reports/ReportsHome.vue'),
       meta: {
@@ -71,21 +71,32 @@ const router = new VueRouter({
       },
       children: [
         {
-          path: '/reports/payrollsubmissions',
-          name: 'payrollSubmissions',
-          component: () => import('../views/Reports/PayrollSubmissions.vue'),
+          path: '/reports/payrollqueue',
+          name: 'payrollQueue',
+          component: () => import('../views/Reports/PayrollQueue.vue'),
           meta: {
             requiresAuth: true
           },
         },
-        {
-          path: '/reports/parse',
-          name: 'userParse',
-          component: () => import('../views/Reports/UserParse.vue'),
-          meta: {
-            requiresAuth: true
-          },
-        },
+        // {
+        //   path: '/reports/evereeUsersWithoutExternalId',
+        //   name: 'evereeUsersWithoutExternalId',
+        //   component: () => import('../views/Reports/EvereeUsersWithoutExternalId.vue'),
+        //   meta: {
+        //     requiresAuth: true
+        //   },
+        // },
+
+
+        
+        // {
+        //   path: '/reports/parse',
+        //   name: 'userParse',
+        //   component: () => import('../views/Reports/UserParse.vue'),
+        //   meta: {
+        //     requiresAuth: true
+        //   },
+        // },
       ]
     },
     // {
@@ -144,14 +155,6 @@ const router = new VueRouter({
             requiresAuth: true
           },
         },
-        // {
-        //   path: '/reports/parse',
-        //   name: 'userParse',
-        //   component: () => import('../views/Reports/UserParse.vue'),
-        //   meta: {
-        //     requiresAuth: true
-        //   },
-        // },
       ]
     },
     
@@ -176,7 +179,7 @@ const router = new VueRouter({
       name: 'addgroup',
       component: () => import('../views/Groups/AddGroup.vue'),
       meta: {
-        requiresAuth: true
+        requiresAuth: true,
       },
     },
     {
@@ -184,7 +187,8 @@ const router = new VueRouter({
       name: 'groupHome',
       component: () => import('../views/Groups/GroupHome.vue'),
       meta: {
-        requiresAuth: true
+        requiresAuth: true,
+        refreshGroup: true
       },
       children: [
         {
@@ -316,6 +320,14 @@ const router = new VueRouter({
             requiresAuth: true
           },
         },
+        {
+          path: '/events/:id/email',
+          name: 'eventEmail',
+          component: () => import('../views/Events/EventEmail.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
 
 
         
@@ -365,14 +377,7 @@ const router = new VueRouter({
     //     requiresAuth: true
     //   },
     // },
-    // {
-    //   path: '/events/:id/email',
-    //   name: 'eventemail',
-    //   component: () => import('../views/Events/EventEmail.vue'),
-    //   meta: {
-    //     requiresAuth: true
-    //   },
-    // },
+    
     
     {
       path: '/timesheets/:id/:day',
@@ -669,6 +674,24 @@ const router = new VueRouter({
               requiresAuth: true
             },
           },
+          {
+            path: '/users/:id/backgroundcheck',
+            name: 'userBackgroundCheck',
+            component: () => import('../views/Users/UserBackgroundCheck.vue'),
+            props: true,
+            meta: {
+              requiresAuth: true
+            },
+          },
+          {
+            path: '/users/:id/backgroundcheck/:ic',
+            name: 'backgroundCheck',
+            component: () => import('../views/Users/Check.vue'),
+            props: true,
+            meta: {
+              requiresAuth: true
+            },
+          },
 
         {
           path: '/users/:id/assignments',
@@ -743,85 +766,43 @@ const router = new VueRouter({
         requiresAuth: true
       },
     },
+
     {
-      path: '/clientaccess',
-      name: 'clientAccess',
-      component: () => import('../views/ClientAccess/ClientAccess.vue'),
+      path: '/access', redirect: '/access/clients',
+      name: 'clientAccessHome',
+      component: () => import('../views/ClientAccess/ClientAccessHome.vue'),
       meta: {
         requiresAuth: true
       },
-    },
-    {
-      path: '/clientaccess/new',
-      name: 'giveClientAccess',
-      component: () => import('../views/ClientAccess/GiveAccess.vue'),
-      meta: {
-        requiresAuth: true
-      },
-    },
-    {
-      path: '/clientaccess/:id',
-      name: 'manageAccess',
-      component: () => import('../views/ClientAccess/ManageAccess.vue'),
-      meta: {
-        requiresAuth: true
-      },
+      children: [
+        {
+          path: '/access/clients',
+          name: 'clientAccess',
+          component: () => import('../views/ClientAccess/ClientAccess.vue'),
+          props: true,
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/access/new',
+          name: 'giveClientAccess',
+          component: () => import('../views/ClientAccess/GiveAccess.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+        {
+          path: '/access/clients/:id',
+          name: 'manageAccess',
+          component: () => import('../views/ClientAccess/ManageAccess.vue'),
+          meta: {
+            requiresAuth: true
+          },
+        },
+      ]
     },
 
-
-
-    
-    // {
-    //   path: '/eventplacements',
-    //   name: 'eventplacements',
-    //   component: () => import('../views/Placements/ByEvent.vue'),
-    //   meta: {
-    //     requiresAuth: true
-    //   },
-    // },
-    // {
-    //   path: '/eventplacements/:id',
-    //   name: 'eventplacement',
-    //   component: () => import('../views/Placements/Event.vue'),
-    //   meta: {
-    //     requiresAuth: true
-    //   },
-    // },
-    // {
-    //   path: '/placements', redirect: '/placements/day',
-    //   name: 'placementshome',
-    //   component: () => import('../views/Placements/PlacementsHome.vue'),
-    //   meta: {
-    //     requiresAuth: true
-    //   },
-    //   children: [
-    //     {
-    //       path: '/placements/day',
-    //       name: 'placements',
-    //       component: () => import('../views/Placements/Placements.vue'),
-    //       meta: {
-    //         requiresAuth: true
-    //       },
-    //     },
-    //     {
-    //       path: '/placements/day/:id',
-    //       name: 'day',
-    //       component: () => import(/* webpackChunkName: "day" */ '../views/Placements/Day.vue'),
-    //       meta: {
-    //         requiresAuth: true
-    //       }
-    //     },
-        
-    //   ]
-    // },
-    // {
-    //   path: '/timesheets',
-    //   name: 'shifts',
-    //   component: () => import('../views/Shifts/Shifts.vue'),
-    //   meta: {
-    //     requiresAuth: true
-    //   },
-    // },
     {
       path: '/timesheets/:id',
       name: 'shift',
@@ -830,22 +811,7 @@ const router = new VueRouter({
         requiresAuth: true
       },
     },
-    // {
-    //   path: '/opr',
-    //   name: 'opr',
-    //   component: () => import('../views/OPR/OPR.vue'),
-    //   meta: {
-    //     requiresAuth: true
-    //   },
-    // },
-    // {
-    //   path: '/verifications',
-    //   name: 'verifications',
-    //   component: () => import('../views/Verifications/Verifications.vue'),
-    //   meta: {
-    //     requiresAuth: true
-    //   },
-    // },
+
   ]
 })
 
@@ -854,27 +820,42 @@ router.beforeEach((to, from, next) => {
   let requiresAuth = to.matched.some(record => record.meta.requiresAuth);
   let refreshUser = to.matched.some(x => x.meta.refreshUser)
   let refreshEvent = to.matched.some(x => x.meta.refreshEvent)
+  let refreshGroup = to.matched.some(x => x.meta.refreshGroup)
 
   if (requiresAuth && !currentUser) next('login');
-  else if (!requiresAuth && currentUser) next('dashboard');
+  // else if (!requiresAuth && currentUser) next('dashboard');
   else next();
 
-  if (refreshUser && (to.name == "userDetails" || to.name == "userPayroll" || to.name == "userAssignments" || to.name == "userNotes" || to.name == "userGallery" || to.name == "userReviews" || to.name == "userMessages")) 
+  if (refreshGroup && (to.name == "groupHome" || to.name == "groupEdit" || to.name == "groupMessages" || to.name == "groupWaitlist" || to.name == "groupApplicants" || to.name == "group"))
+  {
+    console.log('not clearing group')
+  
+  } else if (refreshGroup) {
+    store.dispatch('clearGroupState')
+  } else {
+
+  }
+
+  if (refreshUser && (to.name == "userSkills" || to.name == "userPayHistory" || to.name == "userId" || to.name == "userGroups" || to.name == "userEmergency" || to.name == "userCerts" || to.name == "userBackgroundCheck" || to.name == "userDetails" || to.name == "userPayroll" || to.name == "userAssignments" || to.name == "userNotes" || to.name == "userGallery" || to.name == "userReviews" || to.name == "userMessages")) 
   {
     console.log('not clearing state')
   
-  } else  {
+  } else if (refreshUser) {
     console.log(to.name)
     console.log('clearing state')
     store.dispatch('clearUserState')
+  } else {
+
   }
 
   if (refreshEvent && (to.name == "eventDetails" || to.name == "eventplacement" || to.name == "eventshifts" || to.name == "eventCheckin" || to.name == "eventtimesheets" || to.name == "weekCheckin" || to.name == "weekDetails"))
   {
     console.log('not clearing state')
-  } else  {
+  } else if (refreshEvent) {
     store.dispatch('clearEventState')
     store.dispatch('clearWeekState')
+  } else {
+
   }
 });
 

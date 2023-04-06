@@ -5,9 +5,9 @@
         <h1>Venues</h1>
         <span>
           <router-link :to="{name: 'addvenue'}" class="color--text">
-            <button class="btn btn__outlined ml-3">Add Venue</button>
+            <button class="btn btn__outlined btn__small ml-3">Add Venue</button>
           </router-link>
-          <button class="btn btn__outlined ml-3" @click="exportAll()">Export</button>
+          <!-- <button class="btn btn__outlined ml-3" @click="exportAll()">Export</button> -->
         </span>
         
       </div>
@@ -31,6 +31,9 @@
           <template slot="table-row" slot-scope="props">
             <span v-if="props.column.field == 'visible'">
               <i class="fa-solid fa-check" v-if="props.row.visible" style="color:green;"></i>
+            </span>
+            <span v-else-if="props.column.field == 'client'">
+              <button class="btn chip mr-2" v-for="(c, index) in props.row.client" :key="index">{{c.title}}</button>
             </span>
             <span v-else>
               {{props.formattedRow[props.column.field]}}
@@ -78,8 +81,9 @@ export default {
         field: 'address.state',
       },
       {
-        label: 'Visible',
-        field: 'visible',
+        label: 'Client',
+        field: 'client',
+        sortable: false
       },
     ]
   }),

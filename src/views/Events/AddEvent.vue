@@ -9,8 +9,8 @@
       	<div class="dashboard__container--body">
       		<div class="dashboard__container--body--col">
             <div>
-    				<div class="mb-3">
-    					<label for="eventName">Event Name:</label>
+    				<div class="mb-4">
+    					<label for="eventName">Event Title:</label>
     					<input type="text" v-model.trim="event.title" id="eventName" required />
     				</div>
     				<div class="mb-3">
@@ -21,7 +21,7 @@
               <label for="venueVisibility">Vaccination Required:</label>
               <input type="checkbox" v-model.trim="event.requiredVaccine" id="venueVisibility" class="ml-3" />
             </div>
-            <div class="mb-3" v-if="tags && tags.length > 1">
+            <!-- <div class="mb-3" v-if="tags && tags.length > 1">
               <label for="tags">Tags:</label>
               <v-select
                 class="mt-2"
@@ -31,7 +31,7 @@
                 v-model="event.tags"
                 >
               </v-select>
-            </div>
+            </div> -->
             <div class="mb-3" v-if="venues && venues.length > 1">
               <label for="venue">Venue:</label>
               <v-select
@@ -65,7 +65,7 @@
               </v-select>
             </div>
             <div class="mb-3" v-if="mgrs.length >= 1 && event.venue">
-            <label for="pickDate">Managers:</label>
+            <label for="pickDate">Staffing Managers:</label>
               <v-select
                 class="mt-2"
                 label="name" 
@@ -75,7 +75,7 @@
                 >
               </v-select>
             </div>
-            <div class="mb-3" v-if="groups && groups.length >= 1">
+            <div class="mb-3" v-if="(groups && groups.length >= 1)  && event.venue">
             <label for="mgrs">Restrict to Groups:</label>
               <v-select
                 class="mt-2"
@@ -90,9 +90,9 @@
             
             </div>
           </div>
-          <div class="dashboard__container--body--col">
+          <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="mb-3">
-              <label for="eventDescription">Description:</label>
+              <label for="eventDescription">Description (optional):</label>
               <vue-editor id="eventDescription" v-model="event.description" required></vue-editor>
             </div>
           </div>
@@ -238,7 +238,7 @@
             </div>
           </div>
 
-      		<div class="dashboard__container--body--col" v-if="event.venue">
+      		<!-- <div class="dashboard__container--body--col" v-if="event.venue">
             <div class="flex flex-column align-center">
               <div class="event-wrapper" :style="{ backgroundImage: 'url(' + backgroundUrl + ')' }">
                 <croppa 
@@ -261,12 +261,7 @@
               <p class="caption mt-3">jpg or png file. 2MB max</p>
             </div>
 
-            <!-- <div class="mb-3 mt-5">
-              <label for="venueImage">Use Venue Image Instead:</label>
-              <input type="checkbox" v-model.trim="event.useVenueImage" id="venueImage" class="ml-3" />
-            </div> -->
-
-          </div>
+          </div> -->
           <div class="dashboard__container--body--col" v-if="event.venue">
 
             <div class="mb-3">

@@ -109,6 +109,9 @@
           <router-link :to="`/users/${$route.params.id}/payhistory`">
             <button class="btn btn__small mr-3 mt-3" v-bind:class="{ 'btn__dark': isPayHistory, 'btn__outlined btn__small': !isPayHistory }">Pay History</button>
           </router-link>
+          <router-link :to="`/users/${$route.params.id}/backgroundcheck`">
+            <button class="btn btn__small mr-3 mt-3" v-bind:class="{ 'btn__dark': isBackgroundCheck, 'btn__outlined btn__small': !isBackgroundCheck }">Background Check</button>
+          </router-link>
           <!-- <router-link :to="`/users/${$route.params.id}/everee`">
             <button class="btn btn__small mr-3 mt-3" v-bind:class="{ 'btn__dark': isEveree, 'btn__outlined btn__small': !isEveree }">Everee Data</button>
           </router-link> -->
@@ -199,6 +202,9 @@ export default {
     },
     isPayHistory() {
       return this.$route.name == 'userPayHistory';
+    },
+    isBackgroundCheck() {
+      return (this.$route.name == 'userBackgroundCheck' || this.$route.name == 'backgroundCheck');
     },
     pic () {
       if (this.user) {

@@ -189,3 +189,12 @@ button[disabled] {
   color: #999 !important;
   opacity:0.5;
 }
+
+.floating_buttons {
+	background: transparent;
+  position: fixed;
+  right: 2rem;
+  bottom: 2rem;
+  width: auto;
+  margin: auto;
+}

@@ -6,10 +6,11 @@
         <div class="flex align-center">
           <span>
           <h1 v-if="eventInfo && eventInfo.title" class="pb-1">{{eventInfo.title}}</h1>
-          <span v-if="eventInfo && eventInfo.venue && eventInfo.venue.title">
-            <p>{{eventInfo.venue.title}}<span v-if="eventInfo.venue && eventInfo.venue.address"> | {{eventInfo.venue.address.city}}, {{eventInfo.venue.address.state}}</span> | {{eventInfo.startDate | moment("ddd, MMM Do YYYY") }}<span v-if="eventInfo.endDate"> - {{eventInfo.endDate | moment("ddd, MMM Do YYYY") }}</span></p>
+            <span v-if="eventInfo && eventInfo.venue && eventInfo.venue.title">
+              <p>{{eventInfo.venue.title}}<span v-if="eventInfo.venue && eventInfo.venue.address"> | {{eventInfo.venue.address.city}}, {{eventInfo.venue.address.state}}</span> | {{eventInfo.startDate | moment("ddd, MMM Do YYYY") }}<span v-if="eventInfo.endDate"> - {{eventInfo.endDate | moment("ddd, MMM Do YYYY") }}</span></p>
+            </span>
           </span>
-          </span>
+          
           <!-- <button class="btn btn__large btn__success ml-5" v-if="event && event.published" :disabled="event.cancelled">
             Published
           </button>
@@ -23,13 +24,24 @@
         <div class="flex align-center flex-wrap justify-flex-end">
          <!--  <button class="btn btn__outlined btn__small mr-3" @click="venueSync()">Sync Venue Details</button>
           <button class="btn btn__outlined btn__small mr-3" @click="email()">Preview Info Email</button> -->
+
+          <button class="btn btn__success btn__small ml-5 mr-3" v-if="eventInfo && eventInfo.published" :disabled="eventInfo.cancelled">
+            Published
+          </button>
+          <button class="btn btn__warning btn__small ml-5 mr-3" v-if="eventInfo && !eventInfo.published" :disabled="eventInfo.status == 'cancelled'">
+            Draft
+          </button>
+          <button class="btn btn__danger btn__small ml-5 mr-3" v-if="eventInfo && eventInfo.status == 'cancelled'">
+            Cancelled
+          </button>
+      
           <button class="btn btn__outlined btn__small" @click="goBack()"><i class="fas fa-arrow-left"></i></button>
         </div>
 
       </div>
       <span class="flex align-start flex-wrap">
         <router-link :to="`/events/${$route.params.id}`">
-          <button class="btn btn__small mr-3 mb-2" v-bind:class="{ 'btn__dark': isEvent, 'btn__outlined btn__small': !isEvent }">Edit</button>
+          <button class="btn btn__small mr-3 mb-2" v-bind:class="{ 'btn__dark': isEvent, 'btn__outlined btn__small': !isEvent }">Edit Event</button>
         </router-link>
         <router-link :to="`/events/${$route.params.id}/checkin`">
           <button class="btn btn__small mr-3 mb-2" v-bind:class="{ 'btn__dark': isCheckin, 'btn__outlined btn__small': !isCheckin }">Check-In</button>
@@ -44,7 +56,10 @@
           <button class="btn btn__small mr-3 mb-2" v-bind:class="{ 'btn__dark': isTimesheets, 'btn__outlined btn__small': !isTimesheets }">Timesheets</button>
         </router-link>
         <router-link :to="`/events/${$route.params.id}/files`">
-          <button class="btn btn__small mr-3 mb-2" v-bind:class="{ 'btn__dark': isFiles, 'btn__outlined btn__small': !isFiles }">Files</button>
+          <button class="btn btn__small mr-3 mb-2" v-bind:class="{ 'btn__dark': isFiles, 'btn__outlined btn__small': !isFiles }">Upload Files</button>
+        </router-link>
+        <router-link :to="`/events/${$route.params.id}/email`">
+          <button class="btn btn__small mr-3 mb-2" v-bind:class="{ 'btn__dark': isEmail, 'btn__outlined btn__small': !isEmail }">Preview Email</button>
         </router-link>
 
       
@@ -103,6 +118,9 @@ export default {
     },
     isFiles() {
       return this.$route.name == 'eventFiles';
+    },
+    isEmail() {
+      return this.$route.name == 'eventEmail';
     },
     // sheets() {
     //   let url = `/events/` + this.$route.params.id + `/timesheets`

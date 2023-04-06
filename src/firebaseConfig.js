@@ -90,6 +90,7 @@ const marketingLeadsCollection = db.collection('marketingLeads')
 const leadApplicationsCollection = db.collection('leadApplications')
 const payrollSubmissionsCollection = db.collection('payrollSubmissions')
 const weeksCollection = db.collection('weeks')
+const backgroundChecksCollection = db.collection('backgroundChecks')
 
 export {
   db,
@@ -158,5 +159,6 @@ export {
   marketingLeadsCollection,
   leadApplicationsCollection,
   payrollSubmissionsCollection,
-  weeksCollection
+  weeksCollection,
+  backgroundChecksCollection
 }

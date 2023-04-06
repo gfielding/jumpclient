@@ -16,7 +16,7 @@
       <div class="dashboard__container--body pt-3">
           <Loader v-if="!groups || groups.length == 0" />
           <vue-good-table
-            v-if="showAllGroups"
+            v-if="showAllGroups && groups || groups.length >= 1"
               :columns="columns"
               :rows="groups"
                styleClass="vgt-table condensed"
